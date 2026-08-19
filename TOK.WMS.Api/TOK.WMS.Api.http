@@ -1,0 +1,6 @@
+@TOK.WMS.Api_HostAddress = http://localhost:5216
+
+GET {{TOK.WMS.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

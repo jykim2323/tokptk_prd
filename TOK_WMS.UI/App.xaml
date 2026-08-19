@@ -1,0 +1,27 @@
+﻿<Application x:Class="TOK.WMS.UI.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Startup="Application_Startup">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- 글로벌 컨버터 -->
+                <ResourceDictionary Source="/Styles/Converters.xaml"/>
+                <!-- 기본 테마: Light (ThemeService 가 런타임에 교체) -->
+                <ResourceDictionary Source="Themes/LightTheme.xaml"/>
+                <!-- 분리된 View 스타일 -->
+                <ResourceDictionary Source="Styles/DataGridStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+
+            <!-- Assets/Fonts/NotoSansKR-Regular.ttf: 빌드 작업 Resource -->
+            <FontFamily x:Key="AppFont">
+                /TOK.WMS.UI;component/Assets/Fonts/#Noto Sans KR
+            </FontFamily>
+
+            <Style TargetType="{x:Type Window}">
+                <Setter Property="FontFamily" Value="{StaticResource AppFont}"/>
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

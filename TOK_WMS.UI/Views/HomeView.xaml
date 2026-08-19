@@ -1,0 +1,15 @@
+﻿<UserControl x:Class="TOK.WMS.UI.Views.HomeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             Background="{DynamicResource AppBackgroundBrush}"
+             Foreground="{DynamicResource AppTextBrush}">
+
+
+    <DockPanel Margin="12">
+        <Border>
+            <Image Source="/TOK.WMS.UI;component/Assets/TOK_Main.png"
+               Stretch="Uniform"/>
+        </Border>
+    </DockPanel>
+</UserControl>

@@ -1,0 +1,79 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- ═══════════════════════════════════════
+         TOK Dark Theme
+         Orange : #D25F2F
+         Blue   : #6AA7DF
+         ═══════════════════════════════════════ -->
+
+    <!-- Header -->
+    <LinearGradientBrush x:Key="HeaderBrush"
+                         StartPoint="0,0"
+                         EndPoint="1,0">
+        <GradientStop Color="#263746" Offset="0"/>
+        <GradientStop Color="#5D89B7" Offset="0.65"/>
+        <GradientStop Color="#6AA7DF" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- Surfaces -->
+    <SolidColorBrush x:Key="AppBackgroundBrush" Color="#111820"/>
+    <SolidColorBrush x:Key="AppSurfaceBrush" Color="#18222C"/>
+    <SolidColorBrush x:Key="AppSurface2Brush" Color="#202D39"/>
+    <SolidColorBrush x:Key="AppBorderBrush" Color="#344655"/>
+
+    <!-- Text -->
+    <SolidColorBrush x:Key="AppTextBrush" Color="#EDF4FA"/>
+    <SolidColorBrush x:Key="AppTextSubBrush" Color="#9DB1C2"/>
+    <SolidColorBrush x:Key="AppTextOnPrimBrush" Color="#FFFFFF"/>
+
+    <!-- TOK Primary / Accent -->
+    <SolidColorBrush x:Key="AppPrimaryBrush" Color="#D25F2F"/>
+    <SolidColorBrush x:Key="AppPrimaryLightBrush" Color="#E47848"/>
+    <SolidColorBrush x:Key="AppAccentBrush" Color="#6AA7DF"/>
+
+    <!-- Sidebar -->
+    <SolidColorBrush x:Key="SidebarBrush" Color="#151E27"/>
+    <SolidColorBrush x:Key="SidebarHoverBrush" Color="#263746"/>
+    <SolidColorBrush x:Key="SidebarActiveBrush" Color="#D25F2F"/>
+    <SolidColorBrush x:Key="SidebarActiveTextBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="SidebarTextBrush" Color="#E4EDF4"/>
+
+    <!-- Status -->
+    <SolidColorBrush x:Key="StatusRunningBrush" Color="#38B869"/>
+    <SolidColorBrush x:Key="StatusReadyBrush" Color="#6AA7DF"/>
+    <SolidColorBrush x:Key="StatusErrorBrush" Color="#EF5350"/>
+    <SolidColorBrush x:Key="StatusIdleBrush" Color="#718292"/>
+
+    <!-- Rack -->
+    <SolidColorBrush x:Key="RackOccupiedBrush" Color="#5D89B7"/>
+    <SolidColorBrush x:Key="RackOccupiedTextBrush" Color="#FFFFFF"/>
+
+    <SolidColorBrush x:Key="RackEmptyBrush" Color="#202D39"/>
+    <SolidColorBrush x:Key="RackEmptyTextBrush" Color="#9DB1C2"/>
+
+    <SolidColorBrush x:Key="RackConveyorBrush" Color="#D25F2F"/>
+    <SolidColorBrush x:Key="RackConveyorTextBrush" Color="#FFFFFF"/>
+
+    <!-- Input / DataGrid -->
+    <SolidColorBrush x:Key="InputBrush" Color="#202D39"/>
+    <SolidColorBrush x:Key="InputBorderBrush" Color="#3C5060"/>
+
+    <SolidColorBrush x:Key="GridRowBrush" Color="#18222C"/>
+    <SolidColorBrush x:Key="GridAltRowBrush" Color="#202D39"/>
+
+    <SolidColorBrush x:Key="GridHeaderBrush" Color="#5D89B7"/>
+    <SolidColorBrush x:Key="GridHeaderTextBrush" Color="#FFFFFF"/>
+
+    <!-- Buttons -->
+    <SolidColorBrush x:Key="BtnPrimaryBrush" Color="#D25F2F"/>
+    <SolidColorBrush x:Key="BtnPrimaryTextBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="BtnHoverBrush" Color="#E47848"/>
+    <SolidColorBrush x:Key="BtnStadardBrush" Color="#718292"/>
+
+    <!-- Theme -->
+    <sys:String x:Key="ThemeToggleIcon">🌙</sys:String>
+    <sys:String x:Key="ThemeToggleTip">라이트 모드로 전환</sys:String>
+
+</ResourceDictionary>

@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="TOK.WMS.Api/TOK.WMS.Api.csproj" Id="ec332d92-7b70-478b-8ec8-e5141d5d2d60" />
+  <Project Path="TOK.WMS.Core/TOK.WMS.Core.csproj" Id="15a8750a-ba77-42eb-ad79-87ff9dce5ad4" />
+  <Project Path="TOK.WMS.Infrastructure/TOK.WMS.Infrastructure.csproj" Id="1f97047b-50ca-4516-b07e-41b005d1739a" />
+  <Project Path="TOK_WMS.UI/TOK.WMS.UI.csproj" />
+</Solution>

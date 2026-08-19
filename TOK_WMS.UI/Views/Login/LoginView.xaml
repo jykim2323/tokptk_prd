@@ -1,0 +1,125 @@
+﻿<Window x:Class="TOK.WMS.UI.Views.Login.LoginView"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:behaviors="clr-namespace:TOK.WMS.UI.Behaviors"
+                xmlns:viewsIogin="clr-namespace:TOK.WMS.UI.Views.Login"
+                xmlns:vmIogin="clr-namespace:TOK.WMS.UI.ViewModels.Login"
+                Icon="/app.ico"
+                Width="440"
+                Height="580"
+                MinWidth="440"
+                MinHeight="560"
+                MaxWidth="440"
+                MaxHeight="580"
+                ResizeMode="NoResize"
+                WindowStartupLocation="CenterScreen"
+                Background="{DynamicResource HeaderBrush}"
+                FontFamily="{StaticResource AppFont}"
+                FontWeight="Medium">
+
+    
+    
+    <Border Margin="8,8,8,5"
+            Background="#FFFFFF"
+            BorderBrush="#D6DEE8"
+            BorderThickness="1"
+            CornerRadius="8">
+        <Grid Margin="32">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Top"  >
+
+                    <Image Source="/Assets/tok-logo.png"
+                           Width="85"
+                           Height="55"
+                           Stretch="Uniform"
+                           Margin="0,0,10,0"/>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="TOK Advanced Materials"
+                               Foreground="#0F172A"
+                               FontSize="16"
+                               FontWeight="Bold"/>
+                        <TextBlock Text="Warehouse Control"
+                                   Foreground="#64748B"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"
+                                   Margin="0,2,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+
+            <StackPanel Grid.Row="1"
+                        VerticalAlignment="Center">
+                <TextBlock Text="로그인"
+                           Margin="0,20,0,0"
+                           Foreground="#0F172A"
+                           FontSize="26"
+                           FontWeight="Bold" />
+                <TextBlock Text="작업자 계정으로 접속하세요"
+                           Foreground="#64748B"
+                           FontSize="13"
+                           Margin="0,6,0,26" />
+
+                <TextBlock Text="아이디"
+                           Foreground="#334155"
+                           FontSize="13"
+                           FontWeight="SemiBold"
+                           Margin="0,0,0,7" />
+                <TextBox x:Name="UserIdInput"
+                         Height="44"
+                         Padding="12,0"
+                         VerticalContentAlignment="Center"
+                         Text="{Binding Id ,UpdateSourceTrigger=PropertyChanged}"
+                         FontSize="15"
+                         BorderBrush="#CBD5E1"
+                         BorderThickness="1"
+                         KeyDown="UserIdInput_KeyDown"/>
+
+                <TextBlock Text="비밀번호"
+                           Foreground="#334155"
+                           FontSize="13"
+                           FontWeight="SemiBold"
+                           Margin="0,18,0,7" />
+                <PasswordBox x:Name="PasswordInput"
+                                 Height="44"
+                                 Padding="12,0"
+                                 VerticalContentAlignment="Center"
+                                 FontSize="15"
+                                 BorderBrush="#CBD5E1"
+                                 BorderThickness="1"
+                                 behaviors:PasswordBoxBinding.Attach="True"
+                                 behaviors:PasswordBoxBinding.BoundPassword="{Binding Password, Mode=TwoWay}"/>
+
+
+                <Button Height="46"
+                        Margin="0,22,0,0"
+                        BorderThickness="0"
+                        Background="{DynamicResource BtnPrimaryBrush}" 
+                        Foreground="{DynamicResource BtnPrimaryTextBrush}"
+                        FontSize="15"
+                        FontWeight="Bold"
+                        Content="로그인"
+                        Cursor="Hand"
+                        Command="{Binding LoginCommand}"
+                        IsDefault="True"/>
+
+                <Border Background="#FEF2F2"
+                        BorderBrush="#FCA5A5"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Padding="10"
+                        Margin="0,16,0,0">
+                    <TextBlock Text="{Binding ErrorMessage}"
+                               Foreground="#B91C1C"
+                               FontSize="12"
+                               TextWrapping="Wrap" />
+                </Border>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>
