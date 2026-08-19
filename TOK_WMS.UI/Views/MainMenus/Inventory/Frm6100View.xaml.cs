@@ -10,7 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using TOK.WMS.UI.ViewModels.MainMenus.Inbounds;
+using TOK.WMS.UI.ViewModels.MainMenus.Inventory;
 
 namespace TOK.WMS.UI.Views.MainMenus.Inventory;
 
@@ -26,8 +26,8 @@ public partial class Frm6100View : UserControl
 
     private void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
-        if (DataContext is Frm6100ViewModel vm)
-            _ = vm.SearchCommand.ExecuteAsync(null);
+        //if (DataContext is Frm6100ViewModel vm)
+        //    _ = vm.SearchCommand.ExecuteAsync(null);
     }
 
 }

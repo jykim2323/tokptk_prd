@@ -57,7 +57,7 @@ public class Frm3100Repository(DbConnectionFactory db) : IFrm3100Repository
         });
     }
 
-    public async Task AddAsync(Frm3100Dto model, IReadOnlyCollection<Frm3100ResDto> Items)
+    public async Task AddAsync(Frm3100Dto model, IReadOnlyCollection<Frm3100Dto.resDto> Items)
     {
         if (string.IsNullOrWhiteSpace(model.PltnoEdit))
         {
@@ -121,12 +121,12 @@ public class Frm3100Repository(DbConnectionFactory db) : IFrm3100Repository
         }
     }
 
-    public Task SaveAsync(Frm3100Dto model, IReadOnlyCollection<Frm3100ResDto> Items, IReadOnlyCollection<Frm3100ResDto> delItems)
+    public Task SaveAsync(Frm3100Dto model, IReadOnlyCollection<Frm3100Dto.resDto> Items, IReadOnlyCollection<Frm3100Dto.resDto> delItems)
     {
         throw new NotImplementedException();
     }
 
-    public Task CancleAsync(IReadOnlyCollection<Frm3100ResDto> Items)
+    public Task CancleAsync(IReadOnlyCollection<Frm3100Dto.resDto> Items)
     {
         throw new NotImplementedException();
     }
@@ -153,7 +153,7 @@ public class Frm3100Repository(DbConnectionFactory db) : IFrm3100Repository
         return true;
     }
 
-    public async Task<IEnumerable<Frm3100ResDto>?> SpeedhAsync(string sPltno)
+    public async Task<IEnumerable<Frm3100Dto.resDto>?> SpeedhAsync(string sPltno)
     {
         using var conn = db.Create();
 
@@ -170,7 +170,7 @@ public class Frm3100Repository(DbConnectionFactory db) : IFrm3100Repository
                     LEFT OUTER JOIN MIMAST B WITH (NOLOCK) ON A.SUBK_CODE = B.MAST_CODE
                      WHERE A.SUBK_PLTNO = @sPltno";
 
-        return await conn.QueryAsync<Frm3100ResDto>(sql, new
+        return await conn.QueryAsync<Frm3100Dto.resDto>(sql, new
         {
             sPltno = sPltno ?? string.Empty
         });
@@ -264,7 +264,7 @@ public class Frm3100Repository(DbConnectionFactory db) : IFrm3100Repository
         }
     }
 
-    public async Task<int> Subk_insert(Frm3100ResDto resDto)
+    public async Task<int> Subk_insert(Frm3100Dto.resDto resDto)
     {
         using var conn = db.Create();
 

@@ -15,22 +15,22 @@ public interface IFrm3100Repository
 
     Task SaveAsync(
             Frm3100Dto model,
-            IReadOnlyCollection<Frm3100ResDto> reservationItems,
-            IReadOnlyCollection<Frm3100ResDto> deleteItems);
+            IReadOnlyCollection<Frm3100Dto.resDto> reservationItems,
+            IReadOnlyCollection<Frm3100Dto.resDto> deleteItems);
 
     Task AddAsync(
     Frm3100Dto model,
-    IReadOnlyCollection<Frm3100ResDto> Items
+    IReadOnlyCollection<Frm3100Dto.resDto> Items
     );
 
-    Task CancleAsync(IReadOnlyCollection<Frm3100ResDto> selectedReservation);
+    Task CancleAsync(IReadOnlyCollection<Frm3100Dto.resDto> selectedReservation);
 
     Task<bool> TrakingAsync(string sPltno);
     Task<bool> Lstk_check(string sPltno);
     Task<bool> Trak_check(string sPltno);
     Task<bool> Subk_check(string sPltno);
     Task<int> Subk_Del(string sPltno, string? sSubkcode = null, string? sSubklotno = null);
-    Task<int> Subk_insert(Frm3100ResDto resDto);
-    Task<IEnumerable<Frm3100ResDto>?> SpeedhAsync(string sPltno);
+    Task<int> Subk_insert(Frm3100Dto.resDto resDto);
+    Task<IEnumerable<Frm3100Dto.resDto>?> SpeedhAsync(string sPltno);
 
 }

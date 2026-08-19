@@ -1,81 +1,63 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿
 
 namespace TOK.WMS.Core.DTOs.Inbounds;
 
 /// <summary>
 /// Frm3100 수동 입고 등록 화면의 품목 조회 결과 한 행을 표현합니다.
 /// </summary>
-public partial class Frm3100Dto : ObservableObject
+public partial class Frm3100Dto 
 {
-    [ObservableProperty] private string _mastCode = string.Empty;
-    [ObservableProperty] private string _mastBcode = string.Empty;
-    [ObservableProperty] private string _mastName = string.Empty;
-    [ObservableProperty] private string _mastUnit = string.Empty;
-    [ObservableProperty] private string _mastWeight = string.Empty;
-    [ObservableProperty] private string _mastGubn1 = string.Empty;
-    [ObservableProperty] private string _gubn1Name = string.Empty;
-    [ObservableProperty] private string _mastGubn2 = string.Empty;
-    [ObservableProperty] private string _gubn2Name = string.Empty;
-    [ObservableProperty] private string _mastGubn3 = string.Empty;
-    [ObservableProperty] private string _gubn3Name = string.Empty;
-    [ObservableProperty] private string _mastDate = string.Empty;
 
-    [ObservableProperty]
-    private string _itemEdit = string.Empty;
+    public string MastCode { get; set; } = string.Empty;
+    public string MastBcode { get; set; } = string.Empty;
+    public string MastName { get; set; } = string.Empty;
+    public string MastUnit { get; set; } = string.Empty;
+    public string MastWeight { get; set; } = string.Empty;
+    public string MastGubn1 { get; set; } = string.Empty;
+    public string Gubn1Name { get; set; } = string.Empty;
+    public string MastGubn2 { get; set; } = string.Empty;
+    public string Gubn2Name { get; set; } = string.Empty;
+    public string MastGubn3 { get; set; } = string.Empty;
+    public string Gubn3Name { get; set; } = string.Empty;
+    public string MastDate { get; set; } = string.Empty;
 
-    [ObservableProperty]
-    private string _itemNmEdit = string.Empty;
+    public string ItemEdit { get; set; } = string.Empty;
+    public string ItemNmEdit { get; set; } = string.Empty;
+    public string PltnoSrcEdit { get; set; } = string.Empty;
+    public string BcrEdit { get; set; } = string.Empty;
+    public string RecNoEdit { get; set; } = string.Empty;
+    public string PltnoEdit { get; set; } = string.Empty;
+    public string ItnbrEdit { get; set; } = string.Empty;
+    public string NameEdit { get; set; } = string.Empty;
+    public string WeightEdit { get; set; } = string.Empty;
+    public string LotnoEdit { get; set; } = string.Empty;
+    public string BoxNoEdit { get; set; } = string.Empty;
+    public string BigoEdit { get; set; } = string.Empty;
 
-    [ObservableProperty]
-    private string _pltnoSrcEdit = string.Empty;
+    public object? LstkLv { get; set; }
+    public object? LstkBk { get; set; }
+    public object? Cnt { get; set; }
 
-    [ObservableProperty]
-    private string _bcrEdit = string.Empty;
+    public string? SubkPltno { get; set; } = string.Empty;
+    public object? SubkCode { get; set; }
+    public object? SubkLotno { get; set; }
+    public object? SubkFlag { get; set; }
 
-    [ObservableProperty]
-    private string _recNoEdit = string.Empty;
 
-    [ObservableProperty]
-    private string _pltnoEdit = string.Empty;
 
-    [ObservableProperty]
-    private string _itnbrEdit = string.Empty;
-
-    [ObservableProperty]
-    private string _nameEdit = string.Empty;
-
-    [ObservableProperty]
-    private string _weightEdit = string.Empty;
-
-    [ObservableProperty]
-    private string _lotnoEdit = string.Empty;
-
-    [ObservableProperty]
-    private string _boxNoEdit = string.Empty;
-
-    [ObservableProperty]
-    private string _bigoEdit = string.Empty;
-
-    [ObservableProperty]
-    private object? _lstkLv;
-
-    [ObservableProperty]
-    private object? _lstkBk;
-
-    [ObservableProperty]
-    private object? _cnt;
-
-    [ObservableProperty]
-    private string? _subkPltno = string.Empty;
-
-    [ObservableProperty]
-    private object? _subkCode;
-
-    [ObservableProperty]
-    private object? _subkLotno;
-
-    [ObservableProperty]
-    private object? _subkFlag;
+    public class resDto 
+    {
+        public string SubkPltno { get; set; } = string.Empty;
+        public string SubkCode { get; set; } = string.Empty;
+        public string MastName { get; set; } = string.Empty;
+        public string SubkLotno { get; set; } = string.Empty;
+        public string SubkWgt { get; set; } = string.Empty;
+        public string SubkBoxno { get; set; } = string.Empty;
+        public string SubkRemark { get; set; } = string.Empty;
+        public string SubkIndate { get; set; } = string.Empty;
+        public string SubkIntime { get; set; } = string.Empty;
+        public string SubkRowState { get; set; } = "1";
+    }
 }
 
 

@@ -51,7 +51,7 @@ public class Frm3100Controller(IFrm3100Repository frm3100Repo) : ControllerBase
 
 
     [HttpPost("save/subk/insert")]
-    public async Task<IActionResult> InsertAsync([FromBody] Frm3100ResDto sPltno) =>
+    public async Task<IActionResult> InsertAsync([FromBody] Frm3100Dto.resDto sPltno) =>
       Ok(await frm3100Repo.Subk_insert(sPltno));
 
     [HttpGet("speed")]
@@ -61,8 +61,10 @@ public class Frm3100Controller(IFrm3100Repository frm3100Repo) : ControllerBase
     {
         public Frm3100Dto Model { get; set; } = new();
 
-        public IReadOnlyCollection<Frm3100ResDto> Items { get; set; }
-            = Array.Empty<Frm3100ResDto>();
+        public IReadOnlyCollection<Frm3100Dto.resDto> Items { get; set; }
+            = Array.Empty<Frm3100Dto.resDto>();
+
+
     }
 
 }

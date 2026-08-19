@@ -41,12 +41,12 @@ public  partial class Frm3100ViewModel : DocumentViewModelBase
     [ObservableProperty] private string _statusMessage = "";
 
     [ObservableProperty] private ObservableCollection<Frm3100Dto> _Items = [];
-    [ObservableProperty] private ObservableCollection<Frm3100ResDto> _reservationItems  = [];
-    public ObservableCollection<Frm3100ResDto> deItems  = [];
+    [ObservableProperty] private ObservableCollection<Frm3100Dto.resDto> _reservationItems  = [];
+    public ObservableCollection<Frm3100Dto.resDto> deItems  = [];
 
     [ObservableProperty] private string _statusText = string.Empty;
     [ObservableProperty] private string _lastActionName = "-";
-    [ObservableProperty] private Frm3100ResDto? _selectedResItem;
+    [ObservableProperty] private Frm3100Dto.resDto? _selectedResItem;
     [ObservableProperty] private bool isTrackingValid;
 
     public event Action? WeightFocus;
@@ -93,7 +93,7 @@ public  partial class Frm3100ViewModel : DocumentViewModelBase
     {
         try
         {
-            var items = new Frm3100ResDto
+            var items = new Frm3100Dto.resDto
             {
                 SubkPltno = PltnoEdit,
                 SubkCode = ItnbrEdit,
@@ -221,13 +221,13 @@ public  partial class Frm3100ViewModel : DocumentViewModelBase
 
                 if (deItems.Count > 0)
                 {
-                    foreach (Frm3100ResDto item in deItems) 
+                    foreach (Frm3100Dto.resDto item in deItems) 
                     {
                         await _frm3100Api.Subk_delAsync(item.SubkPltno, item.SubkCode, item.SubkLotno);
                     }
                 }
 
-                foreach(Frm3100ResDto item in ReservationItems)
+                foreach(Frm3100Dto.resDto item in ReservationItems)
                 {
                     var cnt = await _frm3100Api.Subk_InsertAsync(item);
                 }
@@ -285,7 +285,7 @@ public  partial class Frm3100ViewModel : DocumentViewModelBase
                 OnLockOffHandle?.Invoke();
             }
 
-            foreach (var h in spcheach ?? Enumerable.Empty<Frm3100ResDto>())
+            foreach (var h in spcheach ?? Enumerable.Empty<Frm3100Dto.resDto>())
             { 
                 ReservationItems.Add(h);
             }

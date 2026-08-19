@@ -9,20 +9,20 @@ namespace TOK.WMS.UI.Services.Api.Inbounds;
 public interface IFrm3100Api
 {
     Task<IEnumerable<Frm3100Dto>?> SearchAsync(Frm3100Dto model);
-    Task AddAsync(Frm3100Dto model, IReadOnlyCollection<Frm3100ResDto> items);
+    Task AddAsync(Frm3100Dto model, IReadOnlyCollection<Frm3100Dto.resDto> items);
     Task<bool> TrackingAsync(string sPltNo);
     Task<bool> TrakAsync(string sPltNo);
     Task<bool> LstkAsync(string sPltNo);
     Task<bool> SubkAsync(string sPltNo);
     Task<bool> Subk_delAsync(string sPltNo, string? sSubkcode = null, string? sSubklotno = null);
-    Task<int> Subk_InsertAsync(Frm3100ResDto resDto);
-    Task<IEnumerable<Frm3100ResDto>?> SpeedAsync(string sPltNo);
+    Task<int> Subk_InsertAsync(Frm3100Dto.resDto resDto);
+    Task<IEnumerable<Frm3100Dto.resDto>?> SpeedAsync(string sPltNo);
 
 }
 
 public class Frm3100ApiClient(HttpClient http) : IFrm3100Api
 {
-    public async Task AddAsync(Frm3100Dto model, IReadOnlyCollection<Frm3100ResDto> items)
+    public async Task AddAsync(Frm3100Dto model, IReadOnlyCollection<Frm3100Dto.resDto> items)
     {
         var request = new
         {
@@ -63,9 +63,9 @@ public class Frm3100ApiClient(HttpClient http) : IFrm3100Api
 
         return true;
     }
-    public async Task<IEnumerable<Frm3100ResDto>?> SpeedAsync(string sPltNo)
+    public async Task<IEnumerable<Frm3100Dto.resDto>?> SpeedAsync(string sPltNo)
     {
-        return await http.GetFromJsonAsync<IEnumerable<Frm3100ResDto>?>($"api/inbounds/frm3100/speed?sPltNo={Uri.EscapeDataString(sPltNo)}");
+        return await http.GetFromJsonAsync<IEnumerable<Frm3100Dto.resDto>?>($"api/inbounds/frm3100/speed?sPltNo={Uri.EscapeDataString(sPltNo)}");
     }
 
     public async Task<bool> TrakAsync(string sPltNo)
@@ -126,7 +126,7 @@ public class Frm3100ApiClient(HttpClient http) : IFrm3100Api
         return true;
     }
 
-    public async Task<int> Subk_InsertAsync(Frm3100ResDto resDto)
+    public async Task<int> Subk_InsertAsync(Frm3100Dto.resDto resDto)
     {
         var response = await http.PostAsJsonAsync(
         "api/inbounds/frm3100/save/subk/insert",
