@@ -7,15 +7,26 @@ namespace TOK.WMS.Core.DTOs.Inventory;
 public class Frm6100Dto
 {
    
-    public string? ItemCode { get; set; }
-    public string? PalletNo { get; set; }
+    public string? LstkLoca { get; set; }
+    public string? LstkBk { get; set; }
+    public string? LstkBy { get; set; }
+    public string? LstkLv { get; set; }
+    public string? LstkFlag { get; set; }
+    public string? LstkIndate { get; set; }
+    public string? LstkIntime { get; set; }
+    public string? LstkPltno { get; set; }
 
 
     public class ResDto
     {
-        public string? ItemCode { get; set; }
-        public string? ItemName { get; set; }
-        public decimal Weight { get; set; }
+        public string? LstkLoca { get; set; }
+        public string? LstkBk { get; set; }
+        public string? LstkBy { get; set; }
+        public string? LstkLv { get; set; }
+        public string? LstkFlag { get; set; }
+        public string? LstkIndate { get; set; }
+        public string? LstkIntime { get; set; }
+        public string? LstkPltno { get; set; }
     }
 
 }

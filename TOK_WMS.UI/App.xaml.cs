@@ -16,6 +16,7 @@ using TOK.WMS.UI.Configuration;
 using TOK.WMS.UI.Models.MainMenus;
 using TOK.WMS.UI.Services;
 using TOK.WMS.UI.Services.Api.Inbounds;
+using TOK.WMS.UI.Services.Api.Inventory;
 using TOK.WMS.UI.Services.Api.Login;
 using TOK.WMS.UI.Services.Factories;
 using TOK.WMS.UI.Services.Interfaces;
@@ -23,6 +24,7 @@ using TOK.WMS.UI.ViewModels;
 using TOK.WMS.UI.ViewModels.Base;
 using TOK.WMS.UI.ViewModels.Login;
 using TOK.WMS.UI.ViewModels.MainMenus.Inbounds;
+using TOK.WMS.UI.ViewModels.MainMenus.Inventory;
 using TOK.WMS.UI.Views.Login;
 
 namespace TOK.WMS.UI;
@@ -71,9 +73,15 @@ public partial class App : Application
 
         sc.AddSingleton(settings);
 
-
+        //로그인
         sc.AddHttpClient<ILoginApi, LoginApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+
+
+        // 입고관리
         sc.AddHttpClient<IFrm3100Api, Frm3100ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+
+        // 재고관리
+        sc.AddHttpClient<IFrm6100Api, Frm6100ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
 
 
         sc.AddSingleton<ThemeService>();
@@ -90,8 +98,20 @@ public partial class App : Application
         sc.AddSingleton<LoginViewModel>();
 
         // 문서(탭) VM — 메뉴키로 keyed 등록 (DocumentFactory가 키로 해석)
+
+
+        // 모니터링
         sc.AddKeyedTransient<DocumentViewModelBase, HomeViewModel>(DocumentKeys.Home);
+
+
+        // 입고관리
         sc.AddKeyedTransient<DocumentViewModelBase, Frm3100ViewModel>(DocumentKeys.Frm3100);
+
+
+        // 출고관리
+
+        // 재고관리
+        sc.AddKeyedTransient<DocumentViewModelBase, Frm6100ViewModel>(DocumentKeys.Frm6100);
 
 
 
