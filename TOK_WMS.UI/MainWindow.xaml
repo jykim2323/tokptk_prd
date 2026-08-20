@@ -5,8 +5,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:TOK.WMS.UI.ViewModels"
+        
         xmlns:vmIn="clr-namespace:TOK.WMS.UI.ViewModels.MainMenus.Inbounds"
         xmlns:viewsIn="clr-namespace:TOK.WMS.UI.Views.MainMenus.Inbounds"
+        
+        xmlns:vmInv="clr-namespace:TOK.WMS.UI.ViewModels.MainMenus.Inventory"
+        xmlns:viewsInv="clr-namespace:TOK.WMS.UI.Views.MainMenus.Inventory"
+
         xmlns:view="clr-namespace:TOK.WMS.UI.Views"
         xmlns:adctrl="clr-namespace:AvalonDock.Controls;assembly=AvalonDock"
         xmlns:models="clr-namespace:TOK.WMS.UI.Models.MainMenus"
@@ -18,9 +23,25 @@
         Background="{DynamicResource AppBackgroundBrush}">
 
     <Window.Resources>
+
+        <!-- 입고 관리 -->
         <DataTemplate DataType="{x:Type vmIn:Frm3100ViewModel}">
             <viewsIn:Frm3100View/>
         </DataTemplate>
+
+
+        <!-- 출고 관리 -->
+        
+        
+
+        <!-- 재고 관리 -->
+        <DataTemplate DataType="{x:Type vmInv:Frm6100ViewModel}">
+            <viewsInv:Frm6100View/>
+        </DataTemplate>
+
+
+
+        <!-- 모니터링 -->
         <DataTemplate DataType="{x:Type vm:HomeViewModel}">
             <view:HomeView/>
         </DataTemplate>

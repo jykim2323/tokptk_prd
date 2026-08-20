@@ -6,11 +6,10 @@ namespace TOK.WMS.Core.DTOs.Inventory;
 
 public class Frm6100Dto
 {
-    public class ReqDto
-    {
-        public string? ItemCode { get; set; }
-        public string? PalletNo { get; set; }
-    }
+   
+    public string? ItemCode { get; set; }
+    public string? PalletNo { get; set; }
+
 
     public class ResDto
     {

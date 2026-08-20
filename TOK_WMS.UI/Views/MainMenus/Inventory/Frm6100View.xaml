@@ -63,8 +63,8 @@
         <!-- 헤더 -->
         <Grid DockPanel.Dock="Top" Margin="0,0,10,0" >
             <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
-                <TextBlock Text="📥" FontSize="18" Margin="0,5,8,10" VerticalAlignment="Center"/>
-                <TextBlock Text="핸드스캔 입고 등록" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource AppTextBrush}" VerticalAlignment="Center"/>
+                <TextBlock Text="📦" FontSize="18" Margin="0,5,8,10" VerticalAlignment="Center"/>
+                <TextBlock Text="재고 위치별 조회" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource AppTextBrush}" VerticalAlignment="Center"/>
 
                 <Button Content="🔍  조회" Width="90" Command="{Binding SearchCommand}" Margin="900,5,10,0" FontWeight="Bold" Cursor="Hand" BorderThickness="0"
                         Background="{DynamicResource BtnPrimaryBrush}" Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
@@ -84,65 +84,87 @@
         </Grid>
 
         <!-- 검색 조건 -->
-        <Border DockPanel.Dock="Top" Background="{DynamicResource AppSurfaceBrush}" BorderBrush="{DynamicResource AppBorderBrush}" 
-                BorderThickness="1" CornerRadius="5" Padding="12,10" Margin="0,20,0,8">
+        <Border DockPanel.Dock="Top" BorderThickness="1" BorderBrush="#58A6FF" CornerRadius="2" Padding="12,10" Margin="0,20,0,8">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="100"/>
+                </Grid.ColumnDefinitions>
 
-                <!-- Row 1: 나머지 필터(좌) + 버튼(우) -->
-                <Grid Grid.Row="0">
-                    <StackPanel Orientation="Horizontal" Margin="0,0,18,6">
-                        <TextBlock Text="PLT NO:" Margin="0,0,13,0" Foreground="{DynamicResource BtnPrimaryBrush}" Style="{StaticResource FilterLabel}"/>
-                        <TextBox Width="400"  Text="{Binding PltnoSrcEdit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}" CharacterCasing="Upper">
-                            <TextBox.InputBindings>
-                                <KeyBinding Key="Enter" Command="{Binding TrackingCommand}" />
-                            </TextBox.InputBindings>
-                        </TextBox>
-                        <Button Content="✓  완료" Width="90" Command="{Binding SearchCommand}" Margin="600,6,0,6" FontWeight="Bold" Cursor="Hand" BorderThickness="0"
-                        Background="{DynamicResource BtnPrimaryBrush}" Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
-                    </StackPanel>
-                </Grid>
+                <Border Grid.Row="0"
+                        BorderBrush="#58A6FF"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Margin="0,0,0,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0"
+                                BorderBrush="#58A6FF"
+                                BorderThickness="1"
+                                CornerRadius="4">
+                            <StackPanel Orientation="Horizontal" Margin="10">
+                                <TextBlock Text="재고 위치:" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>
+                                <TextBox Width="400" Text="{Binding PltnoSrcEdit}" Style="{StaticResource DetailInputBox}" CharacterCasing="Upper"/>
+                                <Button Content="🔍 조회" Width="90" Margin="20,0,0,0" Command="{Binding SearchCommand}" FontWeight="Bold" Cursor="Hand" BorderThickness="0"
+                                        Background="{DynamicResource BtnPrimaryBrush}" Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
+                            </StackPanel>
+                        </Border>
+                        
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="20,10,10,10">
+                            <Button Content="✎ 수정" Width="90" FontWeight="Bold" Cursor="Hand" BorderThickness="0"
+                                    Background="{DynamicResource BtnStadardBrush}" Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
+                            <Button Content="🗑️ 삭제" Width="90" Margin="10,0,0,0" FontWeight="Bold" Cursor="Hand" BorderThickness="0"
+                                    Background="{DynamicResource BtnStadardBrush}" Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                
                 <Grid Grid.Row="1">
-                    <StackPanel Orientation="Horizontal" Margin="0,0,18,6">
-                        <TextBlock Text="제품 BCR:" Foreground="{DynamicResource BtnPrimaryBrush}" Style="{StaticResource FilterLabel}"/>
-                        <TextBox Width="700" Text="{Binding itemBcrEdit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}" CharacterCasing="Upper">
-                            <TextBox.InputBindings>
-                                <KeyBinding Key="Enter" Command="{Binding TrackingCommand}" />
-                            </TextBox.InputBindings>
-                        </TextBox>
-                    </StackPanel>
-                </Grid>
-                <Grid Grid.Row="2">
-                    <Border BorderThickness="1" BorderBrush="#58A6FF" CornerRadius="2" Padding="0,10,0,10">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                            <Grid Grid.Row="0">
-                                <StackPanel Orientation="Horizontal" Margin="5,10,20,5">
-                                    <TextBlock Text="품 명:" Style="{StaticResource FilterLabel}"/>
-                                    <TextBox Width="350" Text="{Binding ItemEdit}" Style="{StaticResource DetailInputBox}" CharacterCasing="Upper"/>
-                                    <TextBlock Text="BOX NO:" Margin="50,0,5,0" Style="{StaticResource FilterLabel}"/>
-                                    <TextBox Width="230" Text="{Binding ItemEdit}" Style="{StaticResource DetailInputBox}" CharacterCasing="Upper"/>
-                                </StackPanel>
-                            </Grid>
-                            <Grid Grid.Row="1">
-                                <StackPanel Orientation="Horizontal" Margin="5,20,20,5">
-                                    <TextBlock Text="품 번:" Style="{StaticResource FilterLabel}"/>
-                                    <TextBox Width="350" Text="{Binding ItemEdit}" Style="{StaticResource DetailInputBox}" CharacterCasing="Upper"/>
-                                    <TextBlock Text="중 량:" Margin="50,0,5,0" Style="{StaticResource FilterLabel}"/>
-                                    <TextBox Width="230" Text="{Binding ItemEdit}" Style="{StaticResource DetailInputBox}" CharacterCasing="Upper"/>
-                                </StackPanel>
-                            </Grid>
-                        </Grid>
+                    <Border Grid.Row="0" 
+                             Background="{DynamicResource AppSurfaceBrush}"
+                             BorderBrush="{DynamicResource AppBorderBrush}"
+                             BorderThickness="1" CornerRadius="5" Padding="12,10" Margin="0,10,0,8">
+                        <DockPanel LastChildFill="True">
+                            <Border DockPanel.Dock="Top" Height="40" Style="{StaticResource Header}"
+                                    BorderThickness="1" CornerRadius="5" Padding="12,10" Margin="0,0,0,8">
+                                <TextBlock Text="품목 조회" FontSize="18" FontWeight="Bold" 
+                                            Foreground="{DynamicResource AppTextBrush}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Border>
+                            <!-- 결과 그리드: 컬럼이 데이터 길이에 맞춰 자동 너비 -->
+                            <DataGrid x:Name="MimastDB_Table" ItemsSource="{Binding Items}"
+                                                 Style="{StaticResource ListDataGridStyle}"
+                                                 SelectionMode="Extended"
+                                                 ColumnWidth="Auto"
+                                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                                 ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="*" Width="10" />
+                                    <DataGridTextColumn Header="재고위치" Binding="{Binding LstkLoca}" Width="180" />
+                                    <DataGridTextColumn Header="PLT-NO" Binding="{Binding LstkPltno}" Width="260" />
+                                    <DataGridTextColumn Header="상태" Binding="{Binding LstkFlag}" Width="80" />
+                                    <DataGridTextColumn Header="입고일자" Binding="{Binding LstkIndate}" Width="100" />
+                                    <DataGridTextColumn Header="입고시간" Binding="{Binding LstkIntime}" Width="220" />
+                                </DataGrid.Columns>
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseDoubleClick">
+                                        <i:InvokeCommandAction Command="{Binding MimastCellClickCommand}" CommandParameter="{Binding SelectedItem, ElementName=MimastDB_Table}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </DataGrid>
+                        </DockPanel>
                     </Border>
+                </Grid>
+
+                <Grid Grid.Row="0" Grid.RowSpan="2" Grid.Column="1">
+                    
                 </Grid>
             </Grid>
         </Border>
