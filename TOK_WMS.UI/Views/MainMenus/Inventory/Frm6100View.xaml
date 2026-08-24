@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:conv="clr-namespace:TOK.WMS.UI.Converters"
+             xmlns:behaviors="clr-namespace:TOK.WMS.UI.Behaviors"
              
              Background="{DynamicResource AppBackgroundBrush}"
              Foreground="{DynamicResource AppTextBrush}"
@@ -11,8 +12,8 @@
              Loaded="UserControl_Loaded">
 
     <UserControl.Resources>
-        <conv:LocationFormatConverter x:Key="LocationFormatConverter"/>
-        <conv:LstkStatusConverter x:Key="LstkStatusConverter"/>
+        <conv:LocaFormatConverter x:Key="LocaFormatConverter"/>
+        <conv:LstkFlagConverter x:Key="LstkFlagConverter"/>
         <conv:DateTimeFormatConverter x:Key="DateTimeFormatConverter"/>
         <Style x:Key="FilterLabel" TargetType="TextBlock">
             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -118,7 +119,7 @@
                                 CornerRadius="4">
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <TextBlock Text="재고 위치:" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>
-                                <TextBox Width="400" Text="{Binding LstkLoca, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}" MaxLength="7"/>
+                                <TextBox Width="400" behaviors:LocaMask.Value="{Binding LstkLoca, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}"/>
                                 <Button Content="🔍 조회" Width="90" Margin="20,0,0,0" Command="{Binding SearchCommand}" FontWeight="Bold" Cursor="Hand" BorderThickness="0"
                                         Background="{DynamicResource BtnPrimaryBrush}" Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
                             </StackPanel>
@@ -198,9 +199,9 @@
                                     </Style>
                                 </DataGrid.CellStyle>
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="재고위치" Binding="{Binding LstkLoca, Converter={StaticResource LocationFormatConverter}}"  />
+                                    <DataGridTextColumn Header="재고위치" Binding="{Binding LstkLoca, Converter={StaticResource LocaFormatConverter}}"  />
                                     <DataGridTextColumn Header="PLT-NO" Binding="{Binding LstkPltno}" Width="260" />
-                                    <DataGridTextColumn Header="상태" Binding="{Binding LstkFlag, Converter={StaticResource LstkStatusConverter}}" Width="80" />
+                                    <DataGridTextColumn Header="상태" Binding="{Binding LstkFlag, Converter={StaticResource LstkFlagConverter}}" Width="80" />
                                     <DataGridTextColumn Header="입고일자" Binding="{Binding LstkIndate, Converter={StaticResource DateTimeFormatConverter}}" Width="100" />
                                     <DataGridTextColumn Header="입고시간" Binding="{Binding LstkIntime, Converter={StaticResource DateTimeFormatConverter}  }" Width="220" />
                                 </DataGrid.Columns>

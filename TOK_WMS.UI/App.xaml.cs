@@ -171,7 +171,7 @@ public partial class App : Application
         if (IsApiResponding(settings.ApiBaseUrl)) return;
 
         // 2) 응답이 없는데 프로세스만 남아 있으면(고아) 정리 후 재기동
-        foreach (var p in Process.GetProcessesByName("LSE.WMS.Api"))
+        foreach (var p in Process.GetProcessesByName("TOK.WMS.Api"))
         {
             try { p.Kill(entireProcessTree: true); p.WaitForExit(3000); } catch { }
         }
@@ -179,7 +179,7 @@ public partial class App : Application
         var exe = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, settings.ApiExePath));
         if (!File.Exists(exe))
         {
-            MessageBox.Show($"API 실행파일을 찾을 수 없습니다.\n{exe}", "LSE WMS",
+            MessageBox.Show($"API 실행파일을 찾을 수 없습니다.\n{exe}", "TOK WMS",
                 MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
