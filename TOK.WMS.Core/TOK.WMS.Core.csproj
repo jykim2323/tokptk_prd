@@ -7,11 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <Compile Remove="Entities\Inventory\**" />
+    <EmbeddedResource Remove="Entities\Inventory\**" />
+    <None Remove="Entities\Inventory\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Entities\Inventory\" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DTOs\Warehouse\" />
   </ItemGroup>
 
 </Project>

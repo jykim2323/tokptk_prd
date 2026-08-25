@@ -11,7 +11,6 @@ using System.IO;
 using System.Net.Http;
 using System.Runtime;
 using System.Windows;
-using TOK.WMS.Core;
 using TOK.WMS.UI.Configuration;
 using TOK.WMS.UI.Models.MainMenus;
 using TOK.WMS.UI.Services;
@@ -78,10 +77,10 @@ public partial class App : Application
 
 
         // 입고관리
-        sc.AddHttpClient<IFrm3100Api, Frm3100ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+        sc.AddHttpClient<IFrm3100Api, Frm3100ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl)).AddHttpMessageHandler<WarehouseHeaderHandler>();
 
         // 재고관리
-        sc.AddHttpClient<IFrm6100Api, Frm6100ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+        sc.AddHttpClient<IFrm6100Api, Frm6100ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl)).AddHttpMessageHandler<WarehouseHeaderHandler>();
 
 
         sc.AddSingleton<ThemeService>();
@@ -89,6 +88,9 @@ public partial class App : Application
         sc.AddSingleton<ICurrentUserService, CurrentUserService>();
         sc.AddSingleton<DocumentFactory>();
         sc.AddSingleton<IExcelService, ExcelService>();
+
+        // 원료,제품, 창고 셀렉 변경 컨텍스트
+        sc.AddSingleton<IWarehouseContext, WarehouseContext>();
 
 
         sc.AddSingleton<MainViewModel>();
@@ -99,6 +101,9 @@ public partial class App : Application
 
         // 문서(탭) VM — 메뉴키로 keyed 등록 (DocumentFactory가 키로 해석)
 
+
+        // 원료,제품, 창고 셀렉 변경 컨텍스트 HTTP 핸들러 --> API 호출 시 헤더에 WarehouseId를 자동 추가
+        sc.AddTransient<WarehouseHeaderHandler>();
 
         // 모니터링
         sc.AddKeyedTransient<DocumentViewModelBase, HomeViewModel>(DocumentKeys.Home);

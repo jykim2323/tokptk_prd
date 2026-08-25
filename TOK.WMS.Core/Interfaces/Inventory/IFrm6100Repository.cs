@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TOK.WMS.Core.DTOs.Inventory;
+﻿using TOK.WMS.Core.DTOs.Inventory;
+using TOK.WMS.Core.ETC;
 
 namespace TOK.WMS.Core.Interfaces.Inventory;
 

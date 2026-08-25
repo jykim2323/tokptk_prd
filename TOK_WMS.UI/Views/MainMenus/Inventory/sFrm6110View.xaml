@@ -9,7 +9,7 @@
         Foreground="{DynamicResource AppTextBrush}"
         FontFamily="{StaticResource AppFont}"
         FontWeight="Medium"
-        Title="sFrm6110View" Height="446" Width="696">
+        Title="sFrm6110View" Height="410" Width="700">
 
     <Window.Resources>
         <Style x:Key="FilterLabel" TargetType="TextBlock">
@@ -64,7 +64,7 @@
         <!-- 헤더 -->
         <Grid DockPanel.Dock="Top" Margin="0,0,10,0" >
             <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
-                <TextBlock Text="📦" FontSize="18" Margin="0,5,8,10" VerticalAlignment="Center"/>
+                <TextBlock Text="📦" FontSize="18" Margin="0,5,3,5" VerticalAlignment="Center"/>
                 <TextBlock Text="재고 위치 수정" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource AppTextBrush}" VerticalAlignment="Center"/>
 
                 <Button Content="🔍  조회" Width="90" Command="{Binding SearchCommand}" Margin="900,5,10,0" FontWeight="Bold" Cursor="Hand" BorderThickness="0"
@@ -84,7 +84,7 @@
              FontSize="18" FontWeight="Bold" Foreground="{DynamicResource AppTextSubBrush}"/>
         </Grid>
 
-        <Border DockPanel.Dock="Top" BorderThickness="1" BorderBrush="#58A6FF" CornerRadius="2" Padding="12,10" Margin="0,20,0,8">
+        <Border DockPanel.Dock="Top" BorderThickness="1" BorderBrush="#58A6FF" CornerRadius="2" Padding="12,10" Margin="0,10,0,8">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -97,33 +97,33 @@
 
                 <Grid Grid.Row="0">
                     <StackPanel Orientation="Horizontal" Margin="10">
-                        <TextBlock Text="저장 위치:" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>
+                        <TextBlock Text="저장 위치:" FontSize="15" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>
                         <TextBox Width="400" Text="{Binding LstkLoca, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}" />
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Row="1">
                     <StackPanel Orientation="Horizontal" Margin="10">
-                        <TextBlock Text="재고 위치:" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>
-                        <TextBox Width="400" behaviors:LocaMask.Value="{Binding LstkLoca, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}" MaxLength="7"/>
+                        <TextBlock Text="PLT-NO:" FontSize="15" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>
+                        <TextBox Width="400" Margin="14,0,0,0" behaviors:LocaMask.Value="{Binding LstkLoca, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}" MaxLength="7"/>
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Row="2">
                     <StackPanel Orientation="Horizontal" Margin="10">
-                        <TextBlock Text="재고 위치:" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>
-                        <TextBox Width="400" Text="{Binding LstkLoca, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}" MaxLength="7"/>
+                        <TextBlock Text=" 상 태:" FontSize="15" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>
+                        <TextBox Width="400" Margin="33,0,0,0" Text="{Binding LstkLoca, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}" MaxLength="7"/>
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Row="3">
                     <StackPanel Orientation="Horizontal" Margin="10">
-                        <TextBlock Text="재고 위치:" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>
-                        <TextBox Width="400" Text="{Binding LstkLoca, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}" MaxLength="7"/>
+                        <TextBlock Text="입고일자:" FontSize="15" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>
+                        <TextBox Width="400" Margin="13,0,0,0" Text="{Binding LstkLoca, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}" MaxLength="7"/>
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Row="4">
                     <StackPanel Orientation="Horizontal" Margin="10">
-                        <TextBlock Text="재고 위치:" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>
-                        <TextBox Width="400" Text="{Binding LstkLoca, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}" MaxLength="7"/>
-                        <Button Content="💾  확정" Width="85" Margin="70,0,0,0" Command="{Binding ConfirmedCommand}" FontWeight="Bold" Cursor="Hand" BorderThickness="0"
+                        <TextBlock Text="입고시간:" FontSize="15" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>
+                        <TextBox Width="400" Margin="13,0,0,0" Text="{Binding LstkLoca, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}" MaxLength="7"/>
+                        <Button Content="💾  확정" Width="85" Margin="60,0,0,0" Command="{Binding ConfirmedCommand}" FontWeight="Bold" Cursor="Hand" BorderThickness="0"
                         Background="{DynamicResource BtnStadardBrush}" Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
                     </StackPanel>
                 </Grid>

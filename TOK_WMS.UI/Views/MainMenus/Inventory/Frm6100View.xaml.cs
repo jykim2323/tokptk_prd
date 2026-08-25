@@ -26,8 +26,10 @@ public partial class Frm6100View : UserControl
 
     private void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
-        //if (DataContext is Frm6100ViewModel vm)
-        //    _ = vm.SearchCommand.ExecuteAsync(null);
-    }
+        if (DataContext is Frm6100ViewModel vm)
+            _ = vm.SearchCommand.ExecuteAsync(null);
 
+        txtLoca.Focus();
+        Keyboard.Focus(txtLoca);
+    }
 }

@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TOK.WMS.Core.DTOs.Inbounds;
 using TOK.WMS.Core.DTOs.Inventory;
-using TOK.WMS.Core.Interfaces.Inbounds;
+using TOK.WMS.Core.ETC;
 using TOK.WMS.Core.Interfaces.Inventory;
-using TOK.WMS.Infrastructure.Repositories.Inbounds;
-using TOK.WMS.Infrastructure.Repositories.Inventory;
 
 namespace TOK.WMS.Api.Controllers.Inventory;
 
