@@ -19,12 +19,14 @@ using TOK.WMS.UI.Services.Api.Inventory;
 using TOK.WMS.UI.Services.Api.Login;
 using TOK.WMS.UI.Services.Factories;
 using TOK.WMS.UI.Services.Interfaces;
+using TOK.WMS.UI.Services.Interfaces.Popup;
 using TOK.WMS.UI.ViewModels;
 using TOK.WMS.UI.ViewModels.Base;
 using TOK.WMS.UI.ViewModels.Login;
 using TOK.WMS.UI.ViewModels.MainMenus.Inbounds;
 using TOK.WMS.UI.ViewModels.MainMenus.Inventory;
 using TOK.WMS.UI.Views.Login;
+using TOK.WMS.UI.Views.MainMenus.Inventory;
 
 namespace TOK.WMS.UI;
 
@@ -77,10 +79,11 @@ public partial class App : Application
 
 
         // 입고관리
-        sc.AddHttpClient<IFrm3100Api, Frm3100ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl)).AddHttpMessageHandler<WarehouseHeaderHandler>();
+        sc.AddHttpClient<IFrm3100Api, Frm3100ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));//.AddHttpMessageHandler<WarehouseHeaderHandler>();
 
         // 재고관리
-        sc.AddHttpClient<IFrm6100Api, Frm6100ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl)).AddHttpMessageHandler<WarehouseHeaderHandler>();
+        sc.AddHttpClient<IFrm6100Api, Frm6100ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));//.AddHttpMessageHandler<WarehouseHeaderHandler>();
+        sc.AddHttpClient<ISFrm6110Api, SFrm6110ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));//.AddHttpMessageHandler<WarehouseHeaderHandler>();
 
 
         sc.AddSingleton<ThemeService>();
@@ -89,8 +92,8 @@ public partial class App : Application
         sc.AddSingleton<DocumentFactory>();
         sc.AddSingleton<IExcelService, ExcelService>();
 
-        // 원료,제품, 창고 셀렉 변경 컨텍스트
-        sc.AddSingleton<IWarehouseContext, WarehouseContext>();
+        //// 원료,제품, 창고 셀렉 변경 컨텍스트
+        //sc.AddSingleton<IWarehouseContext, WarehouseContext>();
 
 
         sc.AddSingleton<MainViewModel>();
@@ -99,11 +102,12 @@ public partial class App : Application
         sc.AddSingleton<LoginView>();
         sc.AddSingleton<LoginViewModel>();
 
+
         // 문서(탭) VM — 메뉴키로 keyed 등록 (DocumentFactory가 키로 해석)
 
 
         // 원료,제품, 창고 셀렉 변경 컨텍스트 HTTP 핸들러 --> API 호출 시 헤더에 WarehouseId를 자동 추가
-        sc.AddTransient<WarehouseHeaderHandler>();
+        //sc.AddTransient<WarehouseHeaderHandler>();
 
         // 모니터링
         sc.AddKeyedTransient<DocumentViewModelBase, HomeViewModel>(DocumentKeys.Home);
@@ -117,6 +121,10 @@ public partial class App : Application
 
         // 재고관리
         sc.AddKeyedTransient<DocumentViewModelBase, Frm6100ViewModel>(DocumentKeys.Frm6100);
+
+        sc.AddSingleton<IWindowService, WindowService>();
+        sc.AddTransient<SFrm6110View>();
+        sc.AddTransient<SFrm6110ViewModel>();
 
 
 

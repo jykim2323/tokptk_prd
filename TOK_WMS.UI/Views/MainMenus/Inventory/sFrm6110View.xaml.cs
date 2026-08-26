@@ -2,24 +2,20 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using TOK.WMS.UI.ViewModels.MainMenus.Inventory;
 
 namespace TOK.WMS.UI.Views.MainMenus.Inventory
 {
     /// <summary>
-    /// sFrm6110View.xaml에 대한 상호 작용 논리
+    /// SFrm6110View.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class sFrm6110View : Window
+    public partial class SFrm6110View : Window
     {
-        public sFrm6110View()
+        public SFrm6110View(SFrm6110ViewModel vm)
         {
             InitializeComponent();
+
+            DataContext = vm;
         }
     }
 }

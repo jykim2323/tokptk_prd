@@ -15,9 +15,9 @@ builder.Services.AddControllers(options =>
 builder.Services.AddSignalR();
 builder.Services.AddOpenApi();
 
-// RequestContext를 DI 컨테이너에 등록
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<IWarehouseRequestContext,WarehouseRequestContext>();
+//// RequestContext를 DI 컨테이너에 등록
+//builder.Services.AddHttpContextAccessor();
+//builder.Services.AddScoped<IWarehouseRequestContext,WarehouseRequestContext>();
 
 // WPF 클라이언트에서 접근할 수 있도록 CORS 허용
 builder.Services.AddCors(opt =>

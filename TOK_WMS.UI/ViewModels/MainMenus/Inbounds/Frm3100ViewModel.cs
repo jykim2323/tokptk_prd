@@ -138,12 +138,8 @@ public  partial class Frm3100ViewModel : DocumentViewModelBase
                 throw new InvalidOperationException("삭제 할 데이터가 없습니다. ");
             }
 
-            var result = MessageBox.Show( "현재 라인을 취소(수정) 하겠습니까?",
-                                                                "확인",
-                                            MessageBoxButton.YesNo,
-                                            MessageBoxImage.Question);
-
-            if (result != MessageBoxResult.Yes)
+            if (!_dialog.ShowConfirm("현재 라인을 취소(수정) 하겠습니까?",
+                                                                "확인"))
             {
                 return;
             }

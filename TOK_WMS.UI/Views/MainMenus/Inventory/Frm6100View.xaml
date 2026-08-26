@@ -98,7 +98,7 @@
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
                         <Border Grid.Column="0"
@@ -114,11 +114,11 @@
                             </StackPanel>
                         </Border>
                         
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="100,10,10,10">
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="50,10,10,10">
                             <Button Content="✎ 수정" Width="90" FontWeight="Bold" Cursor="Hand" BorderThickness="0"
-                                    Background="{DynamicResource BtnStadardBrush}" Command="{Binding ModifyCommand}" Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
+                                    Background="{DynamicResource BtnStadardBrush}" Foreground="{DynamicResource BtnPrimaryTextBrush}" Command="{Binding ModifyCommand}" CommandParameter="{Binding SelectedItem, ElementName=DB_Table1}"/>
                             <Button Content="🗑️ 삭제" Width="90" Margin="10,0,0,0" FontWeight="Bold" Cursor="Hand" BorderThickness="0"
-                                    Background="{DynamicResource BtnStadardBrush}" Command="{Binding DeleteCommand}" Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
+                                    Background="{DynamicResource BtnStadardBrush}" Foreground="{DynamicResource BtnPrimaryTextBrush}" Command="{Binding DeleteCommand}" CommandParameter="{Binding SelectedItem, ElementName=DB_Table1}" />
                         </StackPanel>
                     </Grid>
                 </Border>
@@ -160,9 +160,7 @@
                                 <DataGrid.CellStyle>
                                     <Style TargetType="DataGridCell"
                                                              BasedOn="{StaticResource ListCellStyle}">
-
                                         <Style.Triggers>
-
                                             <DataTrigger Binding="{Binding LstkFlag}" Value="Y">
                                                 <Setter Property="Background" Value="Yellow"/>
                                                 <Setter Property="Foreground" Value="Red"/>
@@ -194,7 +192,10 @@
                                 </DataGrid.Columns>
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="MouseDoubleClick">
-                                        <i:InvokeCommandAction Command="{Binding MilstkCellClickCommand}" CommandParameter="{Binding SelectedItem, ElementName=DB_Table1}" />
+                                        <i:InvokeCommandAction Command="{Binding ModifyCommand}" CommandParameter="{Binding SelectedItem, ElementName=DB_Table1}" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="SelectionChanged">
+                                        <i:InvokeCommandAction Command="{Binding SubkSearchCommand}" CommandParameter="{Binding SelectedItem, ElementName=DB_Table1}" />
                                     </i:EventTrigger>
                                 </i:Interaction.Triggers>
                             </DataGrid>
@@ -212,7 +213,7 @@
                              BorderThickness="1" CornerRadius="5" Padding="12,10" Margin="0,10,0,8">
                         <DockPanel LastChildFill="True">
                             <!-- 결과 그리드: 컬럼이 데이터 길이에 맞춰 자동 너비 -->
-                            <DataGrid x:Name="DB_Table2" ItemsSource="{Binding Items}"
+                            <DataGrid x:Name="DB_Table2" ItemsSource="{Binding SubkItems}"
                                             Style="{StaticResource ListDataGridStyle}"
                                             HeadersVisibility="All"
                                             SelectionMode="Extended"
@@ -235,11 +236,16 @@
                                     </Style>
                                 </DataGrid.RowHeaderStyle>
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="재고위치" Binding="{Binding LstkLoca}" Width="200" />
-                                    <DataGridTextColumn Header="PLT-NO" Binding="{Binding LstkPltno}" Width="260" />
-                                    <DataGridTextColumn Header="상태" Binding="{Binding LstkFlag}" Width="80" />
-                                    <DataGridTextColumn Header="입고일자" Binding="{Binding LstkIndate}" Width="100" />
-                                    <DataGridTextColumn Header="입고시간" Binding="{Binding LstkIntime}" Width="*" />
+                                    <DataGridTextColumn Header="재고위치" Binding="{Binding SubkLoca}" Width="200" />
+                                    <DataGridTextColumn Header="PLT-NO" Binding="{Binding SubkPltno}" Width="260" />
+                                    <DataGridTextColumn Header="상태" Binding="{Binding SubkFlag}" Width="80" />
+                                    <DataGridTextColumn Header="품목코드" Binding="{Binding SubkCode}" Width="100" />
+                                    <DataGridTextColumn Header="품 목 명" Binding="{Binding MastName}" Width="AUTO" />
+                                    <DataGridTextColumn Header="LOT-NO" Binding="{Binding SubkLotno}" Width="AUTO" />
+                                    <DataGridTextColumn Header="재고중량" Binding="{Binding SubkWgt}" Width="AUTO" />
+                                    <DataGridTextColumn Header="예약중량" Binding="{Binding SubkRwgt}" Width="AUTO" />
+                                    <DataGridTextColumn Header="Box-No" Binding="{Binding SubkBoxno}" Width="AUTO" />
+                                    <DataGridTextColumn Header="비고" Binding="{Binding SubkRemark}" Width="*" />
                                 </DataGrid.Columns>
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="MouseDoubleClick">

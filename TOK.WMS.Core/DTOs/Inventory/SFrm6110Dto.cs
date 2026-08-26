@@ -4,32 +4,9 @@ using System.Text;
 
 namespace TOK.WMS.Core.DTOs.Inventory;
 
-public class Frm6100Dto
+public class SFrm6110Dto
 {
-   
-    public string? LstkLoca { get; set; }
-    public string? LstkBk { get; set; }
-    public string? LstkBy { get; set; }
-    public string? LstkLv { get; set; }
-    public string? LstkFlag { get; set; }
-    public string? LstkIndate { get; set; }
-    public string? LstkIntime { get; set; }
-    public string? LstkPltno { get; set; }
-
-
-    public class ResDto
-    {
-        public string? LstkLoca { get; set; }
-        public string? LstkBk { get; set; }
-        public string? LstkBy { get; set; }
-        public string? LstkLv { get; set; }
-        public string? LstkFlag { get; set; }
-        public string? LstkIndate { get; set; }
-        public string? LstkIntime { get; set; }
-        public string? LstkPltno { get; set; }
-    }
-
-    public class SubkDto
+    public class ReqDto
     {
         public string? SubkLoca { get; set; }
         public string? SubkFlag { get; set; }
@@ -48,5 +25,4 @@ public class Frm6100Dto
         public string? Gubn2Name { get; set; }
         public string? Gubn3Name { get; set; }
     }
-
 }

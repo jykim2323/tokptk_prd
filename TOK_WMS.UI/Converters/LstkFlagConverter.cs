@@ -14,6 +14,7 @@ public class LstkFlagConverter : IValueConverter
             "X" => "입고예약",
             "Y" => "출고예약",
             "D" => "이중격납",
+            "W" => "이중입고",
             "E" => "공출고",
             "N" => "금지셀",
             _ => value?.ToString() ?? ""

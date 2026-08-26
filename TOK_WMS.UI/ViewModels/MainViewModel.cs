@@ -17,7 +17,6 @@ public partial class MainViewModel : ObservableObject
     private readonly DocumentFactory _factory;
     private readonly ThemeService _theme;
     private readonly IDialogService _dialog;
-    private readonly IWarehouseContext _warehouseContext;
 
 
     private readonly Dispatcher _ui = Application.Current.Dispatcher;
@@ -39,39 +38,38 @@ public partial class MainViewModel : ObservableObject
 
  
 
-    [RelayCommand]
-    private void SelectRawWarehouse()
-    {
-        if (Documents.Any()) 
-        {
-            _dialog.ShowMessage("창을 모두 닫은 후 창을 선택해주세요.", "창이 열려있습니다.");
-            return;
-        }
-        _warehouseContext.SelectedWarehouse = WarehouseType.Raw;
-        SelectedWarehouse = WarehouseType.Raw;
-    }
+    //[RelayCommand]
+    //private void SelectRawWarehouse()
+    //{
+    //    if (Documents.Any()) 
+    //    {
+    //        _dialog.ShowMessage("창을 모두 닫은 후 창을 선택해주세요.", "창이 열려있습니다.");
+    //        return;
+    //    }
+    //    _warehouseContext.SelectedWarehouse = WarehouseType.Raw;
+    //    SelectedWarehouse = WarehouseType.Raw;
+    //}
 
-    [RelayCommand]
-    private void SelectProductWarehouse()
-    {
-        if (Documents.Any())
-        {
-            _dialog.ShowMessage("창을 모두 닫은 후 창을 선택해주세요.", "창이 열려있습니다.");
-            return;
-        }
-        _warehouseContext.SelectedWarehouse = WarehouseType.Product;
-        SelectedWarehouse = WarehouseType.Product;
-    }
+    //[RelayCommand]
+    //private void SelectProductWarehouse()
+    //{
+    //    if (Documents.Any())
+    //    {
+    //        _dialog.ShowMessage("창을 모두 닫은 후 창을 선택해주세요.", "창이 열려있습니다.");
+    //        return;
+    //    }
+    //    _warehouseContext.SelectedWarehouse = WarehouseType.Product;
+    //    SelectedWarehouse = WarehouseType.Product;
+    //}
 
     [ObservableProperty]
     private WarehouseType selectedWarehouse = WarehouseType.Raw;
 
-    public MainViewModel(DocumentFactory factory, ThemeService theme, IDialogService dialog, IWarehouseContext warehouse)
+    public MainViewModel(DocumentFactory factory, ThemeService theme, IDialogService dialog)
     {
         _factory = factory;
         _theme = theme;
         _dialog = dialog;
-        _warehouseContext = warehouse;
 
         OpenDocument(DocumentKeys.Home);
 

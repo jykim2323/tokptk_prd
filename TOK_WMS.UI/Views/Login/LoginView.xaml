@@ -6,7 +6,7 @@
                 xmlns:vmIogin="clr-namespace:TOK.WMS.UI.ViewModels.Login"
                 Icon="/app.ico"
                 Width="440"
-                Height="580"
+                Height="575"
                 MinWidth="440"
                 MinHeight="560"
                 MaxWidth="440"
@@ -97,7 +97,7 @@
 
 
                 <Button Height="46"
-                        Margin="0,22,0,0"
+                        Margin="0,35,0,0"
                         BorderThickness="0"
                         Background="{DynamicResource BtnPrimaryBrush}" 
                         Foreground="{DynamicResource BtnPrimaryTextBrush}"
@@ -108,8 +108,8 @@
                         Command="{Binding LoginCommand}"
                         IsDefault="True"/>
 
-                <Border Background="#FEF2F2"
-                        BorderBrush="#FCA5A5"
+                <Border Background="White"
+                        BorderBrush="White"
                         BorderThickness="1"
                         CornerRadius="4"
                         Padding="10"

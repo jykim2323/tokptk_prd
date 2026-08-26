@@ -8,8 +8,8 @@
 
     <DockPanel Margin="12">
         <Border>
-            <Image Source="/TOK.WMS.UI;component/Assets/TOK_Main.png"
-               Stretch="Uniform"/>
+            <Image Source="/TOK.WMS.UI;component/Assets/main_home.jpg"
+               Stretch="Uniform" Height="863" Width="1729"/>
         </Border>
     </DockPanel>
 </UserControl>

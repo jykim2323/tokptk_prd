@@ -166,7 +166,7 @@ public class Frm3100Repository(DbConnectionFactory db) : IFrm3100Repository
                     A.SUBK_REMARK AS SubkRemark,
                     A.SUBK_PLTNO  AS SubkPltno,
                     '1'           AS SubkRowState
-                    FROM T2MISUBK A WITH (NOLOCK)
+                    FROM T1MISUBK A WITH (NOLOCK)
                     LEFT OUTER JOIN MIMAST B WITH (NOLOCK) ON A.SUBK_CODE = B.MAST_CODE
                      WHERE A.SUBK_PLTNO = @sPltno";
 
@@ -180,7 +180,7 @@ public class Frm3100Repository(DbConnectionFactory db) : IFrm3100Repository
         using var conn = db.Create();
 
         var trak_sql = @"SELECT COUNT(*)
-                    FROM T2TBTRAK WITH (NOLOCK)
+                    FROM T1TBTRAK WITH (NOLOCK)
                     WHERE TRAK_PLTNO = @sPltno";
 
         var trak_cnt = await conn.QuerySingleAsync<int>(trak_sql, new
@@ -201,7 +201,7 @@ public class Frm3100Repository(DbConnectionFactory db) : IFrm3100Repository
         using var conn = db.Create();
 
         var lstk_sql = @"SELECT COUNT(*)
-                    FROM T2MILSTK WITH (NOLOCK)
+                    FROM T1MILSTK WITH (NOLOCK)
                     WHERE LSTK_PLTNO = @sPltno";
 
         var lstk_cnt = await conn.QuerySingleAsync<int>(lstk_sql, new
@@ -222,7 +222,7 @@ public class Frm3100Repository(DbConnectionFactory db) : IFrm3100Repository
         using var conn = db.Create();
 
         var lstk_sql = @"SELECT COUNT(*)
-                    FROM T2MISUBK WITH (NOLOCK)
+                    FROM T1MISUBK WITH (NOLOCK)
                     WHERE SUBK_PLTNO = @sPltno";
 
         var lstk_cnt = await conn.QuerySingleAsync<int>(lstk_sql, new
@@ -245,7 +245,7 @@ public class Frm3100Repository(DbConnectionFactory db) : IFrm3100Repository
         if (string.IsNullOrEmpty(sSubkcode) && string.IsNullOrEmpty(sSubklotno))
         {
             sql = @"
-                    DELETE FROM T2MISUBK
+                    DELETE FROM T1MISUBK
                     WHERE SUBK_PLTNO = @sPltno";
 
 
@@ -254,7 +254,7 @@ public class Frm3100Repository(DbConnectionFactory db) : IFrm3100Repository
         else
         {
             sql = @"
-                    DELETE FROM T2MISUBK
+                    DELETE FROM T1MISUBK
                     WHERE SUBK_PLTNO = @sPltno
                     AND SUBK_CODE = @sSubkcode
                     AND SUBK_LOTNO = @sSubklotno";
@@ -273,7 +273,7 @@ public class Frm3100Repository(DbConnectionFactory db) : IFrm3100Repository
 
         var subkWgt = resDto.SubkWgt?.Replace(".", "") ?? "";
         var sql = @"
-                     INSERT INTO T2MISUBK
+                     INSERT INTO T1MISUBK
                                         (
                                             SUBK_CODE, SUBK_LOTNO, SUBK_FLAG, SUBK_GUBUN,
                                             SUBK_WGT,SUBK_RWGT, SUBK_BOXNO,SUBK_REMARK,

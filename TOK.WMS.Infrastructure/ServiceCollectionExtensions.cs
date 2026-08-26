@@ -1,12 +1,12 @@
-﻿using TOK.WMS.Infrastructure.Data;
-
-using Microsoft.Extensions.DependencyInjection;
-using TOK.WMS.Core.Interfaces.Inbounds;
-using TOK.WMS.Infrastructure.Repositories.Inbounds;
+﻿using Microsoft.Extensions.DependencyInjection;
+using TOK.WMS.Core.ETC;
 using TOK.WMS.Core.Interfaces;
-using TOK.WMS.Infrastructure.Repositories;
-using TOK.WMS.Infrastructure.Repositories.Inventory;
+using TOK.WMS.Core.Interfaces.Inbounds;
 using TOK.WMS.Core.Interfaces.Inventory;
+using TOK.WMS.Infrastructure.Data;
+using TOK.WMS.Infrastructure.Repositories;
+using TOK.WMS.Infrastructure.Repositories.Inbounds;
+using TOK.WMS.Infrastructure.Repositories.Inventory;
 
 namespace TOK.WMS.Infrastructure
 {
@@ -15,6 +15,8 @@ namespace TOK.WMS.Infrastructure
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, string connectionString)
         {
             services.AddSingleton(new DbConnectionFactory(connectionString));
+
+            //services.AddScoped<IWarehouseRequestContext, WarehouseRequestContext>();
 
             //로그인
             services.AddScoped<ILoginRepository, LoginRepository>();
@@ -26,6 +28,7 @@ namespace TOK.WMS.Infrastructure
 
             //재고 관리
             services.AddScoped<IFrm6100Repository, Frm6100Repository>();
+            services.AddScoped<ISFrm6110Repository, SFrm6110Repository>();
 
             //services.AddScoped<IInboundRepository, InboundRepository>();
             //services.AddScoped<IOutboundRepository, OutboundRepository>();

@@ -1,0 +1,35 @@
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Windows;
+using TOK.WMS.Core.DTOs.Inventory;
+using TOK.WMS.UI.ViewModels.MainMenus.Inventory;
+using TOK.WMS.UI.Views.MainMenus.Inventory;
+
+namespace TOK.WMS.UI.Services.Interfaces.Popup;
+
+public class WindowService : IWindowService
+{
+    private readonly IServiceProvider _services;
+
+    public WindowService(IServiceProvider services)
+    {
+        _services = services;
+    }
+
+    public void ShowSFrm6110(Frm6100Dto.ResDto item)
+    {
+        var view = _services.GetRequiredService<SFrm6110View>();
+
+        if (view.DataContext is SFrm6110ViewModel vm)
+        {
+            vm.Initialize(item);
+        }
+
+        view.Owner = Application.Current.MainWindow;
+        view.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+
+        view.ShowDialog();
+    }
+}
