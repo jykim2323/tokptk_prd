@@ -14,6 +14,7 @@
     <UserControl.Resources>
         <conv:LocaFormatConverter x:Key="LocaFormatConverter"/>
         <conv:LstkFlagConverter x:Key="LstkFlagConverter"/>
+        <conv:SubkFlagConverter x:Key="SubkFlagConverter"/>
         <conv:DateTimeFormatConverter x:Key="DateTimeFormatConverter"/>
         <Style x:Key="FilterLabel" TargetType="TextBlock">
             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -108,13 +109,13 @@
                                 behaviors:EnterKey.Command="{Binding SearchCommand}">
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <TextBlock Text="재고 위치:" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>
-                                <TextBox x:Name="txtLoca" Width="400" behaviors:LocaMask.Value="{Binding LstkLoca, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}"/>
+                                <TextBox x:Name="txtLoca" Width="400" behaviors:LocaMask.Value="{Binding SelectedItem.LstkLoca, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}"/>
                                 <Button Content="🔍 조회" Width="90" Margin="20,0,0,0" Command="{Binding SearchCommand}" FontWeight="Bold" Cursor="Hand" BorderThickness="0"
                                         Background="{DynamicResource BtnPrimaryBrush}" Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
                             </StackPanel>
                         </Border>
                         
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="50,10,10,10">
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="50,10,10,10">
                             <Button Content="✎ 수정" Width="90" FontWeight="Bold" Cursor="Hand" BorderThickness="0"
                                     Background="{DynamicResource BtnStadardBrush}" Foreground="{DynamicResource BtnPrimaryTextBrush}" Command="{Binding ModifyCommand}" CommandParameter="{Binding SelectedItem, ElementName=DB_Table1}"/>
                             <Button Content="🗑️ 삭제" Width="90" Margin="10,0,0,0" FontWeight="Bold" Cursor="Hand" BorderThickness="0"
@@ -122,7 +123,7 @@
                         </StackPanel>
                     </Grid>
                 </Border>
-                
+
                 <Grid Grid.Row="1">
                     <Border  Background="{DynamicResource AppSurfaceBrush}"
                              BorderBrush="{DynamicResource AppBorderBrush}"
@@ -136,6 +137,7 @@
                             <!-- 결과 그리드: 컬럼이 데이터 길이에 맞춰 자동 너비 -->
                             <DataGrid x:Name="DB_Table1" ItemsSource="{Binding Items}"
                                                  Style="{StaticResource ListDataGridStyle}"
+                                                 SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
                                                  HeadersVisibility="All"
                                                  SelectionMode="Extended"
                                                  ColumnWidth="Auto"
@@ -203,8 +205,30 @@
                     </Border>
                 </Grid>
 
-                <Grid Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Margin="0,0,0,0">
-                    
+                <Grid Grid.Row="1" Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="2.5*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Margin="30,50,30,15">
+                        <Button Content="📥  셀 재고 등록" Width="150" Height="40" FontSize="15" FontWeight="Bold" Cursor="Hand" BorderThickness="0"  HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                                 Background="{DynamicResource BtnStadardBrush}" Foreground="{DynamicResource BtnPrimaryTextBrush}" Command="{Binding CellinsertCommand}" CommandParameter="{Binding SelectedItem, ElementName=DB_Table1}"/>
+                    </Border>
+                    <Border Grid.Row="1" Margin="30,10">
+                        <Button Content="➕  셀 재고 추가" Width="150" Height="40" FontSize="16" FontWeight="Bold" Cursor="Hand" BorderThickness="0" HorizontalAlignment="Left"
+                                Background="{DynamicResource BtnStadardBrush}" Foreground="{DynamicResource BtnPrimaryTextBrush}" Command="{Binding CelladdCommand}" CommandParameter="{Binding SelectedItem, ElementName=DB_Table1}"/>
+                    </Border>
+                    <Border Grid.Row="2" Margin="30,10">
+                        <Button Content="✕   셀 재고 취소" Width="150" Height="40" FontSize="15" FontWeight="Bold" Cursor="Hand" BorderThickness="0"  HorizontalAlignment="Left"
+                                Background="{DynamicResource BtnStadardBrush}" Foreground="{DynamicResource BtnPrimaryTextBrush}" Command="{Binding CellcancelCommand}" CommandParameter="{Binding SelectedItem, ElementName=DB_Table1}"/>
+                    </Border>
+                    <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="10">
+                        <TextBlock Text="파렛트당 중량:" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>
+                        <TextBox  Width="200" IsReadOnly="True" Text="{Binding SubkWgtTotal, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}"/>
+                    </StackPanel>
                 </Grid>
 
                 <Grid Grid.Row="2"  Grid.ColumnSpan="2" Margin="0,0,0,0">
@@ -238,7 +262,7 @@
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="재고위치" Binding="{Binding SubkLoca}" Width="200" />
                                     <DataGridTextColumn Header="PLT-NO" Binding="{Binding SubkPltno}" Width="260" />
-                                    <DataGridTextColumn Header="상태" Binding="{Binding SubkFlag}" Width="80" />
+                                    <DataGridTextColumn Header="상태" Binding="{Binding SubkFlag, Converter={StaticResource SubkFlagConverter}}" Width="80" />
                                     <DataGridTextColumn Header="품목코드" Binding="{Binding SubkCode}" Width="100" />
                                     <DataGridTextColumn Header="품 목 명" Binding="{Binding MastName}" Width="AUTO" />
                                     <DataGridTextColumn Header="LOT-NO" Binding="{Binding SubkLotno}" Width="AUTO" />

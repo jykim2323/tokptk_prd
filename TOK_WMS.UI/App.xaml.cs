@@ -83,7 +83,9 @@ public partial class App : Application
 
         // 재고관리
         sc.AddHttpClient<IFrm6100Api, Frm6100ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));//.AddHttpMessageHandler<WarehouseHeaderHandler>();
-        sc.AddHttpClient<ISFrm6110Api, SFrm6110ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));//.AddHttpMessageHandler<WarehouseHeaderHandler>();
+        sc.AddHttpClient<ISFrm6110Api, SFrm6110ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+        sc.AddHttpClient<ISFrm6120Api, SFrm6120ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+        sc.AddHttpClient<ILocaAddApi, LocaAddApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
 
 
         sc.AddSingleton<ThemeService>();
@@ -125,6 +127,10 @@ public partial class App : Application
         sc.AddSingleton<IWindowService, WindowService>();
         sc.AddTransient<SFrm6110View>();
         sc.AddTransient<SFrm6110ViewModel>();
+        sc.AddTransient<SFrm6120View>();
+        sc.AddTransient<SFrm6120ViewModel>();
+        sc.AddTransient<LocaAddView>();
+        sc.AddTransient<LocaAddViewModel>();
 
 
 

@@ -15,6 +15,10 @@ public interface IFrm6100Api
     Task<bool> SubkCheckAsync(string lstkLoca);
     Task<int> DeleteAsync(string subkLoca);
     Task<int> LstkClearAsync(string lstkLoca);
+    Task<string?> LstkpltnocheckAsync(string lstkLoca);
+    Task<bool> SubklocacheckAsync(string lstkPltno);
+    Task<bool> CancelSubkAsync(string lstkPltno);
+    Task<bool> CancelLstkAsync(string lstkPltno);
 }
 public class Frm6100ApiClient(HttpClient http) : IFrm6100Api
 {
@@ -26,7 +30,7 @@ public class Frm6100ApiClient(HttpClient http) : IFrm6100Api
         return http.GetFromJsonAsync<IEnumerable<Frm6100Dto.ResDto>?>($"api/inventory/frm6100/search?{qs}");
     }
     public Task<IEnumerable<Frm6100Dto.SubkDto>?> SubkSearchAsync(string lstkLoca)
-   {
+    {
         string qs =
             $"LstkLoca={Uri.EscapeDataString(lstkLoca ?? "")}";
 
@@ -53,5 +57,50 @@ public class Frm6100ApiClient(HttpClient http) : IFrm6100Api
             $"LstkLoca={Uri.EscapeDataString(lstkLoca ?? "")}";
 
         return http.GetFromJsonAsync<int>($"api/inventory/frm6100/lstkclear?{qs}");
+    }
+
+    public Task<bool> LstkCheckAsync(string lstkLoca)
+    {
+        string qs =
+            $"LstkLoca={Uri.EscapeDataString(lstkLoca ?? "")}";
+
+        return http.GetFromJsonAsync<bool>($"api/inventory/frm6100/lstkcheck?{qs}");
+    }
+    public async Task<string?> LstkpltnocheckAsync(string lstkLoca)
+    {
+        string qs =
+            $"LstkLoca={Uri.EscapeDataString(lstkLoca ?? "")}";
+
+        var response = await http.GetAsync(
+            $"api/inventory/frm6100/lstkpltnocheck?{qs}");
+
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadAsStringAsync();
+    }
+
+    public Task<bool> SubklocacheckAsync(string lstkPltno)
+    {
+        string qs =
+            $"LstkPltno={Uri.EscapeDataString(lstkPltno ?? "")}";
+
+        return http.GetFromJsonAsync<bool>($"api/inventory/frm6100/subklocacheck?{qs}");
+    }
+
+    public async Task<bool> CancelSubkAsync(string subkPltno)
+    {
+        var response = await http.PutAsJsonAsync("api/inventory/frm6100/cancelsubk",subkPltno);
+
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<bool>();
+    }
+    public async Task<bool> CancelLstkAsync(string subkPltno)
+    {
+        var response = await http.PutAsJsonAsync("api/inventory/frm6100/cancellstk", subkPltno);
+
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<bool>();
     }
 }

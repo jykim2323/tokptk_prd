@@ -11,7 +11,7 @@ using TOK.WMS.Infrastructure.Data;
 
 namespace TOK.WMS.Infrastructure.Repositories.Inventory;
 
-public class Frm6100Repository(DbConnectionFactory db) : IFrm6100Repository
+public class Frm6100Repository(DbConnectionFactory db, ICoreRepository coreRepo) : IFrm6100Repository
 {
     public async Task<IEnumerable<Frm6100Dto.ResDto>?> SearchAsync(Frm6100Dto reqDto)
     {
@@ -117,5 +117,95 @@ public class Frm6100Repository(DbConnectionFactory db) : IFrm6100Repository
         {
             lstkLoca = lstkLoca ?? string.Empty
         });
+    }
+
+    public async Task<bool> LstkCheckAsync(string lstkLoca)
+    {
+        using var conn = db.Create();
+        var sql = @"SELECT COUNT(*)
+                    FROM T1LSTK WITH (NOLOCK)
+                    WHERE LSTK_LOCA = @lstkLoca";
+        var count = await conn.QuerySingleAsync<int>(sql, new
+        {
+            lstkLoca = lstkLoca ?? string.Empty
+        });
+        return count > 0;
+    }
+
+    public async Task<string?> LstkpltnocheckAsync(string lstkloca)
+    {
+        try
+        {
+            var result = await coreRepo.Lstk_pltno_check(lstkloca ?? string.Empty);
+
+            if (string.IsNullOrEmpty(result)) return string.Empty;
+                
+            return result;
+
+        }
+        catch (Exception ex)
+        {
+            return string.Empty;
+        }
+    }
+
+    public async Task<bool> SubklocacheckAsync(string lstkPltno)
+    {
+        try
+        {
+            var result = await coreRepo.Subk_loca_check(lstkPltno ?? string.Empty);
+
+            if (!result) return false;
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+    }
+
+    public async Task<bool> CancelSubkAsync(string subkloca)
+    {
+        using var conn = db.Create();
+
+        var sql = @"
+                    UPDATE T1MISUBK
+                    SET
+                        SUBK_LOCA   = '',
+                        SUBK_FLAG = '0',
+                        SUBK_GUBUN = ''
+                    WHERE SUBK_LOCA = @_strLoca";
+
+        var affectedRows = await conn.ExecuteAsync(
+            sql,
+            new
+            {
+                _strLoca = subkloca
+            });
+
+        return affectedRows > 0;
+    }
+    public async Task<bool> CancelLstkAsync(string subkloca)
+    {
+        using var conn = db.Create();
+
+        var sql = @"
+                    UPDATE T1MILSTK
+                    SET
+                        LSTK_INDATE   = '',
+                        LSTK_INTIME = '',
+                        LSTK_PLTNO = '',
+                        LSTK_FLAG = '0'
+                    WHERE LSTK_LOCA = @_strLoca";
+
+        var affectedRows = await conn.ExecuteAsync(
+            sql,
+            new
+            {
+                _strLoca = subkloca
+            });
+
+        return affectedRows > 0;
     }
 }

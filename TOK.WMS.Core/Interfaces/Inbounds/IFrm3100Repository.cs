@@ -26,9 +26,6 @@ public interface IFrm3100Repository
     Task CancleAsync(IReadOnlyCollection<Frm3100Dto.resDto> selectedReservation);
 
     Task<bool> TrakingAsync(string sPltno);
-    Task<bool> Lstk_check(string sPltno);
-    Task<bool> Trak_check(string sPltno);
-    Task<bool> Subk_check(string sPltno);
     Task<int> Subk_Del(string sPltno, string? sSubkcode = null, string? sSubklotno = null);
     Task<int> Subk_insert(Frm3100Dto.resDto resDto);
     Task<IEnumerable<Frm3100Dto.resDto>?> SpeedhAsync(string sPltno);

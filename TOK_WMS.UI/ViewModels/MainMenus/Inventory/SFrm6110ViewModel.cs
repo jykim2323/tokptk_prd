@@ -28,8 +28,6 @@ public partial class SFrm6110ViewModel : ObservableObject
     [ObservableProperty] private string _lstkPltno = string.Empty;
 
 
-
-
     public SFrm6110ViewModel(ISFrm6110Api api, IDialogService dialog)
     {
         _sfrm6110Api = api;
@@ -51,6 +49,12 @@ public partial class SFrm6110ViewModel : ObservableObject
     {
         try
         {
+            if(LstkIndate.Length != 8)
+            {
+                _dialog.ShowMessage($"입고 일자는 8자리여야 합니다.", "오류");
+                return;
+            }
+
             var q = new SFrm6110Dto.ReqDto
             {
                 SubkFlag = LstkFlag,
@@ -59,7 +63,6 @@ public partial class SFrm6110ViewModel : ObservableObject
                 SubkLoca = LstkLoca
 
             };
-
 
             if(!_dialog.ShowConfirm($"정말로 확정 합니까?", "확인"))
             {
@@ -71,7 +74,10 @@ public partial class SFrm6110ViewModel : ObservableObject
             if (!result)
             {
                 _dialog.ShowMessage($"{LstkLoca} 위치 수정 실패", "오류");
+                return;
             }
+
+            _dialog.ShowMessage($"작업 성공", "확인");
         }
         catch (Exception ex)
         {

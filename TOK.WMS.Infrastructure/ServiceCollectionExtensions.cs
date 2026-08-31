@@ -21,6 +21,10 @@ namespace TOK.WMS.Infrastructure
             //로그인
             services.AddScoped<ILoginRepository, LoginRepository>();
 
+
+            //공통 쿼리문
+            services.AddScoped<ICoreRepository, CoreRepository>();
+
             //입고 관리
             services.AddScoped<IFrm3100Repository, Frm3100Repository>();
 
@@ -29,6 +33,8 @@ namespace TOK.WMS.Infrastructure
             //재고 관리
             services.AddScoped<IFrm6100Repository, Frm6100Repository>();
             services.AddScoped<ISFrm6110Repository, SFrm6110Repository>();
+            services.AddScoped<ISFrm6120Repository, SFrm6120Repository>();
+            services.AddScoped<ILocaAddRepository, LocaAddRepository>();
 
             //services.AddScoped<IInboundRepository, InboundRepository>();
             //services.AddScoped<IOutboundRepository, OutboundRepository>();

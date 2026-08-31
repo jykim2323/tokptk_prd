@@ -9,7 +9,7 @@ public class SubkFlagConverter : IValueConverter
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         => (value as string) switch
         {
-            "1" => "제품유",
+            "1" => "대기",
             "Y" => "출고예약",
             "0" => "",
             _ => value?.ToString() ?? ""

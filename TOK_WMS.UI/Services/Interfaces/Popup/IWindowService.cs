@@ -8,4 +8,6 @@ namespace TOK.WMS.UI.Services.Interfaces.Popup;
 public interface IWindowService
 {
     void ShowSFrm6110(Frm6100Dto.ResDto item);
+    void ShowSFrm6120(Frm6100Dto.SubkDto item);
+    void ShowLocaAdd(Frm6100Dto.SubkDto item);
 }

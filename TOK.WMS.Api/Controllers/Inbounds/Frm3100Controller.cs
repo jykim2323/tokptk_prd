@@ -8,7 +8,7 @@ namespace TOK.WMS.Api.Controllers.Inbounds;
 
 [Route("api/inbounds/[controller]")]
 [ApiController]
-public class Frm3100Controller(IFrm3100Repository frm3100Repo) : ControllerBase
+public class Frm3100Controller(IFrm3100Repository frm3100Repo, ICoreRepository coreRepo) : ControllerBase
 {
     [HttpGet("search")]
     public async Task<IActionResult> SearchAsync([FromQuery] Frm3100Dto query) =>
@@ -35,15 +35,15 @@ public class Frm3100Controller(IFrm3100Repository frm3100Repo) : ControllerBase
 
     [HttpGet("save/trak")]
     public async Task<IActionResult> TrakAsync([FromQuery] string sPltno) =>
-      Ok(await frm3100Repo.Trak_check(sPltno));
+      Ok(await coreRepo.Trak_check(sPltno));
 
     [HttpGet("save/lstk")]
     public async Task<IActionResult> LstkAsync([FromQuery] string sPltno) =>
-      Ok(await frm3100Repo.Lstk_check(sPltno));
+      Ok(await coreRepo.Lstk_check(sPltno));
 
     [HttpGet("save/subk")]
     public async Task<IActionResult> SubkAsync([FromQuery] string sPltno) =>
-      Ok(await frm3100Repo.Subk_check(sPltno));
+      Ok(await coreRepo.Subk_check(sPltno));
 
     [HttpGet("save/subk/del")]
     public async Task<IActionResult> DelAsync([FromQuery] string sPltno) =>

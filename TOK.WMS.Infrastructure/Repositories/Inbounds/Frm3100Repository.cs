@@ -10,7 +10,7 @@ using TOK.WMS.Infrastructure.Data;
 
 namespace TOK.WMS.Infrastructure.Repositories.Inbounds;
 
-public class Frm3100Repository(DbConnectionFactory db) : IFrm3100Repository
+public class Frm3100Repository(DbConnectionFactory db, ICoreRepository coreRepo) : IFrm3100Repository
 {
     public async Task<IEnumerable<Frm3100Dto>?> SearchAsync(Frm3100Dto model)
     {
@@ -135,12 +135,12 @@ public class Frm3100Repository(DbConnectionFactory db) : IFrm3100Repository
     {
         try
         {
-            if (!Trak_check(sPltno ?? string.Empty).Result)
+            if (!coreRepo.Trak_check(sPltno ?? string.Empty).Result)
             {
                 return false;
             }
 
-            if (!Lstk_check(sPltno ?? string.Empty).Result)
+            if (!coreRepo.Lstk_check(sPltno ?? string.Empty).Result)
             {
                 return false;
             }
@@ -174,68 +174,6 @@ public class Frm3100Repository(DbConnectionFactory db) : IFrm3100Repository
         {
             sPltno = sPltno ?? string.Empty
         });
-    }
-    public async Task<bool> Trak_check(string sPltno)
-    {
-        using var conn = db.Create();
-
-        var trak_sql = @"SELECT COUNT(*)
-                    FROM T1TBTRAK WITH (NOLOCK)
-                    WHERE TRAK_PLTNO = @sPltno";
-
-        var trak_cnt = await conn.QuerySingleAsync<int>(trak_sql, new
-        {
-            sPltno = sPltno ?? string.Empty
-        });
-
-        if (trak_cnt > 0)
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    public async Task<bool> Lstk_check(string sPltno)
-    {
-        using var conn = db.Create();
-
-        var lstk_sql = @"SELECT COUNT(*)
-                    FROM T1MILSTK WITH (NOLOCK)
-                    WHERE LSTK_PLTNO = @sPltno";
-
-        var lstk_cnt = await conn.QuerySingleAsync<int>(lstk_sql, new
-        {
-            sPltno = sPltno ?? string.Empty
-        });
-
-        if (lstk_cnt > 0)
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    public async Task<bool> Subk_check(string sPltno)
-    {
-        using var conn = db.Create();
-
-        var lstk_sql = @"SELECT COUNT(*)
-                    FROM T1MISUBK WITH (NOLOCK)
-                    WHERE SUBK_PLTNO = @sPltno";
-
-        var lstk_cnt = await conn.QuerySingleAsync<int>(lstk_sql, new
-        {
-            sPltno = sPltno ?? string.Empty
-        });
-
-        if (lstk_cnt > 0)
-        {
-            return false;
-        }
-
-        return true;
     }
 
     public async Task<int> Subk_Del(string sPltno, string? sSubkcode = null, string? sSubklotno = null)

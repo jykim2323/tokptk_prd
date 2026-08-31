@@ -1,14 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TOK.WMS.Core.DTOs.Inventory;
 using TOK.WMS.Core.ETC;
+using TOK.WMS.Core.Interfaces;
 using TOK.WMS.Core.Interfaces.Inventory;
+using TOK.WMS.Infrastructure.Repositories;
 
 namespace TOK.WMS.Api.Controllers.Inventory;
 
 
 [Route("api/inventory/[controller]")]
 [ApiController]
-public class Frm6100Controller(IFrm6100Repository frm6100Repo) : ControllerBase
+public class Frm6100Controller(IFrm6100Repository frm6100Repo, ICoreRepository coreRepo) : ControllerBase
 {
     [HttpGet("search")]
     public async Task<IActionResult> SearchAsync([FromQuery] Frm6100Dto reqDto) =>
@@ -28,4 +30,20 @@ public class Frm6100Controller(IFrm6100Repository frm6100Repo) : ControllerBase
     [HttpGet("lstkclear")]
     public async Task<IActionResult> LstkClearAsync([FromQuery] string lstkLoca) =>
         Ok(await frm6100Repo.LstkClearAsync(lstkLoca));
+
+    [HttpGet("lstkpltnocheck")]
+    public async Task<IActionResult> Lstkpltnocheck([FromQuery] string lstkLoca) =>
+        Ok(await coreRepo.Lstk_pltno_check(lstkLoca));
+
+    [HttpGet("subklocacheck")]
+    public async Task<IActionResult> Subklocacheck([FromQuery] string lstkPltno) =>
+        Ok(await coreRepo.Subk_loca_check(lstkPltno));
+
+    [HttpPut("cancelsubk")]
+    public async Task<IActionResult> CancelSubkAsync([FromBody] string subkPltno) =>
+      Ok(await frm6100Repo.CancelSubkAsync(subkPltno));
+
+    [HttpPut("cancellstk")]
+    public async Task<IActionResult> CancelLstkAsync([FromBody] string subkPltno) =>
+      Ok(await frm6100Repo.CancelLstkAsync(subkPltno));
 }

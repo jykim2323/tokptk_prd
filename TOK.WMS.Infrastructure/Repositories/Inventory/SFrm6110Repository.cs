@@ -15,13 +15,6 @@ public class SFrm6110Repository(DbConnectionFactory db) : ISFrm6110Repository
     {
         using var conn = db.Create();
 
-        //var tableName = warehouseContext.SelectedWarehouse switch
-        //{
-        //    WarehouseType.Raw => "T1MILSTK",
-        //    WarehouseType.Product => "T1MILSTK",
-        //    _ => throw new InvalidOperationException()
-        //};
-
         var sql = @"
                     UPDATE T1MILSTK
                     SET
