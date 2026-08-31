@@ -5,6 +5,7 @@ using System.Text.Json;
 using TOK.WMS.Core.DTOs.Inbounds;
 using TOK.WMS.Core.DTOs.Inventory;
 using TOK.WMS.UI.Services.Api.Inbounds;
+using static TOK.WMS.Core.DTOs.Inventory.Frm6100Dto;
 
 namespace TOK.WMS.UI.Services.Api.Inventory;
 
@@ -19,6 +20,8 @@ public interface IFrm6100Api
     Task<bool> SubklocacheckAsync(string lstkPltno);
     Task<bool> CancelSubkAsync(string lstkPltno);
     Task<bool> CancelLstkAsync(string lstkPltno);
+    Task<bool> DeletePltNoAsync(Frm6100Dto.SubkDto subkDto);
+    Task<bool> ResetLstkAsync(string lstkLoca);
 }
 public class Frm6100ApiClient(HttpClient http) : IFrm6100Api
 {
@@ -98,6 +101,23 @@ public class Frm6100ApiClient(HttpClient http) : IFrm6100Api
     public async Task<bool> CancelLstkAsync(string subkPltno)
     {
         var response = await http.PutAsJsonAsync("api/inventory/frm6100/cancellstk", subkPltno);
+
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<bool>();
+    }
+
+    public async Task<bool> DeletePltNoAsync(Frm6100Dto.SubkDto subkDto)
+    {
+        var response = await http.PutAsJsonAsync("api/inventory/frm6100/deletepltno",subkDto);
+
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<bool>();
+    }
+    public async Task<bool> ResetLstkAsync(string lstkLoca)
+    {
+        var response = await http.PutAsJsonAsync("api/inventory/frm6100/resetlstk", lstkLoca);
 
         response.EnsureSuccessStatusCode();
 

@@ -46,4 +46,12 @@ public class Frm6100Controller(IFrm6100Repository frm6100Repo, ICoreRepository c
     [HttpPut("cancellstk")]
     public async Task<IActionResult> CancelLstkAsync([FromBody] string subkPltno) =>
       Ok(await frm6100Repo.CancelLstkAsync(subkPltno));
+
+    [HttpPut("deletepltno")]
+    public async Task<IActionResult> DeletePltNoAsync([FromBody] Frm6100Dto.SubkDto subkDto) =>
+      Ok(await frm6100Repo.DeletePltNoAsync(subkDto));
+
+    [HttpPut("resetlstk")]
+    public async Task<IActionResult> ResetLstkAsync([FromBody] string lstkLoca) =>
+      Ok(await frm6100Repo.ResetLstkAsync(lstkLoca));
 }

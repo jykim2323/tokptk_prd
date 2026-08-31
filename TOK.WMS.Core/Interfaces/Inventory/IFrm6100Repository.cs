@@ -15,5 +15,6 @@ public interface IFrm6100Repository
     Task<bool> SubklocacheckAsync(string lstkPltno);
     Task<bool> CancelSubkAsync(string subkPltno);
     Task<bool> CancelLstkAsync(string subkPltno);
-
+    Task<bool> DeletePltNoAsync(Frm6100Dto.SubkDto subkDto);
+    Task<bool> ResetLstkAsync(string lstkLoca);
 }

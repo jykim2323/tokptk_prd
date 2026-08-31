@@ -38,6 +38,7 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
     [ObservableProperty] private ObservableCollection<Frm6100Dto.ResDto> _items = [];
     [ObservableProperty] private ObservableCollection<Frm6100Dto.SubkDto> _subkItems = [];
     [ObservableProperty] private Frm6100Dto.ResDto? _selectedItem;
+    [ObservableProperty] private Frm6100Dto.SubkDto? _selectedSubkItem;
 
     public Frm6100ViewModel(IFrm6100Api frm6100Api, IDialogService dialog, IWindowService windowService)
     {
@@ -126,7 +127,6 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
             _dialog.ShowMessage($"조회 실패: {ex.Message}", "오류");
         }
     }
-
 
     [RelayCommand]
     private async Task Delete(Frm6100Dto.ResDto? item)
@@ -292,6 +292,55 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
         catch (Exception ex)
         {
             _dialog.ShowMessage($"조회 실패: {ex.Message}", "오류");
+        }
+    }
+
+    [RelayCommand]
+    private async Task DeletePltNo()
+    {
+        try
+        {
+            if (!_dialog.ShowConfirm(" PLT 정보가 사라집니다..  정말로 삭제 확정 합니까.??", "확인"))
+            {
+                return;
+            }
+
+            if(SelectedSubkItem == null)
+            {
+                _dialog.ShowMessage($"삭제할 PLT 정보를 클릭하세요....!", "오류");
+                return;
+            }
+
+            var reqDto = new Frm6100Dto.SubkDto
+            {
+                SubkLoca = SelectedSubkItem?.SubkLoca,
+                SubkCode = SelectedSubkItem?.SubkCode,
+                SubkLotno = SelectedSubkItem?.SubkLotno,
+            };
+
+            var result = await _frm6100Api.DeletePltNoAsync(reqDto);
+
+            if (!result)
+            {
+                _dialog.ShowMessage($" 재고위치 { SelectedSubkItem?.SubkLoca } 삭제 에러!!!!  ", "오류"); 
+                return;
+            }
+
+            var response = await _frm6100Api.SubkCheckAsync("010101" ?? string.Empty);
+
+            if (response)
+            {
+                return;
+            }
+
+            await _frm6100Api.ResetLstkAsync("010101" ?? string.Empty);
+
+            this.SearchCommand.Execute(null);
+        }
+        catch (Exception ex)
+        {
+            //StatusMessage = ex.Message;
+            _dialog.ShowMessage($"삭제 실패: {ex.Message}", "오류");
         }
     }
 }

@@ -8,6 +8,7 @@ using TOK.WMS.Core.ETC;
 using TOK.WMS.Core.Interfaces;
 using TOK.WMS.Core.Interfaces.Inventory;
 using TOK.WMS.Infrastructure.Data;
+using static TOK.WMS.Core.DTOs.Inventory.Frm6100Dto;
 
 namespace TOK.WMS.Infrastructure.Repositories.Inventory;
 
@@ -207,5 +208,35 @@ public class Frm6100Repository(DbConnectionFactory db, ICoreRepository coreRepo)
             });
 
         return affectedRows > 0;
+    }
+    public async Task<bool> DeletePltNoAsync(Frm6100Dto.SubkDto subkDto)
+    {
+        using var conn = db.Create();
+
+        var sql = @"DELETE FROM T1MISUBK 
+                    WHERE SUBK_LOCA = @subkLoca
+                    AND SUBK_CODE = @subkCode
+                    AND ISNULL(SUBK_LOTNO, '') = @subkLotno";
+
+        return await conn.ExecuteAsync(sql, new
+        {
+            subkLoca = subkDto.SubkLoca ?? string.Empty,
+            subkCode = subkDto.SubkCode ?? string.Empty,
+            subkLotno = subkDto.SubkLotno ?? string.Empty
+        }) > 0;
+    }
+
+    public async Task<bool> ResetLstkAsync(string lstkLoca)
+    {
+        using var conn = db.Create();
+
+        var sql = @"UPDATE T1MILSTK 
+                    SET LSTK_FLAG = '0', LSTK_INDATE = '', LSTK_INTIME = '', LSTK_PLTNO = ''
+                    WHERE LSTK_LOCA = @lstkLoca ";
+
+        return await conn.ExecuteAsync(sql, new
+        {
+            lstkLoca = lstkLoca ?? string.Empty,
+        }) > 0;
     }
 }
