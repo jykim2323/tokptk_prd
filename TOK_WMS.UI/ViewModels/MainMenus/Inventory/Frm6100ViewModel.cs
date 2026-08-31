@@ -326,14 +326,14 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
                 return;
             }
 
-            var response = await _frm6100Api.SubkCheckAsync("010101" ?? string.Empty);
+            var response = await _frm6100Api.SubkCheckAsync(SelectedSubkItem?.SubkLoca ?? string.Empty);
 
             if (response)
             {
                 return;
             }
 
-            await _frm6100Api.ResetLstkAsync("010101" ?? string.Empty);
+            await _frm6100Api.ResetLstkAsync(SelectedSubkItem?.SubkLoca ?? string.Empty);
 
             this.SearchCommand.Execute(null);
         }
