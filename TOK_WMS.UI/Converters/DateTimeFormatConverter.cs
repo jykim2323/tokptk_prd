@@ -24,11 +24,6 @@ public class DateTimeFormatConverter : IValueConverter
                 return parsedDateShort.ToString("yyyy-MM-dd");
             }
 
-            // 길이가 6자리 시간 포맷일 경우
-            if (strDate.Length == 6 && DateTime.TryParseExact(strDate, "HHmmss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedTime))
-            {
-                return parsedTime.ToString("HH:mm:ss");
-            }
         }
 
         // 형식이 맞지 않거나 null인 경우 원본 그대로 반환
@@ -37,6 +32,6 @@ public class DateTimeFormatConverter : IValueConverter
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        throw new NotImplementedException();
+        return value;
     }
 }

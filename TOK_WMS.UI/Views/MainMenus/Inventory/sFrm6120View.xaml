@@ -203,13 +203,13 @@
                         <DockPanel LastChildFill="True">
                             <!-- 결과 그리드: 컬럼이 데이터 길이에 맞춰 자동 너비 -->
                             <DataGrid x:Name="DB_Table2" ItemsSource="{Binding SubkItems}"
-                                         Style="{StaticResource ListDataGridStyle}"
-                            HeadersVisibility="All"
-                            SelectionMode="Extended"
-                            ColumnWidth="Auto"
-                            CanUserSortColumns="True"
-                            ScrollViewer.VerticalScrollBarVisibility="Auto"
-                            ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                                        Style="{StaticResource ListDataGridStyle}"
+                                        HeadersVisibility="All"
+                                        SelectionMode="Extended"
+                                        ColumnWidth="Auto"
+                                        CanUserSortColumns="True"
+                                        ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                        ScrollViewer.HorizontalScrollBarVisibility="Auto">
 
                                 <DataGrid.RowHeaderStyle>
                                     <Style TargetType="DataGridRowHeader">

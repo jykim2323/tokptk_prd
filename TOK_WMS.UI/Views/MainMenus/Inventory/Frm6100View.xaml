@@ -16,6 +16,7 @@
         <conv:LstkFlagConverter x:Key="LstkFlagConverter"/>
         <conv:SubkFlagConverter x:Key="SubkFlagConverter"/>
         <conv:DateTimeFormatConverter x:Key="DateTimeFormatConverter"/>
+        <conv:OnlyTimeFormatConverter x:Key="OnlyTimeFormatConverter"/>
         <Style x:Key="FilterLabel" TargetType="TextBlock">
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="FontWeight" Value="Bold"/>
@@ -191,7 +192,7 @@
                                     <DataGridTextColumn Header="PLT-NO" Binding="{Binding LstkPltno}" Width="260" />
                                     <DataGridTextColumn Header="상태" Binding="{Binding LstkFlag, Converter={StaticResource LstkFlagConverter}}" Width="80" />
                                     <DataGridTextColumn Header="입고일자" Binding="{Binding LstkIndate, Converter={StaticResource DateTimeFormatConverter}}" Width="100" />
-                                    <DataGridTextColumn Header="입고시간" Binding="{Binding LstkIntime, Converter={StaticResource DateTimeFormatConverter}  }" Width="*" />
+                                    <DataGridTextColumn Header="입고시간" Binding="{Binding LstkIntime, Converter={StaticResource OnlyTimeFormatConverter}  }" Width="*" />
                                 </DataGrid.Columns>
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="MouseDoubleClick">

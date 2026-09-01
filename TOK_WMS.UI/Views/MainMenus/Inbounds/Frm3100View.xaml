@@ -177,7 +177,7 @@
                     <ColumnDefinition Width="110" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                
+
 
                 <Border Grid.Column="0" 
                      Padding="7,5" Margin="0,0,0,5">
@@ -223,32 +223,32 @@
                             </Border>
 
                             <TextBox Grid.Row="1" Grid.Column="1" Style="{StaticResource DetailInputBox}" Margin="6,0,0,4" Text="{Binding ItnbrEdit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" CharacterCasing="Upper" />
-                            
+
                             <Border Grid.Row="2" Grid.Column="0" Style="{StaticResource DetailLabelCell}">
                                 <TextBlock Style="{StaticResource FilterLabel}" Text="품목명" />
                             </Border>
 
                             <TextBox Grid.Row="2" Grid.Column="1" Style="{StaticResource DetailInputBox}" Margin="6,0,0,4" Text="{Binding NameEdit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" CharacterCasing="Upper" />
-                            
+
                             <Border Grid.Row="3" Grid.Column="0" Style="{StaticResource DetailLabelCell}">
                                 <TextBlock Style="{StaticResource FilterLabel}" Text="중량" />
                             </Border>
 
                             <TextBox x:Name="WeightTextBox" Grid.Row="3" Grid.Column="1" Style="{StaticResource DetailInputBox}" Margin="6,0,0,4" Text="{Binding WeightEdit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                      PreviewTextInput="NumInput" CharacterCasing="Upper"/>
-                            
+
                             <Border Grid.Row="4" Grid.Column="0" Style="{StaticResource DetailLabelCell}">
                                 <TextBlock Style="{StaticResource FilterLabel}" Text="LOT-NO" />
                             </Border>
 
                             <TextBox Grid.Row="4" Grid.Column="1" Style="{StaticResource DetailInputBox}" Margin="6,0,0,4" Text="{Binding LotnoEdit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" CharacterCasing="Upper"/>
-                            
+
                             <Border Grid.Row="5" Grid.Column="0" Style="{StaticResource DetailLabelCell}">
                                 <TextBlock Style="{StaticResource FilterLabel}" Text="BOX-NO" />
                             </Border>
 
                             <TextBox Grid.Row="5" Grid.Column="1" Style="{StaticResource DetailInputBox}" Margin="6,0,0,4" Text="{Binding BoxNoEdit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" CharacterCasing="Upper"/>
-                            
+
                             <Border Grid.Row="6" Grid.Column="0"  Style="{StaticResource DetailLabelCell}">
                                 <TextBlock Style="{StaticResource FilterLabel}" Text="비고" />
                             </Border>
@@ -285,7 +285,7 @@
                                 <RowDefinition Height="*" />
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            
+
                             <DataGrid x:Name="InResGrid"
                                 Grid.Row="0"
                                 ItemsSource="{Binding ReservationItems}"
@@ -316,8 +316,6 @@
                 </Border>
 
             </Grid>
-
-
         </Grid>
     </DockPanel>
 

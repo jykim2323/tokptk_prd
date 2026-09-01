@@ -11,6 +11,7 @@ public class SubkFlagConverter : IValueConverter
         {
             "1" => "대기",
             "Y" => "출고예약",
+            "N" => "금지",
             "0" => "",
             _ => value?.ToString() ?? ""
         };

@@ -1,0 +1,30 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
+using System.Windows.Data;
+
+namespace TOK.WMS.UI.Converters;
+
+public class OnlyTimeFormatConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is string strDate && !string.IsNullOrWhiteSpace(strDate))
+        {
+            // 길이가 6자리 시간 포맷일 경우
+            if (strDate.Length == 6 && DateTime.TryParseExact(strDate, "HHmmss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedTime))
+            {
+                return parsedTime.ToString("HH:mm:ss");
+            }
+        }
+
+        // 형식이 맞지 않거나 null인 경우 원본 그대로 반환
+        return value;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
