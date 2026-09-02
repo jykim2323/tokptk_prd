@@ -19,18 +19,18 @@ public class Frm6300Repository(DbConnectionFactory db) : IFrm6300Repository
 
         var sql = new StringBuilder(@"
                                      SELECT
-                                            STK_CODE AS SubkCode,
-                                            SUM(STK_TQTY) AS SubkTqty,
-                                            MAX(MAST_NAME)  AS MastName,
-                                            MAX(GUBN1_NAME)  AS Gubn1Name,
-                                            MAX(GUBN2_NAME)  AS Gubn2Name,
-                                            MAX(GUBN3_NAME)  AS Gubn3Name
+                                     STK_CODE AS SubkCode,
+                                     SUM(STK_TQTY) AS SubkTqty,
+                                     MAX(MAST_NAME)  AS MastName,
+                                     MAX(GUBN1_NAME)  AS Gubn1Name,
+                                     MAX(GUBN2_NAME)  AS Gubn2Name,
+                                     MAX(GUBN3_NAME)  AS Gubn3Name
                                      FROM T1SUBK_VIEW WITH (NOLOCK)
                                      LEFT OUTER JOIN MIMAST (NOLOCK) ON STK_CODE   = MAST_CODE
                                      LEFT OUTER JOIN MIGUBN1 (NOLOCK) ON GUBN1_CODE = MAST_GUBN1
                                      LEFT OUTER JOIN MIGUBN2 (NOLOCK) ON GUBN2_CODE = MAST_GUBN2
                                      LEFT OUTER JOIN MIGUBN3 (NOLOCK) ON GUBN3_CODE = MAST_GUBN3
-                                     WHERE 1 = 1
+                                     WHERE ISNULL(STK_CODE, '') <> ''
                                     ");
 
         var param = new DynamicParameters();
@@ -65,6 +65,29 @@ public class Frm6300Repository(DbConnectionFactory db) : IFrm6300Repository
         return await conn.QueryAsync<Frm6300Dto.ResDto>(
             sql.ToString(),
             param);
+    }
+
+
+    public async Task<IEnumerable<Frm6300Dto.LotnoResDto>?> LotnoSearchAsync(Frm6300Dto.ReqDto reqDto)
+    {
+        using var conn = db.Create();
+
+        var sql = $@" SELECT
+                        STK_CODE      AS SubkCode,
+                        STK_LOTNO      AS SubkLotno,
+                        SUM(STK_TQTY) AS SubkTqty,
+                        MAX(MAST_NAME)  AS MastName  
+                     FROM T1SUBK_VIEW WITH (NOLOCK)
+                     LEFT OUTER JOIN MIMAST WITH (NOLOCK)
+                         ON STK_CODE = MAST_CODE
+                     WHERE STK_CODE = @_subkCode
+                     GROUP BY STK_CODE, STK_LOTNO
+                     ORDER BY STK_CODE , STK_LOTNO";
+
+        return await conn.QueryAsync<Frm6300Dto.LotnoResDto>(sql, new
+        {
+            _subkCode = reqDto.SubkCode ?? string.Empty
+        });
     }
 }
 

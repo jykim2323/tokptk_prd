@@ -85,6 +85,7 @@ public partial class App : Application
         sc.AddHttpClient<IFrm6100Api, Frm6100ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
         sc.AddHttpClient<IFrm6200Api, Frm6200ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
         sc.AddHttpClient<IFrm6300Api, Frm6300ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+        sc.AddHttpClient<IFrm6450Api, Frm6450ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
         sc.AddHttpClient<ISFrm6110Api, SFrm6110ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
         sc.AddHttpClient<ISFrm6120Api, SFrm6120ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
         sc.AddHttpClient<ILocaAddApi, LocaAddApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
@@ -127,6 +128,7 @@ public partial class App : Application
         sc.AddKeyedTransient<DocumentViewModelBase, Frm6100ViewModel>(DocumentKeys.Frm6100);
         sc.AddKeyedTransient<DocumentViewModelBase, Frm6200ViewModel>(DocumentKeys.Frm6200);
         sc.AddKeyedTransient<DocumentViewModelBase, Frm6300ViewModel>(DocumentKeys.Frm6300);
+        sc.AddKeyedTransient<DocumentViewModelBase, Frm6450ViewModel>(DocumentKeys.Frm6450);
 
         //팝업창 관리
         sc.AddSingleton<IWindowService, WindowService>();

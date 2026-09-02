@@ -16,5 +16,9 @@ public class Frm6300Controller(IFrm6300Repository frm6300Repo) : ControllerBase
     public async Task<IActionResult> SearchAsync([FromQuery] Frm6300Dto.ReqDto reqDto) =>
         Ok(await frm6300Repo.SearchAsync(reqDto));
 
+    [HttpGet("lotnosearch")]
+    public async Task<IActionResult> LotnoSearchAsync([FromQuery] Frm6300Dto.ReqDto reqDto) =>
+        Ok(await frm6300Repo.LotnoSearchAsync(reqDto));
+
 
 }

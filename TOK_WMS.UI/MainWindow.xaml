@@ -38,12 +38,14 @@
         <DataTemplate DataType="{x:Type vmInv:Frm6100ViewModel}">
             <viewsInv:Frm6100View/>
         </DataTemplate>
-
         <DataTemplate DataType="{x:Type vmInv:Frm6200ViewModel}">
             <viewsInv:Frm6200View/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type vmInv:Frm6300ViewModel}">
             <viewsInv:Frm6300View/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vmInv:Frm6450ViewModel}">
+            <viewsInv:Frm6450View/>
         </DataTemplate>
 
 

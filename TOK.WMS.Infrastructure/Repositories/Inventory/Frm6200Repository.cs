@@ -8,7 +8,6 @@ using TOK.WMS.Core.ETC;
 using TOK.WMS.Core.Interfaces;
 using TOK.WMS.Core.Interfaces.Inventory;
 using TOK.WMS.Infrastructure.Data;
-using static TOK.WMS.Core.DTOs.Inventory.Frm6100Dto;
 
 namespace TOK.WMS.Infrastructure.Repositories.Inventory;
 

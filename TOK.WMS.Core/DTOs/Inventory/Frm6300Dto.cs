@@ -31,5 +31,11 @@ public class Frm6300Dto
         public string? Gubn2Name { get; set; }
         public string? Gubn3Name { get; set; }
     }
-
+    public class LotnoResDto
+    {
+        public string? SubkCode { get; set; }
+        public string? SubkTqty { get; set; }
+        public string? MastName { get; set; }
+        public string? SubkLotno { get; set; }
+    }
 }
