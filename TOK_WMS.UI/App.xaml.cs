@@ -86,6 +86,9 @@ public partial class App : Application
         sc.AddHttpClient<IFrm6200Api, Frm6200ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
         sc.AddHttpClient<IFrm6300Api, Frm6300ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
         sc.AddHttpClient<IFrm6450Api, Frm6450ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+        sc.AddHttpClient<IFrm6550Api, Frm6550ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+        sc.AddHttpClient<IFrm6700Api, Frm6700ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+        sc.AddHttpClient<IFrm6900Api, Frm6900ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
         sc.AddHttpClient<ISFrm6110Api, SFrm6110ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
         sc.AddHttpClient<ISFrm6120Api, SFrm6120ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
         sc.AddHttpClient<ILocaAddApi, LocaAddApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
@@ -129,6 +132,9 @@ public partial class App : Application
         sc.AddKeyedTransient<DocumentViewModelBase, Frm6200ViewModel>(DocumentKeys.Frm6200);
         sc.AddKeyedTransient<DocumentViewModelBase, Frm6300ViewModel>(DocumentKeys.Frm6300);
         sc.AddKeyedTransient<DocumentViewModelBase, Frm6450ViewModel>(DocumentKeys.Frm6450);
+        sc.AddKeyedTransient<DocumentViewModelBase, Frm6550ViewModel>(DocumentKeys.Frm6550);
+        sc.AddKeyedTransient<DocumentViewModelBase, Frm6700ViewModel>(DocumentKeys.Frm6700);
+        sc.AddKeyedTransient<DocumentViewModelBase, Frm6900ViewModel>(DocumentKeys.Frm6900);
 
         //팝업창 관리
         sc.AddSingleton<IWindowService, WindowService>();

@@ -15,12 +15,12 @@ using TOK.WMS.UI.ViewModels.Base;
 
 namespace TOK.WMS.UI.ViewModels.MainMenus.Inventory;
 
-public partial class Frm6450ViewModel : DocumentViewModelBase
+public partial class Frm6700ViewModel : DocumentViewModelBase
 {
     private readonly IDialogService _dialog;
-    private readonly IFrm6450Api _frm6450Api;
+    private readonly IFrm6700Api _frm6700Api;
     private readonly IExcelService _excel;
-    [ObservableProperty] private string _stokItem = string.Empty;
+    [ObservableProperty] private string _jegoCode = string.Empty;
     [ObservableProperty] private string _stokFlag = string.Empty;
     [ObservableProperty] private string _stokLoca = string.Empty;
     [ObservableProperty] private string _stokPltno = string.Empty;
@@ -43,22 +43,22 @@ public partial class Frm6450ViewModel : DocumentViewModelBase
     [ObservableProperty] private ComboItem? _selectedDangerousType;
     [ObservableProperty] private ComboItem? _selectedSolubilityType;
     [ObservableProperty] private ComboItem? _selectedPetroleumType;
-    [ObservableProperty] private ObservableCollection<Frm6450Dto.ResDto> _Items = [];
-    [ObservableProperty] private Frm6450Dto.ResDto? _selectedItem;
+    [ObservableProperty] private ObservableCollection<Frm6700Dto.ResDto> _Items = [];
+    [ObservableProperty] private Frm6700Dto.ResDto? _selectedItem;
     [ObservableProperty] private bool _whType = false;
     [ObservableProperty] private bool _stokWhM = false;
     [ObservableProperty] private bool _stokWhS = false;
     [ObservableProperty] private bool _stokWhW = false;
     [ObservableProperty] private bool _stokWhA = false;
 
-    public Frm6450ViewModel(IFrm6450Api frm6450Api, IDialogService dialog, IExcelService excel)
+    public Frm6700ViewModel(IFrm6700Api frm6700Api, IDialogService dialog, IExcelService excel)
     {
-        _frm6450Api = frm6450Api;
+        _frm6700Api = frm6700Api;
         _dialog = dialog;
         _excel = excel;
 
-        Title = "수/자동 재고 현황";
-        ContentId = DocumentKeys.Frm6450;
+        Title = "전일 재고 현황";
+        ContentId = DocumentKeys.Frm6700;
 
         SelectedDangerousType = DangerousTypes.FirstOrDefault();
         SelectedSolubilityType = SolubilityTypes.FirstOrDefault();
@@ -121,10 +121,10 @@ public partial class Frm6450ViewModel : DocumentViewModelBase
     {
         try
         {
-            var reqDto = new Frm6450Dto.ReqDto
+            var reqDto = new Frm6700Dto.ReqDto
             {
-                CloseDate = SelectedInDate?.ToString("yyyyMMdd") ?? DateTime.Now.ToString("yyyyMMdd"),
-                StokItem = StokItem ?? string.Empty,    
+                JegoDate = SelectedInDate?.ToString("yyyyMMdd") ?? DateTime.Now.ToString("yyyyMMdd"),
+                JegoCode = JegoCode ?? string.Empty,
                 MastName = MastName ?? string.Empty,
                 StokWhM = StokWhM,
                 StokWhS = StokWhS,
@@ -132,26 +132,12 @@ public partial class Frm6450ViewModel : DocumentViewModelBase
                 DangerousType = SelectedDangerousType?.Value ?? string.Empty,
                 PetroleumType = SelectedPetroleumType?.Value ?? string.Empty,
                 SolubilityType = SelectedSolubilityType?.Value ?? string.Empty,
-                HistYN = (DateTime.Now.Date >= SelectedInDate?.Date) ? true : false,
             };
 
-            var response = await _frm6450Api.SearchAsync(reqDto);
+            var response = await _frm6700Api.SearchAsync(reqDto);
 
             Items.Clear();
             foreach (var h in response ?? []) Items.Add(h);
-
-            StokWgtTotal = Items.Sum(x => x.StokQty).ToString();
-
-            var count = await _frm6450Api.PltnoCntAsync(reqDto);
-
-            if(count != null)
-            {
-                StokPltTotal = count.Count().ToString();
-            }
-            else
-            {
-                StokPltTotal = "0";
-            }
 
         }
         catch (Exception ex)
@@ -166,7 +152,7 @@ public partial class Frm6450ViewModel : DocumentViewModelBase
         try
         {
             if (Items.Count == 0) { _dialog.ShowMessage("저장할 데이터가 없습니다.", "안내"); return; }
-            if (_excel.Export(Items, "수/자동재고현황"))
+            if (_excel.Export(Items, "전일재고현황"))
                 _dialog.ShowMessage("엑셀로 저장되었습니다.", "완료");
         }
         catch (Exception ex)

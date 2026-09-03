@@ -54,15 +54,15 @@ public class Frm6450Repository(DbConnectionFactory db) : IFrm6450Repository
                 param.Add("MastName", $"%{reqDto.MastName}%");
             }
 
-            if (reqDto.Stok1Wh)
+            if (reqDto.StokWhM)
             {
                 sql.AppendLine(" And  STOK_WH Not IN ('S','W') ");
             }
-            if (reqDto.Stok2Wh)
+            if (reqDto.StokWhS)
             {
                 sql.AppendLine(" And  STOK_WH = 'S' ");
             }
-            if (reqDto.Stok3Wh)
+            if (reqDto.StokWhW)
             {
                 sql.AppendLine(" And  STOK_WH = 'W' ");
             }
@@ -131,15 +131,15 @@ public class Frm6450Repository(DbConnectionFactory db) : IFrm6450Repository
                 param.Add("MastName", $"%{reqDto.MastName}%");
             }
 
-            if (reqDto.Stok1Wh)
+            if (reqDto.StokWhM)
             {
                 sql.AppendLine(" And  A.STOK_WH Not IN ('S','W') ");
             }
-            if (reqDto.Stok2Wh)
+            if (reqDto.StokWhS)
             {
                 sql.AppendLine(" And  A.STOK_WH = 'S' ");
             }
-            if (reqDto.Stok3Wh)
+            if (reqDto.StokWhW)
             {
                 sql.AppendLine(" And  A.STOK_WH = 'W' ");
             }

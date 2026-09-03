@@ -47,6 +47,15 @@
         <DataTemplate DataType="{x:Type vmInv:Frm6450ViewModel}">
             <viewsInv:Frm6450View/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vmInv:Frm6550ViewModel}">
+            <viewsInv:Frm6550View/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vmInv:Frm6700ViewModel}">
+            <viewsInv:Frm6700View/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vmInv:Frm6900ViewModel}">
+            <viewsInv:Frm6900View/>
+        </DataTemplate>
 
 
 

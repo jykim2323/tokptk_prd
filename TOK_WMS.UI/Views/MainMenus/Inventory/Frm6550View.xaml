@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="TOK.WMS.UI.Views.MainMenus.Inventory.Frm6450View"
+﻿<UserControl x:Class="TOK.WMS.UI.Views.MainMenus.Inventory.Frm6550View"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
@@ -9,7 +9,7 @@
              FontFamily="{StaticResource AppFont}"
              FontWeight="Medium"
              Loaded="UserControl_Loaded">
-    
+
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <conv:LocaWhFormatConverter x:Key="LocaWhFormatConverter"/>
@@ -42,7 +42,6 @@
             <Setter Property="BorderThickness" Value="0,0,1,1"/>
             <Setter Property="Padding" Value="12,0"/>
         </Style>
-
         <Style x:Key="Header" TargetType="Border">
             <Setter Property="Background" Value="#ebf4fc"/>
             <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
@@ -73,7 +72,7 @@
 
             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Top" Height="60">
                 <TextBlock Text="📦" FontSize="20" Margin="0,5,5,10" VerticalAlignment="Center"/>
-                <TextBlock Text="수/자동 재고 현황" FontSize="20" FontWeight="Bold"
+                <TextBlock Text="수/자동 재고 집계" FontSize="20" FontWeight="Bold"
                     Foreground="{DynamicResource AppTextBrush}" VerticalAlignment="Center"/>
             </StackPanel>
 
@@ -237,15 +236,6 @@
                 <Grid Grid.Row="3">
                     <Border Height="1" Background="{DynamicResource AppBorderBrush}" Margin="0,10,0,10"/>
                 </Grid>
-                <Grid Grid.Row="4" Margin="10,5,10,10">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="총 합계:"  FontSize="13" FontWeight="Bold" Style="{StaticResource FilterLabel}"/>
-                        <TextBox  Width="130" Height="35" IsReadOnly="True" Text="{Binding StokWgtTotal, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}"/>
-
-                        <TextBlock Text="전체 PLT 수량:"  FontSize="13" FontWeight="Bold" Style="{StaticResource FilterLabel}" Margin="40,0,0,0"/>
-                        <TextBox  Width="130" Height="35" IsReadOnly="True" Text="{Binding StokPltTotal, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}"/>
-                    </StackPanel>
-                </Grid>
             </Grid>
         </Border>
 
@@ -263,7 +253,7 @@
                     <DockPanel LastChildFill="True">
                         <Border DockPanel.Dock="Top" Height="40" Style="{StaticResource Header}"
                                  BorderThickness="1" CornerRadius="5" Padding="12,10" Margin="0,0,0,8">
-                            <TextBlock Text="재고 현황" FontSize="15" FontWeight="Bold" 
+                            <TextBlock Text="재고 집계 현황" FontSize="15" FontWeight="Bold" 
                                             Foreground="{DynamicResource AppTextBrush}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                         </Border>
 
@@ -290,45 +280,22 @@
                                     </Style.Triggers>
                                 </Style>
                             </DataGrid.RowHeaderStyle>
-                            <DataGrid.CellStyle>
-                                <Style TargetType="DataGridCell"
-                                  BasedOn="{StaticResource ListCellStyle}">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding LstkFlag}" Value="Y">
-                                            <Setter Property="Background" Value="Yellow"/>
-                                            <Setter Property="Foreground" Value="Red"/>
-                                            <Setter Property="FontWeight" Value="Bold"/>
-                                        </DataTrigger>
-
-                                        <DataTrigger Binding="{Binding LstkFlag}" Value="E">
-                                            <Setter Property="Background" Value="Yellow"/>
-                                            <Setter Property="Foreground" Value="Red"/>
-                                            <Setter Property="FontWeight" Value="Bold"/>
-                                        </DataTrigger>
-
-                                        <DataTrigger Binding="{Binding LstkFlag}" Value="N">
-                                            <Setter Property="Background" Value="Red"/>
-                                            <Setter Property="Foreground" Value="White"/>
-                                            <Setter Property="FontWeight" Value="Bold"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </DataGrid.CellStyle>
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="창고" Binding="{Binding StokWh, Converter={StaticResource StokWhFlagConverter}}" Width="70"  />
                                 <DataGridTextColumn Header="품목코드" Binding="{Binding StokItem}" Width="200" />
                                 <DataGridTextColumn Header="품 목 명" Binding="{Binding MastName}" Width="150" />
-                                <DataGridTextColumn Header="LOT-NO" Binding="{Binding StokLotno}" Width="180" />
-                                <DataGridTextColumn Header="저장위치" Binding="{Binding StokLoca, Converter={StaticResource LocaWhFormatConverter}}" Width="150" />
-                                <DataGridTextColumn Header="상태" Binding="{Binding StokFlag, Converter={StaticResource LstkFlagConverter}}" Width="70" />
-                                <DataGridTextColumn Header="재고수량" Binding="{Binding StokQty}" Width="100" />
-                                <DataGridTextColumn Header="BOXNO" Binding="{Binding StokBoxno}" Width="AUTO" />
-                                <DataGridTextColumn Header="비고" Binding="{Binding StokRemark}" Width="AUTO" />
-                                <DataGridTextColumn Header="입고일자" Binding="{Binding StokIndate, Converter={StaticResource DateTimeFormatConverter}}" Width="AUTO" />
-                                <DataGridTextColumn Header="입고시간" Binding="{Binding StokIntime, Converter={StaticResource OnlyTimeFormatConverter}}" Width="AUTO" />
+                                <DataGridTextColumn Header="생산동" Binding="{Binding StokSqty}" Width="70"  />
+                                <DataGridTextColumn Header="외부동" Binding="{Binding StokWqty}" Width="70"  />
+                                <DataGridTextColumn Header="수동창고" Binding="{Binding StokMqty}" Width="70"  />
+                                <DataGridTextColumn Header="합계" Binding="{Binding StokTqty}" Width="180" />
                                 <DataGridTextColumn Header="위험물" Binding="{Binding DangerousType}" Width="AUTO" />
                                 <DataGridTextColumn Header="석유류" Binding="{Binding PetroleumType}" Width="AUTO" />
-                                <DataGridTextColumn Header="수용성" Binding="{Binding SolubilityType}" Width="*" />
+                                <DataGridTextColumn Header="수용성" Binding="{Binding SolubilityType}" Width="AUTO" />
+
+                                <DataGridTextColumn Header="창고A" Binding="{Binding StokAqty}" Width="100"  />
+                                <DataGridTextColumn Header="창고B" Binding="{Binding StokBqty}" Width="100"  />
+                                <DataGridTextColumn Header="창고C" Binding="{Binding StokCqty}" Width="100"  />
+                                <DataGridTextColumn Header="창고D" Binding="{Binding StokDqty}" Width="100"  />
+                                <DataGridTextColumn Header="창고E" Binding="{Binding StokEqty}" Width="100"  />
                             </DataGrid.Columns>
                         </DataGrid>
                     </DockPanel>

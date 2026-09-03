@@ -8,16 +8,14 @@ using TOK.WMS.Core.DTOs.Inventory;
 
 namespace TOK.WMS.UI.Services.Api.Inventory;
 
-public interface IFrm6450Api
+public interface IFrm6550Api
 {
-    Task<IEnumerable<Frm6450Dto.ResDto>?> SearchAsync(Frm6450Dto.ReqDto searchDto);
-
-    Task<IEnumerable<Frm6450Dto.ResDto>?> PltnoCntAsync(Frm6450Dto.ReqDto searchDto);
+    Task<IEnumerable<Frm6550Dto.ResDto>?> SearchAsync(Frm6550Dto.ReqDto searchDto);
 }
 
-public class Frm6450ApiClient(HttpClient http) : IFrm6450Api
+public class Frm6550ApiClient(HttpClient http) : IFrm6550Api
 {
-    public Task<IEnumerable<Frm6450Dto.ResDto>?> SearchAsync(Frm6450Dto.ReqDto searchDto)
+    public Task<IEnumerable<Frm6550Dto.ResDto>?> SearchAsync(Frm6550Dto.ReqDto searchDto)
     {
         var query = new Dictionary<string, string?>
         {
@@ -27,27 +25,17 @@ public class Frm6450ApiClient(HttpClient http) : IFrm6450Api
             ["DangerousType"] = searchDto.DangerousType,
             ["PetroleumType"] = searchDto.PetroleumType,
             ["SolubilityType"] = searchDto.SolubilityType,
-            ["HistYN"] = searchDto.HistYN.ToString(),
             ["StokWhM"] = searchDto.StokWhM.ToString(),
             ["StokWhS"] = searchDto.StokWhS.ToString(),
             ["StokWhW"] = searchDto.StokWhW.ToString(),
         };
 
         var url = QueryHelpers.AddQueryString(
-            "api/inventory/frm6450/search",
+            "api/inventory/frm6550/search",
             query);
 
-        return http.GetFromJsonAsync<IEnumerable<Frm6450Dto.ResDto>?>(url);
+        return http.GetFromJsonAsync<IEnumerable<Frm6550Dto.ResDto>?>(url);
     }
 
-    public Task<IEnumerable<Frm6450Dto.ResDto>?> PltnoCntAsync(Frm6450Dto.ReqDto searchDto)
-    {
-        string qs =
-            $"CloseDate={Uri.EscapeDataString(searchDto.CloseDate ?? "")}";
-
-            qs += $"&HistYN={searchDto.HistYN}";
-
-        return http.GetFromJsonAsync<IEnumerable<Frm6450Dto.ResDto>?>($"api/inventory/frm6450/pltnocnt?{qs}");
-    }
 }
 
