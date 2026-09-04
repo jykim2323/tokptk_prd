@@ -135,12 +135,12 @@ public class Frm3100Repository(DbConnectionFactory db, ICoreRepository coreRepo)
     {
         try
         {
-            if (!coreRepo.Trak_check(sPltno ?? string.Empty).Result)
+            if (! await coreRepo.Trak_check(sPltno ?? string.Empty))
             {
                 return false;
             }
 
-            if (!coreRepo.Lstk_check(sPltno ?? string.Empty).Result)
+            if (!await coreRepo.Lstk_check(sPltno ?? string.Empty))
             {
                 return false;
             }

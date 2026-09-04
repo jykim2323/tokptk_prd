@@ -76,7 +76,7 @@ public class Frm6900Repository(DbConnectionFactory db, ICoreRepository coreRepo)
         return await conn.QueryAsync<Frm6900Dto.ResDto>(sql.ToString(), param);
     }
 
-    public async Task<IEnumerable<Frm6900Dto.SubkDto>?> SubkSearchAsync(string lstkLoca)
+    public async Task<IEnumerable<Frm6900Dto.SubkDto>?> SubkSearchAsync(Frm6900Dto.ReqDto reqDto)
     {
         using var conn = db.Create();
 
@@ -106,12 +106,14 @@ public class Frm6900Repository(DbConnectionFactory db, ICoreRepository coreRepo)
                          ON GUBN2_CODE = MAST_GUBN2
                      LEFT OUTER JOIN MIGUBN3 WITH (NOLOCK)
                          ON GUBN3_CODE = MAST_GUBN3
-                     WHERE SUBK_LOCA = @_subkLoca
+                     WHERE SUBK_LOCA = @SubkLoca
+                     AND   SUBK_PLTNO = @SubkPltno
                      ORDER BY SUBK_LOCA, SUBK_CODE";
 
         return await conn.QueryAsync<Frm6900Dto.SubkDto>(sql, new
         {
-            _subkLoca = lstkLoca ?? string.Empty
+            SubkLoca = reqDto.SubkLoca ?? string.Empty,
+            SubkPltno = reqDto.SubkPltno ?? string.Empty
         });
     }
 
@@ -120,7 +122,7 @@ public class Frm6900Repository(DbConnectionFactory db, ICoreRepository coreRepo)
         try
         {
 
-            if (!coreRepo.Lstk_check(sPltno ?? string.Empty).Result)
+            if (!await coreRepo.Trak_check(sPltno ?? string.Empty))
             {
                 return false;
             }
@@ -137,7 +139,7 @@ public class Frm6900Repository(DbConnectionFactory db, ICoreRepository coreRepo)
     {
         try
         {
-            if (!coreRepo.Lstk_check(sPltno ?? string.Empty).Result)
+            if (!await coreRepo.Lstk_check(sPltno ?? string.Empty))
             {
                 return false;
             }
@@ -154,7 +156,7 @@ public class Frm6900Repository(DbConnectionFactory db, ICoreRepository coreRepo)
     {
         try
         {
-            if (!coreRepo.Subk_loca_check(sPltno ?? string.Empty).Result)
+            if (!await coreRepo.Subk_loca_check(sPltno ?? string.Empty))
             {
                 return false;
             }
@@ -164,5 +166,48 @@ public class Frm6900Repository(DbConnectionFactory db, ICoreRepository coreRepo)
             return false;
         }
         return true;
+    }
+    
+    public async Task<bool> SubkCheck(string subkLoca)
+    {
+        try
+        {
+            if (!await coreRepo.Subk_check(subkLoca ?? string.Empty))
+            {
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+        return true;
+    }
+    public async Task<int> DeleteAsync(string subkLoca)
+    {
+        using var conn = db.Create();
+
+        var sql = @"DELETE FROM T1MISUBK WHERE SUBK_LOCA = @subkLoca";
+
+        return await conn.ExecuteAsync(sql, new
+        {
+            subkLoca = subkLoca ?? string.Empty
+        });
+    }
+    public async Task<int> LstkClearAsync(string lstkLoca)
+    {
+        using var conn = db.Create();
+
+        var sql = @"Update  T1MILSTK Set 
+                            LSTK_FLAG = '0', 
+                            LSTK_INDATE = '', 
+                            LSTK_INTIME = '',
+                            LSTK_PLTNO = ''
+                            WHERE LSTK_LOCA = @lstkLoca";
+
+        return await conn.ExecuteAsync(sql, new
+        {
+            lstkLoca = lstkLoca ?? string.Empty
+        });
     }
 }

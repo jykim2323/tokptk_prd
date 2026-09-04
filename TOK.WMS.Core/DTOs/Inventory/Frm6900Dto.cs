@@ -51,6 +51,7 @@ public partial class Frm6900Dto
         public string? Gubn1Name { get; set; }
         public string? Gubn2Name { get; set; }
         public string? Gubn3Name { get; set; }
+        public bool? Modify { get; set; } = false;
     }
 
 }

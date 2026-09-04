@@ -47,7 +47,20 @@ public class WindowService : IWindowService
 
         view.ShowDialog();
     }
+    public void ShowSFrm6130(Frm6900Dto.SubkDto item)
+    {
+        var view = _services.GetRequiredService<SFrm6130View>();
 
+        if (view.DataContext is SFrm6130ViewModel vm)
+        {
+            vm.Initialize(item);
+        }
+
+        view.Owner = Application.Current.MainWindow;
+        view.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+
+        view.ShowDialog();
+    }
     public void ShowLocaAdd(Frm6100Dto.SubkDto item)
     {
         var view = _services.GetRequiredService<LocaAddView>();

@@ -9,5 +9,6 @@ public interface IWindowService
 {
     void ShowSFrm6110(Frm6100Dto.ResDto item);
     void ShowSFrm6120(Frm6100Dto.SubkDto item);
+    void ShowSFrm6130(Frm6900Dto.SubkDto item);
     void ShowLocaAdd(Frm6100Dto.SubkDto item);
 }

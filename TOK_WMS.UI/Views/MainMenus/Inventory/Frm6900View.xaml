@@ -16,6 +16,7 @@
         <conv:LocaFormatConverter x:Key="LocaFormatConverter"/>
         <conv:LstkFlagConverter x:Key="LstkFlagConverter"/>
         <conv:SubkFlagConverter x:Key="SubkFlagConverter"/>
+        <conv:SubkFlagInvetoryConverter x:Key="SubkFlagInvetoryConverter"/>
         <conv:DateTimeFormatConverter x:Key="DateTimeFormatConverter"/>
         <conv:OnlyTimeFormatConverter x:Key="OnlyTimeFormatConverter"/>
         <Style x:Key="FilterLabel" TargetType="TextBlock">
@@ -290,7 +291,7 @@
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="재고위치" Binding="{Binding SubkLoca}" Width="200" />
                                     <DataGridTextColumn Header="PLT-NO" Binding="{Binding SubkPltno}" Width="260" />
-                                    <DataGridTextColumn Header="상태" Binding="{Binding SubkFlag, Converter={StaticResource SubkFlagConverter}}" Width="80" />
+                                    <DataGridTextColumn Header="상태" Binding="{Binding SubkFlag, Converter={StaticResource SubkFlagInvetoryConverter}}" Width="80" />
                                     <DataGridTextColumn Header="품목코드" Binding="{Binding SubkCode}" Width="100" />
                                     <DataGridTextColumn Header="품 목 명" Binding="{Binding MastName}" Width="AUTO" />
                                     <DataGridTextColumn Header="LOT-NO" Binding="{Binding SubkLotno}" Width="AUTO" />
@@ -311,13 +312,13 @@
                 <Grid Grid.Row="3" Grid.Column="1" Margin="0,0,0,0">
                     <StackPanel Orientation="Horizontal">
                         <Button Content="💾 등록" Width="100" HorizontalAlignment="Right" Padding="16,16" Margin="0,0,15,0"
-                                Command="{Binding DeletePltNoCommand}" CommandParameter="{Binding SelectedItem, ElementName=DB_Table2}" FontWeight="Bold" Cursor="Hand" BorderThickness="0"
+                                Command="{Binding RegisterCommand}" CommandParameter="{Binding SelectedSubkItem , Mode=TwoWay}" FontWeight="Bold" Cursor="Hand" BorderThickness="0"
                                 Background="{DynamicResource BtnPrimaryBrush}" Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
                         <Button Content="✏️ 수정" Width="100" HorizontalAlignment="Right" Padding="16,16" Margin="0,0,15,0"
-                                Command="{Binding DeletePltNoCommand}" CommandParameter="{Binding SelectedItem, ElementName=DB_Table2}" FontWeight="Bold" Cursor="Hand" BorderThickness="0"
+                                Command="{Binding ModifyCommand}" CommandParameter="{Binding SelectedSubkItem , Mode=TwoWay}" FontWeight="Bold" Cursor="Hand" BorderThickness="0"
                                 Background="{DynamicResource BtnStadardBrush}" Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
                         <Button Content="🗑️ 삭제" Width="100" HorizontalAlignment="Right" Padding="16,16" 
-                                Command="{Binding DeletePltNoCommand}" CommandParameter="{Binding SelectedItem, ElementName=DB_Table2}" FontWeight="Bold" Cursor="Hand" BorderThickness="0"
+                                Command="{Binding DeletePltNoCommand}" CommandParameter="{Binding SelectedSubkItem , Mode=TwoWay}" FontWeight="Bold" Cursor="Hand" BorderThickness="0"
                                 Background="{DynamicResource BtnStadardBrush}" Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
                     </StackPanel>
                 </Grid>

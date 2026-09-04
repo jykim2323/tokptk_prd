@@ -15,7 +15,7 @@ public class LocaAddRepository(DbConnectionFactory db, ICoreRepository coreRepo)
 {
     public async Task<bool> SubkCheckAsync(LocaAddDto.ReqDto reqdto)
     {
-        if (!coreRepo.Subk_dup_check(reqdto.SubkPltno ?? string.Empty, reqdto.SubkCode ?? string.Empty, reqdto.SubkLotno ?? string.Empty).Result)
+        if (!await coreRepo.Subk_dup_check(reqdto.SubkPltno ?? string.Empty, reqdto.SubkCode ?? string.Empty, reqdto.SubkLotno ?? string.Empty))
         {
             return false;
         }

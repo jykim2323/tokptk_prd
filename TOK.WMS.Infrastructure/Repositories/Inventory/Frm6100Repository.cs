@@ -107,7 +107,7 @@ public class Frm6100Repository(DbConnectionFactory db, ICoreRepository coreRepo)
     {
         using var conn = db.Create();
 
-        var sql = @"Update  T2MILSTK Set 
+        var sql = @"Update  T1MILSTK Set 
                             LSTK_FLAG = '0', 
                             LSTK_INDATE = '', 
                             LSTK_INTIME = '',

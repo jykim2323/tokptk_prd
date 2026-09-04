@@ -9,7 +9,7 @@ namespace TOK.WMS.Api.Controllers.Inventory;
 [Route("api/inventory/[controller]")]
 [ApiController]
 
-public class LocaAddController(ILocaAddRepository locaAddRepo,ICoreRepository coreRepo) : ControllerBase
+public class LocaAddController(ILocaAddRepository locaAddRepo) : ControllerBase
 {
 
     [HttpGet("subkcheck")]

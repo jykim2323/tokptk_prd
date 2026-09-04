@@ -145,7 +145,7 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
 
                 if (deleteCount <= 0)
                 {
-                    _dialog.ShowMessage($"재고위치(T2MISUBK) '{item.LstkLoca}' 삭제 {deleteCount} 건 오류", "오류");
+                    _dialog.ShowMessage($"재고위치(T1MISUBK) '{item.LstkLoca}' 삭제 {deleteCount} 건 오류", "오류");
                     return;
                 }
 
@@ -153,7 +153,7 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
 
                 if (lstkclearCount <= 0)
                 {
-                    _dialog.ShowMessage($"재고위치(T2MISUBK) '{item.LstkLoca}' 삭제 {deleteCount} 건 오류", "오류");
+                    _dialog.ShowMessage($"재고위치(T1MILSTK) '{item.LstkLoca}' 삭제 {deleteCount} 건 오류", "오류");
                     return;
                 }
 

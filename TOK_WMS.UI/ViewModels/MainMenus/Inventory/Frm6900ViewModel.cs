@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using TOK.WMS.Core.DTOs.Inventory;
 using TOK.WMS.UI.Models.MainMenus;
 using TOK.WMS.UI.Services;
+using TOK.WMS.UI.Services.Api.Inbounds;
 using TOK.WMS.UI.Services.Api.Inventory;
 using TOK.WMS.UI.Services.Interfaces.Popup;
 using TOK.WMS.UI.ViewModels.Base;
@@ -53,11 +54,11 @@ public partial class Frm6900ViewModel : DocumentViewModelBase
     [RelayCommand]
     private async Task ValidateSelected()
     {
-        if (string.IsNullOrEmpty(SelectedItem?.SubkPltno))
-        {
-            SelectedItem?.IsClicked = false;
-            return;
-        }
+        //if (string.IsNullOrEmpty(SelectedItem?.SubkPltno))
+        //{
+        //    SelectedItem?.IsClicked = false;
+        //    return;
+        //}
 
         if(!await _frm6900Api.TrackingAsync(SelectedItem?.SubkPltno ?? string.Empty))
         {
@@ -110,6 +111,36 @@ public partial class Frm6900ViewModel : DocumentViewModelBase
     }
 
     [RelayCommand]
+    private async Task SubkSearch()
+    {
+        try
+        {
+            if (SelectedItem?.SubkLoca == null)
+            {
+                return;
+            }
+
+            var result = await _frm6900Api.SubkSearchAsync(new Frm6900Dto.ReqDto
+            {
+                SubkLoca = SelectedItem?.SubkLoca,
+                SubkPltno = SelectedItem?.SubkPltno
+            });
+
+            SubkItems.Clear();
+
+            foreach (var h in result ?? []) SubkItems.Add(h);
+
+
+            SubkWgtTotal = SubkItems.Sum(x => decimal.TryParse(x.SubkWgt, out var wgt) ? wgt : 0).ToString();
+
+        }
+        catch (Exception ex)
+        {
+            _dialog.ShowMessage($"조회 실패: {ex.Message}", "오류");
+        }
+    }
+
+    [RelayCommand]
     private async Task SaveLocaSearch()
     {
         try
@@ -120,20 +151,117 @@ public partial class Frm6900ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage($"조회 실패: {ex.Message}", "오류");
+            _dialog.ShowMessage($"화면 생성 실패: {ex.Message}", "오류");
         }
     }
 
     [RelayCommand]
-    private async Task SubkSearch()
+    private async Task PltnoInsert() 
     {
         try
         {
+            _mainViewModel.OpenDocumentCommand.Execute(DocumentKeys.Frm3100);
 
+            this.SearchCommand.Execute(null);
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage($"조회 실패: {ex.Message}", "오류");
+            _dialog.ShowMessage($"화면 생성 실패: {ex.Message}", "오류");
+        }
+    }
+
+    [RelayCommand]
+    private async Task Register(Frm6900Dto.SubkDto item)
+    {
+        try
+        {
+            if(string.IsNullOrEmpty(SelectedItem?.SubkPltno))
+            {
+                _dialog.ShowMessage($" 등록할 파렛트 번호(PLT-NO)를 입력해주세요 !", "오류");
+                return;
+            }
+
+            if (item == null && SubkItems != null)
+            {
+                item = (SubkItems.FirstOrDefault());
+                item?.Modify = false;
+            }
+
+            _windowService.ShowSFrm6130(item ?? new Frm6900Dto.SubkDto());
+
+            this.SearchCommand.Execute(null);
+        }
+        catch (Exception ex)
+        {
+            _dialog.ShowMessage($"화면 생성 실패: {ex.Message}", "오류");
+        }
+    }
+
+    [RelayCommand]
+    private async Task Modify(Frm6900Dto.SubkDto item)
+    {
+        try
+        {
+            if (item == null && SubkItems != null)
+            {
+                item = (SubkItems.FirstOrDefault());
+            }
+
+            item?.Modify = true;
+            item.SubkLotno = SelectedSubkItem?.SubkLotno ?? SubkItems.FirstOrDefault()?.SubkLotno ?? item?.SubkLotno;
+
+            _windowService.ShowSFrm6130(item??new Frm6900Dto.SubkDto());
+
+            this.SearchCommand.Execute(null);
+        }
+        catch (Exception ex)
+        {
+            _dialog.ShowMessage($"화면 생성 실패: {ex.Message}", "오류");
+        }
+    }
+
+    [RelayCommand]
+    private async Task DeletePltNo(Frm6900Dto.SubkDto item)
+    {
+        try
+        {
+            if (!_dialog.ShowConfirm("정말로 확정 합니까.?", "확인"))
+            {
+                return;
+            }
+
+            //TRUE 재고 있음
+            var subkCheck = await _frm6900Api.SubkCheckAsync(item?.SubkLoca ?? string.Empty);
+
+            if (subkCheck)
+            {
+                if (!_dialog.ShowConfirm("재고가 있습니다.확정 합니까? (재고가 지워집니다)", "확인"))
+                {
+                    return;
+                }
+
+                var deleteCount = await _frm6900Api.DeleteAsync(item?.SubkLoca ?? string.Empty);
+
+                if (deleteCount <= 0)
+                {
+                    _dialog.ShowMessage($"재고위치(T1MISUBK) '{item?.SubkLoca}' 삭제 {deleteCount} 건 오류", "오류");
+                    return;
+                }
+
+                var lstkclearCount = await _frm6900Api.LstkClearAsync(item?.SubkLoca ?? string.Empty);
+
+                if (lstkclearCount <= 0)
+                {
+                    _dialog.ShowMessage($"재고위치(T1MILSTK) '{item?.SubkLoca}' 삭제 {deleteCount} 건 오류", "오류");
+                    return;
+                }
+                this.SearchCommand.Execute(null);
+            }
+        }
+        catch (Exception ex)
+        {
+            //StatusMessage = ex.Message;
+            _dialog.ShowMessage($"삭제 실패: {ex.Message}", "오류");
         }
     }
 }
