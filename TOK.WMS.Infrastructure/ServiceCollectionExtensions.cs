@@ -27,6 +27,9 @@ namespace TOK.WMS.Infrastructure
 
             //입고 관리
             services.AddScoped<IFrm3100Repository, Frm3100Repository>();
+            services.AddScoped<IFrm3300Repository, Frm3300Repository>();
+            services.AddScoped<IFrm3400Repository, Frm3400Repository>();
+            services.AddScoped<IFrm3700Repository, Frm3700Repository>();
 
 
 

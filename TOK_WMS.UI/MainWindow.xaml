@@ -28,6 +28,15 @@
         <DataTemplate DataType="{x:Type vmIn:Frm3100ViewModel}">
             <viewsIn:Frm3100View/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vmIn:Frm3300ViewModel}">
+            <viewsIn:Frm3300View/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vmIn:Frm3400ViewModel}">
+            <viewsIn:Frm3400View/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vmIn:Frm3700ViewModel}">
+            <viewsIn:Frm3700View/>
+        </DataTemplate>
 
 
         <!-- 출고 관리 -->
