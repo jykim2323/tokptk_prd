@@ -245,7 +245,7 @@
                     </Border>
                     <Border Grid.Row="2" Margin="30,10">
                         <Button Content="➕  팔렛트 합침" Width="150" Height="40" FontSize="13" FontWeight="Bold" Cursor="Hand" BorderThickness="0"  HorizontalAlignment="Left"
-                                Background="{DynamicResource BtnStadardBrush}" Foreground="{DynamicResource BtnPrimaryTextBrush}" Command="{Binding PltAddUpCommand}" CommandParameter="{Binding SelectedItem, ElementName=DB_Table1}"/>
+                                Background="{DynamicResource BtnStadardBrush}" Foreground="{DynamicResource BtnPrimaryTextBrush}" Command="{Binding PltnoAddUpCommand}" />
                     </Border>
                     <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="10">
                         <TextBlock Text="파렛트당 중량:" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>

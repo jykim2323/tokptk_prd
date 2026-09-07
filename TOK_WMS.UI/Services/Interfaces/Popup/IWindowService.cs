@@ -11,4 +11,5 @@ public interface IWindowService
     void ShowSFrm6120(Frm6100Dto.SubkDto item);
     void ShowSFrm6130(Frm6900Dto.SubkDto item);
     void ShowLocaAdd(Frm6100Dto.SubkDto item);
+    void ShowSFrm6910(string leftPltno, string rightPltno);
 }

@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using System.Collections.ObjectModel;
 using TOK.WMS.Core.DTOs.Inventory;
@@ -60,7 +61,13 @@ public partial class Frm6900ViewModel : DocumentViewModelBase
         //    return;
         //}
 
-        if(!await _frm6900Api.TrackingAsync(SelectedItem?.SubkPltno ?? string.Empty))
+        if (Items.Count(x => x.IsClicked) == 3)
+        {
+            SelectedItem?.IsClicked = false;
+            return;
+        }
+
+        if (!await _frm6900Api.TrackingAsync(SelectedItem?.SubkPltno ?? string.Empty))
         {
             _dialog.ShowMessage($"{SelectedItem?.SubkPltno} 해당 PLT-NO는 현재 입/출고 작업이 진행 중입니다.", "오류");
             SelectedItem?.IsClicked = false;
@@ -74,7 +81,7 @@ public partial class Frm6900ViewModel : DocumentViewModelBase
             return;
         }
 
-        if (!await _frm6900Api.SubkLocaCheckAsync(SelectedItem?.SubkPltno ?? string.Empty))
+        if (await _frm6900Api.SubkLocaCheckAsync(SelectedItem?.SubkPltno ?? string.Empty))
         {
             _dialog.ShowMessage($"{SelectedItem?.SubkPltno}  위치  {SelectedItem?.SubkLoca} 가 지정된 파레트는 선택할 수 없습니다.", "오류");
             SelectedItem?.IsClicked = false;
@@ -95,6 +102,30 @@ public partial class Frm6900ViewModel : DocumentViewModelBase
             {
                 SubkLoca = SelectedItem?.SubkLoca ?? string.Empty,
                 SubkPltno = SelectedItem?.SubkPltno ?? string.Empty,
+            };
+
+            var result = await _frm6900Api.SearchAsync(reqDto);
+            Items.Clear();
+            foreach (var h in result ?? []) Items.Add(h);
+
+
+            this.SubkSearchCommand?.Execute(null);
+        }
+        catch (Exception ex)
+        {
+            _dialog.ShowMessage($"조회 실패: {ex.Message}", "오류");
+        }
+    }
+
+    [RelayCommand]
+    private async Task SearchAll()
+    {
+        try
+        {
+            var reqDto = new Frm6900Dto.ReqDto
+            {
+                SubkLoca = string.Empty,
+                SubkPltno = string.Empty,
             };
 
             var result = await _frm6900Api.SearchAsync(reqDto);
@@ -163,6 +194,35 @@ public partial class Frm6900ViewModel : DocumentViewModelBase
             _mainViewModel.OpenDocumentCommand.Execute(DocumentKeys.Frm3100);
 
             this.SearchCommand.Execute(null);
+        }
+        catch (Exception ex)
+        {
+            _dialog.ShowMessage($"화면 생성 실패: {ex.Message}", "오류");
+        }
+    }
+
+    [RelayCommand]
+    private async Task PltnoAddUp(Frm6900Dto.SubkDto item)
+    {
+        try
+        {
+            if (Items.Count(x => x.IsClicked) == 2)
+            {
+                var pltNos = Items
+                                .Where(x => x.IsClicked)
+                                .Select(x => x.SubkPltno)
+                                .ToArray();
+
+                _windowService.ShowSFrm6910(pltNos[0], pltNos[1]);
+            }
+            else
+            {
+                _dialog.ShowMessage($"파렛트를 2개 선택해주세요.", "오류");
+                return;
+            }
+
+            this.SearchAllCommand.Execute(null);
+
         }
         catch (Exception ex)
         {

@@ -92,6 +92,7 @@ public partial class App : Application
         sc.AddHttpClient<ISFrm6110Api, SFrm6110ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
         sc.AddHttpClient<ISFrm6120Api, SFrm6120ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
         sc.AddHttpClient<ISFrm6130Api, SFrm6130ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+        sc.AddHttpClient<ISFrm6910Api, SFrm6910ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
         sc.AddHttpClient<ILocaAddApi, LocaAddApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
 
 
@@ -145,6 +146,8 @@ public partial class App : Application
         sc.AddTransient<SFrm6120ViewModel>();
         sc.AddTransient<SFrm6130View>();
         sc.AddTransient<SFrm6130ViewModel>();
+        sc.AddTransient<SFrm6910View>();
+        sc.AddTransient<SFrm6910ViewModel>();
         sc.AddTransient<LocaAddView>();
         sc.AddTransient<LocaAddViewModel>();
 

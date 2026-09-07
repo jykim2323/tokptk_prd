@@ -41,6 +41,7 @@ namespace TOK.WMS.Infrastructure
             services.AddScoped<ISFrm6110Repository, SFrm6110Repository>();
             services.AddScoped<ISFrm6120Repository, SFrm6120Repository>();
             services.AddScoped<ISFrm6130Repository, SFrm6130Repository>();
+            services.AddScoped<ISFrm6910Repository, SFrm6910Repository>();
             services.AddScoped<ILocaAddRepository, LocaAddRepository>();
 
             //services.AddScoped<IInboundRepository, InboundRepository>();
