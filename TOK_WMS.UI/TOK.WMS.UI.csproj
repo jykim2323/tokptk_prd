@@ -55,4 +55,10 @@
     <Resource Include="Assets\TOK_Main.png" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\Api\Outbounds\" />
+    <Folder Include="ViewModels\MainMenus\Outbounds\" />
+    <Folder Include="Views\MainMenus\Outbounds\" />
+  </ItemGroup>
+
 </Project>

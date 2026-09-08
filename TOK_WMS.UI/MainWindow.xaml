@@ -28,6 +28,9 @@
         <DataTemplate DataType="{x:Type vmIn:Frm3100ViewModel}">
             <viewsIn:Frm3100View/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vmIn:Frm3130ViewModel}">
+            <viewsIn:Frm3130View/>
+        </DataTemplate>
         <DataTemplate DataType="{x:Type vmIn:Frm3300ViewModel}">
             <viewsIn:Frm3300View/>
         </DataTemplate>
@@ -36,6 +39,9 @@
         </DataTemplate>
         <DataTemplate DataType="{x:Type vmIn:Frm3700ViewModel}">
             <viewsIn:Frm3700View/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vmIn:Frm3900ViewModel}">
+            <viewsIn:Frm3900View/>
         </DataTemplate>
 
 

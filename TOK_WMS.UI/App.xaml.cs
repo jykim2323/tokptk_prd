@@ -80,9 +80,11 @@ public partial class App : Application
 
         // 입고관리
         sc.AddHttpClient<IFrm3100Api, Frm3100ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));//.AddHttpMessageHandler<WarehouseHeaderHandler>();
+        sc.AddHttpClient<IFrm3130Api, Frm3130ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
         sc.AddHttpClient<IFrm3300Api, Frm3300ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
         sc.AddHttpClient<IFrm3400Api, Frm3400ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
         sc.AddHttpClient<IFrm3700Api, Frm3700ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+        sc.AddHttpClient<IFrm3900Api, Frm3900ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
 
         // 재고관리
         sc.AddHttpClient<IFrm6100Api, Frm6100ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
@@ -128,9 +130,11 @@ public partial class App : Application
 
         // 입고관리
         sc.AddKeyedTransient<DocumentViewModelBase, Frm3100ViewModel>(DocumentKeys.Frm3100);
+        sc.AddKeyedTransient<DocumentViewModelBase, Frm3130ViewModel>(DocumentKeys.Frm3130);
         sc.AddKeyedTransient<DocumentViewModelBase, Frm3300ViewModel>(DocumentKeys.Frm3300);
         sc.AddKeyedTransient<DocumentViewModelBase, Frm3400ViewModel>(DocumentKeys.Frm3400);
         sc.AddKeyedTransient<DocumentViewModelBase, Frm3700ViewModel>(DocumentKeys.Frm3700);
+        sc.AddKeyedTransient<DocumentViewModelBase, Frm3900ViewModel>(DocumentKeys.Frm3900);
 
 
         // 출고관리

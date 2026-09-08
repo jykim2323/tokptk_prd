@@ -1,14 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TOK.WMS.Core.DTOs.Inbounds;
-using TOK.WMS.Core.Entities.Inbounds;
+﻿using TOK.WMS.Core.DTOs.Inbounds;
 
 namespace TOK.WMS.Core.Interfaces.Inbounds;
 
-/// <summary>
-/// Frm3130 입고 관리 - 핸드스캔 입고등록  Repository가 제공해야 하는 조회/작업 계약을 정의합니다.
-/// </summary>
 public interface IFrm3130Repository
 {
+    Task<IEnumerable<Frm3130Dto.ResDto>?> SearchAsync(
+        Frm3130Dto.ReqDto reqDto);
+
+    Task<Frm3130Dto.PltCheckDto?> PltCheckAsync(
+        string pltNo);
+
+    Task<Frm3130Dto.InsertResultDto> InsertAsync(
+        Frm3130Dto.InsertReqDto reqDto);
+
+    Task<Frm3130Dto.EmptyResultDto> EmptyInsertAsync(
+        string pltNo,
+        string userId);
+
+    Task<int> DeleteAsync(
+        Frm3130Dto.DeleteReqDto reqDto);
+
+    Task<int> DeleteAllAsync(
+        string pltNo);
 }

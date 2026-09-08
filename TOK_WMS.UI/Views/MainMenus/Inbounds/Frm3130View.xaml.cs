@@ -17,7 +17,7 @@ public partial class Frm3130View : UserControl
 
     private void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
-        //if (DataContext is Frm3130ViewModel vm)
-        //    _ = vm.SearchCommand.ExecuteAsync(null);
+        if (DataContext is Frm3130ViewModel vm)
+            _ = vm.SearchCommand.ExecuteAsync(null);
     }
 }

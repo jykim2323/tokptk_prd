@@ -220,8 +220,6 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="10" />
             </Grid.RowDefinitions>
 
             <Border Grid.Row="0" 
