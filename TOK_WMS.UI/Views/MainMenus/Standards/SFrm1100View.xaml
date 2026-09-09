@@ -9,7 +9,7 @@
         WindowStyle="None"
         ResizeMode="NoResize"
         Width="760"
-        Height="610">
+        Height="672">
 
     <Window.Resources>
 
