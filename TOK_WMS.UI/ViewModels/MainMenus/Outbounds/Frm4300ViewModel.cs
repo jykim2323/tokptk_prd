@@ -6,6 +6,7 @@ using TOK.WMS.Core.DTOs.Outbounds;
 using TOK.WMS.UI.Models.MainMenus;
 using TOK.WMS.UI.Services;
 using TOK.WMS.UI.Services.Api.Outbounds;
+using TOK.WMS.UI.Services.ETC;
 using TOK.WMS.UI.Services.Interfaces;
 using TOK.WMS.UI.ViewModels.Base;
 

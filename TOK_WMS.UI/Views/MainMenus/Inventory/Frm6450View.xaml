@@ -103,7 +103,7 @@
                         Background="{DynamicResource AppSurfaceBrush}"
                         BorderBrush="{DynamicResource AppBorderBrush}"
                         BorderThickness="1" CornerRadius="5" Padding="12,10" Margin="0,0,0,10"
-                        behaviors:EnterKey.Command="{Binding SearchCommand}">
+                        behaviors:EnterKey.Command="{Binding ItemSearchCommand}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -155,7 +155,7 @@
                                                 Style="{StaticResource FilterLabel}"/>
                                     <TextBox Width="200" Margin="1,0,0,0" Text="{Binding StokItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}"/>
 
-                                    <Button Content="🔍" Width="30" Command="{Binding MimastSearchCommand}" 
+                                    <Button Content="🔍" Width="30" Command="{Binding ItemSearchCommand}" 
                                         FontWeight="Bold" Cursor="Hand" BorderThickness="0"
                                         Background="{DynamicResource BtnStadardBrush}" Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
 

@@ -154,7 +154,7 @@
                                                 Style="{StaticResource FilterLabel}"/>
                                     <TextBox Width="200" Margin="1,0,0,0" Text="{Binding StokItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}"/>
 
-                                    <Button Content="🔍" Width="30" Command="{Binding MimastSearchCommand}" 
+                                    <Button Content="🔍" Width="30" Command="{Binding ItemSearchCommand}" 
                                         FontWeight="Bold" Cursor="Hand" BorderThickness="0"
                                         Background="{DynamicResource BtnStadardBrush}" Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
 

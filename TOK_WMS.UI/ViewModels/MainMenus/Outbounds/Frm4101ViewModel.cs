@@ -6,6 +6,7 @@ using TOK.WMS.Core.DTOs.Outbounds;
 using TOK.WMS.UI.Models.MainMenus;
 using TOK.WMS.UI.Services;
 using TOK.WMS.UI.Services.Api.Outbounds;
+using TOK.WMS.UI.Services.ETC;
 using TOK.WMS.UI.ViewModels.Base;
 
 namespace TOK.WMS.UI.ViewModels.MainMenus.Outbounds;
@@ -291,8 +292,6 @@ public partial class Frm4101ViewModel : DocumentViewModelBase
     {
         Clear();
 
-        // 실제 Document 닫기는
-        // 네 기존 MainViewModel / WindowService 패턴 연결
     }
 
 

@@ -18,6 +18,8 @@ using TOK.WMS.UI.Services.Api.Inbounds;
 using TOK.WMS.UI.Services.Api.Inventory;
 using TOK.WMS.UI.Services.Api.Login;
 using TOK.WMS.UI.Services.Api.Outbounds;
+using TOK.WMS.UI.Services.Api.Standards;
+using TOK.WMS.UI.Services.ETC;
 using TOK.WMS.UI.Services.Factories;
 using TOK.WMS.UI.Services.Interfaces;
 using TOK.WMS.UI.Services.Interfaces.Popup;
@@ -27,8 +29,10 @@ using TOK.WMS.UI.ViewModels.Login;
 using TOK.WMS.UI.ViewModels.MainMenus.Inbounds;
 using TOK.WMS.UI.ViewModels.MainMenus.Inventory;
 using TOK.WMS.UI.ViewModels.MainMenus.Outbounds;
+using TOK.WMS.UI.ViewModels.MainMenus.Standards;
 using TOK.WMS.UI.Views.Login;
 using TOK.WMS.UI.Views.MainMenus.Inventory;
+using TOK.WMS.UI.Views.MainMenus.Standards;
 
 namespace TOK.WMS.UI;
 
@@ -79,6 +83,10 @@ public partial class App : Application
         //로그인
         sc.AddHttpClient<ILoginApi, LoginApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
 
+        // 기준 정보 관리
+        sc.AddHttpClient<IFrm1100Api, Frm1100ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+        sc.AddHttpClient<ISFrm1100Api, SFrm1100ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+        sc.AddHttpClient<IMastDispApi, MastDispApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
 
         // 입고관리
         sc.AddHttpClient<IFrm3100Api, Frm3100ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));//.AddHttpMessageHandler<WarehouseHeaderHandler>();
@@ -95,6 +103,8 @@ public partial class App : Application
         sc.AddHttpClient<IFrm4102Api, Frm4102ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
         sc.AddHttpClient<IFrm4103Api, Frm4103ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
         sc.AddHttpClient<IFrm4300Api, Frm4300ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+        sc.AddHttpClient<IFrm4400Api, Frm4400ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+        sc.AddHttpClient<IFrm4500Api, Frm4500ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
 
         // 재고관리
         sc.AddHttpClient<IFrm6100Api, Frm6100ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
@@ -138,6 +148,9 @@ public partial class App : Application
         sc.AddKeyedTransient<DocumentViewModelBase, HomeViewModel>(DocumentKeys.Home);
 
 
+        // 기준 정보 관리
+        sc.AddKeyedTransient<DocumentViewModelBase, Frm1100ViewModel>(DocumentKeys.Frm1100);
+
         // 입고관리
         sc.AddKeyedTransient<DocumentViewModelBase, Frm3100ViewModel>(DocumentKeys.Frm3100);
         sc.AddKeyedTransient<DocumentViewModelBase, Frm3130ViewModel>(DocumentKeys.Frm3130);
@@ -146,13 +159,14 @@ public partial class App : Application
         sc.AddKeyedTransient<DocumentViewModelBase, Frm3700ViewModel>(DocumentKeys.Frm3700);
         sc.AddKeyedTransient<DocumentViewModelBase, Frm3900ViewModel>(DocumentKeys.Frm3900);
 
-
         // 출고관리
         sc.AddKeyedTransient<DocumentViewModelBase, Frm4100ViewModel>(DocumentKeys.Frm4100);
         sc.AddKeyedTransient<DocumentViewModelBase, Frm4101ViewModel>(DocumentKeys.Frm4101);
         sc.AddKeyedTransient<DocumentViewModelBase, Frm4102ViewModel>(DocumentKeys.Frm4102);
         sc.AddKeyedTransient<DocumentViewModelBase, Frm4103ViewModel>(DocumentKeys.Frm4103);
         sc.AddKeyedTransient<DocumentViewModelBase, Frm4300ViewModel>(DocumentKeys.Frm4300);
+        sc.AddKeyedTransient<DocumentViewModelBase, Frm4400ViewModel>(DocumentKeys.Frm4400);
+        sc.AddKeyedTransient<DocumentViewModelBase, Frm4500ViewModel>(DocumentKeys.Frm4500);
 
         // 재고관리
         sc.AddKeyedTransient<DocumentViewModelBase, Frm6100ViewModel>(DocumentKeys.Frm6100);
@@ -163,7 +177,7 @@ public partial class App : Application
         sc.AddKeyedTransient<DocumentViewModelBase, Frm6700ViewModel>(DocumentKeys.Frm6700);
         sc.AddKeyedTransient<DocumentViewModelBase, Frm6900ViewModel>(DocumentKeys.Frm6900);
 
-        //팝업창 관리
+        //팝업창 관리 - 재고
         sc.AddSingleton<IWindowService, WindowService>();
         sc.AddTransient<SFrm6110View>();
         sc.AddTransient<SFrm6110ViewModel>();
@@ -175,6 +189,12 @@ public partial class App : Application
         sc.AddTransient<SFrm6910ViewModel>();
         sc.AddTransient<LocaAddView>();
         sc.AddTransient<LocaAddViewModel>();
+
+        //팝업창 관리 - 기준정보관리
+        sc.AddTransient<SFrm1100View>();
+        sc.AddTransient<SFrm1100ViewModel>();
+        sc.AddTransient<MastDispView>();
+        sc.AddTransient<MastDispViewModel>();
 
 
 

@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace TOK.WMS.UI.Services;
+namespace TOK.WMS.UI.Services.ETC;
 
 public class DialogService : IDialogService
 {

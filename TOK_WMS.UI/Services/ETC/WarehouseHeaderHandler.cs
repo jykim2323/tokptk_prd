@@ -1,7 +1,7 @@
 ﻿using System.Net.Http;
 using TOK.WMS.UI.Services.Interfaces;
 
-namespace TOK.WMS.UI.Services;
+namespace TOK.WMS.UI.Services.ETC;
 
 public class WarehouseHeaderHandler : DelegatingHandler
 {

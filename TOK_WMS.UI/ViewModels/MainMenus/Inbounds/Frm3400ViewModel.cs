@@ -13,6 +13,7 @@ using TOK.WMS.UI.Models.MainMenus;
 using TOK.WMS.UI.Services;
 using TOK.WMS.UI.Services.Api;
 using TOK.WMS.UI.Services.Api.Inbounds;
+using TOK.WMS.UI.Services.ETC;
 using TOK.WMS.UI.ViewModels.Base;
 
 namespace TOK.WMS.UI.ViewModels.MainMenus.Inbounds;

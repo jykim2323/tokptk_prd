@@ -4,8 +4,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows;
 using TOK.WMS.Core.DTOs.Inventory;
+using TOK.WMS.Core.DTOs.Standards;
 using TOK.WMS.UI.ViewModels.MainMenus.Inventory;
+using TOK.WMS.UI.ViewModels.MainMenus.Standards;
 using TOK.WMS.UI.Views.MainMenus.Inventory;
+using TOK.WMS.UI.Views.MainMenus.Standards;
 
 namespace TOK.WMS.UI.Services.Interfaces.Popup;
 
@@ -88,5 +91,58 @@ public class WindowService : IWindowService
         view.WindowStartupLocation = WindowStartupLocation.CenterOwner;
 
         view.ShowDialog();
+    }
+    public void ShowSFrm1100(SFrm1100Dto.InitDto item, string mode)
+    {
+        var view =
+            _services.GetRequiredService<SFrm1100View>();
+
+        if (view.DataContext is SFrm1100ViewModel vm)
+        {
+            vm.Initialize(
+                item,
+                mode);
+        }
+
+        view.Owner =
+            Application.Current.MainWindow;
+
+        view.WindowStartupLocation =
+            WindowStartupLocation.CenterOwner;
+
+        view.ShowDialog();
+    }
+
+    public MastDispDto.ResDto? ShowMastDisp(
+    string searchText)
+    {
+        var view =
+            _services.GetRequiredService<
+                MastDispView>();
+
+
+        if (view.DataContext is not
+            MastDispViewModel vm)
+        {
+            return null;
+        }
+
+
+        vm.Initialize(
+            searchText);
+
+
+        view.Owner =
+            Application.Current.MainWindow;
+
+
+        view.WindowStartupLocation =
+            WindowStartupLocation.CenterOwner;
+
+
+        view.ShowDialog();
+
+
+        return vm.SelectedResult;
     }
 }

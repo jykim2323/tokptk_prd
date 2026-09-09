@@ -10,10 +10,29 @@
 
     <UserControl.Resources>
 
-        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
-        <conv:LocaFormatConverter x:Key="LocaFormatConverter"/>
-        <conv:LstkFlagConverter x:Key="LstkFlagConverter"/>
-        <conv:SubkFlagConverter x:Key="SubkFlagConverter"/>
+        <BooleanToVisibilityConverter
+            x:Key="BoolToVisibility"/>
+
+
+        <!-- 날짜 / 시간 -->
+
+        <conv:DateTimeFormatConverter
+            x:Key="DateTimeFormatConverter"/>
+
+
+        <!-- 위치 -->
+
+        <conv:LocaFormatConverter
+            x:Key="LocaFormatConverter"/>
+
+
+        <conv:LstkFlagConverter
+            x:Key="LstkFlagConverter"/>
+
+
+        <conv:SubkFlagConverter
+            x:Key="SubkFlagConverter"/>
+
 
         <!-- ===================================================== -->
         <!-- 검색 Label -->
@@ -125,6 +144,8 @@
             </Grid.ColumnDefinitions>
 
 
+            <!-- 제목 -->
+
             <StackPanel Grid.Column="0"
                         Orientation="Horizontal"
                         VerticalAlignment="Center">
@@ -132,6 +153,7 @@
                 <TextBlock Text="📦"
                            FontSize="20"
                            Margin="0,0,8,0"/>
+
 
                 <TextBlock Text="미출고 현황"
                            FontSize="20"
@@ -142,7 +164,9 @@
             </StackPanel>
 
 
+            <!-- ================================================= -->
             <!-- 우측 버튼 -->
+            <!-- ================================================= -->
 
             <StackPanel Grid.Column="1"
                         Orientation="Horizontal"
@@ -175,11 +199,8 @@
                         FontWeight="Bold"
                         Cursor="Hand"
                         BorderThickness="0"
-                        Background="{DynamicResource BtnPrimaryBrush}"
-                        Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
-
-
-                <!-- 인쇄는 추후 -->
+                        Background="ForestGreen"
+                        Foreground="White"/>
 
 
                 <!-- 수동출고 완료 -->
@@ -230,7 +251,9 @@
                 </Grid.ColumnDefinitions>
 
 
+                <!-- ================================================= -->
                 <!-- 검색 종류 -->
+                <!-- ================================================= -->
 
                 <ComboBox Grid.Column="0"
                           Height="34"
@@ -245,7 +268,9 @@
                           BorderBrush="{DynamicResource InputBorderBrush}"/>
 
 
-                <!-- 검색 Text -->
+                <!-- ================================================= -->
+                <!-- 검색어 -->
+                <!-- ================================================= -->
 
                 <TextBox Grid.Column="1"
                          Text="{Binding SearchText,
@@ -263,7 +288,9 @@
                 </TextBox>
 
 
+                <!-- ================================================= -->
                 <!-- 조회 -->
+                <!-- ================================================= -->
 
                 <Button Grid.Column="3"
                         Content="🔍 조회"
@@ -276,7 +303,9 @@
                         Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
 
 
+                <!-- ================================================= -->
                 <!-- 건수 -->
+                <!-- ================================================= -->
 
                 <TextBlock Grid.Column="5"
                            Text="{Binding StatusMessage}"
@@ -304,7 +333,9 @@
             <DockPanel>
 
 
-                <!-- Header -->
+                <!-- ================================================= -->
+                <!-- Grid Header -->
+                <!-- ================================================= -->
 
                 <Grid DockPanel.Dock="Top"
                       Height="40"
@@ -327,7 +358,7 @@
 
 
                 <!-- ================================================= -->
-                <!-- Grid -->
+                <!-- DataGrid -->
                 <!-- ================================================= -->
 
                 <DataGrid x:Name="DB_Table1"
@@ -347,63 +378,84 @@
                     <DataGrid.Columns>
 
 
+                        <!-- ========================================= -->
                         <!-- 출고일자 -->
+                        <!-- ========================================= -->
 
                         <DataGridTextColumn Header="출고일자"
-                                            Binding="{Binding DisplayDate}"
+                                            Binding="{Binding OuptDate,
+                                            Converter={StaticResource DateTimeFormatConverter}}"
                                             Width="115"/>
 
 
+                        <!-- ========================================= -->
                         <!-- 출고시간 -->
+                        <!-- ========================================= -->
 
                         <DataGridTextColumn Header="출고시간"
-                                            Binding="{Binding DisplayTime}"
+                                            Binding="{Binding OuptTime,
+                                            Converter={StaticResource DateTimeFormatConverter}}"
                                             Width="100"/>
 
 
+                        <!-- ========================================= -->
                         <!-- PLT -->
+                        <!-- ========================================= -->
 
                         <DataGridTextColumn Header="PLT-NO"
                                             Binding="{Binding OuptPltno}"
                                             Width="135"/>
 
 
-                        <!-- 코드 -->
+                        <!-- ========================================= -->
+                        <!-- 품목코드 -->
+                        <!-- ========================================= -->
 
                         <DataGridTextColumn Header="품목코드"
                                             Binding="{Binding OuptCode}"
                                             Width="160"/>
 
 
+                        <!-- ========================================= -->
                         <!-- 품명 -->
+                        <!-- ========================================= -->
 
                         <DataGridTextColumn Header="품 목 명"
                                             Binding="{Binding MastName}"
                                             Width="240"/>
 
 
+                        <!-- ========================================= -->
                         <!-- LOT -->
+                        <!-- ========================================= -->
 
                         <DataGridTextColumn Header="LOT-NO"
                                             Binding="{Binding OuptLotno}"
                                             Width="170"/>
 
 
+                        <!-- ========================================= -->
                         <!-- 납품처 -->
+                        <!-- ========================================= -->
 
                         <DataGridTextColumn Header="납품처"
                                             Binding="{Binding OuptCust}"
                                             Width="150"/>
 
 
+                        <!-- ========================================= -->
                         <!-- 위치 -->
+                        <!-- ========================================= -->
 
                         <DataGridTextColumn Header="재고위치"
-                                            Binding="{Binding OuptLoca, Converter={StaticResource LocaFormatConverter}}"
+                                            Binding="{Binding OuptLoca,
+                                            Converter={StaticResource LocaFormatConverter}}"
                                             Width="110"/>
 
 
-                        <!-- 재고 -->
+                        <!-- ========================================= -->
+                        <!-- 재고중량 -->
+                        <!-- ========================================= -->
 
                         <DataGridTextColumn Header="재고중량"
                                             Binding="{Binding OuptWgt,
@@ -411,7 +463,9 @@
                                             Width="105"/>
 
 
-                        <!-- 출고 -->
+                        <!-- ========================================= -->
+                        <!-- 출고중량 -->
+                        <!-- ========================================= -->
 
                         <DataGridTextColumn Header="출고중량"
                                             Binding="{Binding OuptOutWgt,
@@ -419,42 +473,54 @@
                                             Width="105"/>
 
 
+                        <!-- ========================================= -->
                         <!-- BOX -->
+                        <!-- ========================================= -->
 
                         <DataGridTextColumn Header="BOX-NO"
                                             Binding="{Binding OuptBoxno}"
                                             Width="135"/>
 
 
+                        <!-- ========================================= -->
                         <!-- 출고 BOX -->
+                        <!-- ========================================= -->
 
                         <DataGridTextColumn Header="출고 BOX"
                                             Binding="{Binding OuptBoxno1}"
                                             Width="135"/>
 
 
+                        <!-- ========================================= -->
                         <!-- 비고 -->
+                        <!-- ========================================= -->
 
                         <DataGridTextColumn Header="비 고"
                                             Binding="{Binding OuptRemark}"
                                             Width="180"/>
 
 
+                        <!-- ========================================= -->
                         <!-- 출고 비고 -->
+                        <!-- ========================================= -->
 
                         <DataGridTextColumn Header="출고 비고"
                                             Binding="{Binding OuptRemark1}"
                                             Width="180"/>
 
 
+                        <!-- ========================================= -->
                         <!-- 차수 -->
+                        <!-- ========================================= -->
 
                         <DataGridTextColumn Header="차수"
                                             Binding="{Binding OuptChasu}"
                                             Width="75"/>
 
 
+                        <!-- ========================================= -->
                         <!-- INDEX -->
+                        <!-- ========================================= -->
 
                         <DataGridTextColumn Header="출고 INDEX"
                                             Binding="{Binding OuptIndex}"

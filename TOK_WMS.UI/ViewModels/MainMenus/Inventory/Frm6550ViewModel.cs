@@ -11,6 +11,8 @@ using TOK.WMS.UI.Models.MainMenus;
 using TOK.WMS.UI.Services;
 using TOK.WMS.UI.Services.Api.Inbounds;
 using TOK.WMS.UI.Services.Api.Inventory;
+using TOK.WMS.UI.Services.ETC;
+using TOK.WMS.UI.Services.Interfaces.Popup;
 using TOK.WMS.UI.ViewModels.Base;
 
 namespace TOK.WMS.UI.ViewModels.MainMenus.Inventory;
@@ -20,6 +22,7 @@ public partial class Frm6550ViewModel : DocumentViewModelBase
     private readonly IDialogService _dialog;
     private readonly IFrm6550Api _frm6550Api;
     private readonly IExcelService _excel;
+    private readonly IWindowService _windowService;
     [ObservableProperty] private string _stokItem = string.Empty;
     [ObservableProperty] private string _stokFlag = string.Empty;
     [ObservableProperty] private string _stokLoca = string.Empty;
@@ -51,11 +54,12 @@ public partial class Frm6550ViewModel : DocumentViewModelBase
     [ObservableProperty] private bool _stokWhW = false;
     [ObservableProperty] private bool _stokWhA = false;
 
-    public Frm6550ViewModel(IFrm6550Api frm6550Api, IDialogService dialog, IExcelService excel)
+    public Frm6550ViewModel(IFrm6550Api frm6550Api, IDialogService dialog, IExcelService excel, IWindowService windowService)
     {
         _frm6550Api = frm6550Api;
         _dialog = dialog;
         _excel = excel;
+        _windowService = windowService;
 
         Title = "수/자동 재고 집계";
         ContentId = DocumentKeys.Frm6550;
@@ -143,6 +147,37 @@ public partial class Frm6550ViewModel : DocumentViewModelBase
         catch (Exception ex)
         {
             _dialog.ShowMessage($"조회 실패: {ex.Message}", "오류");
+        }
+    }
+
+    [RelayCommand]
+    private void ItemSearch()
+    {
+        try
+        {
+            var result =
+                _windowService.ShowMastDisp(
+                    StokItem ?? string.Empty);
+
+
+            if (result == null)
+                return;
+
+
+            StokItem =
+                result.MastCode
+                ?? string.Empty;
+
+
+            //StokItem =
+            //    result.MastName
+            //    ?? string.Empty;
+        }
+        catch (Exception ex)
+        {
+            _dialog.ShowMessage(
+                $"품목 조회 실패: {ex.Message}",
+                "오류");
         }
     }
 

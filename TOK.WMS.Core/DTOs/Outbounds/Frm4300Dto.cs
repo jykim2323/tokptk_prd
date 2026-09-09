@@ -1,48 +1,50 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-
-namespace TOK.WMS.Core.DTOs.Outbounds;
+﻿namespace TOK.WMS.Core.DTOs.Outbounds;
 
 public partial class Frm4300Dto
 {
     // =========================================================
-    // 조회
+    // 조회 조건
     // =========================================================
 
     public class ReqDto
     {
         public string? SearchType { get; set; }
+
         public string? SearchText { get; set; }
     }
 
 
     // =========================================================
-    // 검색 종류
+    // 검색 조건 ComboBox
     // =========================================================
 
     public class SearchTypeDto
     {
         public string? Name { get; set; }
+
         public string? Value { get; set; }
     }
 
 
     // =========================================================
-    // 조회 결과
+    // 미출고 현황 조회 결과
     // =========================================================
 
-    public partial class ResDto : ObservableObject
+    public class ResDto
     {
         public string? OuptDate { get; set; }
 
         public string? OuptIndex { get; set; }
+
+        public int? OuptSeqno { get; set; }
+
+        public string? OuptPltno { get; set; }
 
         public string? OuptCode { get; set; }
 
         public string? MastName { get; set; }
 
         public string? OuptLotno { get; set; }
-
-        public int? OuptSeqno { get; set; }
 
         public string? OuptGubun { get; set; }
 
@@ -51,10 +53,6 @@ public partial class Frm4300Dto
         public decimal OuptOutWgt { get; set; }
 
         public string? OuptLoca { get; set; }
-
-        public string? OuptBoxno1 { get; set; }
-
-        public string? OuptRemark1 { get; set; }
 
         public string? OuptTime { get; set; }
 
@@ -70,56 +68,14 @@ public partial class Frm4300Dto
 
         public string? OuptCust { get; set; }
 
-        public string? OuptPltno { get; set; }
+        public string? OuptRemark1 { get; set; }
 
-
-        // =====================================================
-        // 화면용 날짜
-        // =====================================================
-
-        public string DisplayDate
-        {
-            get
-            {
-                if (string.IsNullOrWhiteSpace(OuptDate) ||
-                    OuptDate.Length != 8)
-                {
-                    return OuptDate ?? string.Empty;
-                }
-
-                return
-                    $"{OuptDate[..4]}-" +
-                    $"{OuptDate.Substring(4, 2)}-" +
-                    $"{OuptDate.Substring(6, 2)}";
-            }
-        }
-
-
-        // =====================================================
-        // 화면용 시간
-        // =====================================================
-
-        public string DisplayTime
-        {
-            get
-            {
-                if (string.IsNullOrWhiteSpace(OuptTime) ||
-                    OuptTime.Length != 6)
-                {
-                    return OuptTime ?? string.Empty;
-                }
-
-                return
-                    $"{OuptTime[..2]}:" +
-                    $"{OuptTime.Substring(2, 2)}:" +
-                    $"{OuptTime.Substring(4, 2)}";
-            }
-        }
+        public string? OuptBoxno1 { get; set; }
     }
 
 
     // =========================================================
-    // 삭제
+    // 삭제 요청
     // =========================================================
 
     public class DeleteReqDto
@@ -127,6 +83,10 @@ public partial class Frm4300Dto
         public List<DeleteItemDto> Items { get; set; } = [];
     }
 
+
+    // =========================================================
+    // 삭제 대상
+    // =========================================================
 
     public class DeleteItemDto
     {
@@ -153,7 +113,7 @@ public partial class Frm4300Dto
 
 
     // =========================================================
-    // 수동출고 완료
+    // 수동출고 완료 요청
     // =========================================================
 
     public class CompleteReqDto
@@ -167,6 +127,10 @@ public partial class Frm4300Dto
         public string? UserId { get; set; }
     }
 
+
+    // =========================================================
+    // 수동출고 완료 결과
+    // =========================================================
 
     public class CompleteResultDto
     {

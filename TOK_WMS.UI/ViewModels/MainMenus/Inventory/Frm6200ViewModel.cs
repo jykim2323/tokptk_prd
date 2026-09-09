@@ -9,6 +9,7 @@ using TOK.WMS.Core.DTOs.Inventory;
 using TOK.WMS.UI.Models.MainMenus;
 using TOK.WMS.UI.Services;
 using TOK.WMS.UI.Services.Api.Inventory;
+using TOK.WMS.UI.Services.ETC;
 using TOK.WMS.UI.Services.Interfaces.Popup;
 using TOK.WMS.UI.ViewModels.Base;
 

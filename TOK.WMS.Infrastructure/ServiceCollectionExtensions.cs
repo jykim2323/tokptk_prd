@@ -9,6 +9,7 @@ using TOK.WMS.Infrastructure.Repositories;
 using TOK.WMS.Infrastructure.Repositories.Inbounds;
 using TOK.WMS.Infrastructure.Repositories.Inventory;
 using TOK.WMS.Infrastructure.Repositories.Outbounds;
+using TOK.WMS.Infrastructure.Repositories.Standards;
 
 namespace TOK.WMS.Infrastructure
 {
@@ -27,6 +28,10 @@ namespace TOK.WMS.Infrastructure
             //공통 쿼리문
             services.AddScoped<ICoreRepository, CoreRepository>();
 
+
+            //기준 정보 관리
+            services.AddScoped<IFrm1100Repository, Frm1100Repository>();
+
             //입고 관리
             services.AddScoped<IFrm3100Repository, Frm3100Repository>();
             services.AddScoped<IFrm3130Repository, Frm3130Repository>();
@@ -43,6 +48,8 @@ namespace TOK.WMS.Infrastructure
             services.AddScoped<IFrm4102Repository, Frm4102Repository>();
             services.AddScoped<IFrm4103Repository, Frm4103Repository>();
             services.AddScoped<IFrm4300Repository, Frm4300Repository>();
+            services.AddScoped<IFrm4400Repository, Frm4400Repository>();
+            services.AddScoped<IFrm4500Repository, Frm4500Repository>();
 
 
             //재고 관리
@@ -58,6 +65,7 @@ namespace TOK.WMS.Infrastructure
             services.AddScoped<ISFrm6130Repository, SFrm6130Repository>();
             services.AddScoped<ISFrm6910Repository, SFrm6910Repository>();
             services.AddScoped<ILocaAddRepository, LocaAddRepository>();
+            services.AddScoped<IMastDispRepository, MastDispRepository>();
 
             //services.AddScoped<IInboundRepository, InboundRepository>();
             //services.AddScoped<IOutboundRepository, OutboundRepository>();

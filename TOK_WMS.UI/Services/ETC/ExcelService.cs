@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using TOK.WMS.Core.Attributes;
 using TOK.WMS.Core.DTOs.Outbounds;
 
-namespace TOK.WMS.UI.Services;
+namespace TOK.WMS.UI.Services.ETC;
 
 
 public interface IExcelService

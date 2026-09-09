@@ -4,7 +4,7 @@ using System.Text;
 using TOK.WMS.Core.DTOs.Login;
 using TOK.WMS.UI.Services.Interfaces;
 
-namespace TOK.WMS.UI.Services;
+namespace TOK.WMS.UI.Services.ETC;
 
 public class CurrentUserService : ICurrentUserService
 {

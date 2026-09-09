@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace TOK.WMS.UI.Services;
+namespace TOK.WMS.UI.Services.ETC;
 
 /// <summary>
 /// 앱 전역 Light / Dark 테마 전환 서비스.
