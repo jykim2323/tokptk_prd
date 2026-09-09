@@ -3,10 +3,12 @@ using TOK.WMS.Core.ETC;
 using TOK.WMS.Core.Interfaces;
 using TOK.WMS.Core.Interfaces.Inbounds;
 using TOK.WMS.Core.Interfaces.Inventory;
+using TOK.WMS.Core.Interfaces.Outbounds;
 using TOK.WMS.Infrastructure.Data;
 using TOK.WMS.Infrastructure.Repositories;
 using TOK.WMS.Infrastructure.Repositories.Inbounds;
 using TOK.WMS.Infrastructure.Repositories.Inventory;
+using TOK.WMS.Infrastructure.Repositories.Outbounds;
 
 namespace TOK.WMS.Infrastructure
 {
@@ -33,6 +35,14 @@ namespace TOK.WMS.Infrastructure
             services.AddScoped<IFrm3700Repository, Frm3700Repository>();
             services.AddScoped<IFrm3900Repository, Frm3900Repository>();
 
+
+
+            //출고 관리
+            services.AddScoped<IFrm4100Repository, Frm4100Repository>();
+            services.AddScoped<IFrm4101Repository, Frm4101Repository>();
+            services.AddScoped<IFrm4102Repository, Frm4102Repository>();
+            services.AddScoped<IFrm4103Repository, Frm4103Repository>();
+            services.AddScoped<IFrm4300Repository, Frm4300Repository>();
 
 
             //재고 관리

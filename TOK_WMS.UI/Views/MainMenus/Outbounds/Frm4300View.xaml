@@ -1,0 +1,473 @@
+﻿<UserControl x:Class="TOK.WMS.UI.Views.MainMenus.Outbounds.Frm4300View"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:conv="clr-namespace:TOK.WMS.UI.Converters"
+             Background="{DynamicResource AppBackgroundBrush}"
+             Foreground="{DynamicResource AppTextBrush}"
+             FontFamily="{StaticResource AppFont}"
+             FontWeight="Medium">
+
+    <UserControl.Resources>
+
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+        <conv:LocaFormatConverter x:Key="LocaFormatConverter"/>
+        <conv:LstkFlagConverter x:Key="LstkFlagConverter"/>
+        <conv:SubkFlagConverter x:Key="SubkFlagConverter"/>
+
+        <!-- ===================================================== -->
+        <!-- 검색 Label -->
+        <!-- ===================================================== -->
+
+        <Style x:Key="FilterLabel"
+               TargetType="TextBlock">
+
+            <Setter Property="VerticalAlignment"
+                    Value="Center"/>
+
+            <Setter Property="Margin"
+                    Value="0,0,8,0"/>
+
+            <Setter Property="FontWeight"
+                    Value="Bold"/>
+
+            <Setter Property="Foreground"
+                    Value="{DynamicResource AppTextBrush}"/>
+
+        </Style>
+
+
+        <!-- ===================================================== -->
+        <!-- 검색 Input -->
+        <!-- ===================================================== -->
+
+        <Style x:Key="FilterBox"
+               TargetType="TextBox">
+
+            <Setter Property="Height"
+                    Value="34"/>
+
+            <Setter Property="Padding"
+                    Value="8,3"/>
+
+            <Setter Property="FontSize"
+                    Value="14"/>
+
+            <Setter Property="VerticalContentAlignment"
+                    Value="Center"/>
+
+            <Setter Property="Background"
+                    Value="{DynamicResource InputBrush}"/>
+
+            <Setter Property="Foreground"
+                    Value="{DynamicResource AppTextBrush}"/>
+
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource InputBorderBrush}"/>
+
+            <Setter Property="BorderThickness"
+                    Value="1"/>
+
+
+            <Style.Triggers>
+
+                <Trigger Property="IsKeyboardFocusWithin"
+                         Value="True">
+
+                    <Setter Property="BorderBrush"
+                            Value="{DynamicResource BtnPrimaryBrush}"/>
+
+                    <Setter Property="BorderThickness"
+                            Value="2"/>
+
+                </Trigger>
+
+            </Style.Triggers>
+
+        </Style>
+
+    </UserControl.Resources>
+
+
+    <!-- ========================================================= -->
+    <!-- Loaded 시 조회 -->
+    <!-- ========================================================= -->
+
+    <i:Interaction.Triggers>
+
+        <i:EventTrigger EventName="Loaded">
+
+            <i:InvokeCommandAction
+                Command="{Binding SearchCommand}"/>
+
+        </i:EventTrigger>
+
+    </i:Interaction.Triggers>
+
+
+    <DockPanel Margin="12">
+
+
+        <!-- ===================================================== -->
+        <!-- HEADER -->
+        <!-- ===================================================== -->
+
+        <Grid DockPanel.Dock="Top"
+              Height="55"
+              Margin="0,0,0,8">
+
+            <Grid.ColumnDefinitions>
+
+                <ColumnDefinition Width="*"/>
+
+                <ColumnDefinition Width="Auto"/>
+
+            </Grid.ColumnDefinitions>
+
+
+            <StackPanel Grid.Column="0"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center">
+
+                <TextBlock Text="📦"
+                           FontSize="20"
+                           Margin="0,0,8,0"/>
+
+                <TextBlock Text="미출고 현황"
+                           FontSize="20"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"
+                           Foreground="{DynamicResource AppTextBrush}"/>
+
+            </StackPanel>
+
+
+            <!-- 우측 버튼 -->
+
+            <StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center">
+
+
+                <!-- 삭제 -->
+
+                <Button Content="🗑 삭제"
+                        Width="95"
+                        Height="38"
+                        Margin="0,0,12,0"
+                        Command="{Binding DeleteCommand}"
+                        Visibility="{Binding IsAdmin,
+                                     Converter={StaticResource BoolToVisibility}}"
+                        FontWeight="Bold"
+                        Cursor="Hand"
+                        BorderThickness="0"
+                        Background="{DynamicResource BtnStadardBrush}"
+                        Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
+
+
+                <!-- Excel -->
+
+                <Button Content="📊 엑셀"
+                        Width="95"
+                        Height="38"
+                        Margin="0,0,12,0"
+                        Command="{Binding ExcelCommand}"
+                        FontWeight="Bold"
+                        Cursor="Hand"
+                        BorderThickness="0"
+                        Background="{DynamicResource BtnPrimaryBrush}"
+                        Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
+
+
+                <!-- 인쇄는 추후 -->
+
+
+                <!-- 수동출고 완료 -->
+
+                <Button Content="✅ 수동출고완료"
+                        Width="135"
+                        Height="38"
+                        Command="{Binding CompleteCommand}"
+                        FontWeight="Bold"
+                        Cursor="Hand"
+                        BorderThickness="0"
+                        Background="{DynamicResource BtnPrimaryBrush}"
+                        Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
+
+            </StackPanel>
+
+        </Grid>
+
+
+        <!-- ===================================================== -->
+        <!-- 검색 영역 -->
+        <!-- ===================================================== -->
+
+        <Border DockPanel.Dock="Top"
+                Background="{DynamicResource AppSurfaceBrush}"
+                BorderBrush="{DynamicResource AppBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="5"
+                Padding="12"
+                Margin="0,0,0,8">
+
+            <Grid>
+
+                <Grid.ColumnDefinitions>
+
+                    <ColumnDefinition Width="150"/>
+
+                    <ColumnDefinition Width="300"/>
+
+                    <ColumnDefinition Width="15"/>
+
+                    <ColumnDefinition Width="95"/>
+
+                    <ColumnDefinition Width="*"/>
+
+                    <ColumnDefinition Width="Auto"/>
+
+                </Grid.ColumnDefinitions>
+
+
+                <!-- 검색 종류 -->
+
+                <ComboBox Grid.Column="0"
+                          Height="34"
+                          Margin="0,0,8,0"
+                          ItemsSource="{Binding SearchTypes}"
+                          SelectedItem="{Binding SelectedSearchType,
+                                               Mode=TwoWay}"
+                          DisplayMemberPath="Name"
+                          VerticalContentAlignment="Center"
+                          Background="{DynamicResource InputBrush}"
+                          Foreground="{DynamicResource AppTextBrush}"
+                          BorderBrush="{DynamicResource InputBorderBrush}"/>
+
+
+                <!-- 검색 Text -->
+
+                <TextBox Grid.Column="1"
+                         Text="{Binding SearchText,
+                                        Mode=TwoWay,
+                                        UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource FilterBox}">
+
+                    <TextBox.InputBindings>
+
+                        <KeyBinding Key="Enter"
+                                    Command="{Binding SearchCommand}"/>
+
+                    </TextBox.InputBindings>
+
+                </TextBox>
+
+
+                <!-- 조회 -->
+
+                <Button Grid.Column="3"
+                        Content="🔍 조회"
+                        Height="34"
+                        Command="{Binding SearchCommand}"
+                        FontWeight="Bold"
+                        Cursor="Hand"
+                        BorderThickness="0"
+                        Background="{DynamicResource BtnPrimaryBrush}"
+                        Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
+
+
+                <!-- 건수 -->
+
+                <TextBlock Grid.Column="5"
+                           Text="{Binding StatusMessage}"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Right"
+                           FontSize="14"
+                           FontWeight="Bold"
+                           Foreground="{DynamicResource AppTextSubBrush}"/>
+
+            </Grid>
+
+        </Border>
+
+
+        <!-- ===================================================== -->
+        <!-- Data -->
+        <!-- ===================================================== -->
+
+        <Border Background="{DynamicResource AppSurfaceBrush}"
+                BorderBrush="{DynamicResource AppBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="5"
+                Padding="8">
+
+            <DockPanel>
+
+
+                <!-- Header -->
+
+                <Grid DockPanel.Dock="Top"
+                      Height="40"
+                      Margin="0,0,0,7">
+
+                    <TextBlock Text="📋 미출고 데이터"
+                               FontSize="15"
+                               FontWeight="Bold"
+                               VerticalAlignment="Center"/>
+
+
+                    <TextBlock Text="{Binding RecordCount,
+                                              StringFormat=조회건수 : {0:N0}건}"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource AppTextSubBrush}"/>
+
+                </Grid>
+
+
+                <!-- ================================================= -->
+                <!-- Grid -->
+                <!-- ================================================= -->
+
+                <DataGrid x:Name="DB_Table1"
+                          ItemsSource="{Binding Items}"
+                          SelectedItem="{Binding SelectedItem,
+                                                 Mode=TwoWay}"
+                          Style="{StaticResource ListDataGridStyle}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          CanUserAddRows="False"
+                          CanUserSortColumns="True"
+                          SelectionMode="Single"
+                          SelectionUnit="FullRow"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto">
+
+                    <DataGrid.Columns>
+
+
+                        <!-- 출고일자 -->
+
+                        <DataGridTextColumn Header="출고일자"
+                                            Binding="{Binding DisplayDate}"
+                                            Width="115"/>
+
+
+                        <!-- 출고시간 -->
+
+                        <DataGridTextColumn Header="출고시간"
+                                            Binding="{Binding DisplayTime}"
+                                            Width="100"/>
+
+
+                        <!-- PLT -->
+
+                        <DataGridTextColumn Header="PLT-NO"
+                                            Binding="{Binding OuptPltno}"
+                                            Width="135"/>
+
+
+                        <!-- 코드 -->
+
+                        <DataGridTextColumn Header="품목코드"
+                                            Binding="{Binding OuptCode}"
+                                            Width="160"/>
+
+
+                        <!-- 품명 -->
+
+                        <DataGridTextColumn Header="품 목 명"
+                                            Binding="{Binding MastName}"
+                                            Width="240"/>
+
+
+                        <!-- LOT -->
+
+                        <DataGridTextColumn Header="LOT-NO"
+                                            Binding="{Binding OuptLotno}"
+                                            Width="170"/>
+
+
+                        <!-- 납품처 -->
+
+                        <DataGridTextColumn Header="납품처"
+                                            Binding="{Binding OuptCust}"
+                                            Width="150"/>
+
+
+                        <!-- 위치 -->
+
+                        <DataGridTextColumn Header="재고위치"
+                                            Binding="{Binding OuptLoca, Converter={StaticResource LocaFormatConverter}}"
+                                            Width="110"/>
+
+
+                        <!-- 재고 -->
+
+                        <DataGridTextColumn Header="재고중량"
+                                            Binding="{Binding OuptWgt,
+                                            StringFormat={}{0:N2}}"
+                                            Width="105"/>
+
+
+                        <!-- 출고 -->
+
+                        <DataGridTextColumn Header="출고중량"
+                                            Binding="{Binding OuptOutWgt,
+                                            StringFormat={}{0:N2}}"
+                                            Width="105"/>
+
+
+                        <!-- BOX -->
+
+                        <DataGridTextColumn Header="BOX-NO"
+                                            Binding="{Binding OuptBoxno}"
+                                            Width="135"/>
+
+
+                        <!-- 출고 BOX -->
+
+                        <DataGridTextColumn Header="출고 BOX"
+                                            Binding="{Binding OuptBoxno1}"
+                                            Width="135"/>
+
+
+                        <!-- 비고 -->
+
+                        <DataGridTextColumn Header="비 고"
+                                            Binding="{Binding OuptRemark}"
+                                            Width="180"/>
+
+
+                        <!-- 출고 비고 -->
+
+                        <DataGridTextColumn Header="출고 비고"
+                                            Binding="{Binding OuptRemark1}"
+                                            Width="180"/>
+
+
+                        <!-- 차수 -->
+
+                        <DataGridTextColumn Header="차수"
+                                            Binding="{Binding OuptChasu}"
+                                            Width="75"/>
+
+
+                        <!-- INDEX -->
+
+                        <DataGridTextColumn Header="출고 INDEX"
+                                            Binding="{Binding OuptIndex}"
+                                            Width="150"/>
+
+                    </DataGrid.Columns>
+
+                </DataGrid>
+
+            </DockPanel>
+
+        </Border>
+
+    </DockPanel>
+
+</UserControl>

@@ -17,9 +17,4 @@
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.11" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="DTOs\Outbounds\" />
-    <Folder Include="Interfaces\Outbounds\" />
-  </ItemGroup>
-
 </Project>

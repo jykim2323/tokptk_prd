@@ -17,8 +17,4 @@
     <ProjectReference Include="..\TOK.WMS.Infrastructure\TOK.WMS.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\Outbounds\" />
-  </ItemGroup>
-
 </Project>

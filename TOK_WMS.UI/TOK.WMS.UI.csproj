@@ -23,6 +23,7 @@
     <PackageReference Include="ClosedXML" Version="0.105.0" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageReference Include="Dirkster.AvalonDock" Version="4.74.1" />
+    <PackageReference Include="ExcelDataReader" Version="3.9.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.12" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.10" />
     <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="10.0.10" />
@@ -53,12 +54,6 @@
     <Resource Include="Assets\tok-logo.png" />
     <Resource Include="Assets\TOK.png" />
     <Resource Include="Assets\TOK_Main.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Services\Api\Outbounds\" />
-    <Folder Include="ViewModels\MainMenus\Outbounds\" />
-    <Folder Include="Views\MainMenus\Outbounds\" />
   </ItemGroup>
 
 </Project>

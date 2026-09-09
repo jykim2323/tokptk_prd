@@ -17,6 +17,7 @@ using TOK.WMS.UI.Services;
 using TOK.WMS.UI.Services.Api.Inbounds;
 using TOK.WMS.UI.Services.Api.Inventory;
 using TOK.WMS.UI.Services.Api.Login;
+using TOK.WMS.UI.Services.Api.Outbounds;
 using TOK.WMS.UI.Services.Factories;
 using TOK.WMS.UI.Services.Interfaces;
 using TOK.WMS.UI.Services.Interfaces.Popup;
@@ -25,6 +26,7 @@ using TOK.WMS.UI.ViewModels.Base;
 using TOK.WMS.UI.ViewModels.Login;
 using TOK.WMS.UI.ViewModels.MainMenus.Inbounds;
 using TOK.WMS.UI.ViewModels.MainMenus.Inventory;
+using TOK.WMS.UI.ViewModels.MainMenus.Outbounds;
 using TOK.WMS.UI.Views.Login;
 using TOK.WMS.UI.Views.MainMenus.Inventory;
 
@@ -86,6 +88,14 @@ public partial class App : Application
         sc.AddHttpClient<IFrm3700Api, Frm3700ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
         sc.AddHttpClient<IFrm3900Api, Frm3900ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
 
+
+        // 출고관리
+        sc.AddHttpClient<IFrm4100Api, Frm4100ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+        sc.AddHttpClient<IFrm4101Api, Frm4101ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+        sc.AddHttpClient<IFrm4102Api, Frm4102ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+        sc.AddHttpClient<IFrm4103Api, Frm4103ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+        sc.AddHttpClient<IFrm4300Api, Frm4300ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+
         // 재고관리
         sc.AddHttpClient<IFrm6100Api, Frm6100ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
         sc.AddHttpClient<IFrm6200Api, Frm6200ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
@@ -138,6 +148,11 @@ public partial class App : Application
 
 
         // 출고관리
+        sc.AddKeyedTransient<DocumentViewModelBase, Frm4100ViewModel>(DocumentKeys.Frm4100);
+        sc.AddKeyedTransient<DocumentViewModelBase, Frm4101ViewModel>(DocumentKeys.Frm4101);
+        sc.AddKeyedTransient<DocumentViewModelBase, Frm4102ViewModel>(DocumentKeys.Frm4102);
+        sc.AddKeyedTransient<DocumentViewModelBase, Frm4103ViewModel>(DocumentKeys.Frm4103);
+        sc.AddKeyedTransient<DocumentViewModelBase, Frm4300ViewModel>(DocumentKeys.Frm4300);
 
         // 재고관리
         sc.AddKeyedTransient<DocumentViewModelBase, Frm6100ViewModel>(DocumentKeys.Frm6100);

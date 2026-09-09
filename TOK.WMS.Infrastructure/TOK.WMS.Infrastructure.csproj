@@ -15,8 +15,4 @@
     <ProjectReference Include="..\TOK.WMS.Core\TOK.WMS.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Repositories\Outbounds\" />
-  </ItemGroup>
-
 </Project>
