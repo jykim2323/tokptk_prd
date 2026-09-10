@@ -1,0 +1,639 @@
+﻿<UserControl x:Class="TOK.WMS.UI.Views.MainMenus.Standards.Frm1500View"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             Background="{DynamicResource AppBackgroundBrush}"
+             Foreground="{DynamicResource AppTextBrush}"
+             FontFamily="{StaticResource AppFont}"
+             FontWeight="Medium">
+
+    <UserControl.Resources>
+
+        <!-- ===================================================== -->
+        <!-- Label -->
+        <!-- ===================================================== -->
+
+        <Style x:Key="FilterLabel"
+               TargetType="TextBlock">
+
+            <Setter Property="VerticalAlignment"
+                    Value="Center"/>
+
+            <Setter Property="FontWeight"
+                    Value="Bold"/>
+
+            <Setter Property="FontSize"
+                    Value="14"/>
+
+            <Setter Property="Foreground"
+                    Value="{DynamicResource AppTextBrush}"/>
+
+        </Style>
+
+
+        <!-- ===================================================== -->
+        <!-- TextBox -->
+        <!-- ===================================================== -->
+
+        <Style x:Key="FilterBox"
+               TargetType="TextBox">
+
+            <Setter Property="Height"
+                    Value="34"/>
+
+            <Setter Property="Padding"
+                    Value="8,3"/>
+
+            <Setter Property="VerticalContentAlignment"
+                    Value="Center"/>
+
+            <Setter Property="Background"
+                    Value="{DynamicResource InputBrush}"/>
+
+            <Setter Property="Foreground"
+                    Value="{DynamicResource AppTextBrush}"/>
+
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource InputBorderBrush}"/>
+
+            <Setter Property="BorderThickness"
+                    Value="1"/>
+
+            <Setter Property="FontSize"
+                    Value="14"/>
+
+
+            <Style.Triggers>
+
+                <Trigger Property="IsKeyboardFocusWithin"
+                         Value="True">
+
+                    <Setter Property="BorderBrush"
+                            Value="{DynamicResource BtnPrimaryBrush}"/>
+
+                    <Setter Property="BorderThickness"
+                            Value="2"/>
+
+                </Trigger>
+
+            </Style.Triggers>
+
+        </Style>
+
+
+        <!-- ===================================================== -->
+        <!-- CRUD Button -->
+        <!-- ===================================================== -->
+
+        <Style x:Key="CrudButton"
+               TargetType="Button">
+
+            <Setter Property="Height"
+                    Value="38"/>
+
+            <Setter Property="MinWidth"
+                    Value="90"/>
+
+            <Setter Property="Margin"
+                    Value="4,0"/>
+
+            <Setter Property="FontWeight"
+                    Value="Bold"/>
+
+            <Setter Property="Cursor"
+                    Value="Hand"/>
+
+            <Setter Property="BorderThickness"
+                    Value="0"/>
+
+            <Setter Property="Foreground"
+                    Value="{DynamicResource BtnPrimaryTextBrush}"/>
+
+        </Style>
+
+    </UserControl.Resources>
+
+
+    <!-- ========================================================= -->
+    <!-- Loaded -->
+    <!-- ========================================================= -->
+
+    <i:Interaction.Triggers>
+
+        <i:EventTrigger EventName="Loaded">
+
+            <i:InvokeCommandAction
+                Command="{Binding LoadedCommand}"/>
+
+        </i:EventTrigger>
+
+    </i:Interaction.Triggers>
+
+
+    <DockPanel Margin="12">
+
+
+        <!-- ===================================================== -->
+        <!-- HEADER -->
+        <!-- ===================================================== -->
+
+        <Grid DockPanel.Dock="Top"
+              Height="55"
+              Margin="0,0,0,8">
+
+            <Grid.ColumnDefinitions>
+
+                <ColumnDefinition Width="*"/>
+
+                <ColumnDefinition Width="Auto"/>
+
+            </Grid.ColumnDefinitions>
+
+
+            <StackPanel Grid.Column="0"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center">
+
+                <TextBlock Text="🧩"
+                           FontSize="20"
+                           Margin="0,0,8,0"/>
+
+
+                <TextBlock Text="구분코드 마스터 관리"
+                           FontSize="20"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"/>
+
+            </StackPanel>
+
+
+            <StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center">
+
+                <TextBlock Text="{Binding StatusMessage}"
+                           Margin="0,0,20,0"
+                           VerticalAlignment="Center"
+                           FontWeight="Bold"
+                           Foreground="{DynamicResource AppTextSubBrush}"/>
+
+
+                <Button Content="🔍 조회"
+                        Width="95"
+                        Height="38"
+                        Command="{Binding SearchCommand}"
+                        FontWeight="Bold"
+                        Cursor="Hand"
+                        BorderThickness="0"
+                        Background="{DynamicResource BtnPrimaryBrush}"
+                        Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
+
+            </StackPanel>
+
+        </Grid>
+
+
+        <!-- ===================================================== -->
+        <!-- BODY -->
+        <!-- ===================================================== -->
+
+        <Grid>
+
+            <Grid.ColumnDefinitions>
+
+                <ColumnDefinition Width="*"/>
+
+                <ColumnDefinition Width="10"/>
+
+                <ColumnDefinition Width="*"/>
+
+                <ColumnDefinition Width="10"/>
+
+                <ColumnDefinition Width="*"/>
+
+            </Grid.ColumnDefinitions>
+
+
+            <!-- ================================================= -->
+            <!-- GUBN 1 -->
+            <!-- ================================================= -->
+
+            <Border Grid.Column="0"
+                    Background="{DynamicResource AppSurfaceBrush}"
+                    BorderBrush="{DynamicResource AppBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="5"
+                    Padding="10">
+
+                <DockPanel>
+
+
+                    <!-- Header -->
+
+                    <TextBlock DockPanel.Dock="Top"
+                               Text="⚠️ 위험물 - 구분#1"
+                               FontSize="16"
+                               FontWeight="Bold"
+                               Margin="0,0,0,10"/>
+
+
+                    <!-- 입력 -->
+
+                    <Border DockPanel.Dock="Top"
+                            BorderBrush="{DynamicResource AppBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="10"
+                            Margin="0,0,0,8">
+
+                        <Grid>
+
+                            <Grid.ColumnDefinitions>
+
+                                <ColumnDefinition Width="70"/>
+
+                                <ColumnDefinition Width="*"/>
+
+                            </Grid.ColumnDefinitions>
+
+
+                            <Grid.RowDefinitions>
+
+                                <RowDefinition Height="42"/>
+
+                                <RowDefinition Height="42"/>
+
+                            </Grid.RowDefinitions>
+
+
+                            <TextBlock Grid.Row="0"
+                                       Grid.Column="0"
+                                       Text="구분#1"
+                                       Style="{StaticResource FilterLabel}"/>
+
+
+                            <TextBox Grid.Row="0"
+                                     Grid.Column="1"
+                                     Text="{Binding Gubn1Code,
+                                                    Mode=TwoWay,
+                                                    UpdateSourceTrigger=PropertyChanged}"
+                                     CharacterCasing="Upper"
+                                     Style="{StaticResource FilterBox}"/>
+
+
+                            <TextBlock Grid.Row="1"
+                                       Grid.Column="0"
+                                       Text="구분명"
+                                       Style="{StaticResource FilterLabel}"/>
+
+
+                            <TextBox Grid.Row="1"
+                                     Grid.Column="1"
+                                     Text="{Binding Gubn1Name,
+                                                    Mode=TwoWay,
+                                                    UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource FilterBox}"/>
+
+                        </Grid>
+
+                    </Border>
+
+
+                    <!-- Buttons -->
+
+                    <StackPanel DockPanel.Dock="Bottom"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                Margin="0,8,0,0">
+
+                        <Button Content="➕ 등록"
+                                Command="{Binding InsertGubn1Command}"
+                                Style="{StaticResource CrudButton}"
+                                Background="{DynamicResource BtnPrimaryBrush}"/>
+
+
+                        <Button Content="✏ 수정"
+                                Command="{Binding UpdateGubn1Command}"
+                                Style="{StaticResource CrudButton}"
+                                Background="{DynamicResource BtnStadardBrush}"/>
+
+
+                        <Button Content="🗑 삭제"
+                                Command="{Binding DeleteGubn1Command}"
+                                Style="{StaticResource CrudButton}"
+                                Background="{DynamicResource BtnStadardBrush}"/>
+
+                    </StackPanel>
+
+
+                    <!-- Grid -->
+
+                    <DataGrid ItemsSource="{Binding Gubn1Items}"
+                              SelectedItem="{Binding SelectedGubn1,
+                                                     Mode=TwoWay}"
+                              Style="{StaticResource ListDataGridStyle}"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              CanUserAddRows="False"
+                              CanUserSortColumns="True"
+                              SelectionMode="Single"
+                              SelectionUnit="FullRow">
+
+                        <DataGrid.Columns>
+
+                            <DataGridTextColumn Header="구분"
+                                                Binding="{Binding Gubn1Code}"
+                                                Width="90"/>
+
+
+                            <DataGridTextColumn Header="구 분 명"
+                                                Binding="{Binding Gubn1Name}"
+                                                Width="*"/>
+
+                        </DataGrid.Columns>
+
+                    </DataGrid>
+
+                </DockPanel>
+
+            </Border>
+
+
+            <!-- ================================================= -->
+            <!-- GUBN 2 -->
+            <!-- ================================================= -->
+
+            <Border Grid.Column="2"
+                    Background="{DynamicResource AppSurfaceBrush}"
+                    BorderBrush="{DynamicResource AppBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="5"
+                    Padding="10">
+
+                <DockPanel>
+
+
+                    <TextBlock DockPanel.Dock="Top"
+                               Text="🛢️ 석유류 - 구분#2"
+                               FontSize="16"
+                               FontWeight="Bold"
+                               Margin="0,0,0,10"/>
+
+
+                    <Border DockPanel.Dock="Top"
+                            BorderBrush="{DynamicResource AppBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="10"
+                            Margin="0,0,0,8">
+
+                        <Grid>
+
+                            <Grid.ColumnDefinitions>
+
+                                <ColumnDefinition Width="70"/>
+
+                                <ColumnDefinition Width="*"/>
+
+                            </Grid.ColumnDefinitions>
+
+
+                            <Grid.RowDefinitions>
+
+                                <RowDefinition Height="42"/>
+
+                                <RowDefinition Height="42"/>
+
+                            </Grid.RowDefinitions>
+
+
+                            <TextBlock Grid.Row="0"
+                                       Grid.Column="0"
+                                       Text="구분#2"
+                                       Style="{StaticResource FilterLabel}"/>
+
+
+                            <TextBox Grid.Row="0"
+                                     Grid.Column="1"
+                                     Text="{Binding Gubn2Code,
+                                                    Mode=TwoWay,
+                                                    UpdateSourceTrigger=PropertyChanged}"
+                                     CharacterCasing="Upper"
+                                     Style="{StaticResource FilterBox}"/>
+
+
+                            <TextBlock Grid.Row="1"
+                                       Grid.Column="0"
+                                       Text="구분명"
+                                       Style="{StaticResource FilterLabel}"/>
+
+
+                            <TextBox Grid.Row="1"
+                                     Grid.Column="1"
+                                     Text="{Binding Gubn2Name,
+                                                    Mode=TwoWay,
+                                                    UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource FilterBox}"/>
+
+                        </Grid>
+
+                    </Border>
+
+
+                    <StackPanel DockPanel.Dock="Bottom"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                Margin="0,8,0,0">
+
+                        <Button Content="➕ 등록"
+                                Command="{Binding InsertGubn2Command}"
+                                Style="{StaticResource CrudButton}"
+                                Background="{DynamicResource BtnPrimaryBrush}"/>
+
+
+                        <Button Content="✏ 수정"
+                                Command="{Binding UpdateGubn2Command}"
+                                Style="{StaticResource CrudButton}"
+                                Background="{DynamicResource BtnStadardBrush}"/>
+
+
+                        <Button Content="🗑 삭제"
+                                Command="{Binding DeleteGubn2Command}"
+                                Style="{StaticResource CrudButton}"
+                                Background="{DynamicResource BtnStadardBrush}"/>
+
+                    </StackPanel>
+
+
+                    <DataGrid ItemsSource="{Binding Gubn2Items}"
+                              SelectedItem="{Binding SelectedGubn2,
+                                                     Mode=TwoWay}"
+                              Style="{StaticResource ListDataGridStyle}"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              CanUserAddRows="False"
+                              CanUserSortColumns="True"
+                              SelectionMode="Single"
+                              SelectionUnit="FullRow">
+
+                        <DataGrid.Columns>
+
+                            <DataGridTextColumn Header="구분"
+                                                Binding="{Binding Gubn2Code}"
+                                                Width="90"/>
+
+
+                            <DataGridTextColumn Header="구 분 명"
+                                                Binding="{Binding Gubn2Name}"
+                                                Width="*"/>
+
+                        </DataGrid.Columns>
+
+                    </DataGrid>
+
+                </DockPanel>
+
+            </Border>
+
+
+            <!-- ================================================= -->
+            <!-- GUBN 3 -->
+            <!-- ================================================= -->
+
+            <Border Grid.Column="4"
+                    Background="{DynamicResource AppSurfaceBrush}"
+                    BorderBrush="{DynamicResource AppBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="5"
+                    Padding="10">
+
+                <DockPanel>
+
+
+                    <TextBlock DockPanel.Dock="Top"
+                               Text="💧 수용성 - 구분#3"
+                               FontSize="16"
+                               FontWeight="Bold"
+                               Margin="0,0,0,10"/>
+
+
+                    <Border DockPanel.Dock="Top"
+                            BorderBrush="{DynamicResource AppBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="10"
+                            Margin="0,0,0,8">
+
+                        <Grid>
+
+                            <Grid.ColumnDefinitions>
+
+                                <ColumnDefinition Width="70"/>
+
+                                <ColumnDefinition Width="*"/>
+
+                            </Grid.ColumnDefinitions>
+
+
+                            <Grid.RowDefinitions>
+
+                                <RowDefinition Height="42"/>
+
+                                <RowDefinition Height="42"/>
+
+                            </Grid.RowDefinitions>
+
+
+                            <TextBlock Grid.Row="0"
+                                       Grid.Column="0"
+                                       Text="구분#3"
+                                       Style="{StaticResource FilterLabel}"/>
+
+
+                            <TextBox Grid.Row="0"
+                                     Grid.Column="1"
+                                     Text="{Binding Gubn3Code,
+                                                    Mode=TwoWay,
+                                                    UpdateSourceTrigger=PropertyChanged}"
+                                     CharacterCasing="Upper"
+                                     Style="{StaticResource FilterBox}"/>
+
+
+                            <TextBlock Grid.Row="1"
+                                       Grid.Column="0"
+                                       Text="구분명"
+                                       Style="{StaticResource FilterLabel}"/>
+
+
+                            <TextBox Grid.Row="1"
+                                     Grid.Column="1"
+                                     Text="{Binding Gubn3Name,
+                                                    Mode=TwoWay,
+                                                    UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource FilterBox}"/>
+
+                        </Grid>
+
+                    </Border>
+
+
+                    <StackPanel DockPanel.Dock="Bottom"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                Margin="0,8,0,0">
+
+                        <Button Content="➕ 등록"
+                                Command="{Binding InsertGubn3Command}"
+                                Style="{StaticResource CrudButton}"
+                                Background="{DynamicResource BtnPrimaryBrush}"/>
+
+
+                        <Button Content="✏ 수정"
+                                Command="{Binding UpdateGubn3Command}"
+                                Style="{StaticResource CrudButton}"
+                                Background="{DynamicResource BtnStadardBrush}"/>
+
+
+                        <Button Content="🗑 삭제"
+                                Command="{Binding DeleteGubn3Command}"
+                                Style="{StaticResource CrudButton}"
+                                Background="{DynamicResource BtnStadardBrush}"/>
+
+                    </StackPanel>
+
+
+                    <DataGrid ItemsSource="{Binding Gubn3Items}"
+                              SelectedItem="{Binding SelectedGubn3,
+                                                     Mode=TwoWay}"
+                              Style="{StaticResource ListDataGridStyle}"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              CanUserAddRows="False"
+                              CanUserSortColumns="True"
+                              SelectionMode="Single"
+                              SelectionUnit="FullRow">
+
+                        <DataGrid.Columns>
+
+                            <DataGridTextColumn Header="구분"
+                                                Binding="{Binding Gubn3Code}"
+                                                Width="90"/>
+
+
+                            <DataGridTextColumn Header="구 분 명"
+                                                Binding="{Binding Gubn3Name}"
+                                                Width="*"/>
+
+                        </DataGrid.Columns>
+
+                    </DataGrid>
+
+                </DockPanel>
+
+            </Border>
+
+        </Grid>
+
+    </DockPanel>
+
+</UserControl>

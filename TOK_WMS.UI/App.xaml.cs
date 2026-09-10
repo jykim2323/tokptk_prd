@@ -85,6 +85,8 @@ public partial class App : Application
 
         // 기준 정보 관리
         sc.AddHttpClient<IFrm1100Api, Frm1100ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+        sc.AddHttpClient<IFrm1300Api, Frm1300ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+        sc.AddHttpClient<IFrm1500Api, Frm1500ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
         sc.AddHttpClient<ISFrm1100Api, SFrm1100ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
         sc.AddHttpClient<IMastDispApi, MastDispApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
 
@@ -150,6 +152,8 @@ public partial class App : Application
 
         // 기준 정보 관리
         sc.AddKeyedTransient<DocumentViewModelBase, Frm1100ViewModel>(DocumentKeys.Frm1100);
+        sc.AddKeyedTransient<DocumentViewModelBase, Frm1300ViewModel>(DocumentKeys.Frm1300);
+        sc.AddKeyedTransient<DocumentViewModelBase, Frm1500ViewModel>(DocumentKeys.Frm1500);
 
         // 입고관리
         sc.AddKeyedTransient<DocumentViewModelBase, Frm3100ViewModel>(DocumentKeys.Frm3100);

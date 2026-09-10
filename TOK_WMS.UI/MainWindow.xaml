@@ -34,6 +34,12 @@
         <DataTemplate DataType="{x:Type vmStd:Frm1100ViewModel}">
             <viewsStd:Frm1100View/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vmStd:Frm1300ViewModel}">
+            <viewsStd:Frm1300View/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vmStd:Frm1500ViewModel}">
+            <viewsStd:Frm1500View/>
+        </DataTemplate>
 
 
         <!-- 입고 관리 -->

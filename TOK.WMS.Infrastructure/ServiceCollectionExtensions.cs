@@ -31,6 +31,8 @@ namespace TOK.WMS.Infrastructure
 
             //기준 정보 관리
             services.AddScoped<IFrm1100Repository, Frm1100Repository>();
+            services.AddScoped<IFrm1300Repository, Frm1300Repository>();
+            services.AddScoped<IFrm1500Repository, Frm1500Repository>();
 
             //입고 관리
             services.AddScoped<IFrm3100Repository, Frm3100Repository>();

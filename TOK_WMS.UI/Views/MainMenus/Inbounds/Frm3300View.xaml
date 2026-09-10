@@ -11,158 +11,500 @@
              Loaded="UserControl_Loaded">
 
     <UserControl.Resources>
-        <conv:LocaFormatConverter x:Key="LocaFormatConverter"/>
-        <conv:LstkFlagConverter x:Key="LstkFlagConverter"/>
-        <conv:SubkFlagConverter x:Key="SubkFlagConverter"/>
-        <conv:DateTimeFormatConverter x:Key="DateTimeFormatConverter"/>
-        <conv:OnlyTimeFormatConverter x:Key="OnlyTimeFormatConverter"/>
-        <conv:RadioButtonConverter x:Key="RadioButtonConverter"/>
-        <Style x:Key="FilterLabel" TargetType="TextBlock">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Margin" Value="0,0,6,0"/>
-            <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}"/>
-        </Style>
-        <Style x:Key="FilterBox" TargetType="TextBox">
-            <Setter Property="Width" Value="120"/>
-            <Setter Property="Padding" Value="5,4"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Background" Value="{DynamicResource InputBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
-            <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}"/>
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="BorderThickness" Value="1"/>
-        </Style>
-        <Style x:Key="DetailLabelCell" TargetType="Border">
-            <Setter Property="Background" Value="#F2F6FA"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
-            <Setter Property="BorderThickness" Value="0,0,1,1"/>
-            <Setter Property="Padding" Value="12,0"/>
+
+        <conv:LocaFormatConverter
+            x:Key="LocaFormatConverter"/>
+
+        <conv:LstkFlagConverter
+            x:Key="LstkFlagConverter"/>
+
+        <conv:SubkFlagConverter
+            x:Key="SubkFlagConverter"/>
+
+        <conv:DateTimeFormatConverter
+            x:Key="DateTimeFormatConverter"/>
+
+        <conv:OnlyTimeFormatConverter
+            x:Key="OnlyTimeFormatConverter"/>
+
+        <conv:RadioButtonConverter
+            x:Key="RadioButtonConverter"/>
+
+
+        <!-- ===================================================== -->
+        <!-- Filter Label -->
+        <!-- ===================================================== -->
+
+        <Style x:Key="FilterLabel"
+               TargetType="TextBlock">
+
+            <Setter Property="VerticalAlignment"
+                    Value="Center"/>
+
+            <Setter Property="FontWeight"
+                    Value="Bold"/>
+
+            <Setter Property="Margin"
+                    Value="0,0,6,0"/>
+
+            <Setter Property="Foreground"
+                    Value="{DynamicResource AppTextBrush}"/>
+
         </Style>
 
-        <Style x:Key="Header" TargetType="Border">
-            <Setter Property="Background" Value="#ebf4fc"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
-            <Setter Property="BorderThickness" Value="2,2,2,2"/>
+
+        <!-- ===================================================== -->
+        <!-- Filter Box -->
+        <!-- ===================================================== -->
+
+        <Style x:Key="FilterBox"
+               TargetType="TextBox">
+
+            <Setter Property="Width"
+                    Value="120"/>
+
+            <Setter Property="Padding"
+                    Value="5,4"/>
+
+            <Setter Property="VerticalContentAlignment"
+                    Value="Center"/>
+
+            <Setter Property="Background"
+                    Value="{DynamicResource InputBrush}"/>
+
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource InputBorderBrush}"/>
+
+            <Setter Property="Foreground"
+                    Value="{DynamicResource AppTextBrush}"/>
+
+            <Setter Property="FontSize"
+                    Value="16"/>
+
+            <Setter Property="BorderThickness"
+                    Value="1"/>
+
         </Style>
 
-        <Style x:Key="DetailInputBox" TargetType="TextBox">
-            <Setter Property="Height" Value="34"/>
-            <Setter Property="Margin" Value="8,3,0,5"/>
-            <Setter Property="Padding" Value="10,4"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Background" Value="{DynamicResource InputBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontSize" Value="14"/>
+
+        <!-- ===================================================== -->
+        <!-- Detail Label -->
+        <!-- ===================================================== -->
+
+        <Style x:Key="DetailLabelCell"
+               TargetType="Border">
+
+            <Setter Property="Background"
+                    Value="#F2F6FA"/>
+
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource AppBorderBrush}"/>
+
+            <Setter Property="BorderThickness"
+                    Value="0,0,1,1"/>
+
+            <Setter Property="Padding"
+                    Value="12,0"/>
+
+        </Style>
+
+
+        <!-- ===================================================== -->
+        <!-- Header -->
+        <!-- ===================================================== -->
+
+        <Style x:Key="Header"
+               TargetType="Border">
+
+            <Setter Property="Background"
+                    Value="#ebf4fc"/>
+
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource AppBorderBrush}"/>
+
+            <Setter Property="BorderThickness"
+                    Value="2"/>
+
+        </Style>
+
+
+        <!-- ===================================================== -->
+        <!-- Detail Input -->
+        <!-- ===================================================== -->
+
+        <Style x:Key="DetailInputBox"
+               TargetType="TextBox">
+
+            <Setter Property="Height"
+                    Value="34"/>
+
+            <Setter Property="Margin"
+                    Value="8,3,0,5"/>
+
+            <Setter Property="Padding"
+                    Value="10,4"/>
+
+            <Setter Property="VerticalContentAlignment"
+                    Value="Center"/>
+
+            <Setter Property="Background"
+                    Value="{DynamicResource InputBrush}"/>
+
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource InputBorderBrush}"/>
+
+            <Setter Property="BorderThickness"
+                    Value="1"/>
+
+            <Setter Property="FontSize"
+                    Value="14"/>
+
 
             <Style.Triggers>
-                <Trigger Property="IsKeyboardFocusWithin" Value="True">
+
+                <Trigger Property="IsKeyboardFocusWithin"
+                         Value="True">
+
                     <Setter Property="BorderBrush"
-                    Value="{DynamicResource BtnPrimaryBrush}"/>
-                    <Setter Property="BorderThickness" Value="2"/>
+                            Value="{DynamicResource BtnPrimaryBrush}"/>
+
+                    <Setter Property="BorderThickness"
+                            Value="2"/>
+
                 </Trigger>
+
             </Style.Triggers>
+
         </Style>
+
     </UserControl.Resources>
 
 
     <DockPanel Margin="12">
-        <!-- 헤더 -->
-        <Grid DockPanel.Dock="Top" Margin="0,0,10,0" >
-
-            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Top" Height="60">
-                <TextBlock Text="📦" FontSize="20" Margin="0,5,5,10" VerticalAlignment="Center"/>
-                <TextBlock Text="미 입고 현황" FontSize="20" FontWeight="Bold" Width="500"
-            Foreground="{DynamicResource AppTextBrush}" VerticalAlignment="Center"/>
 
 
+        <!-- ===================================================== -->
+        <!-- HEADER -->
+        <!-- ===================================================== -->
 
-                <Button Width="90" HorizontalAlignment="Right" Content="🔍 조회" Command="{Binding SearchCommand}"  
-                Padding="16,6" FontWeight="Bold" Cursor="Hand" BorderThickness="0" Margin="1,0,10,5"
-                Background="{DynamicResource BtnPrimaryBrush}"
-                Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
+        <Grid DockPanel.Dock="Top"
+              Height="60"
+              Margin="0,0,10,0">
 
-                <Button Width="90" HorizontalAlignment="Right" Content="📊 엑셀" Command="{Binding ExportExcelCommand}"  
-                Padding="16,6" FontWeight="Bold" Cursor="Hand" BorderThickness="0" Margin="5,0,10,5"
-                Background="ForestGreen" 
-                Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
+            <Grid.ColumnDefinitions>
 
-                <Button Width="90" HorizontalAlignment="Right" Content="🖨️ 인쇄" Command="{Binding PrintCommand}"  
-                Padding="16,6" FontWeight="Bold" Cursor="Hand" BorderThickness="0" Margin="5,0,10,5"
-                Background="{DynamicResource BtnStadardBrush}" 
-                Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
+                <!-- 왼쪽 제목 -->
+                <ColumnDefinition Width="*"/>
 
-                <Button Width="90" HorizontalAlignment="Right" Content="🗑️ 삭제" Command="{Binding DeleteCommand}"  
-                Padding="16,6" FontWeight="Bold" Cursor="Hand" BorderThickness="0" Margin="5,0,10,5"
-                Background="{DynamicResource BtnStadardBrush}" 
-                Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
+                <!-- 오른쪽 버튼 -->
+                <ColumnDefinition Width="Auto"/>
 
-                <Button Width="90" HorizontalAlignment="Right" Content="⏻ 종료" Command="{Binding CloseCommand}"  
-                Padding="16,6" FontWeight="Bold" Cursor="Hand" BorderThickness="0" Margin="5,0,10,5"
-                Background="{DynamicResource BtnStadardBrush}" 
-                Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
+            </Grid.ColumnDefinitions>
+
+
+            <!-- ================================================= -->
+            <!-- 제목 -->
+            <!-- ================================================= -->
+
+            <StackPanel Grid.Column="0"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center">
+
+                <TextBlock Text="📦"
+                           FontSize="20"
+                           Margin="0,0,5,0"
+                           VerticalAlignment="Center"/>
+
+
+                <TextBlock Text="미 입고 현황"
+                           FontSize="20"
+                           FontWeight="Bold"
+                           Foreground="{DynamicResource AppTextBrush}"
+                           VerticalAlignment="Center"/>
+
             </StackPanel>
 
-            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+
+            <!-- ================================================= -->
+            <!-- 버튼 -->
+            <!-- ================================================= -->
+
+            <StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center">
+
+
+                <!-- 조회 -->
+
+                <Button Width="90"
+                        Height="42"
+                        Content="🔍 조회"
+                        Command="{Binding SearchCommand}"
+                        Padding="16,6"
+                        FontWeight="Bold"
+                        Cursor="Hand"
+                        BorderThickness="0"
+                        Margin="0,0,10,0"
+                        Background="{DynamicResource BtnPrimaryBrush}"
+                        Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
+
+
+                <!-- Excel -->
+
+                <Button Width="90"
+                        Height="42"
+                        Content="📊 엑셀"
+                        Command="{Binding ExportExcelCommand}"
+                        Padding="16,6"
+                        FontWeight="Bold"
+                        Cursor="Hand"
+                        BorderThickness="0"
+                        Margin="0,0,10,0"
+                        Background="ForestGreen"
+                        Foreground="White"/>
+
+
+                <!-- 인쇄 -->
+
+                <Button Width="90"
+                        Height="42"
+                        Content="🖨️ 인쇄"
+                        Command="{Binding PrintCommand}"
+                        Padding="16,6"
+                        FontWeight="Bold"
+                        Cursor="Hand"
+                        BorderThickness="0"
+                        Margin="0,0,10,0"
+                        Background="{DynamicResource BtnStadardBrush}"
+                        Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
+
+
+                <!-- 삭제 -->
+
+                <Button Width="90"
+                        Height="42"
+                        Content="🗑️ 삭제"
+                        Command="{Binding DeleteCommand}"
+                        Padding="16,6"
+                        FontWeight="Bold"
+                        Cursor="Hand"
+                        BorderThickness="0"
+                        Margin="0,0,10,0"
+                        Background="{DynamicResource BtnStadardBrush}"
+                        Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
+
+
+                <!-- 종료 -->
+
+                <Button Width="90"
+                        Height="42"
+                        Content="⏻ 종료"
+                        Command="{Binding CloseCommand}"
+                        Padding="16,6"
+                        FontWeight="Bold"
+                        Cursor="Hand"
+                        BorderThickness="0"
+                        Background="{DynamicResource BtnStadardBrush}"
+                        Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
+
             </StackPanel>
-            <!--<TextBlock Text="{Binding StatusMessage}" HorizontalAlignment="Right" VerticalAlignment="Center"
-        FontSize="18" FontWeight="Bold" Foreground="{DynamicResource AppTextSubBrush}"/>-->
+
         </Grid>
 
+
+        <!-- ===================================================== -->
+        <!-- DATA -->
+        <!-- ===================================================== -->
 
         <Grid>
+
             <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
+
+                <RowDefinition Height="*"/>
+
             </Grid.RowDefinitions>
 
-            <Border Grid.Row="0" 
-                Background="{DynamicResource AppSurfaceBrush}"
-                BorderBrush="{DynamicResource AppBorderBrush}"
-                BorderThickness="1" CornerRadius="5" Padding="12,10" Margin="0,10,0,8">
+
+            <Border Grid.Row="0"
+                    Background="{DynamicResource AppSurfaceBrush}"
+                    BorderBrush="{DynamicResource AppBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="5"
+                    Padding="12,10"
+                    Margin="0,10,0,8">
+
                 <DockPanel LastChildFill="True">
-                    <Border DockPanel.Dock="Top" Height="40" Style="{StaticResource Header}"
-                             BorderThickness="1" CornerRadius="5" Padding="12,10" Margin="0,0,0,8">
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
-                            <TextBlock Text="미 입고 현황 :" 
-                                        FontSize="13" FontWeight="Bold" 
-                                        Foreground="{DynamicResource AppTextBrush}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-                            <TextBox Text="{Binding RowTotalCount}" Margin="10,0,0,0" 
-                                        FontSize="13" FontWeight="Bold" 
-                                        Foreground="{DynamicResource AppTextBrush}"
-                                        Background="#ebf4fc"
-                                        BorderThickness="0"/>
+
+
+                    <!-- ================================================= -->
+                    <!-- 데이터 Header -->
+                    <!-- ================================================= -->
+
+                    <Border DockPanel.Dock="Top"
+                            Height="40"
+                            Style="{StaticResource Header}"
+                            BorderThickness="1"
+                            CornerRadius="5"
+                            Padding="12,10"
+                            Margin="0,0,0,8">
+
+                        <StackPanel Orientation="Horizontal">
+
+
+                            <TextBlock Text="미 입고 현황 :"
+                                       FontSize="13"
+                                       FontWeight="Bold"
+                                       Foreground="{DynamicResource AppTextBrush}"
+                                       VerticalAlignment="Center"/>
+
+
+                            <TextBox Text="{Binding RowTotalCount}"
+                                     Margin="10,0,0,0"
+                                     FontSize="13"
+                                     FontWeight="Bold"
+                                     Foreground="{DynamicResource AppTextBrush}"
+                                     Background="#ebf4fc"
+                                     BorderThickness="0"
+                                     IsReadOnly="True"/>
+
                         </StackPanel>
+
                     </Border>
-                    <!-- 결과 그리드: 컬럼이 데이터 길이에 맞춰 자동 너비 -->
-                    <DataGrid x:Name="MimastDB_Table" ItemsSource="{Binding Items}"
-                         Style="{StaticResource ListDataGridStyle}"
-                         SelectedItem="{Binding SelectedItem}"
-                        HeadersVisibility="All"
-                        RowHeaderWidth="45"
-                        LoadingRow="DataGrid_LoadingRow"
-                        ScrollViewer.VerticalScrollBarVisibility="Auto"
-                        ScrollViewer.HorizontalScrollBarVisibility="Auto">
+
+
+                    <!-- ================================================= -->
+                    <!-- DATA GRID -->
+                    <!-- ================================================= -->
+
+                    <DataGrid x:Name="MimastDB_Table"
+                              ItemsSource="{Binding Items}"
+                              SelectedItem="{Binding SelectedItem}"
+                              Style="{StaticResource ListDataGridStyle}"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              CanUserAddRows="False"
+                              HeadersVisibility="All"
+                              RowHeaderWidth="45"
+                              LoadingRow="DataGrid_LoadingRow"
+                              ScrollViewer.VerticalScrollBarVisibility="Auto"
+                              ScrollViewer.HorizontalScrollBarVisibility="Auto">
+
+
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="입고일자" Binding="{Binding InptIndate , Converter={StaticResource DateTimeFormatConverter}}" Width="160" />
-                            <DataGridTextColumn Header="입고시간" Binding="{Binding InptStime , Converter={StaticResource OnlyTimeFormatConverter}}" Width="180" />
-                            <DataGridTextColumn Header="호기" Binding="{Binding InptHogi}" Width="260" />
-                            <DataGridTextColumn Header="저장위치" Binding="{Binding InptLoca, Converter={StaticResource LocaFormatConverter}}" Width="80" />
-                            <DataGridTextColumn Header="PLT-NO" Binding="{Binding InptPltNo}" Width="100" />
-                            <DataGridTextColumn Header="품목코드" Binding="{Binding InptCode}" Width="220" />
-                            <DataGridTextColumn Header="품 목 명" Binding="{Binding MastName}" Width="230" />
-                            <DataGridTextColumn Header="LOT-NO" Binding="{Binding InptLotno}" Width="200" />
-                            <DataGridTextColumn Header="입고중량" Binding="{Binding InptWeight}" Width="100" />
-                            <DataGridTextColumn Header="BOX-NO" Binding="{Binding InptBoxno}" Width="AUTO" />
-                            <DataGridTextColumn Header="비고" Binding="{Binding InptRemark}" Width="200" />
-                            <DataGridTextColumn Header="입고순번" Binding="{Binding InptIndex}" Width="200" />
-                            <DataGridTextColumn Header="발행" Binding="{Binding InptLabel}" Width="50" />
-                            <DataGridTextColumn Header="사용자ID" Binding="{Binding InptId}" Width="*" />
+
+
+                            <!-- 입고일자 -->
+
+                            <DataGridTextColumn Header="입고일자"
+                                                Binding="{Binding InptIndate,
+                                                Converter={StaticResource DateTimeFormatConverter}}"
+                                                Width="160"/>
+
+
+                            <!-- 입고시간 -->
+
+                            <DataGridTextColumn Header="입고시간"
+                                                Binding="{Binding InptStime,
+                                                Converter={StaticResource OnlyTimeFormatConverter}}"
+                                                Width="180"/>
+
+
+                            <!-- 호기 -->
+
+                            <DataGridTextColumn Header="호기"
+                                                Binding="{Binding InptHogi}"
+                                                Width="260"/>
+
+
+                            <!-- 저장위치 -->
+
+                            <DataGridTextColumn Header="저장위치"
+                                                Binding="{Binding InptLoca,
+                                                Converter={StaticResource LocaFormatConverter}}"
+                                                Width="80"/>
+
+
+                            <!-- PLT -->
+
+                            <DataGridTextColumn Header="PLT-NO"
+                                                Binding="{Binding InptPltNo}"
+                                                Width="100"/>
+
+
+                            <!-- 품목코드 -->
+
+                            <DataGridTextColumn Header="품목코드"
+                                                Binding="{Binding InptCode}"
+                                                Width="220"/>
+
+
+                            <!-- 품목명 -->
+
+                            <DataGridTextColumn Header="품 목 명"
+                                                Binding="{Binding MastName}"
+                                                Width="230"/>
+
+
+                            <!-- LOT -->
+
+                            <DataGridTextColumn Header="LOT-NO"
+                                                Binding="{Binding InptLotno}"
+                                                Width="200"/>
+
+
+                            <!-- 입고중량 -->
+
+                            <DataGridTextColumn Header="입고중량"
+                                                Binding="{Binding InptWeight}"
+                                                Width="100"/>
+
+
+                            <!-- BOX -->
+
+                            <DataGridTextColumn Header="BOX-NO"
+                                                Binding="{Binding InptBoxno}"
+                                                Width="Auto"/>
+
+
+                            <!-- 비고 -->
+
+                            <DataGridTextColumn Header="비고"
+                                                Binding="{Binding InptRemark}"
+                                                Width="200"/>
+
+
+                            <!-- 입고순번 -->
+
+                            <DataGridTextColumn Header="입고순번"
+                                                Binding="{Binding InptIndex}"
+                                                Width="200"/>
+
+
+                            <!-- 발행 -->
+
+                            <DataGridTextColumn Header="발행"
+                                                Binding="{Binding InptLabel}"
+                                                Width="50"/>
+
+
+                            <!-- 사용자 -->
+
+                            <DataGridTextColumn Header="사용자ID"
+                                                Binding="{Binding InptId}"
+                                                Width="*"
+                                                MinWidth="100"/>
+
                         </DataGrid.Columns>
+
                     </DataGrid>
+
                 </DockPanel>
+
             </Border>
+
         </Grid>
+
     </DockPanel>
 
 </UserControl>

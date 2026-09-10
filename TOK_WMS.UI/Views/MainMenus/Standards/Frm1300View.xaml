@@ -1,0 +1,513 @@
+﻿<UserControl x:Class="TOK.WMS.UI.Views.MainMenus.Standards.Frm1300View"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             Background="{DynamicResource AppBackgroundBrush}"
+             Foreground="{DynamicResource AppTextBrush}"
+             FontFamily="{StaticResource AppFont}"
+             FontWeight="Medium">
+
+    <UserControl.Resources>
+
+        <BooleanToVisibilityConverter
+            x:Key="BoolToVisibility"/>
+
+
+        <Style x:Key="FilterLabel"
+               TargetType="TextBlock">
+
+            <Setter Property="VerticalAlignment"
+                    Value="Center"/>
+
+            <Setter Property="FontWeight"
+                    Value="Bold"/>
+
+            <Setter Property="Margin"
+                    Value="0,0,8,0"/>
+
+            <Setter Property="Foreground"
+                    Value="{DynamicResource AppTextBrush}"/>
+
+        </Style>
+
+
+        <Style x:Key="FilterBox"
+               TargetType="TextBox">
+
+            <Setter Property="Height"
+                    Value="34"/>
+
+            <Setter Property="Padding"
+                    Value="8,3"/>
+
+            <Setter Property="VerticalContentAlignment"
+                    Value="Center"/>
+
+            <Setter Property="Background"
+                    Value="{DynamicResource InputBrush}"/>
+
+            <Setter Property="Foreground"
+                    Value="{DynamicResource AppTextBrush}"/>
+
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource InputBorderBrush}"/>
+
+            <Setter Property="BorderThickness"
+                    Value="1"/>
+
+            <Setter Property="FontSize"
+                    Value="14"/>
+
+
+            <Style.Triggers>
+
+                <Trigger Property="IsKeyboardFocusWithin"
+                         Value="True">
+
+                    <Setter Property="BorderBrush"
+                            Value="{DynamicResource BtnPrimaryBrush}"/>
+
+                    <Setter Property="BorderThickness"
+                            Value="2"/>
+
+                </Trigger>
+
+            </Style.Triggers>
+
+        </Style>
+
+    </UserControl.Resources>
+
+
+    <i:Interaction.Triggers>
+
+        <i:EventTrigger EventName="Loaded">
+
+            <i:InvokeCommandAction
+                Command="{Binding LoadedCommand}"/>
+
+        </i:EventTrigger>
+
+    </i:Interaction.Triggers>
+
+
+    <DockPanel Margin="12">
+
+
+        <!-- ===================================================== -->
+        <!-- HEADER -->
+        <!-- ===================================================== -->
+
+        <Grid DockPanel.Dock="Top"
+              Height="60"
+              Margin="0,0,0,8">
+
+            <Grid.ColumnDefinitions>
+
+                <ColumnDefinition Width="*"/>
+
+                <ColumnDefinition Width="Auto"/>
+
+            </Grid.ColumnDefinitions>
+
+
+            <StackPanel Grid.Column="0"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center">
+
+                <TextBlock Text="👤"
+                           FontSize="20"
+                           Margin="0,0,8,0"/>
+
+
+                <TextBlock Text="사용자 ID 관리"
+                           FontSize="20"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"/>
+
+            </StackPanel>
+
+
+            <StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center">
+
+
+                <Button Content="➕ 등록"
+                        Width="95"
+                        Height="40"
+                        Margin="0,0,10,0"
+                        Command="{Binding InsertCommand}"
+                        Visibility="{Binding IsAdmin,
+                                             Converter={StaticResource BoolToVisibility}}"
+                        FontWeight="Bold"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        Background="{DynamicResource BtnPrimaryBrush}"
+                        Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
+
+
+                <Button Content="✏ 수정"
+                        Width="95"
+                        Height="40"
+                        Margin="0,0,10,0"
+                        Command="{Binding UpdateCommand}"
+                        Visibility="{Binding IsAdmin,
+                                             Converter={StaticResource BoolToVisibility}}"
+                        FontWeight="Bold"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        Background="{DynamicResource BtnStadardBrush}"
+                        Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
+
+
+                <Button Content="🗑 삭제"
+                        Width="95"
+                        Height="40"
+                        Command="{Binding DeleteCommand}"
+                        Visibility="{Binding IsAdmin,
+                                             Converter={StaticResource BoolToVisibility}}"
+                        FontWeight="Bold"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        Background="{DynamicResource BtnStadardBrush}"
+                        Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
+
+            </StackPanel>
+
+        </Grid>
+
+
+        <!-- ===================================================== -->
+        <!-- BODY -->
+        <!-- ===================================================== -->
+
+        <Grid>
+
+            <Grid.ColumnDefinitions>
+
+                <ColumnDefinition Width="440"/>
+
+                <ColumnDefinition Width="12"/>
+
+                <ColumnDefinition Width="*"/>
+
+            </Grid.ColumnDefinitions>
+
+
+            <!-- ================================================= -->
+            <!-- LEFT -->
+            <!-- ================================================= -->
+
+            <Border Grid.Column="0"
+                    Background="{DynamicResource AppSurfaceBrush}"
+                    BorderBrush="{DynamicResource AppBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="5"
+                    Padding="10">
+
+                <DockPanel>
+
+
+                    <Grid DockPanel.Dock="Top"
+                          Height="40"
+                          Margin="0,0,0,8">
+
+                        <TextBlock Text="📋 사용자 목록"
+                                   FontSize="15"
+                                   FontWeight="Bold"
+                                   VerticalAlignment="Center"/>
+
+
+                        <TextBlock Text="{Binding RecordCount,
+                                                  StringFormat=총 {0:N0}건}"
+                                   HorizontalAlignment="Right"
+                                   VerticalAlignment="Center"
+                                   FontWeight="Bold"
+                                   Foreground="{DynamicResource AppTextSubBrush}"/>
+
+                    </Grid>
+
+
+                    <DataGrid ItemsSource="{Binding Items}"
+                              SelectedItem="{Binding SelectedItem,
+                                                     Mode=TwoWay}"
+                              Style="{StaticResource ListDataGridStyle}"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              CanUserAddRows="False"
+                              CanUserSortColumns="True"
+                              SelectionMode="Single"
+                              SelectionUnit="FullRow"
+                              ScrollViewer.VerticalScrollBarVisibility="Auto"
+                              ScrollViewer.HorizontalScrollBarVisibility="Auto">
+
+                        <DataGrid.Columns>
+
+
+                            <DataGridTextColumn Header="사용자 ID"
+                                                Binding="{Binding UserId}"
+                                                Width="150"/>
+
+
+                            <DataGridTextColumn Header="성 명"
+                                                Binding="{Binding UserName}"
+                                                Width="*"/>
+
+
+                            <DataGridTextColumn Header="사용자 등급"
+                                                Binding="{Binding UserKind}"
+                                                Width="110"/>
+
+
+                            <DataGridTextColumn Header="사용여부"
+                                                Binding="{Binding UserUses}"
+                                                Width="100"/>
+
+                        </DataGrid.Columns>
+
+                    </DataGrid>
+
+                </DockPanel>
+
+            </Border>
+
+
+            <!-- ================================================= -->
+            <!-- RIGHT -->
+            <!-- ================================================= -->
+
+            <StackPanel Grid.Column="2">
+
+
+                <!-- ============================================= -->
+                <!-- 검색 -->
+                <!-- ============================================= -->
+
+                <Border Background="{DynamicResource AppSurfaceBrush}"
+                        BorderBrush="{DynamicResource AppBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="5"
+                        Padding="12"
+                        Margin="0,0,0,10">
+
+                    <Grid>
+
+                        <Grid.ColumnDefinitions>
+
+                            <ColumnDefinition Width="Auto"/>
+
+                            <ColumnDefinition Width="250"/>
+
+                            <ColumnDefinition Width="12"/>
+
+                            <ColumnDefinition Width="95"/>
+
+                            <ColumnDefinition Width="12"/>
+
+                            <ColumnDefinition Width="105"/>
+
+                        </Grid.ColumnDefinitions>
+
+
+                        <TextBlock Grid.Column="0"
+                                   Text="검색 ID:"
+                                   Style="{StaticResource FilterLabel}"/>
+
+
+                        <TextBox Grid.Column="1"
+                                 Text="{Binding SearchText,
+                                                Mode=TwoWay,
+                                                UpdateSourceTrigger=PropertyChanged}"
+                                 CharacterCasing="Lower"
+                                 Style="{StaticResource FilterBox}">
+
+                            <TextBox.InputBindings>
+
+                                <KeyBinding Key="Enter"
+                                            Command="{Binding SearchCommand}"/>
+
+                            </TextBox.InputBindings>
+
+                        </TextBox>
+
+
+                        <Button Grid.Column="3"
+                                Content="🔍 검색"
+                                Command="{Binding SearchCommand}"
+                                FontWeight="Bold"
+                                BorderThickness="0"
+                                Cursor="Hand"
+                                Background="{DynamicResource BtnPrimaryBrush}"
+                                Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
+
+
+                        <Button Grid.Column="5"
+                                Content="🔄 전체조회"
+                                Command="{Binding AllSearchCommand}"
+                                FontWeight="Bold"
+                                BorderThickness="0"
+                                Cursor="Hand"
+                                Background="{DynamicResource BtnStadardBrush}"
+                                Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
+
+                    </Grid>
+
+                </Border>
+
+
+                <!-- ============================================= -->
+                <!-- 상세 -->
+                <!-- ============================================= -->
+
+                <Border Background="{DynamicResource AppSurfaceBrush}"
+                        BorderBrush="{DynamicResource AppBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="5"
+                        Padding="20">
+
+                    <Grid>
+
+                        <Grid.ColumnDefinitions>
+
+                            <ColumnDefinition Width="120"/>
+
+                            <ColumnDefinition Width="260"/>
+
+                            <ColumnDefinition Width="40"/>
+
+                            <ColumnDefinition Width="120"/>
+
+                            <ColumnDefinition Width="260"/>
+
+                        </Grid.ColumnDefinitions>
+
+
+                        <Grid.RowDefinitions>
+
+                            <RowDefinition Height="55"/>
+
+                            <RowDefinition Height="55"/>
+
+                            <RowDefinition Height="55"/>
+
+                            <RowDefinition Height="55"/>
+
+                            <RowDefinition Height="55"/>
+
+                        </Grid.RowDefinitions>
+
+
+                        <!-- 사용자 ID -->
+
+                        <TextBlock Grid.Row="0"
+                                   Grid.Column="0"
+                                   Text="사용자 ID"
+                                   Style="{StaticResource FilterLabel}"/>
+
+
+                        <TextBox Grid.Row="0"
+                                 Grid.Column="1"
+                                 Text="{Binding UserId,
+                                                Mode=TwoWay,
+                                                UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource FilterBox}"/>
+
+
+                        <!-- 비밀번호 -->
+
+                        <TextBlock Grid.Row="0"
+                                   Grid.Column="3"
+                                   Text="비밀번호"
+                                   Style="{StaticResource FilterLabel}"/>
+
+
+                        <TextBox Grid.Row="0"
+                                 Grid.Column="4"
+                                 Text="{Binding UserPassword,
+                                                Mode=TwoWay,
+                                                UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource FilterBox}"/>
+
+
+                        <!-- 성명 -->
+
+                        <TextBlock Grid.Row="1"
+                                   Grid.Column="0"
+                                   Text="성 명"
+                                   Style="{StaticResource FilterLabel}"/>
+
+
+                        <TextBox Grid.Row="1"
+                                 Grid.Column="1"
+                                 Text="{Binding UserName,
+                                                Mode=TwoWay,
+                                                UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource FilterBox}"/>
+
+
+                        <!-- 등급 -->
+
+                        <TextBlock Grid.Row="2"
+                                   Grid.Column="0"
+                                   Text="등 급"
+                                   Style="{StaticResource FilterLabel}"/>
+
+
+                        <ComboBox Grid.Row="2"
+                                  Grid.Column="1"
+                                  Height="34"
+                                  ItemsSource="{Binding UserKinds}"
+                                  SelectedItem="{Binding SelectedUserKind,
+                                                         Mode=TwoWay}"
+                                  DisplayMemberPath="Name"
+                                  VerticalContentAlignment="Center"
+                                  Background="{DynamicResource InputBrush}"
+                                  Foreground="{DynamicResource AppTextBrush}"
+                                  BorderBrush="{DynamicResource InputBorderBrush}"/>
+
+
+                        <!-- 생성일 -->
+
+                        <TextBlock Grid.Row="3"
+                                   Grid.Column="0"
+                                   Text="생성일"
+                                   Style="{StaticResource FilterLabel}"/>
+
+
+                        <TextBox Grid.Row="3"
+                                 Grid.Column="1"
+                                 Text="{Binding UserWdate,
+                                                StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}"
+                                 IsReadOnly="True"
+                                 Background="LightGray"
+                                 Style="{StaticResource FilterBox}"/>
+
+
+                        <!-- 권한 설명 -->
+
+                        <TextBlock Grid.Row="4"
+                                   Grid.Column="0"
+                                   Text="현재 등급"
+                                   Style="{StaticResource FilterLabel}"/>
+
+
+                        <TextBlock Grid.Row="4"
+                                   Grid.Column="1"
+                                   Text="{Binding SelectedUserKind.Name}"
+                                   VerticalAlignment="Center"
+                                   FontSize="15"
+                                   FontWeight="Bold"
+                                   Foreground="{DynamicResource BtnPrimaryBrush}"/>
+
+                    </Grid>
+
+                </Border>
+
+            </StackPanel>
+
+        </Grid>
+
+    </DockPanel>
+
+</UserControl>
