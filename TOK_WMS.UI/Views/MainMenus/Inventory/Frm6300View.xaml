@@ -231,6 +231,10 @@
                                Foreground="{DynamicResource AppTextBrush}"
                                VerticalAlignment="Center"/>
 
+
+                    <TextBlock Text="- Frm6300" FontSize="12" FontWeight="Bold" Margin="10,0,0,0"
+                    Foreground="{DynamicResource AppTextBrush}" VerticalAlignment="Center"/>
+
                 </StackPanel>
 
 

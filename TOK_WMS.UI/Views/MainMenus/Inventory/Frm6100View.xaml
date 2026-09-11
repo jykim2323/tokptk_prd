@@ -73,6 +73,9 @@
             <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
                 <TextBlock Text="📦" FontSize="20" Margin="0,5,5,5" VerticalAlignment="Center"/>
                 <TextBlock Text="재고 위치별 조회" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource AppTextBrush}" VerticalAlignment="Center"/>
+
+                <TextBlock Text="- Frm6100" FontSize="12" FontWeight="Bold" Margin="10,0,0,0"
+                    Foreground="{DynamicResource AppTextBrush}" VerticalAlignment="Center"/>
             </StackPanel>
 
             <TextBlock Text="{Binding StatusMessage}" HorizontalAlignment="Right" VerticalAlignment="Center"

@@ -84,6 +84,9 @@
                Foreground="{DynamicResource AppTextBrush}"
                VerticalAlignment="Center"/>
 
+
+            <TextBlock Grid.Column="2" Text="- SFrm6120" FontSize="12" FontWeight="Bold" Margin="10,0,0,0" Foreground="{DynamicResource AppTextBrush}" VerticalAlignment="Center"/>
+
             <Button Grid.Column="3"
             Content="❌  종료"
             Width="85"

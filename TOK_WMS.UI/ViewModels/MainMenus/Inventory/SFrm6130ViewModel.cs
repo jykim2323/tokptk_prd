@@ -25,8 +25,6 @@ public partial class SFrm6130ViewModel : ObservableObject
     private readonly IDialogService _dialog;
     private readonly ICurrentUserService _currentUsers;
 
-    //private Frm6900Dto.SubkDto? vm;
-
     [ObservableProperty] private DateTime? _selectedInDate;
     [ObservableProperty] private string _subkLoca = string.Empty;
     [ObservableProperty] private string _subkFlag = string.Empty;

@@ -67,6 +67,8 @@
             <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
                 <TextBlock Text="📦" FontSize="18" Margin="0,5,3,5" VerticalAlignment="Center"/>
                 <TextBlock Text="{Binding TitleText}" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource AppTextBrush}" VerticalAlignment="Center"/>
+                <TextBlock Text="- SFrm6130" FontSize="12" FontWeight="Bold" Margin="10,0,0,0" Foreground="{DynamicResource AppTextBrush}" VerticalAlignment="Center"/>
+                
                 <Button Content="❌  종료" Width="85" Margin="390,0,0,0"  FontWeight="Bold" Cursor="Hand" BorderThickness="0"
                                 Background="{DynamicResource BtnStadardBrush}" Foreground="{DynamicResource BtnPrimaryTextBrush}"
                                 Command="{Binding CloseCommand}"  CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>

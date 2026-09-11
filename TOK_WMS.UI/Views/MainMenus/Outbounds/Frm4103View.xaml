@@ -58,6 +58,7 @@
                 <TextBlock Text="피킹리스트 발행"
                            FontSize="20"
                            FontWeight="Bold"/>
+                <TextBlock Text="- Frm4103" FontSize="12" FontWeight="Bold" Margin="10,0,0,0" Foreground="{DynamicResource AppTextBrush}" VerticalAlignment="Center"/>
 
             </StackPanel>
 

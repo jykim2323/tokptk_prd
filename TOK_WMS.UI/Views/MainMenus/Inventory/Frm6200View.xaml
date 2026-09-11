@@ -74,7 +74,9 @@
 
             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Top" Height="60">
                 <TextBlock Text="📦" FontSize="20" Margin="0,5,5,10" VerticalAlignment="Center"/>
-                <TextBlock Text="재고 자료 조회" FontSize="20" FontWeight="Bold"
+                <TextBlock Text="재고 자료 조회" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource AppTextBrush}" VerticalAlignment="Center"/>
+
+                <TextBlock Text="- Frm6200" FontSize="12" FontWeight="Bold" Margin="10,0,0,0"
                     Foreground="{DynamicResource AppTextBrush}" VerticalAlignment="Center"/>
             </StackPanel>
 
