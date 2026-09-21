@@ -319,18 +319,32 @@ public class Frm4102Repository(
         IDbConnection conn,
         IDbTransaction tx)
     {
+        //const string sql = @"
+        //    SELECT
+        //        STAT_SC1IO AS StatSc1Io,
+        //        STAT_SC2IO AS StatSc2Io,
+        //        STAT_SC3IO AS StatSc3Io,
+
+        //        STAT_CV1 AS StatCv1,
+        //        STAT_CV2 AS StatCv2,
+        //        STAT_CV3 AS StatCv3,
+        //        STAT_CV4 AS StatCv4,
+        //        STAT_CV5 AS StatCv5,
+        //        STAT_CV6 AS StatCv6,
+
+        //        STAT_ODATE AS StatOdate,
+        //        ISNULL(STAT_OINDX, 1) AS StatOindx
+
+        //    FROM T1TBSTAT WITH (UPDLOCK, HOLDLOCK)
+
+        //    WHERE STAT_PSWD = 'JPLS'
+        //";
+
         const string sql = @"
             SELECT
                 STAT_SC1IO AS StatSc1Io,
                 STAT_SC2IO AS StatSc2Io,
                 STAT_SC3IO AS StatSc3Io,
-
-                STAT_CV1 AS StatCv1,
-                STAT_CV2 AS StatCv2,
-                STAT_CV3 AS StatCv3,
-                STAT_CV4 AS StatCv4,
-                STAT_CV5 AS StatCv5,
-                STAT_CV6 AS StatCv6,
 
                 STAT_ODATE AS StatOdate,
                 ISNULL(STAT_OINDX, 1) AS StatOindx
@@ -589,7 +603,7 @@ public class Frm4102Repository(
 
 
             // =============================================
-            // T2TIODAT
+            // T1TIODAT
             // =============================================
 
             await UpsertTiodatAsync(
