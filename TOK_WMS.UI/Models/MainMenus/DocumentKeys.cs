@@ -5,7 +5,7 @@ public static class DocumentKeys
 {
 
     /// <summary>home 메뉴 Key</summary>
-    public const string Home = "home";
+    public const string Mornitor = "Mornitor";
 
 
 

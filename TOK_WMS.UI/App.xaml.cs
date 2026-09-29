@@ -14,9 +14,11 @@ using System.Windows;
 using TOK.WMS.UI.Configuration;
 using TOK.WMS.UI.Models.MainMenus;
 using TOK.WMS.UI.Services;
+using TOK.WMS.UI.Services.Api.Controls;
 using TOK.WMS.UI.Services.Api.Inbounds;
 using TOK.WMS.UI.Services.Api.Inventory;
 using TOK.WMS.UI.Services.Api.Login;
+using TOK.WMS.UI.Services.Api.Monitoring;
 using TOK.WMS.UI.Services.Api.Outbounds;
 using TOK.WMS.UI.Services.Api.Standards;
 using TOK.WMS.UI.Services.ETC;
@@ -26,8 +28,10 @@ using TOK.WMS.UI.Services.Interfaces.Popup;
 using TOK.WMS.UI.ViewModels;
 using TOK.WMS.UI.ViewModels.Base;
 using TOK.WMS.UI.ViewModels.Login;
+using TOK.WMS.UI.ViewModels.MainMenus.Controls;
 using TOK.WMS.UI.ViewModels.MainMenus.Inbounds;
 using TOK.WMS.UI.ViewModels.MainMenus.Inventory;
+using TOK.WMS.UI.ViewModels.MainMenus.Monitoring;
 using TOK.WMS.UI.ViewModels.MainMenus.Outbounds;
 using TOK.WMS.UI.ViewModels.MainMenus.Standards;
 using TOK.WMS.UI.Views.Login;
@@ -122,6 +126,23 @@ public partial class App : Application
         sc.AddHttpClient<ISFrm6910Api, SFrm6910ApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
         sc.AddHttpClient<ILocaAddApi, LocaAddApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
 
+        // 시스템 제어관리 - 스태커 크레인 신호 조회
+        sc.AddHttpClient<IScChannelApi, ScChannelApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+
+        // 시스템 제어관리 - 컨베이어 신호 조회·수정
+        sc.AddHttpClient<IConveyorSignalApi, ConveyorSignalApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+
+        // 시스템 제어관리 - 시스템 운전 설정
+        sc.AddHttpClient<ISystemOperationApi, SystemOperationApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+
+        // 시스템 제어관리 - 예약/완료대기/에러이력
+        sc.AddHttpClient<IScReservationApi, ScReservationApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+        sc.AddHttpClient<ITransferCompletionWaitApi, TransferCompletionWaitApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+        sc.AddHttpClient<IErrorHistoryApi, ErrorHistoryApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+
+        // 모니터링 - 상품창고 SC1 라인 조회
+        sc.AddHttpClient<ISc1LineApi, Sc1LineApiClient>(c => c.BaseAddress = new Uri(settings.ApiBaseUrl));
+
 
         sc.AddSingleton<ThemeService>();
         sc.AddSingleton<IDialogService, DialogService>();
@@ -147,7 +168,17 @@ public partial class App : Application
         //sc.AddTransient<WarehouseHeaderHandler>();
 
         // 모니터링
-        sc.AddKeyedTransient<DocumentViewModelBase, HomeViewModel>(DocumentKeys.Home);
+        sc.AddKeyedTransient<DocumentViewModelBase, MonitoringViewModel>(DocumentKeys.Mornitor);
+
+
+
+        // 시스템 제어관리
+        sc.AddKeyedTransient<DocumentViewModelBase, SystemOperationViewModel>(DocumentKeys.Frm2100);
+        sc.AddKeyedTransient<DocumentViewModelBase, ScReservationViewModel>(DocumentKeys.Frm2200);
+        sc.AddKeyedTransient<DocumentViewModelBase, TransferCompletionWaitViewModel>(DocumentKeys.Frm2300);
+        sc.AddKeyedTransient<DocumentViewModelBase, ScSignalViewModel>(DocumentKeys.Frm2400);
+        sc.AddKeyedTransient<DocumentViewModelBase, ConveyorSignalViewModel>(DocumentKeys.Frm2500);
+        sc.AddKeyedTransient<DocumentViewModelBase, ErrorHistoryViewModel>(DocumentKeys.Frm2700);
 
 
         // 기준 정보 관리

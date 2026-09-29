@@ -1,13 +1,17 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using TOK.WMS.Core.ETC;
 using TOK.WMS.Core.Interfaces;
+using TOK.WMS.Core.Interfaces.Controls;
 using TOK.WMS.Core.Interfaces.Inbounds;
 using TOK.WMS.Core.Interfaces.Inventory;
+using TOK.WMS.Core.Interfaces.Monitoring;
 using TOK.WMS.Core.Interfaces.Outbounds;
 using TOK.WMS.Infrastructure.Data;
 using TOK.WMS.Infrastructure.Repositories;
+using TOK.WMS.Infrastructure.Repositories.Controls;
 using TOK.WMS.Infrastructure.Repositories.Inbounds;
 using TOK.WMS.Infrastructure.Repositories.Inventory;
+using TOK.WMS.Infrastructure.Repositories.Monitoring;
 using TOK.WMS.Infrastructure.Repositories.Outbounds;
 using TOK.WMS.Infrastructure.Repositories.Standards;
 
@@ -68,6 +72,21 @@ namespace TOK.WMS.Infrastructure
             services.AddScoped<ISFrm6910Repository, SFrm6910Repository>();
             services.AddScoped<ILocaAddRepository, LocaAddRepository>();
             services.AddScoped<IMastDispRepository, MastDispRepository>();
+
+            //설비 신호 관리
+            services.AddScoped<IScChannelRepository, ScChannelRepository>();
+            services.AddScoped<IConveyorSignalRepository, ConveyorSignalRepository>();
+
+            //시스템 운전 설정
+            services.AddScoped<ISystemOperationRepository, SystemOperationRepository>();
+
+            //시스템 제어관리 - 예약/완료대기/에러이력
+            services.AddScoped<IScReservationRepository, ScReservationRepository>();
+            services.AddScoped<ITransferCompletionWaitRepository, TransferCompletionWaitRepository>();
+            services.AddScoped<IErrorHistoryRepository, ErrorHistoryRepository>();
+
+            //메인 모니터링(조회 전용)
+            services.AddScoped<IMonitoringRepository, MonitoringRepository>();
 
             //services.AddScoped<IInboundRepository, InboundRepository>();
             //services.AddScoped<IOutboundRepository, OutboundRepository>();

@@ -15,4 +15,8 @@ public interface IWindowService
     void ShowSFrm6910(string leftPltno, string rightPltno);
     void ShowSFrm1100(SFrm1100Dto.InitDto item, string mode);
     public MastDispDto.ResDto? ShowMastDisp(string searchText);
+    void ShowTrackingInfo(string trackNo);
+    void ShowStackerWork(int craneNo);
+    void ShowRackOverview(int bank, int selectedBay);
+    void ShowRackCellDetail(string location);
 }

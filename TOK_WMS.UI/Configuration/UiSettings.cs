@@ -8,6 +8,7 @@ public class UiSettings
 
     // 폴링 주기 (밀리초)
     public int MonitorPollMs { get; init; } = 3000;
+    public int PositionPollMs { get; init; } = 200;
     public int MenusPollMs { get; init; } = 4000;
     public int RackPollMs { get; init; } = 3000;
     public int SignalPollMs { get; init; } = 2000;

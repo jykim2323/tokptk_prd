@@ -1,0 +1,186 @@
+<Window x:Class="TOK.WMS.UI.Views.Monitoring.Popups.RackCellDetailView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:behaviors="clr-namespace:TOK.WMS.UI.Behaviors"
+        Title="셀 정보"
+        Width="1460"
+        Height="650"
+        MinWidth="900"
+        MinHeight="520"
+        Style="{StaticResource MonitoringPopupWindowStyle}"
+        Foreground="{DynamicResource AppTextBrush}"
+        FontFamily="{StaticResource AppFont}">
+
+    <Window.Resources>
+        <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,0,0,5"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppTextSubBrush}"/>
+        </Style>
+
+        <Style x:Key="ReadOnlyFieldStyle" TargetType="TextBox">
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="Padding" Value="9,5"/>
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Background" Value="{DynamicResource InputBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <Style x:Key="ToolbarButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="MinWidth" Value="88"/>
+            <Setter Property="Margin" Value="8,0,0,0"/>
+            <Setter Property="Padding" Value="14,0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Background" Value="{DynamicResource BtnPrimaryBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource BtnPrimaryTextBrush}"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                Margin="0,0,0,12"
+                Padding="14,9"
+                Background="{DynamicResource HeaderBrush}"
+                CornerRadius="9"
+                behaviors:PopupWindowBehavior.IsDragHandle="True">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <TextBlock Text="셀 정보"
+                               FontSize="22"
+                               FontWeight="Bold"
+                               Foreground="White"/>
+                    <TextBlock Margin="0,3,0,0"
+                               Foreground="#EAF4FB"
+                               Text="T2 셀 상태와 품목별 재고를 조회합니다."/>
+                </StackPanel>
+
+                <Button Grid.Column="1"
+                        Content="조회"
+                        Command="{Binding SearchCommand}"
+                        Style="{StaticResource ToolbarButtonStyle}"
+                        Background="#44FFFFFF"/>
+                <Button Grid.Column="2"
+                        Content="✕"
+                        Command="{Binding CloseCommand}"
+                        CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                        Style="{StaticResource PopupCloseButtonStyle}"/>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1"
+                Padding="12"
+                Background="{DynamicResource AppSurfaceBrush}"
+                BorderBrush="{DynamicResource AppBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="5">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.05*"/>
+                    <ColumnDefinition Width="0.8*"/>
+                    <ColumnDefinition Width="1.05*"/>
+                    <ColumnDefinition Width="1.2*"/>
+                    <ColumnDefinition Width="1.25*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                    <TextBlock Text="저장위치 (열-연-단)" Style="{StaticResource FieldLabelStyle}"/>
+                    <TextBox Text="{Binding DisplayLocation}" Style="{StaticResource ReadOnlyFieldStyle}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                    <TextBlock Text="상태 코드" Style="{StaticResource FieldLabelStyle}"/>
+                    <TextBox Text="{Binding CellFlag}" Style="{StaticResource ReadOnlyFieldStyle}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2" Margin="0,0,10,0">
+                    <TextBlock Text="셀 상태" Style="{StaticResource FieldLabelStyle}"/>
+                    <TextBox Text="{Binding CellStatusName}" Style="{StaticResource ReadOnlyFieldStyle}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="3" Margin="0,0,10,0">
+                    <TextBlock Text="PLT-NO" Style="{StaticResource FieldLabelStyle}"/>
+                    <TextBox Text="{Binding CellPalletNo}" Style="{StaticResource ReadOnlyFieldStyle}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="4">
+                    <TextBlock Text="입고일시" Style="{StaticResource FieldLabelStyle}"/>
+                    <TextBox Text="{Binding CellInboundAt}" Style="{StaticResource ReadOnlyFieldStyle}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="2" Margin="2,11,2,7">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock VerticalAlignment="Center"
+                       FontSize="16"
+                       FontWeight="SemiBold"
+                       Text="셀 품목 재고"/>
+            <TextBlock Grid.Column="1"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource AppTextSubBrush}"
+                       Text="{Binding InventoryCount, StringFormat={}{0:N0}건}"/>
+        </Grid>
+
+        <Border Grid.Row="3"
+                Background="{DynamicResource AppSurfaceBrush}"
+                BorderBrush="{DynamicResource AppBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="5">
+            <DataGrid ItemsSource="{Binding InventoryItems}"
+                      Style="{StaticResource ListDataGridStyle}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      SelectionMode="Single"
+                      SelectionUnit="FullRow">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="상태" Binding="{Binding Flag}" Width="75"/>
+                    <DataGridTextColumn Header="PLT-NO" Binding="{Binding PalletNo}" Width="145"/>
+                    <DataGridTextColumn Header="품번코드" Binding="{Binding ItemCode}" Width="135"/>
+                    <DataGridTextColumn Header="품번명" Binding="{Binding ItemName}" Width="185"/>
+                    <DataGridTextColumn Header="LOT-NO" Binding="{Binding LotNo}" Width="135"/>
+                    <DataGridTextColumn Header="재고수량" Binding="{Binding Quantity, StringFormat={}{0:N2}}" Width="105"/>
+                    <DataGridTextColumn Header="예약수량" Binding="{Binding ReservedQuantity, StringFormat={}{0:N2}}" Width="105"/>
+                    <DataGridTextColumn Header="BOX-NO" Binding="{Binding BoxNo}" Width="125"/>
+                    <DataGridTextColumn Header="비고" Binding="{Binding Remark}" Width="180"/>
+                    <DataGridTextColumn Header="입고일자" Binding="{Binding InDate}" Width="105"/>
+                    <DataGridTextColumn Header="입고시간" Binding="{Binding InTime}" Width="105"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <Grid Grid.Row="4" Margin="2,10,2,0">
+            <TextBlock VerticalAlignment="Center"
+                       Foreground="{DynamicResource AppTextSubBrush}"
+                       Text="{Binding StatusMessage}"/>
+            <ProgressBar Width="170"
+                         Height="5"
+                         HorizontalAlignment="Right"
+                         VerticalAlignment="Center"
+                         IsIndeterminate="True"
+                         Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        </Grid>
+    </Grid>
+</Window>

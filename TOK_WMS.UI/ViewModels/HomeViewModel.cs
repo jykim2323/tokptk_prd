@@ -7,8 +7,8 @@ public partial class HomeViewModel : DocumentViewModelBase
 {
     public HomeViewModel()
     {
-        Title = "Home";
-        ContentId = DocumentKeys.Home;
+        Title = "Mornitor";
+        ContentId = DocumentKeys.Mornitor;
     }
 
 }

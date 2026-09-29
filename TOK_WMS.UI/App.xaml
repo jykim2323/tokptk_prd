@@ -11,6 +11,12 @@
                 <ResourceDictionary Source="Themes/LightTheme.xaml"/>
                 <!-- 분리된 View 스타일 -->
                 <ResourceDictionary Source="Styles/DataGridStyles.xaml"/>
+                <!-- 모니터링 View 스타일 -->
+                <ResourceDictionary Source="Styles/MonitoringStyles.xaml"/>
+                <!-- 모니터링 카드형 팝업 스타일 -->
+                <ResourceDictionary Source="Styles/PopupStyles.xaml"/>
+                <!-- PLC 신호 모니터링 스타일 -->
+                <ResourceDictionary Source="Styles/SignalStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
 

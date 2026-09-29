@@ -72,7 +72,7 @@ public partial class MainViewModel : ObservableObject
         _theme = theme;
         _dialog = dialog;
 
-        OpenDocument(DocumentKeys.Home);
+        OpenDocument(DocumentKeys.Mornitor);
 
     }
 
@@ -80,7 +80,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void OpenHome()
     {
-        OpenDocument(DocumentKeys.Home); // 없으면 생성, 있으면 포커스(ActiveDocument 설정)
+        OpenDocument(DocumentKeys.Mornitor); // 없으면 생성, 있으면 포커스(ActiveDocument 설정)
         (ActiveDocument as IRefreshable)?.Refresh();    // 모니터면 즉시 새로고침
     }
 

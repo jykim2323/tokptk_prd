@@ -1,0 +1,1266 @@
+﻿<UserControl x:Class="TOK.WMS.UI.Views.Monitoring.MonitoringView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:behaviors="clr-namespace:TOK.WMS.UI.Behaviors"
+             mc:Ignorable="d"
+             d:DesignWidth="1600"
+             d:DesignHeight="900">
+
+    <UserControl.Resources>
+
+        <!-- 랙 셀: 공통 입체감 + 위쪽 보라색 표시선 -->
+        <Style x:Key="RackCellStyle"
+               TargetType="{x:Type Label}"
+               BasedOn="{StaticResource RaisedCellBaseStyle}">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#B8C1CB"/>
+            <Setter Property="Foreground" Value="#172B4D"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Label}">
+                        <Grid Background="Transparent"
+                              SnapsToDevicePixels="True">
+
+                            <Border Margin="1,1,0,0"
+                                    Background="#28172B4D"
+                                    CornerRadius="2"/>
+
+                            <Border Margin="0,0,1,1"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="2">
+
+                                <Grid>
+                                    <Rectangle Height="4"
+                                               Margin="1,1,1,0"
+                                               VerticalAlignment="Top"
+                                               Fill="#980098"
+                                               RadiusX="1"
+                                               RadiusY="1"/>
+
+                                    <Border BorderBrush="#B8FFFFFF"
+                                            BorderThickness="1,1,0,0"
+                                            CornerRadius="1"/>
+
+                                    <Border BorderBrush="#36000000"
+                                            BorderThickness="0,0,1,1"
+                                            CornerRadius="1"/>
+
+                                    <ContentPresenter
+                                        Content="{TemplateBinding Content}"
+                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                        Margin="0,3,0,0"/>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 3~13열의 1연 위치에 표시하는 트래킹 구간 -->
+        <Style x:Key="TrackingSlotStyle"
+               TargetType="{x:Type Label}"
+               BasedOn="{StaticResource RaisedCellBaseStyle}">
+            <Setter Property="Background" Value="#E7F2FF"/>
+            <Setter Property="BorderBrush" Value="#4F82BA"/>
+            <Setter Property="Foreground" Value="#285E8E"/>
+            <Setter Property="FontSize" Value="8"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+
+        <Style x:Key="ColumnHeaderStyle" TargetType="Label">
+            <Setter Property="Background" Value="#E8EDF3"/>
+            <Setter Property="BorderBrush" Value="#AEB7C1"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="#172B4D"/>
+            <Setter Property="FontSize" Value="9"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Focusable" Value="False"/>
+        </Style>
+
+        <Style x:Key="CraneStyle" TargetType="Label">
+            <Setter Property="BorderBrush" Value="#172B4D"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Focusable" Value="False"/>
+        </Style>
+
+        <Style x:Key="AreaTitleStyle" TargetType="Label">
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="#172B4D"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Focusable" Value="False"/>
+        </Style>
+
+    </UserControl.Resources>
+
+    <Grid Background="#EEF1F4">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0*"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="237*"/>
+            <ColumnDefinition Width="163*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0"
+                Margin="8,8,8,8"
+                Padding="8"
+                Background="White"
+                BorderBrush="#CBD1D8"
+                BorderThickness="1"
+                CornerRadius="5"
+                ClipToBounds="True" Grid.RowSpan="2">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <!-- 설비 배치 전용 영역 -->
+                    <RowDefinition Height="*"/>
+                    <!-- 상태 및 메시지 전용 영역 -->
+                    <RowDefinition Height="190"/>
+                </Grid.RowDefinitions>
+
+                <!-- 가로와 세로를 함께 계산하여 전체 도면을 화면 안에 표시 -->
+                <Viewbox Grid.Row="0"
+                     Stretch="Uniform"
+                     StretchDirection="Both"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Top"
+                     Margin="12">
+
+                    <!-- 도면 전체를 같은 비율로 확대하기 위한 표시 영역 -->
+                    <Grid x:Name="WarehouseViewport"
+                      Width="800"
+                      Height="930">
+
+                        <Canvas x:Name="WarehouseCanvas"
+                        Width="800"
+                        Height="1072"
+                        MouseLeftButtonDown="WarehouseCanvas_OnMouseDoubleClick"
+                        behaviors:CanvasMotion.PixelsPerSecond="120"
+                        behaviors:CanvasMotion.MinimumTravelTimeMs="220"
+                        Background="Transparent">
+
+                            <Canvas.RenderTransform>
+                                <TransformGroup>
+                                    <!-- 가운데를 기준으로 좌우만 1.1배 확대 -->
+                                    <ScaleTransform ScaleX="1.3" ScaleY="1"/>
+
+                                    <!-- 도면 전체를 왼쪽으로 조금 이동하고 기존 위쪽 이동값 유지 -->
+                                    <TranslateTransform X="-145" Y="-140"/>
+                                </TransformGroup>
+                            </Canvas.RenderTransform>
+
+                            <!-- 설비와 같은 가로 배율을 따르되 위·아래 여백을 둔 배경 -->
+                            <Rectangle x:Name="EquipmentAreaBackground"
+                                       Canvas.Left="0"
+                                       Canvas.Top="165"
+                                       Width="800"
+                                       Height="880"
+                                       Fill="#F1F3F5"
+                                       RadiusX="4"
+                                       RadiusY="4"
+                                       IsHitTestVisible="False"
+                                       Panel.ZIndex="-100"/>
+
+                            <!-- 구역 제목 -->
+
+                            <!-- 상품창고와 제품창고 구분선 -->
+                            <Rectangle x:Name="WarehouseTypeDivider"
+                               Canvas.Left="132"
+                               Canvas.Top="178"
+                               Width="2"
+                               Height="747"
+                               Fill="#8FA3B8"
+                               Opacity="0.7"
+                               RadiusX="1"
+                               RadiusY="1"
+                               Panel.ZIndex="20"
+                               IsHitTestVisible="False"/>
+
+                            <!-- 랙 열별 연회색 받침: 셀 사이와 모서리에만 은은하게 보이도록 1px 확장 -->
+                            <Rectangle x:Name="RackColumn01_Backplate" Canvas.Left="19"  Canvas.Top="321" Width="32" Height="482" Fill="#E0E5EA" RadiusX="2" RadiusY="2" Panel.ZIndex="-20" IsHitTestVisible="False"/>
+                            <Rectangle x:Name="RackColumn02_Backplate" Canvas.Left="85"  Canvas.Top="321" Width="32" Height="482" Fill="#E0E5EA" RadiusX="2" RadiusY="2" Panel.ZIndex="-20" IsHitTestVisible="False"/>
+                            <Rectangle x:Name="RackColumn03_Backplate" Canvas.Left="149" Canvas.Top="321" Width="32" Height="482" Fill="#E0E5EA" RadiusX="2" RadiusY="2" Panel.ZIndex="-20" IsHitTestVisible="False"/>
+                            <Rectangle x:Name="RackColumn04_Backplate" Canvas.Left="215" Canvas.Top="321" Width="32" Height="482" Fill="#E0E5EA" RadiusX="2" RadiusY="2" Panel.ZIndex="-20" IsHitTestVisible="False"/>
+                            <Rectangle x:Name="RackColumn05_Backplate" Canvas.Left="249" Canvas.Top="321" Width="32" Height="482" Fill="#E0E5EA" RadiusX="2" RadiusY="2" Panel.ZIndex="-20" IsHitTestVisible="False"/>
+                            <Rectangle x:Name="RackColumn06_Backplate" Canvas.Left="315" Canvas.Top="321" Width="32" Height="482" Fill="#E0E5EA" RadiusX="2" RadiusY="2" Panel.ZIndex="-20" IsHitTestVisible="False"/>
+                            <Rectangle x:Name="RackColumn07_Backplate" Canvas.Left="349" Canvas.Top="321" Width="32" Height="482" Fill="#E0E5EA" RadiusX="2" RadiusY="2" Panel.ZIndex="-20" IsHitTestVisible="False"/>
+                            <Rectangle x:Name="RackColumn08_Backplate" Canvas.Left="415" Canvas.Top="321" Width="32" Height="482" Fill="#E0E5EA" RadiusX="2" RadiusY="2" Panel.ZIndex="-20" IsHitTestVisible="False"/>
+                            <Rectangle x:Name="RackColumn09_Backplate" Canvas.Left="449" Canvas.Top="321" Width="32" Height="482" Fill="#E0E5EA" RadiusX="2" RadiusY="2" Panel.ZIndex="-20" IsHitTestVisible="False"/>
+                            <Rectangle x:Name="RackColumn10_Backplate" Canvas.Left="515" Canvas.Top="321" Width="32" Height="482" Fill="#E0E5EA" RadiusX="2" RadiusY="2" Panel.ZIndex="-20" IsHitTestVisible="False"/>
+                            <Rectangle x:Name="RackColumn11_Backplate" Canvas.Left="549" Canvas.Top="321" Width="32" Height="482" Fill="#E0E5EA" RadiusX="2" RadiusY="2" Panel.ZIndex="-20" IsHitTestVisible="False"/>
+                            <Rectangle x:Name="RackColumn12_Backplate" Canvas.Left="615" Canvas.Top="321" Width="32" Height="482" Fill="#E0E5EA" RadiusX="2" RadiusY="2" Panel.ZIndex="-20" IsHitTestVisible="False"/>
+                            <Rectangle x:Name="RackColumn13_Backplate" Canvas.Left="649" Canvas.Top="321" Width="32" Height="482" Fill="#E0E5EA" RadiusX="2" RadiusY="2" Panel.ZIndex="-20" IsHitTestVisible="False"/>
+                            <Rectangle x:Name="RackColumn14_Backplate" Canvas.Left="715" Canvas.Top="321" Width="32" Height="482" Fill="#E0E5EA" RadiusX="2" RadiusY="2" Panel.ZIndex="-20" IsHitTestVisible="False"/>
+
+                            <!-- 82번 RGV 위쪽: 3~14열 트래킹 2줄 -->
+                            <Label x:Name="PLT83" Content="83" Canvas.Left="350" Canvas.Top="126" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[83]}" ToolTip="{Binding TrackStates[83].ToolTip}"/>
+                            <Label x:Name="PLT84" Content="84" Canvas.Left="416" Canvas.Top="126" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" Tag="{Binding TrackStates[84]}" ToolTip="{Binding TrackStates[84].ToolTip}"/>
+
+                            <!-- 82번 RGV 아래쪽: 3~14열 트래킹 2줄 -->
+                            <Label x:Name="PLT60" Content="60" Canvas.Left="150" Canvas.Top="218" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" Tag="{Binding TrackStates[60]}" ToolTip="{Binding TrackStates[60].ToolTip}"/>
+                            <Label x:Name="PLT61" Content="61" Canvas.Left="150" Canvas.Top="262" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" Tag="{Binding TrackStates[61]}" ToolTip="{Binding TrackStates[61].ToolTip}"/>
+                            <Label x:Name="PLT63" Content="63" Canvas.Left="216" Canvas.Top="218" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[63]}" ToolTip="{Binding TrackStates[63].ToolTip}"/>
+                            <Label x:Name="PLT62" Content="62" Canvas.Left="216" Canvas.Top="262" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[62]}" ToolTip="{Binding TrackStates[62].ToolTip}"/>
+                            <Label x:Name="PLT64" Content="64" Canvas.Left="250" Canvas.Top="218" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" Tag="{Binding TrackStates[64]}" ToolTip="{Binding TrackStates[64].ToolTip}"/>
+                            <Label x:Name="PLT65" Content="65" Canvas.Left="250" Canvas.Top="262" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" Tag="{Binding TrackStates[65]}" ToolTip="{Binding TrackStates[65].ToolTip}"/>
+                            <Label x:Name="PLT67" Content="67" Canvas.Left="316" Canvas.Top="218" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[67]}" ToolTip="{Binding TrackStates[67].ToolTip}"/>
+                            <Label x:Name="PLT66" Content="66" Canvas.Left="316" Canvas.Top="262" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[66]}" ToolTip="{Binding TrackStates[66].ToolTip}"/>
+                            <Label x:Name="PLT68" Content="68" Canvas.Left="350" Canvas.Top="218" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" Tag="{Binding TrackStates[68]}" ToolTip="{Binding TrackStates[68].ToolTip}"/>
+                            <Label x:Name="PLT69" Content="69" Canvas.Left="350" Canvas.Top="262" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" Tag="{Binding TrackStates[69]}" ToolTip="{Binding TrackStates[69].ToolTip}"/>
+                            <Label x:Name="PLT71" Content="71" Canvas.Left="416" Canvas.Top="218" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[71]}" ToolTip="{Binding TrackStates[71].ToolTip}"/>
+                            <Label x:Name="PLT70" Content="70" Canvas.Left="416" Canvas.Top="262" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[70]}" ToolTip="{Binding TrackStates[70].ToolTip}"/>
+                            <Label x:Name="PLT72" Content="72" Canvas.Left="450" Canvas.Top="218" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" Tag="{Binding TrackStates[72]}" ToolTip="{Binding TrackStates[72].ToolTip}"/>
+                            <Label x:Name="PLT73" Content="73" Canvas.Left="450" Canvas.Top="262" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" Tag="{Binding TrackStates[73]}" ToolTip="{Binding TrackStates[73].ToolTip}"/>
+                            <Label x:Name="PLT75" Content="75" Canvas.Left="516" Canvas.Top="218" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[75]}" ToolTip="{Binding TrackStates[75].ToolTip}"/>
+                            <Label x:Name="PLT74" Content="74" Canvas.Left="516" Canvas.Top="262" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[74]}" ToolTip="{Binding TrackStates[74].ToolTip}"/>
+                            <Label x:Name="PLT76" Content="76" Canvas.Left="550" Canvas.Top="218" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" Tag="{Binding TrackStates[76]}" ToolTip="{Binding TrackStates[76].ToolTip}"/>
+                            <Label x:Name="PLT77" Content="77" Canvas.Left="550" Canvas.Top="262" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" Tag="{Binding TrackStates[77]}" ToolTip="{Binding TrackStates[77].ToolTip}"/>
+                            <Label x:Name="PLT79" Content="79" Canvas.Left="616" Canvas.Top="218" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[79]}" ToolTip="{Binding TrackStates[79].ToolTip}"/>
+                            <Label x:Name="PLT78" Content="78" Canvas.Left="616" Canvas.Top="262" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[78]}" ToolTip="{Binding TrackStates[78].ToolTip}"/>
+                            <Label x:Name="PLT80" Content="80" Canvas.Left="650" Canvas.Top="218" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[80]}" ToolTip="{Binding TrackStates[80].ToolTip}"/>
+                            <Label x:Name="PLT81" Content="81" Canvas.Left="650" Canvas.Top="262" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[81]}" ToolTip="{Binding TrackStates[81].ToolTip}"/>
+
+                            <!-- 상부 82번 RGV -->
+                            <Rectangle x:Name="TopRailUpper" Canvas.Left="150" Canvas.Top="186"
+                               Width="550" Height="2" Fill="#20252A"/>
+                            <Rectangle x:Name="TopRailLower" Canvas.Left="150" Canvas.Top="198"
+                               Width="550" Height="2" Fill="#20252A"/>
+                            <Rectangle x:Name="TopRailLeftStop" Canvas.Left="150" Canvas.Top="176"
+                               Width="5" Height="34" Fill="#20252A"/>
+                            <Rectangle x:Name="TopRailRightStop" Canvas.Left="700" Canvas.Top="176"
+                               Width="5" Height="34" Fill="#20252A"/>
+
+                            <ContentControl x:Name="TopCarrier82"
+                                    Content="{Binding RgvStates[02].DisplayNo, FallbackValue=82}"
+                                    Style="{StaticResource RgvCarrierStyle}"
+                                    behaviors:CanvasMotion.TargetLeft="{Binding RgvStates[02].CanvasLeft, FallbackValue=363}"
+                                    Canvas.Top="172"
+                                    Tag="{Binding RgvStates[02]}"
+                                    ToolTip="{Binding RgvStates[02].ToolTip}"
+                                    Panel.ZIndex="10"/>
+
+                            <!-- 열 번호 -->
+                            <Label x:Name="Column01_Header" Content="1열" Canvas.Left="20" Canvas.Top="306" Width="30" Height="16" Style="{StaticResource ColumnHeaderStyle}" ToolTip="{Binding Bank1ModeStatus}" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="9"/>
+                            <Label x:Name="Column02_Header" Content="2열" Canvas.Left="86" Canvas.Top="306" Width="30" Height="16" Style="{StaticResource ColumnHeaderStyle}" ToolTip="{Binding Bank2ModeStatus}"/>
+                            <Label x:Name="Column03_Header" Content="3열" Canvas.Left="150" Canvas.Top="306" Width="30" Height="16" Style="{StaticResource ColumnHeaderStyle}"/>
+                            <Label x:Name="Column04_Header" Content="4열" Canvas.Left="216" Canvas.Top="306" Width="30" Height="16" Style="{StaticResource ColumnHeaderStyle}"/>
+                            <Label x:Name="Column05_Header" Content="5열" Canvas.Left="250" Canvas.Top="306" Width="30" Height="16" Style="{StaticResource ColumnHeaderStyle}"/>
+                            <Label x:Name="Column06_Header" Content="6열" Canvas.Left="316" Canvas.Top="306" Width="30" Height="16" Style="{StaticResource ColumnHeaderStyle}"/>
+                            <Label x:Name="Column07_Header" Content="7열" Canvas.Left="350" Canvas.Top="306" Width="30" Height="16" Style="{StaticResource ColumnHeaderStyle}"/>
+                            <Label x:Name="Column08_Header" Content="8열" Canvas.Left="416" Canvas.Top="306" Width="30" Height="16" Style="{StaticResource ColumnHeaderStyle}"/>
+                            <Label x:Name="Column09_Header" Content="9열" Canvas.Left="450" Canvas.Top="306" Width="30" Height="16" Style="{StaticResource ColumnHeaderStyle}"/>
+                            <Label x:Name="Column10_Header" Content="10열" Canvas.Left="516" Canvas.Top="306" Width="30" Height="16" Style="{StaticResource ColumnHeaderStyle}"/>
+                            <Label x:Name="Column11_Header" Content="11열" Canvas.Left="550" Canvas.Top="306" Width="30" Height="16" Style="{StaticResource ColumnHeaderStyle}"/>
+                            <Label x:Name="Column12_Header" Content="12열" Canvas.Left="616" Canvas.Top="306" Width="30" Height="16" Style="{StaticResource ColumnHeaderStyle}"/>
+                            <Label x:Name="Column13_Header" Content="13열" Canvas.Left="650" Canvas.Top="306" Width="30" Height="16" Style="{StaticResource ColumnHeaderStyle}"/>
+                            <Label x:Name="Column14_Header" Content="14열" Canvas.Left="716" Canvas.Top="306" Width="30" Height="16" Style="{StaticResource ColumnHeaderStyle}"/>
+
+                            <!-- 크레인 -->
+                            <!-- 1호기 -->
+                            <Rectangle x:Name="Crane01_Rail" Canvas.Left="67" Canvas.Top="322" Width="3" Height="480" Fill="#252A30"/>
+                            <Rectangle x:Name="Crane01_StopTop" Canvas.Left="60" Canvas.Top="322" Width="17" Height="3" Fill="#252A30"/>
+                            <Rectangle x:Name="Crane01_StopBottom" Canvas.Left="60" Canvas.Top="799" Width="17" Height="3" Fill="#252A30"/>
+                            <Label x:Name="SC01"
+                           Content="1"
+                           Style="{StaticResource StackerCraneStyle}"
+                           Canvas.Left="42"
+                           behaviors:CanvasMotion.TargetTop="{Binding CraneStates[01].CanvasTop, FallbackValue=544}"
+                           Background="{Binding CraneStates[01].Background, FallbackValue=#32D43F}"
+                           Tag="{Binding CraneStates[01]}"
+                           ToolTip="{Binding CraneStates[01].ToolTip}"
+                           Panel.ZIndex="40" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <!-- 2호기 -->
+                            <Rectangle x:Name="Crane02_Rail" Canvas.Left="197" Canvas.Top="322" Width="3" Height="480" Fill="#252A30"/>
+                            <Rectangle x:Name="Crane02_StopTop" Canvas.Left="190" Canvas.Top="322" Width="17" Height="3" Fill="#252A30"/>
+                            <Rectangle x:Name="Crane02_StopBottom" Canvas.Left="190" Canvas.Top="799" Width="17" Height="3" Fill="#252A30"/>
+                            <Label x:Name="SC02"
+                           Content="2"
+                           Style="{StaticResource StackerCraneStyle}"
+                           Canvas.Left="171"
+                           behaviors:CanvasMotion.TargetTop="{Binding CraneStates[02].CanvasTop, FallbackValue=544}"
+                           Background="{Binding CraneStates[02].Background, FallbackValue=#32D43F}"
+                           Tag="{Binding CraneStates[02]}"
+                           ToolTip="{Binding CraneStates[02].ToolTip}"
+                           Panel.ZIndex="40" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <!-- 3호기 -->
+                            <Rectangle x:Name="Crane03_Rail" Canvas.Left="298" Canvas.Top="322" Width="3" Height="480" Fill="#252A30"/>
+                            <Rectangle x:Name="Crane03_StopTop" Canvas.Left="291" Canvas.Top="322" Width="17" Height="3" Fill="#252A30"/>
+                            <Rectangle x:Name="Crane03_StopBottom" Canvas.Left="291" Canvas.Top="799" Width="17" Height="3" Fill="#252A30"/>
+                            <Label x:Name="SC03"
+                           Content="3"
+                           Style="{StaticResource StackerCraneStyle}"
+                           Canvas.Left="272"
+                           behaviors:CanvasMotion.TargetTop="{Binding CraneStates[03].CanvasTop, FallbackValue=544}"
+                           Background="{Binding CraneStates[03].Background, FallbackValue=#32D43F}"
+                           Tag="{Binding CraneStates[03]}"
+                           ToolTip="{Binding CraneStates[03].ToolTip}"
+                           Panel.ZIndex="40" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <!-- 4호기 -->
+                            <Rectangle x:Name="Crane04_Rail" Canvas.Left="397" Canvas.Top="322" Width="3" Height="480" Fill="#252A30"/>
+                            <Rectangle x:Name="Crane04_StopTop" Canvas.Left="390" Canvas.Top="322" Width="17" Height="3" Fill="#252A30"/>
+                            <Rectangle x:Name="Crane04_StopBottom" Canvas.Left="390" Canvas.Top="799" Width="17" Height="3" Fill="#252A30"/>
+                            <Label x:Name="SC04"
+                           Content="4"
+                           Style="{StaticResource StackerCraneStyle}"
+                           Canvas.Left="371"
+                           behaviors:CanvasMotion.TargetTop="{Binding CraneStates[04].CanvasTop, FallbackValue=544}"
+                           Background="{Binding CraneStates[04].Background, FallbackValue=#32D43F}"
+                           Tag="{Binding CraneStates[04]}"
+                           ToolTip="{Binding CraneStates[04].ToolTip}"
+                           Panel.ZIndex="40" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <!-- 5호기 -->
+                            <Rectangle x:Name="Crane05_Rail" Canvas.Left="497" Canvas.Top="322" Width="3" Height="480" Fill="#252A30"/>
+                            <Rectangle x:Name="Crane05_StopTop" Canvas.Left="490" Canvas.Top="322" Width="17" Height="3" Fill="#252A30"/>
+                            <Rectangle x:Name="Crane05_StopBottom" Canvas.Left="490" Canvas.Top="799" Width="17" Height="3" Fill="#252A30"/>
+                            <Label x:Name="SC05"
+                           Content="5"
+                           Style="{StaticResource StackerCraneStyle}"
+                           Canvas.Left="471"
+                           behaviors:CanvasMotion.TargetTop="{Binding CraneStates[05].CanvasTop, FallbackValue=544}"
+                           Background="{Binding CraneStates[05].Background, FallbackValue=#32D43F}"
+                           Tag="{Binding CraneStates[05]}"
+                           ToolTip="{Binding CraneStates[05].ToolTip}"
+                           Panel.ZIndex="40" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <!-- 6호기 -->
+                            <Rectangle x:Name="Crane06_Rail" Canvas.Left="597" Canvas.Top="322" Width="3" Height="480" Fill="#252A30"/>
+                            <Rectangle x:Name="Crane06_StopTop" Canvas.Left="590" Canvas.Top="322" Width="17" Height="3" Fill="#252A30"/>
+                            <Rectangle x:Name="Crane06_StopBottom" Canvas.Left="590" Canvas.Top="799" Width="17" Height="3" Fill="#252A30"/>
+                            <Label x:Name="SC06"
+                           Content="6"
+                           Style="{StaticResource StackerCraneStyle}"
+                           Canvas.Left="571"
+                           behaviors:CanvasMotion.TargetTop="{Binding CraneStates[06].CanvasTop, FallbackValue=544}"
+                           Background="{Binding CraneStates[06].Background, FallbackValue=#32D43F}"
+                           Tag="{Binding CraneStates[06]}"
+                           ToolTip="{Binding CraneStates[06].ToolTip}"
+                           Panel.ZIndex="40" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <!-- 7호기 -->
+                            <Rectangle x:Name="Crane07_Rail" Canvas.Left="697" Canvas.Top="322" Width="3" Height="480" Fill="#252A30"/>
+                            <Rectangle x:Name="Crane07_StopTop" Canvas.Left="690" Canvas.Top="322" Width="17" Height="3" Fill="#252A30"/>
+                            <Rectangle x:Name="Crane07_StopBottom" Canvas.Left="690" Canvas.Top="799" Width="17" Height="3" Fill="#252A30"/>
+                            <Label x:Name="SC07"
+                           Content="7"
+                           Style="{StaticResource StackerCraneStyle}"
+                           Canvas.Left="671"
+                           behaviors:CanvasMotion.TargetTop="{Binding CraneStates[07].CanvasTop, FallbackValue=544}"
+                           Background="{Binding CraneStates[07].Background, FallbackValue=#32D43F}"
+                           Tag="{Binding CraneStates[07]}"
+                           ToolTip="{Binding CraneStates[07].ToolTip}"
+                           Panel.ZIndex="40" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+
+                            <!-- 랙과 1연 컨베이어 -->
+                            <Label x:Name="Rack0109" Content="9" Canvas.Left="20" Canvas.Top="322" Width="30" Height="50" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0109].Background}" ToolTip="{Binding RackBayStates[0109].ToolTip}"/>
+                            <Label x:Name="Rack0108" Content="8" Canvas.Left="20" Canvas.Top="369.75" Width="30" Height="51" Style="{StaticResource RackCellStyle}" HorizontalAlignment="Center" VerticalAlignment="Top" Background="{Binding RackBayStates[0108].Background}" ToolTip="{Binding RackBayStates[0108].ToolTip}"/>
+                            <Label x:Name="Rack0107" Content="7" Canvas.Left="20" Canvas.Top="419.5" Width="30" Height="50" Style="{StaticResource RackCellStyle}" HorizontalAlignment="Center" VerticalAlignment="Top" Background="{Binding RackBayStates[0107].Background}" ToolTip="{Binding RackBayStates[0107].ToolTip}"/>
+                            <Label x:Name="Rack0106" Content="6" Canvas.Left="20" Canvas.Top="469.25" Width="30" Height="50" Style="{StaticResource RackCellStyle}" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{Binding RackBayStates[0106].Background}" ToolTip="{Binding RackBayStates[0106].ToolTip}"/>
+                            <Label x:Name="Rack0105" Content="5" Canvas.Left="20" Canvas.Top="519" Width="30" Height="50" Style="{StaticResource RackCellStyle}" HorizontalAlignment="Center" VerticalAlignment="Top" Background="{Binding RackBayStates[0105].Background}" ToolTip="{Binding RackBayStates[0105].ToolTip}"/>
+                            <Label x:Name="Rack0104" Content="4" Canvas.Left="20" Canvas.Top="568.75" Width="30" Height="50" Style="{StaticResource RackCellStyle}" HorizontalAlignment="Center" VerticalAlignment="Top" Background="{Binding RackBayStates[0104].Background}" ToolTip="{Binding RackBayStates[0104].ToolTip}"/>
+                            <Label x:Name="Rack0103" Content="3" Canvas.Left="20" Canvas.Top="618.5" Width="30" Height="50" Style="{StaticResource RackCellStyle}" HorizontalAlignment="Center" VerticalAlignment="Top" Background="{Binding RackBayStates[0103].Background}" ToolTip="{Binding RackBayStates[0103].ToolTip}"/>
+                            <Label x:Name="Rack0102" Content="2" Canvas.Left="20" Canvas.Top="668.25" Width="30" Height="50" Style="{StaticResource RackCellStyle}" HorizontalAlignment="Center" VerticalAlignment="Top" Background="{Binding RackBayStates[0102].Background}" ToolTip="{Binding RackBayStates[0102].ToolTip}"/>
+                            <Label x:Name="Rack0101" Content="1" Canvas.Left="20" Canvas.Top="718" Width="30" Height="50" Style="{StaticResource RackCellStyle}" HorizontalAlignment="Center" VerticalAlignment="Top" Background="{Binding RackBayStates[0101].Background}" ToolTip="{Binding RackBayStates[0101].ToolTip}"/>
+                            <Label x:Name="Rack0209" Content="9" Canvas.Left="86" Canvas.Top="322" Width="30" Height="50" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0209].Background}" ToolTip="{Binding RackBayStates[0209].ToolTip}"/>
+                            <Label x:Name="Rack0208" Content="8" Canvas.Left="86" Canvas.Top="369.75" Width="30" Height="50" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0208].Background}" ToolTip="{Binding RackBayStates[0208].ToolTip}"/>
+                            <Label x:Name="Rack0207" Content="7" Canvas.Left="86" Canvas.Top="419.5" Width="30" Height="50" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0207].Background}" ToolTip="{Binding RackBayStates[0207].ToolTip}"/>
+                            <Label x:Name="Rack0206" Content="6" Canvas.Left="86" Canvas.Top="469.25" Width="30" Height="50" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0206].Background}" ToolTip="{Binding RackBayStates[0206].ToolTip}"/>
+                            <Label x:Name="Rack0205" Content="5" Canvas.Left="86" Canvas.Top="519" Width="30" Height="50" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0205].Background}" ToolTip="{Binding RackBayStates[0205].ToolTip}"/>
+                            <Label x:Name="Rack0204" Content="4" Canvas.Left="86" Canvas.Top="568.75" Width="30" Height="50" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0204].Background}" ToolTip="{Binding RackBayStates[0204].ToolTip}"/>
+                            <Label x:Name="Rack0203" Content="3" Canvas.Left="86" Canvas.Top="618.5" Width="30" Height="50" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0203].Background}" ToolTip="{Binding RackBayStates[0203].ToolTip}"/>
+                            <Label x:Name="Rack0202" Content="2" Canvas.Left="86" Canvas.Top="668.25" Width="30" Height="50" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0202].Background}" ToolTip="{Binding RackBayStates[0202].ToolTip}"/>
+                            <Label x:Name="Rack0201" Content="1" Canvas.Left="86" Canvas.Top="718" Width="30" Height="50" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0201].Background}" ToolTip="{Binding RackBayStates[0201].ToolTip}"/>
+                            <Label x:Name="Rack0315" Content="15" Canvas.Left="150" Canvas.Top="322" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0315].Background}" ToolTip="{Binding RackBayStates[0315].ToolTip}"/>
+                            <Label x:Name="Rack0314" Content="14" Canvas.Left="150" Canvas.Top="354" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0314].Background}" ToolTip="{Binding RackBayStates[0314].ToolTip}"/>
+                            <Label x:Name="Rack0313" Content="13" Canvas.Left="150" Canvas.Top="386" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0313].Background}" ToolTip="{Binding RackBayStates[0313].ToolTip}"/>
+                            <Label x:Name="Rack0312" Content="12" Canvas.Left="150" Canvas.Top="418" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0312].Background}" ToolTip="{Binding RackBayStates[0312].ToolTip}"/>
+                            <Label x:Name="Rack0311" Content="11" Canvas.Left="150" Canvas.Top="450" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0311].Background}" ToolTip="{Binding RackBayStates[0311].ToolTip}"/>
+                            <Label x:Name="Rack0310" Content="10" Canvas.Left="150" Canvas.Top="482" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0310].Background}" ToolTip="{Binding RackBayStates[0310].ToolTip}"/>
+                            <Label x:Name="Rack0309" Content="9" Canvas.Left="150" Canvas.Top="514" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0309].Background}" ToolTip="{Binding RackBayStates[0309].ToolTip}"/>
+                            <Label x:Name="Rack0308" Content="8" Canvas.Left="150" Canvas.Top="546" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0308].Background}" ToolTip="{Binding RackBayStates[0308].ToolTip}"/>
+                            <Label x:Name="Rack0307" Content="7" Canvas.Left="150" Canvas.Top="578" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0307].Background}" ToolTip="{Binding RackBayStates[0307].ToolTip}"/>
+                            <Label x:Name="Rack0306" Content="6" Canvas.Left="150" Canvas.Top="610" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0306].Background}" ToolTip="{Binding RackBayStates[0306].ToolTip}"/>
+                            <Label x:Name="Rack0305" Content="5" Canvas.Left="150" Canvas.Top="642" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0305].Background}" ToolTip="{Binding RackBayStates[0305].ToolTip}"/>
+                            <Label x:Name="Rack0304" Content="4" Canvas.Left="150" Canvas.Top="674" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0304].Background}" ToolTip="{Binding RackBayStates[0304].ToolTip}"/>
+                            <Label x:Name="Rack0303" Content="3" Canvas.Left="150" Canvas.Top="706" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0303].Background}" ToolTip="{Binding RackBayStates[0303].ToolTip}"/>
+                            <Label x:Name="Rack0302" Content="2" Canvas.Left="150" Canvas.Top="738" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0302].Background}" ToolTip="{Binding RackBayStates[0302].ToolTip}"/>
+                            <Label x:Name="Rack0415" Content="15" Canvas.Left="216" Canvas.Top="322" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0415].Background}" ToolTip="{Binding RackBayStates[0415].ToolTip}"/>
+                            <Label x:Name="Rack0414" Content="14" Canvas.Left="216" Canvas.Top="354" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0414].Background}" ToolTip="{Binding RackBayStates[0414].ToolTip}"/>
+                            <Label x:Name="Rack0413" Content="13" Canvas.Left="216" Canvas.Top="386" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0413].Background}" ToolTip="{Binding RackBayStates[0413].ToolTip}"/>
+                            <Label x:Name="Rack0412" Content="12" Canvas.Left="216" Canvas.Top="418" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0412].Background}" ToolTip="{Binding RackBayStates[0412].ToolTip}"/>
+                            <Label x:Name="Rack0411" Content="11" Canvas.Left="216" Canvas.Top="450" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0411].Background}" ToolTip="{Binding RackBayStates[0411].ToolTip}"/>
+                            <Label x:Name="Rack0410" Content="10" Canvas.Left="216" Canvas.Top="482" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0410].Background}" ToolTip="{Binding RackBayStates[0410].ToolTip}"/>
+                            <Label x:Name="Rack0409" Content="9" Canvas.Left="216" Canvas.Top="514" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0409].Background}" ToolTip="{Binding RackBayStates[0409].ToolTip}"/>
+                            <Label x:Name="Rack0408" Content="8" Canvas.Left="216" Canvas.Top="546" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0408].Background}" ToolTip="{Binding RackBayStates[0408].ToolTip}"/>
+                            <Label x:Name="Rack0407" Content="7" Canvas.Left="216" Canvas.Top="578" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0407].Background}" ToolTip="{Binding RackBayStates[0407].ToolTip}"/>
+                            <Label x:Name="Rack0406" Content="6" Canvas.Left="216" Canvas.Top="610" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0406].Background}" ToolTip="{Binding RackBayStates[0406].ToolTip}"/>
+                            <Label x:Name="Rack0405" Content="5" Canvas.Left="216" Canvas.Top="642" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0405].Background}" ToolTip="{Binding RackBayStates[0405].ToolTip}"/>
+                            <Label x:Name="Rack0404" Content="4" Canvas.Left="216" Canvas.Top="674" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0404].Background}" ToolTip="{Binding RackBayStates[0404].ToolTip}"/>
+                            <Label x:Name="Rack0403" Content="3" Canvas.Left="216" Canvas.Top="706" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0403].Background}" ToolTip="{Binding RackBayStates[0403].ToolTip}"/>
+                            <Label x:Name="Rack0402" Content="2" Canvas.Left="216" Canvas.Top="738" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0402].Background}" ToolTip="{Binding RackBayStates[0402].ToolTip}"/>
+                            <Label x:Name="Rack0515" Content="15" Canvas.Left="250" Canvas.Top="322" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0515].Background}" ToolTip="{Binding RackBayStates[0515].ToolTip}"/>
+                            <Label x:Name="Rack0514" Content="14" Canvas.Left="250" Canvas.Top="354" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0514].Background}" ToolTip="{Binding RackBayStates[0514].ToolTip}"/>
+                            <Label x:Name="Rack0513" Content="13" Canvas.Left="250" Canvas.Top="386" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0513].Background}" ToolTip="{Binding RackBayStates[0513].ToolTip}"/>
+                            <Label x:Name="Rack0512" Content="12" Canvas.Left="250" Canvas.Top="418" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0512].Background}" ToolTip="{Binding RackBayStates[0512].ToolTip}"/>
+                            <Label x:Name="Rack0511" Content="11" Canvas.Left="250" Canvas.Top="450" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0511].Background}" ToolTip="{Binding RackBayStates[0511].ToolTip}"/>
+                            <Label x:Name="Rack0510" Content="10" Canvas.Left="250" Canvas.Top="482" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0510].Background}" ToolTip="{Binding RackBayStates[0510].ToolTip}"/>
+                            <Label x:Name="Rack0509" Content="9" Canvas.Left="250" Canvas.Top="514" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0509].Background}" ToolTip="{Binding RackBayStates[0509].ToolTip}"/>
+                            <Label x:Name="Rack0508" Content="8" Canvas.Left="250" Canvas.Top="546" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0508].Background}" ToolTip="{Binding RackBayStates[0508].ToolTip}"/>
+                            <Label x:Name="Rack0507" Content="7" Canvas.Left="250" Canvas.Top="578" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0507].Background}" ToolTip="{Binding RackBayStates[0507].ToolTip}"/>
+                            <Label x:Name="Rack0506" Content="6" Canvas.Left="250" Canvas.Top="610" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0506].Background}" ToolTip="{Binding RackBayStates[0506].ToolTip}"/>
+                            <Label x:Name="Rack0505" Content="5" Canvas.Left="250" Canvas.Top="642" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0505].Background}" ToolTip="{Binding RackBayStates[0505].ToolTip}"/>
+                            <Label x:Name="Rack0504" Content="4" Canvas.Left="250" Canvas.Top="674" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0504].Background}" ToolTip="{Binding RackBayStates[0504].ToolTip}"/>
+                            <Label x:Name="Rack0503" Content="3" Canvas.Left="250" Canvas.Top="706" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0503].Background}" ToolTip="{Binding RackBayStates[0503].ToolTip}"/>
+                            <Label x:Name="Rack0502" Content="2" Canvas.Left="250" Canvas.Top="738" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0502].Background}" ToolTip="{Binding RackBayStates[0502].ToolTip}"/>
+                            <Label x:Name="Rack0615" Content="15" Canvas.Left="316" Canvas.Top="322" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0615].Background}" ToolTip="{Binding RackBayStates[0615].ToolTip}"/>
+                            <Label x:Name="Rack0614" Content="14" Canvas.Left="316" Canvas.Top="354" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0614].Background}" ToolTip="{Binding RackBayStates[0614].ToolTip}"/>
+                            <Label x:Name="Rack0613" Content="13" Canvas.Left="316" Canvas.Top="386" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0613].Background}" ToolTip="{Binding RackBayStates[0613].ToolTip}"/>
+                            <Label x:Name="Rack0612" Content="12" Canvas.Left="316" Canvas.Top="418" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0612].Background}" ToolTip="{Binding RackBayStates[0612].ToolTip}"/>
+                            <Label x:Name="Rack0611" Content="11" Canvas.Left="316" Canvas.Top="450" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0611].Background}" ToolTip="{Binding RackBayStates[0611].ToolTip}"/>
+                            <Label x:Name="Rack0610" Content="10" Canvas.Left="316" Canvas.Top="482" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0610].Background}" ToolTip="{Binding RackBayStates[0610].ToolTip}"/>
+                            <Label x:Name="Rack0609" Content="9" Canvas.Left="316" Canvas.Top="514" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0609].Background}" ToolTip="{Binding RackBayStates[0609].ToolTip}"/>
+                            <Label x:Name="Rack0608" Content="8" Canvas.Left="316" Canvas.Top="546" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0608].Background}" ToolTip="{Binding RackBayStates[0608].ToolTip}"/>
+                            <Label x:Name="Rack0607" Content="7" Canvas.Left="316" Canvas.Top="578" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0607].Background}" ToolTip="{Binding RackBayStates[0607].ToolTip}"/>
+                            <Label x:Name="Rack0606" Content="6" Canvas.Left="316" Canvas.Top="610" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0606].Background}" ToolTip="{Binding RackBayStates[0606].ToolTip}"/>
+                            <Label x:Name="Rack0605" Content="5" Canvas.Left="316" Canvas.Top="642" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0605].Background}" ToolTip="{Binding RackBayStates[0605].ToolTip}"/>
+                            <Label x:Name="Rack0604" Content="4" Canvas.Left="316" Canvas.Top="674" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0604].Background}" ToolTip="{Binding RackBayStates[0604].ToolTip}"/>
+                            <Label x:Name="Rack0603" Content="3" Canvas.Left="316" Canvas.Top="706" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0603].Background}" ToolTip="{Binding RackBayStates[0603].ToolTip}"/>
+                            <Label x:Name="Rack0602" Content="2" Canvas.Left="316" Canvas.Top="738" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0602].Background}" ToolTip="{Binding RackBayStates[0602].ToolTip}"/>
+                            <Label x:Name="Rack0715" Content="15" Canvas.Left="350" Canvas.Top="322" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0715].Background}" ToolTip="{Binding RackBayStates[0715].ToolTip}"/>
+                            <Label x:Name="Rack0714" Content="14" Canvas.Left="350" Canvas.Top="354" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0714].Background}" ToolTip="{Binding RackBayStates[0714].ToolTip}"/>
+                            <Label x:Name="Rack0713" Content="13" Canvas.Left="350" Canvas.Top="386" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0713].Background}" ToolTip="{Binding RackBayStates[0713].ToolTip}"/>
+                            <Label x:Name="Rack0712" Content="12" Canvas.Left="350" Canvas.Top="418" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0712].Background}" ToolTip="{Binding RackBayStates[0712].ToolTip}"/>
+                            <Label x:Name="Rack0711" Content="11" Canvas.Left="350" Canvas.Top="450" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0711].Background}" ToolTip="{Binding RackBayStates[0711].ToolTip}"/>
+                            <Label x:Name="Rack0710" Content="10" Canvas.Left="350" Canvas.Top="482" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0710].Background}" ToolTip="{Binding RackBayStates[0710].ToolTip}"/>
+                            <Label x:Name="Rack0709" Content="9" Canvas.Left="350" Canvas.Top="514" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0709].Background}" ToolTip="{Binding RackBayStates[0709].ToolTip}"/>
+                            <Label x:Name="Rack0708" Content="8" Canvas.Left="350" Canvas.Top="546" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0708].Background}" ToolTip="{Binding RackBayStates[0708].ToolTip}"/>
+                            <Label x:Name="Rack0707" Content="7" Canvas.Left="350" Canvas.Top="578" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0707].Background}" ToolTip="{Binding RackBayStates[0707].ToolTip}"/>
+                            <Label x:Name="Rack0706" Content="6" Canvas.Left="350" Canvas.Top="610" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0706].Background}" ToolTip="{Binding RackBayStates[0706].ToolTip}"/>
+                            <Label x:Name="Rack0705" Content="5" Canvas.Left="350" Canvas.Top="642" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0705].Background}" ToolTip="{Binding RackBayStates[0705].ToolTip}"/>
+                            <Label x:Name="Rack0704" Content="4" Canvas.Left="350" Canvas.Top="674" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0704].Background}" ToolTip="{Binding RackBayStates[0704].ToolTip}"/>
+                            <Label x:Name="Rack0703" Content="3" Canvas.Left="350" Canvas.Top="706" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0703].Background}" ToolTip="{Binding RackBayStates[0703].ToolTip}"/>
+                            <Label x:Name="Rack0702" Content="2" Canvas.Left="350" Canvas.Top="738" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0702].Background}" ToolTip="{Binding RackBayStates[0702].ToolTip}"/>
+                            <Label x:Name="Rack0815" Content="15" Canvas.Left="416" Canvas.Top="322" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0815].Background}" ToolTip="{Binding RackBayStates[0815].ToolTip}"/>
+                            <Label x:Name="Rack0814" Content="14" Canvas.Left="416" Canvas.Top="354" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0814].Background}" ToolTip="{Binding RackBayStates[0814].ToolTip}"/>
+                            <Label x:Name="Rack0813" Content="13" Canvas.Left="416" Canvas.Top="386" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0813].Background}" ToolTip="{Binding RackBayStates[0813].ToolTip}"/>
+                            <Label x:Name="Rack0812" Content="12" Canvas.Left="416" Canvas.Top="418" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0812].Background}" ToolTip="{Binding RackBayStates[0812].ToolTip}"/>
+                            <Label x:Name="Rack0811" Content="11" Canvas.Left="416" Canvas.Top="450" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0811].Background}" ToolTip="{Binding RackBayStates[0811].ToolTip}"/>
+                            <Label x:Name="Rack0810" Content="10" Canvas.Left="416" Canvas.Top="482" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0810].Background}" ToolTip="{Binding RackBayStates[0810].ToolTip}"/>
+                            <Label x:Name="Rack0809" Content="9" Canvas.Left="416" Canvas.Top="514" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0809].Background}" ToolTip="{Binding RackBayStates[0809].ToolTip}"/>
+                            <Label x:Name="Rack0808" Content="8" Canvas.Left="416" Canvas.Top="546" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0808].Background}" ToolTip="{Binding RackBayStates[0808].ToolTip}"/>
+                            <Label x:Name="Rack0807" Content="7" Canvas.Left="416" Canvas.Top="578" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0807].Background}" ToolTip="{Binding RackBayStates[0807].ToolTip}"/>
+                            <Label x:Name="Rack0806" Content="6" Canvas.Left="416" Canvas.Top="610" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0806].Background}" ToolTip="{Binding RackBayStates[0806].ToolTip}"/>
+                            <Label x:Name="Rack0805" Content="5" Canvas.Left="416" Canvas.Top="642" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0805].Background}" ToolTip="{Binding RackBayStates[0805].ToolTip}"/>
+                            <Label x:Name="Rack0804" Content="4" Canvas.Left="416" Canvas.Top="674" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0804].Background}" ToolTip="{Binding RackBayStates[0804].ToolTip}"/>
+                            <Label x:Name="Rack0803" Content="3" Canvas.Left="416" Canvas.Top="706" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0803].Background}" ToolTip="{Binding RackBayStates[0803].ToolTip}"/>
+                            <Label x:Name="Rack0802" Content="2" Canvas.Left="416" Canvas.Top="738" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0802].Background}" ToolTip="{Binding RackBayStates[0802].ToolTip}"/>
+                            <Label x:Name="Rack0915" Content="15" Canvas.Left="450" Canvas.Top="322" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0915].Background}" ToolTip="{Binding RackBayStates[0915].ToolTip}"/>
+                            <Label x:Name="Rack0914" Content="14" Canvas.Left="450" Canvas.Top="354" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0914].Background}" ToolTip="{Binding RackBayStates[0914].ToolTip}"/>
+                            <Label x:Name="Rack0913" Content="13" Canvas.Left="450" Canvas.Top="386" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0913].Background}" ToolTip="{Binding RackBayStates[0913].ToolTip}"/>
+                            <Label x:Name="Rack0912" Content="12" Canvas.Left="450" Canvas.Top="418" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0912].Background}" ToolTip="{Binding RackBayStates[0912].ToolTip}"/>
+                            <Label x:Name="Rack0911" Content="11" Canvas.Left="450" Canvas.Top="450" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0911].Background}" ToolTip="{Binding RackBayStates[0911].ToolTip}"/>
+                            <Label x:Name="Rack0910" Content="10" Canvas.Left="450" Canvas.Top="482" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0910].Background}" ToolTip="{Binding RackBayStates[0910].ToolTip}"/>
+                            <Label x:Name="Rack0909" Content="9" Canvas.Left="450" Canvas.Top="514" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0909].Background}" ToolTip="{Binding RackBayStates[0909].ToolTip}"/>
+                            <Label x:Name="Rack0908" Content="8" Canvas.Left="450" Canvas.Top="546" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0908].Background}" ToolTip="{Binding RackBayStates[0908].ToolTip}"/>
+                            <Label x:Name="Rack0907" Content="7" Canvas.Left="450" Canvas.Top="578" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0907].Background}" ToolTip="{Binding RackBayStates[0907].ToolTip}"/>
+                            <Label x:Name="Rack0906" Content="6" Canvas.Left="450" Canvas.Top="610" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0906].Background}" ToolTip="{Binding RackBayStates[0906].ToolTip}"/>
+                            <Label x:Name="Rack0905" Content="5" Canvas.Left="450" Canvas.Top="642" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0905].Background}" ToolTip="{Binding RackBayStates[0905].ToolTip}"/>
+                            <Label x:Name="Rack0904" Content="4" Canvas.Left="450" Canvas.Top="674" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0904].Background}" ToolTip="{Binding RackBayStates[0904].ToolTip}"/>
+                            <Label x:Name="Rack0903" Content="3" Canvas.Left="450" Canvas.Top="706" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0903].Background}" ToolTip="{Binding RackBayStates[0903].ToolTip}"/>
+                            <Label x:Name="Rack0902" Content="2" Canvas.Left="450" Canvas.Top="738" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[0902].Background}" ToolTip="{Binding RackBayStates[0902].ToolTip}"/>
+                            <Label x:Name="Rack1015" Content="15" Canvas.Left="516" Canvas.Top="322" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1015].Background}" ToolTip="{Binding RackBayStates[1015].ToolTip}"/>
+                            <Label x:Name="Rack1014" Content="14" Canvas.Left="516" Canvas.Top="354" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1014].Background}" ToolTip="{Binding RackBayStates[1014].ToolTip}"/>
+                            <Label x:Name="Rack1013" Content="13" Canvas.Left="516" Canvas.Top="386" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1013].Background}" ToolTip="{Binding RackBayStates[1013].ToolTip}"/>
+                            <Label x:Name="Rack1012" Content="12" Canvas.Left="516" Canvas.Top="418" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1012].Background}" ToolTip="{Binding RackBayStates[1012].ToolTip}"/>
+                            <Label x:Name="Rack1011" Content="11" Canvas.Left="516" Canvas.Top="450" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1011].Background}" ToolTip="{Binding RackBayStates[1011].ToolTip}"/>
+                            <Label x:Name="Rack1010" Content="10" Canvas.Left="516" Canvas.Top="482" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1010].Background}" ToolTip="{Binding RackBayStates[1010].ToolTip}"/>
+                            <Label x:Name="Rack1009" Content="9" Canvas.Left="516" Canvas.Top="514" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1009].Background}" ToolTip="{Binding RackBayStates[1009].ToolTip}"/>
+                            <Label x:Name="Rack1008" Content="8" Canvas.Left="516" Canvas.Top="546" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1008].Background}" ToolTip="{Binding RackBayStates[1008].ToolTip}"/>
+                            <Label x:Name="Rack1007" Content="7" Canvas.Left="516" Canvas.Top="578" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1007].Background}" ToolTip="{Binding RackBayStates[1007].ToolTip}"/>
+                            <Label x:Name="Rack1006" Content="6" Canvas.Left="516" Canvas.Top="610" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1006].Background}" ToolTip="{Binding RackBayStates[1006].ToolTip}"/>
+                            <Label x:Name="Rack1005" Content="5" Canvas.Left="516" Canvas.Top="642" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1005].Background}" ToolTip="{Binding RackBayStates[1005].ToolTip}"/>
+                            <Label x:Name="Rack1004" Content="4" Canvas.Left="516" Canvas.Top="674" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1004].Background}" ToolTip="{Binding RackBayStates[1004].ToolTip}"/>
+                            <Label x:Name="Rack1003" Content="3" Canvas.Left="516" Canvas.Top="706" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1003].Background}" ToolTip="{Binding RackBayStates[1003].ToolTip}"/>
+                            <Label x:Name="Rack1002" Content="2" Canvas.Left="516" Canvas.Top="738" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1002].Background}" ToolTip="{Binding RackBayStates[1002].ToolTip}"/>
+                            <Label x:Name="Rack1115" Content="15" Canvas.Left="550" Canvas.Top="322" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1115].Background}" ToolTip="{Binding RackBayStates[1115].ToolTip}"/>
+                            <Label x:Name="Rack1114" Content="14" Canvas.Left="550" Canvas.Top="354" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1114].Background}" ToolTip="{Binding RackBayStates[1114].ToolTip}"/>
+                            <Label x:Name="Rack1113" Content="13" Canvas.Left="550" Canvas.Top="386" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1113].Background}" ToolTip="{Binding RackBayStates[1113].ToolTip}"/>
+                            <Label x:Name="Rack1112" Content="12" Canvas.Left="550" Canvas.Top="418" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1112].Background}" ToolTip="{Binding RackBayStates[1112].ToolTip}"/>
+                            <Label x:Name="Rack1111" Content="11" Canvas.Left="550" Canvas.Top="450" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1111].Background}" ToolTip="{Binding RackBayStates[1111].ToolTip}"/>
+                            <Label x:Name="Rack1110" Content="10" Canvas.Left="550" Canvas.Top="482" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1110].Background}" ToolTip="{Binding RackBayStates[1110].ToolTip}"/>
+                            <Label x:Name="Rack1109" Content="9" Canvas.Left="550" Canvas.Top="514" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1109].Background}" ToolTip="{Binding RackBayStates[1109].ToolTip}"/>
+                            <Label x:Name="Rack1108" Content="8" Canvas.Left="550" Canvas.Top="546" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1108].Background}" ToolTip="{Binding RackBayStates[1108].ToolTip}"/>
+                            <Label x:Name="Rack1107" Content="7" Canvas.Left="550" Canvas.Top="578" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1107].Background}" ToolTip="{Binding RackBayStates[1107].ToolTip}"/>
+                            <Label x:Name="Rack1106" Content="6" Canvas.Left="550" Canvas.Top="610" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1106].Background}" ToolTip="{Binding RackBayStates[1106].ToolTip}"/>
+                            <Label x:Name="Rack1105" Content="5" Canvas.Left="550" Canvas.Top="642" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1105].Background}" ToolTip="{Binding RackBayStates[1105].ToolTip}"/>
+                            <Label x:Name="Rack1104" Content="4" Canvas.Left="550" Canvas.Top="674" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1104].Background}" ToolTip="{Binding RackBayStates[1104].ToolTip}"/>
+                            <Label x:Name="Rack1103" Content="3" Canvas.Left="550" Canvas.Top="706" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1103].Background}" ToolTip="{Binding RackBayStates[1103].ToolTip}"/>
+                            <Label x:Name="Rack1102" Content="2" Canvas.Left="550" Canvas.Top="738" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1102].Background}" ToolTip="{Binding RackBayStates[1102].ToolTip}"/>
+                            <Label x:Name="Rack1215" Content="15" Canvas.Left="616" Canvas.Top="322" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1215].Background}" ToolTip="{Binding RackBayStates[1215].ToolTip}"/>
+                            <Label x:Name="Rack1214" Content="14" Canvas.Left="616" Canvas.Top="354" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1214].Background}" ToolTip="{Binding RackBayStates[1214].ToolTip}"/>
+                            <Label x:Name="Rack1213" Content="13" Canvas.Left="616" Canvas.Top="386" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1213].Background}" ToolTip="{Binding RackBayStates[1213].ToolTip}"/>
+                            <Label x:Name="Rack1212" Content="12" Canvas.Left="616" Canvas.Top="418" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1212].Background}" ToolTip="{Binding RackBayStates[1212].ToolTip}"/>
+                            <Label x:Name="Rack1211" Content="11" Canvas.Left="616" Canvas.Top="450" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1211].Background}" ToolTip="{Binding RackBayStates[1211].ToolTip}"/>
+                            <Label x:Name="Rack1210" Content="10" Canvas.Left="616" Canvas.Top="482" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1210].Background}" ToolTip="{Binding RackBayStates[1210].ToolTip}"/>
+                            <Label x:Name="Rack1209" Content="9" Canvas.Left="616" Canvas.Top="514" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1209].Background}" ToolTip="{Binding RackBayStates[1209].ToolTip}"/>
+                            <Label x:Name="Rack1208" Content="8" Canvas.Left="616" Canvas.Top="546" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1208].Background}" ToolTip="{Binding RackBayStates[1208].ToolTip}"/>
+                            <Label x:Name="Rack1207" Content="7" Canvas.Left="616" Canvas.Top="578" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1207].Background}" ToolTip="{Binding RackBayStates[1207].ToolTip}"/>
+                            <Label x:Name="Rack1206" Content="6" Canvas.Left="616" Canvas.Top="610" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1206].Background}" ToolTip="{Binding RackBayStates[1206].ToolTip}"/>
+                            <Label x:Name="Rack1205" Content="5" Canvas.Left="616" Canvas.Top="642" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1205].Background}" ToolTip="{Binding RackBayStates[1205].ToolTip}"/>
+                            <Label x:Name="Rack1204" Content="4" Canvas.Left="616" Canvas.Top="674" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1204].Background}" ToolTip="{Binding RackBayStates[1204].ToolTip}"/>
+                            <Label x:Name="Rack1203" Content="3" Canvas.Left="616" Canvas.Top="706" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1203].Background}" ToolTip="{Binding RackBayStates[1203].ToolTip}"/>
+                            <Label x:Name="Rack1202" Content="2" Canvas.Left="616" Canvas.Top="738" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1202].Background}" ToolTip="{Binding RackBayStates[1202].ToolTip}"/>
+                            <Label x:Name="Rack1315" Content="15" Canvas.Left="650" Canvas.Top="322" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1315].Background}" ToolTip="{Binding RackBayStates[1315].ToolTip}"/>
+                            <Label x:Name="Rack1314" Content="14" Canvas.Left="650" Canvas.Top="354" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1314].Background}" ToolTip="{Binding RackBayStates[1314].ToolTip}"/>
+                            <Label x:Name="Rack1313" Content="13" Canvas.Left="650" Canvas.Top="386" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1313].Background}" ToolTip="{Binding RackBayStates[1313].ToolTip}"/>
+                            <Label x:Name="Rack1312" Content="12" Canvas.Left="650" Canvas.Top="418" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1312].Background}" ToolTip="{Binding RackBayStates[1312].ToolTip}"/>
+                            <Label x:Name="Rack1311" Content="11" Canvas.Left="650" Canvas.Top="450" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1311].Background}" ToolTip="{Binding RackBayStates[1311].ToolTip}"/>
+                            <Label x:Name="Rack1310" Content="10" Canvas.Left="650" Canvas.Top="482" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1310].Background}" ToolTip="{Binding RackBayStates[1310].ToolTip}"/>
+                            <Label x:Name="Rack1309" Content="9" Canvas.Left="650" Canvas.Top="514" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1309].Background}" ToolTip="{Binding RackBayStates[1309].ToolTip}"/>
+                            <Label x:Name="Rack1308" Content="8" Canvas.Left="650" Canvas.Top="546" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1308].Background}" ToolTip="{Binding RackBayStates[1308].ToolTip}"/>
+                            <Label x:Name="Rack1307" Content="7" Canvas.Left="650" Canvas.Top="578" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1307].Background}" ToolTip="{Binding RackBayStates[1307].ToolTip}"/>
+                            <Label x:Name="Rack1306" Content="6" Canvas.Left="650" Canvas.Top="610" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1306].Background}" ToolTip="{Binding RackBayStates[1306].ToolTip}"/>
+                            <Label x:Name="Rack1305" Content="5" Canvas.Left="650" Canvas.Top="642" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1305].Background}" ToolTip="{Binding RackBayStates[1305].ToolTip}"/>
+                            <Label x:Name="Rack1304" Content="4" Canvas.Left="650" Canvas.Top="674" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1304].Background}" ToolTip="{Binding RackBayStates[1304].ToolTip}"/>
+                            <Label x:Name="Rack1303" Content="3" Canvas.Left="650" Canvas.Top="706" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1303].Background}" ToolTip="{Binding RackBayStates[1303].ToolTip}"/>
+                            <Label x:Name="Rack1302" Content="2" Canvas.Left="650" Canvas.Top="738" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1302].Background}" ToolTip="{Binding RackBayStates[1302].ToolTip}"/>
+                            <Label x:Name="Rack1415" Content="15" Canvas.Left="716" Canvas.Top="322" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1415].Background}" ToolTip="{Binding RackBayStates[1415].ToolTip}"/>
+                            <Label x:Name="Rack1414" Content="14" Canvas.Left="716" Canvas.Top="354" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1414].Background}" ToolTip="{Binding RackBayStates[1414].ToolTip}"/>
+                            <Label x:Name="Rack1413" Content="13" Canvas.Left="716" Canvas.Top="386" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1413].Background}" ToolTip="{Binding RackBayStates[1413].ToolTip}"/>
+                            <Label x:Name="Rack1412" Content="12" Canvas.Left="716" Canvas.Top="418" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1412].Background}" ToolTip="{Binding RackBayStates[1412].ToolTip}"/>
+                            <Label x:Name="Rack1411" Content="11" Canvas.Left="716" Canvas.Top="450" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1411].Background}" ToolTip="{Binding RackBayStates[1411].ToolTip}"/>
+                            <Label x:Name="Rack1410" Content="10" Canvas.Left="716" Canvas.Top="482" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1410].Background}" ToolTip="{Binding RackBayStates[1410].ToolTip}"/>
+                            <Label x:Name="Rack1409" Content="9" Canvas.Left="716" Canvas.Top="514" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1409].Background}" ToolTip="{Binding RackBayStates[1409].ToolTip}"/>
+                            <Label x:Name="Rack1408" Content="8" Canvas.Left="716" Canvas.Top="546" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1408].Background}" ToolTip="{Binding RackBayStates[1408].ToolTip}"/>
+                            <Label x:Name="Rack1407" Content="7" Canvas.Left="716" Canvas.Top="578" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1407].Background}" ToolTip="{Binding RackBayStates[1407].ToolTip}"/>
+                            <Label x:Name="Rack1406" Content="6" Canvas.Left="716" Canvas.Top="610" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1406].Background}" ToolTip="{Binding RackBayStates[1406].ToolTip}"/>
+                            <Label x:Name="Rack1405" Content="5" Canvas.Left="716" Canvas.Top="642" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1405].Background}" ToolTip="{Binding RackBayStates[1405].ToolTip}"/>
+                            <Label x:Name="Rack1404" Content="4" Canvas.Left="716" Canvas.Top="674" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1404].Background}" ToolTip="{Binding RackBayStates[1404].ToolTip}"/>
+                            <Label x:Name="Rack1403" Content="3" Canvas.Left="716" Canvas.Top="706" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1403].Background}" ToolTip="{Binding RackBayStates[1403].ToolTip}"/>
+                            <Label x:Name="Rack1402" Content="2" Canvas.Left="716" Canvas.Top="738" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1402].Background}" ToolTip="{Binding RackBayStates[1402].ToolTip}"/>
+                            <Label x:Name="Rack1401" Content="1" Canvas.Left="716" Canvas.Top="770" Width="30" Height="32" Style="{StaticResource RackCellStyle}" Background="{Binding RackBayStates[1401].Background}" ToolTip="{Binding RackBayStates[1401].ToolTip}"/>
+
+                            <!-- 트래킹 구간: 상품 1·2열은 RGV가 없으므로 4칸 연속 -->
+                            <!-- PLT01~08 셀 사이 회색 연결 구간 -->
+
+                            <Label x:Name="PLT01" Content="01" Canvas.Left="20" Canvas.Top="768" Width="30" Height="45" Style="{StaticResource OutboundTrackingSectionStyle}" HorizontalAlignment="Center" VerticalAlignment="Top" Tag="{Binding TrackStates[01]}" ToolTip="{Binding TrackStates[01].ToolTip}"/>
+                            <Label x:Name="PLT02" Content="02" Canvas.Left="20" Canvas.Top="823" Width="30" Height="45" Style="{StaticResource OutboundTrackingSectionStyle}" Tag="{Binding TrackStates[02]}" ToolTip="{Binding TrackStates[02].ToolTip}"/>
+                            <Label x:Name="PLT03" Content="03" Canvas.Left="20" Canvas.Top="878" Width="30" Height="45" Style="{StaticResource OutboundTrackingSectionStyle}" Tag="{Binding TrackStates[03]}" ToolTip="{Binding TrackStates[03].ToolTip}"/>
+                            <Label x:Name="PLT04" Content="04" Canvas.Left="20" Canvas.Top="934" Width="30" Height="45" Style="{StaticResource OutboundTrackingSectionStyle}" Tag="{Binding TrackStates[04]}" ToolTip="{Binding TrackStates[04].ToolTip}"/>
+                            <Label x:Name="PLT08" Content="08" Canvas.Left="86" Canvas.Top="768" Width="30" Height="45" Style="{StaticResource InboundTrackingSectionStyle}" HorizontalAlignment="Center" VerticalAlignment="Top" Tag="{Binding TrackStates[08]}" ToolTip="{Binding TrackStates[08].ToolTip}"/>
+                            <Label x:Name="PLT07" Content="07" Canvas.Left="86" Canvas.Top="823" Width="30" Height="45" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[07]}" ToolTip="{Binding TrackStates[07].ToolTip}"/>
+                            <Label x:Name="PLT06" Content="06" Canvas.Left="86" Canvas.Top="878" Width="30" Height="45" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[06]}" ToolTip="{Binding TrackStates[06].ToolTip}"/>
+                            <Label x:Name="PLT05" Content="05" Canvas.Left="86" Canvas.Top="934" Width="30" Height="45" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[05]}" ToolTip="{Binding TrackStates[05].ToolTip}"/>
+
+                            <!-- 3~14열: RGV 위쪽 트래킹 2줄 -->
+                            <Label x:Name="PLT28" Content="28" Canvas.Left="150" Canvas.Top="770" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" HorizontalAlignment="Center" VerticalAlignment="Top" Tag="{Binding TrackStates[28]}" ToolTip="{Binding TrackStates[28].ToolTip}"/>
+                            <Label x:Name="PLT27" Content="27" Canvas.Left="150" Canvas.Top="810" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" HorizontalAlignment="Center" VerticalAlignment="Top" Tag="{Binding TrackStates[27]}" ToolTip="{Binding TrackStates[27].ToolTip}"/>
+                            <Label x:Name="PLT26" Content="26" Canvas.Left="150" Canvas.Top="850" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Tag="{Binding TrackStates[26]}" ToolTip="{Binding TrackStates[26].ToolTip}"/>
+                            <Label x:Name="PLT29" Content="29" Canvas.Left="216" Canvas.Top="770" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" HorizontalAlignment="Center" VerticalAlignment="Top" Tag="{Binding TrackStates[29]}" ToolTip="{Binding TrackStates[29].ToolTip}"/>
+                            <Label x:Name="PLT30" Content="30" Canvas.Left="216" Canvas.Top="810" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" HorizontalAlignment="Center" VerticalAlignment="Center" Tag="{Binding TrackStates[30]}" ToolTip="{Binding TrackStates[30].ToolTip}"/>
+                            <Label x:Name="PLT31" Content="31" Canvas.Left="216" Canvas.Top="850" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" Tag="{Binding TrackStates[31]}" ToolTip="{Binding TrackStates[31].ToolTip}"/>
+                            <Label x:Name="PLT34" Content="34" Canvas.Left="250" Canvas.Top="770" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" HorizontalAlignment="Center" VerticalAlignment="Top" Tag="{Binding TrackStates[34]}" ToolTip="{Binding TrackStates[34].ToolTip}"/>
+                            <Label x:Name="PLT33" Content="33" Canvas.Left="250" Canvas.Top="810" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[33]}" ToolTip="{Binding TrackStates[33].ToolTip}"/>
+                            <Label x:Name="PLT32" Content="32" Canvas.Left="250" Canvas.Top="850" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[32]}" ToolTip="{Binding TrackStates[32].ToolTip}"/>
+                            <Label x:Name="PLT35" Content="35" Canvas.Left="316" Canvas.Top="770" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" HorizontalAlignment="Center" VerticalAlignment="Top" Tag="{Binding TrackStates[35]}" ToolTip="{Binding TrackStates[35].ToolTip}"/>
+                            <Label x:Name="PLT36" Content="36" Canvas.Left="316" Canvas.Top="810" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" HorizontalAlignment="Center" VerticalAlignment="Top" Tag="{Binding TrackStates[36]}" ToolTip="{Binding TrackStates[36].ToolTip}"/>
+                            <Label x:Name="PLT37" Content="37" Canvas.Left="316" Canvas.Top="850" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" Tag="{Binding TrackStates[37]}" ToolTip="{Binding TrackStates[37].ToolTip}"/>
+                            <Label x:Name="PLT40" Content="40" Canvas.Left="350" Canvas.Top="770" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" HorizontalAlignment="Center" VerticalAlignment="Top" Tag="{Binding TrackStates[40]}" ToolTip="{Binding TrackStates[40].ToolTip}"/>
+                            <Label x:Name="PLT39" Content="39" Canvas.Left="350" Canvas.Top="810" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[39]}" ToolTip="{Binding TrackStates[39].ToolTip}"/>
+                            <Label x:Name="PLT38" Content="38" Canvas.Left="350" Canvas.Top="850" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[38]}" ToolTip="{Binding TrackStates[38].ToolTip}"/>
+                            <Label x:Name="PLT41" Content="41" Canvas.Left="416" Canvas.Top="770" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" HorizontalAlignment="Center" VerticalAlignment="Top" Tag="{Binding TrackStates[41]}" ToolTip="{Binding TrackStates[41].ToolTip}"/>
+                            <Label x:Name="PLT42" Content="42" Canvas.Left="416" Canvas.Top="810" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" Tag="{Binding TrackStates[42]}" ToolTip="{Binding TrackStates[42].ToolTip}"/>
+                            <Label x:Name="PLT43" Content="43" Canvas.Left="416" Canvas.Top="850" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" Tag="{Binding TrackStates[43]}" ToolTip="{Binding TrackStates[43].ToolTip}"/>
+                            <Label x:Name="PLT46" Content="46" Canvas.Left="450" Canvas.Top="770" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" HorizontalAlignment="Center" VerticalAlignment="Top" Tag="{Binding TrackStates[46]}" ToolTip="{Binding TrackStates[46].ToolTip}"/>
+                            <Label x:Name="PLT45" Content="45" Canvas.Left="450" Canvas.Top="810" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[45]}" ToolTip="{Binding TrackStates[45].ToolTip}"/>
+                            <Label x:Name="PLT44" Content="44" Canvas.Left="450" Canvas.Top="850" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[44]}" ToolTip="{Binding TrackStates[44].ToolTip}"/>
+                            <Label x:Name="PLT47" Content="47" Canvas.Left="516" Canvas.Top="770" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" HorizontalAlignment="Center" VerticalAlignment="Top" Tag="{Binding TrackStates[47]}" ToolTip="{Binding TrackStates[47].ToolTip}"/>
+                            <Label x:Name="PLT48" Content="48" Canvas.Left="516" Canvas.Top="810" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" Tag="{Binding TrackStates[48]}" ToolTip="{Binding TrackStates[48].ToolTip}"/>
+                            <Label x:Name="PLT49" Content="49" Canvas.Left="516" Canvas.Top="850" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" Tag="{Binding TrackStates[49]}" ToolTip="{Binding TrackStates[49].ToolTip}"/>
+                            <Label x:Name="PLT52" Content="52" Canvas.Left="550" Canvas.Top="770" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" HorizontalAlignment="Center" VerticalAlignment="Top" Tag="{Binding TrackStates[52]}" ToolTip="{Binding TrackStates[52].ToolTip}"/>
+                            <Label x:Name="PLT51" Content="51" Canvas.Left="550" Canvas.Top="810" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[51]}" ToolTip="{Binding TrackStates[51].ToolTip}"/>
+                            <Label x:Name="PLT50" Content="50" Canvas.Left="550" Canvas.Top="850" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[50]}" ToolTip="{Binding TrackStates[50].ToolTip}"/>
+                            <Label x:Name="PLT53" Content="53" Canvas.Left="616" Canvas.Top="770" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" HorizontalAlignment="Center" VerticalAlignment="Top" Tag="{Binding TrackStates[53]}" ToolTip="{Binding TrackStates[53].ToolTip}"/>
+                            <Label x:Name="PLT54" Content="54" Canvas.Left="616" Canvas.Top="810" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" Tag="{Binding TrackStates[54]}" ToolTip="{Binding TrackStates[54].ToolTip}"/>
+                            <Label x:Name="PLT55" Content="55" Canvas.Left="616" Canvas.Top="850" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" Tag="{Binding TrackStates[55]}" ToolTip="{Binding TrackStates[55].ToolTip}"/>
+                            <Label x:Name="PLT58" Content="58" Canvas.Left="650" Canvas.Top="770" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" HorizontalAlignment="Center" VerticalAlignment="Top" Tag="{Binding TrackStates[58]}" ToolTip="{Binding TrackStates[58].ToolTip}"/>
+                            <Label x:Name="PLT57" Content="57" Canvas.Left="650" Canvas.Top="810" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[57]}" ToolTip="{Binding TrackStates[57].ToolTip}"/>
+                            <Label x:Name="PLT56" Content="56" Canvas.Left="650" Canvas.Top="850" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[56]}" ToolTip="{Binding TrackStates[56].ToolTip}"/>
+
+                            <!-- 송도 IRdy/ORdy와 같은 Ready 표시. 평택 D5005(T2TBCVC1.R.CH06)를 사용한다. -->
+                            <ToggleButton x:Name="TrackingCornerIndicator01" Canvas.Left="22" Canvas.Top="770" Panel.ZIndex="60" Style="{StaticResource TrackingCornerIndicatorStyle}" IsChecked="{Binding StationReadyStates[01], Mode=OneWay}"/>
+                            <ToggleButton x:Name="TrackingCornerIndicator08" Canvas.Left="88" Canvas.Top="770" Panel.ZIndex="60" Style="{StaticResource TrackingCornerIndicatorStyle}" IsChecked="{Binding StationReadyStates[08], Mode=OneWay}"/>
+                            <ToggleButton x:Name="TrackingCornerIndicator28" Canvas.Left="152" Canvas.Top="772" Panel.ZIndex="60" Style="{StaticResource TrackingCornerIndicatorStyle}" IsChecked="{Binding StationReadyStates[28], Mode=OneWay}"/>
+                            <ToggleButton x:Name="TrackingCornerIndicator29" Canvas.Left="218" Canvas.Top="772" Panel.ZIndex="60" Style="{StaticResource TrackingCornerIndicatorStyle}" IsChecked="{Binding StationReadyStates[29], Mode=OneWay}"/>
+                            <ToggleButton x:Name="TrackingCornerIndicator34" Canvas.Left="252" Canvas.Top="772" Panel.ZIndex="60" Style="{StaticResource TrackingCornerIndicatorStyle}" IsChecked="{Binding StationReadyStates[34], Mode=OneWay}"/>
+                            <ToggleButton x:Name="TrackingCornerIndicator35" Canvas.Left="318" Canvas.Top="772" Panel.ZIndex="60" Style="{StaticResource TrackingCornerIndicatorStyle}" IsChecked="{Binding StationReadyStates[35], Mode=OneWay}"/>
+                            <ToggleButton x:Name="TrackingCornerIndicator40" Canvas.Left="352" Canvas.Top="772" Panel.ZIndex="60" Style="{StaticResource TrackingCornerIndicatorStyle}" IsChecked="{Binding StationReadyStates[40], Mode=OneWay}"/>
+                            <ToggleButton x:Name="TrackingCornerIndicator41" Canvas.Left="418" Canvas.Top="772" Panel.ZIndex="60" Style="{StaticResource TrackingCornerIndicatorStyle}" IsChecked="{Binding StationReadyStates[41], Mode=OneWay}"/>
+                            <ToggleButton x:Name="TrackingCornerIndicator46" Canvas.Left="452" Canvas.Top="772" Panel.ZIndex="60" Style="{StaticResource TrackingCornerIndicatorStyle}" IsChecked="{Binding StationReadyStates[46], Mode=OneWay}"/>
+                            <ToggleButton x:Name="TrackingCornerIndicator47" Canvas.Left="518" Canvas.Top="772" Panel.ZIndex="60" Style="{StaticResource TrackingCornerIndicatorStyle}" IsChecked="{Binding StationReadyStates[47], Mode=OneWay}"/>
+                            <ToggleButton x:Name="TrackingCornerIndicator52" Canvas.Left="552" Canvas.Top="772" Panel.ZIndex="60" Style="{StaticResource TrackingCornerIndicatorStyle}" IsChecked="{Binding StationReadyStates[52], Mode=OneWay}"/>
+                            <ToggleButton x:Name="TrackingCornerIndicator53" Canvas.Left="618" Canvas.Top="772" Panel.ZIndex="60" Style="{StaticResource TrackingCornerIndicatorStyle}" IsChecked="{Binding StationReadyStates[53], Mode=OneWay}"/>
+                            <ToggleButton x:Name="TrackingCornerIndicator58" Canvas.Left="652" Canvas.Top="772" Panel.ZIndex="60" Style="{StaticResource TrackingCornerIndicatorStyle}" IsChecked="{Binding StationReadyStates[58], Mode=OneWay}"/>
+
+                            <!-- 3~14열: RGV 아래쪽 트래킹 2줄 -->
+                            <Label x:Name="PLT15" Content="15" Canvas.Left="150" Canvas.Top="940" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" Tag="{Binding TrackStates[15]}" ToolTip="{Binding TrackStates[15].ToolTip}"/>
+                            <Label x:Name="PLT14" Content="14" Canvas.Left="150" Canvas.Top="990" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" Tag="{Binding TrackStates[14]}" ToolTip="{Binding TrackStates[14].ToolTip}"/>
+                            <Label x:Name="PLT13" Content="13" Canvas.Left="181" Canvas.Top="990" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Tag="{Binding TrackStates[13]}" ToolTip="{Binding TrackStates[13].ToolTip}"/>
+                            <Label x:Name="PLT12" Content="12" Canvas.Left="212" Canvas.Top="990" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Tag="{Binding TrackStates[12]}" ToolTip="{Binding TrackStates[12].ToolTip}"/>
+                            <Label x:Name="PLT11" Content="11" Canvas.Left="212" Canvas.Top="940" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Tag="{Binding TrackStates[11]}" ToolTip="{Binding TrackStates[11].ToolTip}"/>
+                            <Label x:Name="PLT16" Content="16" Canvas.Left="244" Canvas.Top="990" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Tag="{Binding TrackStates[16]}" ToolTip="{Binding TrackStates[16].ToolTip}"/>
+                            <Label x:Name="PLT17" Content="17" Canvas.Left="275" Canvas.Top="990" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Tag="{Binding TrackStates[17]}" ToolTip="{Binding TrackStates[17].ToolTip}"/>
+                            <Label x:Name="PLT18" Content="18" Canvas.Left="306" Canvas.Top="990" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Tag="{Binding TrackStates[18]}" ToolTip="{Binding TrackStates[18].ToolTip}"/>
+                            <Label x:Name="PLT20" Content="20" Canvas.Left="337" Canvas.Top="990" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Tag="{Binding TrackStates[20]}" ToolTip="{Binding TrackStates[20].ToolTip}"/>
+                            <Label x:Name="PLT19" Content="19" Canvas.Left="337" Canvas.Top="940" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Tag="{Binding TrackStates[19]}" ToolTip="{Binding TrackStates[19].ToolTip}"/>
+                            <Label x:Name="PLT24" Content="24" Canvas.Left="275" Canvas.Top="940" Width="30" Height="41" Style="{StaticResource SpecialOutboundTrackingSectionStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Tag="{Binding TrackStates[24]}" ToolTip="{Binding TrackStates[24].ToolTip}"/>
+                            <Label x:Name="PLT21" Content="21" Canvas.Left="368" Canvas.Top="990" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Tag="{Binding TrackStates[21]}" ToolTip="{Binding TrackStates[21].ToolTip}"/>
+                            <Label x:Name="PLT22" Content="22" Canvas.Left="399" Canvas.Top="990" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Tag="{Binding TrackStates[22]}" ToolTip="{Binding TrackStates[22].ToolTip}"/>
+                            <Label x:Name="PLT23" Content="23" Canvas.Left="399" Canvas.Top="940" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Tag="{Binding TrackStates[23]}" ToolTip="{Binding TrackStates[23].ToolTip}"/>
+
+                            <!-- RGV: 3열부터 14열까지만 배치 -->
+                            <Rectangle x:Name="RgvRailUpper" Canvas.Left="150" Canvas.Top="905"
+                               Width="550" Height="2" Fill="#20252A"/>
+                            <Rectangle x:Name="RgvRailLower" Canvas.Left="150" Canvas.Top="918"
+                               Width="550" Height="2" Fill="#20252A"/>
+                            <Rectangle x:Name="RgvRailLeftStop" Canvas.Left="150" Canvas.Top="895"
+                               Width="5" Height="34" Fill="#20252A"/>
+                            <Rectangle x:Name="RgvRailRightStop" Canvas.Left="700" Canvas.Top="895"
+                               Width="5" Height="34" Fill="#20252A"/>
+
+                            <ContentControl x:Name="BottomCarrier25"
+                                    Content="{Binding RgvStates[01].DisplayNo, FallbackValue=25}"
+                                    Style="{StaticResource RgvCarrierStyle}"
+                                    behaviors:CanvasMotion.TargetLeft="{Binding RgvStates[01].CanvasLeft, FallbackValue=363}"
+                                    Canvas.Top="894"
+                                    Tag="{Binding RgvStates[01]}"
+                                    ToolTip="{Binding RgvStates[01].ToolTip}"
+                                    Panel.ZIndex="10"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_"
+                        Canvas.Left="20" Canvas.Top="802"
+                        Width="30" Height="179"
+                        Fill="#B8BEC6"
+                        IsHitTestVisible="False"
+                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_복사__C_"
+                        Canvas.Left="86" Canvas.Top="802"
+                        Width="30" Height="179"
+                        Fill="#B8BEC6"
+                        IsHitTestVisible="False"
+                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_복사__C_1"
+                        Canvas.Left="20" Canvas.Top="802"
+                        Width="30" Height="179"
+                        Fill="#B8BEC6"
+                        IsHitTestVisible="False"
+                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_1"
+                        Canvas.Left="397" Canvas.Top="940"
+                        Width="33" Height="90"
+                        Fill="#B8BEC6"
+                        IsHitTestVisible="False"
+                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_1복사__C_"
+                        Canvas.Left="335" Canvas.Top="940"
+                        Width="33" Height="90"
+                        Fill="#B8BEC6"
+                        IsHitTestVisible="False"
+                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_1복사__C_1"
+                        Canvas.Left="273" Canvas.Top="940"
+                        Width="33" Height="90"
+                        Fill="#B8BEC6"
+                        IsHitTestVisible="False"
+                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_1복사__C_2"
+                        Canvas.Left="210" Canvas.Top="940"
+                        Width="33" Height="90"
+                        Fill="#B8BEC6"
+                        IsHitTestVisible="False"
+                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_"
+                        Canvas.Left="149" Canvas.Top="940"
+                        Width="33" Height="90"
+                        Fill="#B8BEC6"
+                        IsHitTestVisible="False" 
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Top"
+                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_1복사__C_1복사__C_"
+                        Canvas.Left="161" Canvas.Top="988"
+                        Width="270" Height="42"
+                        Fill="#B8BEC6"
+                        IsHitTestVisible="False"
+                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2"
+                        Canvas.Left="150" Canvas.Top="769"
+                        Width="29" Height="120"
+                        Fill="#B8BEC6"
+                        IsHitTestVisible="False"
+                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C_"
+                        Canvas.Left="215" Canvas.Top="769"
+                        Width="65" Height="120"
+                        Fill="#B8BEC6"
+                        IsHitTestVisible="False"
+                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C2_"
+                        Canvas.Left="315" Canvas.Top="769"
+                        Width="65" Height="120"
+                        Fill="#B8BEC6"
+                        IsHitTestVisible="False"
+                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C3_"
+                        Canvas.Left="415" Canvas.Top="769"
+                        Width="65" Height="120"
+                        Fill="#B8BEC6"
+                        IsHitTestVisible="False"
+                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C4_"
+                        Canvas.Left="515" Canvas.Top="769"
+                        Width="65" Height="120"
+                        Fill="#B8BEC6"
+                        IsHitTestVisible="False"
+                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C5_"
+                        Canvas.Left="615" Canvas.Top="769"
+                        Width="65" Height="120"
+                        Fill="#B8BEC6"
+                        IsHitTestVisible="False"
+                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_3"
+                        Canvas.Left="150" Canvas.Top="216"
+                        Width="30" Height="88"
+                        Fill="#B8BEC6"
+                        IsHitTestVisible="False"
+                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C6_"
+                        Canvas.Left="215" Canvas.Top="216"
+                        Width="65" Height="88"
+                        Fill="#B8BEC6"
+                        IsHitTestVisible="False"
+                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C7_"
+                        Canvas.Left="316" Canvas.Top="216"
+                        Width="65" Height="88"
+                        Fill="#B8BEC6"
+                        IsHitTestVisible="False"
+                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C8_"
+                        Canvas.Left="416" Canvas.Top="216"
+                        Width="65" Height="88"
+                        Fill="#B8BEC6"
+                        IsHitTestVisible="False"
+                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C9_"
+                        Canvas.Left="516" Canvas.Top="216"
+                        Width="65" Height="88"
+                        Fill="#B8BEC6"
+                        IsHitTestVisible="False"
+                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__10_"
+                        Canvas.Left="615" Canvas.Top="216"
+                        Width="65" Height="88"
+                        Fill="#B8BEC6"
+                        IsHitTestVisible="False"
+                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__10_복사__C_"
+                        Canvas.Left="347" Canvas.Top="116"
+                        Width="102" Height="50"
+                        Fill="#B8BEC6"
+                        IsHitTestVisible="False"
+                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Control x:Name="OP01" Style="{StaticResource StatusLampStyle}" Canvas.Left="470" Canvas.Top="950" Panel.ZIndex="30"
+                                     Background="{Binding OperatorStates[02].Background}" Opacity="{Binding OperatorStates[02].Opacity}" ToolTip="{Binding OperatorStates[02].ToolTip}"/>
+                            <Control x:Name="OP02" Style="{StaticResource StatusLampStyle}" Canvas.Left="500" Canvas.Top="950" Panel.ZIndex="30"
+                                     Background="{Binding OperatorStates[03].Background}" Opacity="{Binding OperatorStates[03].Opacity}" ToolTip="{Binding OperatorStates[03].ToolTip}"/>
+                            <Control x:Name="OP03" Style="{StaticResource StatusLampStyle}" Canvas.Left="490" Canvas.Top="125" Panel.ZIndex="30"
+                                     Background="{Binding OperatorStates[04].Background}" Opacity="{Binding OperatorStates[04].Opacity}" ToolTip="{Binding OperatorStates[04].ToolTip}"/>
+                            <Control x:Name="bcr01" Style="{StaticResource BcrSignalStyle}" Canvas.Left="68" Canvas.Top="900" Panel.ZIndex="30"
+                                     Background="{Binding BcrStates[01].Background}" Opacity="{Binding BcrStates[01].Opacity}" ToolTip="{Binding BcrStates[01].ToolTip}"/>
+                            <Control x:Name="bcr02" Style="{StaticResource BcrSignalStyle}" Canvas.Left="331" Canvas.Top="130" Panel.ZIndex="30"
+                                     Background="{Binding BcrStates[04].Background}" Opacity="{Binding BcrStates[04].Opacity}" ToolTip="{Binding BcrStates[04].ToolTip}"/>
+                            <Control x:Name="bcr03" Style="{StaticResource BcrSignalStyle}" Canvas.Left="135" Canvas.Top="1000" Panel.ZIndex="30"
+                                     Background="{Binding BcrStates[02].Background}" Opacity="{Binding BcrStates[02].Opacity}" ToolTip="{Binding BcrStates[02].ToolTip}"/>
+                            <Control x:Name="bcr04" Style="{StaticResource BcrSignalStyle}" Canvas.Left="434" Canvas.Top="1000" Panel.ZIndex="30"
+                                     Background="{Binding BcrStates[03].Background}" Opacity="{Binding BcrStates[03].Opacity}" ToolTip="{Binding BcrStates[03].ToolTip}"/>
+                            <!--<TextBox x:Name="tbBcr02" Text="BCR 리딩 정상" Style="{StaticResource BcrTextBoxStyle}" Canvas.Left="66" Canvas.Top="1016"/>
+                    <TextBox x:Name="tbBcr03" Text="BCR 리딩 정상" Style="{StaticResource BcrTextBoxStyle}" Canvas.Left="434" Canvas.Top="1016"/>
+                    <TextBox x:Name="tbBcr04" Text="BCR 리딩 정상" Style="{StaticResource BcrTextBoxStyle}" Canvas.Left="262" Canvas.Top="146"/>-->
+                            <TextBox x:Name="tbPck01" Text="피킹출고" Style="{StaticResource PckTextBoxStyle}" Canvas.Left="180" Canvas.Top="1040"/>
+                            <TextBox x:Name="tbPck02" Text="완전출고" Style="{StaticResource PckTextBoxStyle}" Canvas.Left="340" Canvas.Top="1040"/>
+
+                            <!-- 하향/상향 화살표 -->
+                            <Control x:Name="DownArrow01" Style="{StaticResource DownArrowStyle}" Canvas.Left="70" Canvas.Top="958" Panel.ZIndex="30"
+                                     Visibility="{Binding Bank2OutboundArrowVisibility}" ToolTip="{Binding Sc1ModeToolTip}"/>
+                            <Control x:Name="UpArrow01" Style="{StaticResource UpArrowStyle}" Canvas.Left="70" Canvas.Top="958" Panel.ZIndex="30"
+                                     Visibility="{Binding Bank2InboundArrowVisibility}" ToolTip="{Binding Sc1ModeToolTip}"/>
+                            <Control x:Name="DownArrow02" Style="{StaticResource DownArrowStyle}" Canvas.Left="6" Canvas.Top="958" Panel.ZIndex="30"
+                                     Visibility="{Binding Bank1OutboundArrowVisibility}" ToolTip="{Binding Sc1ModeToolTip}"/>
+                            <Button x:Name="Bank2AvailabilityButton"
+                                    Canvas.Left="45"
+                                    Canvas.Top="977"
+                                    Width="64"
+                                    Height="18"
+                                    Panel.ZIndex="80"
+                                    Content="{Binding Bank2AvailabilityText}"
+                                    d:Content="입고 가능"
+                                    Visibility="{Binding Bank2AvailabilityVisibility}"
+                                    d:Visibility="Visible"
+                                    ToolTip="{Binding Sc1ModeToolTip}"
+                                    Command="{Binding ToggleBank2ModeCommand}"
+                                    Foreground="#1756D9"
+                                    Background="#F7FAFF"
+                                    BorderBrush="#AFC5E5"
+                                    BorderThickness="1"
+                                    Padding="0"
+                                    Cursor="Hand"
+                                    FontSize="9"
+                                    FontWeight="Bold"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Border x:Name="ModeButtonBorder"
+                                                Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                CornerRadius="2">
+                                            <ContentPresenter Content="{TemplateBinding Content}"
+                                                              TextElement.Foreground="{TemplateBinding Foreground}"
+                                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="ModeButtonBorder" Property="Background" Value="#EAF2FF"/>
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Setter TargetName="ModeButtonBorder" Property="Background" Value="#DCE9FF"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+
+                            <!-- 파란색 상태 램프 -->
+                            <Control x:Name="StatusLamp01"
+                             Style="{StaticResource StatusLampStyle}"
+                             Canvas.Left="20"
+                             Canvas.Top="1000"
+                             Background="{Binding OperatorStates[01].Background}"
+                             Opacity="{Binding OperatorStates[01].Opacity}"
+                             ToolTip="{Binding OperatorStates[01].ToolTip}"
+                             Panel.ZIndex="30"/>
+                            <Label Content="2층 라인" Canvas.Left="20" Canvas.Top="230" FontSize="24" FontFamily="Noto Sans KR" FontWeight="Bold"/>
+                            <Label Content="1층 라인" Canvas.Left="620" Canvas.Top="970" FontSize="24" FontFamily="Noto Sans KR" FontWeight="Bold"/>
+                            <Label Content="OP #1" Canvas.Left="6" Canvas.Top="1010" FontSize="9" FontFamily="Noto Sans KR" FontWeight="Bold"/>
+                            <Label Content="OP #2" Canvas.Left="454" Canvas.Top="960" FontSize="9" FontFamily="Noto Sans KR" FontWeight="Bold"/>
+                            <Label Content="OP #3" Canvas.Left="495" Canvas.Top="960" FontSize="9" FontFamily="Noto Sans KR" FontWeight="Bold"/>
+                            <Label Content="OP #4" Canvas.Left="484" Canvas.Top="136" FontSize="9" FontFamily="Noto Sans KR" FontWeight="Bold"/>
+                            <Button x:Name="BcrCanvasButton01" Content="BCR #1" Canvas.Left="49" Canvas.Top="907" Style="{StaticResource BcrCanvasLabelStyle}"
+                                    Foreground="{Binding BcrStates[01].Foreground}" ToolTip="{Binding BcrStates[01].ToolTip}" Command="{Binding ToggleBcrCommand}" CommandParameter="1"/>
+                            <Button x:Name="BcrCanvasButton02" Content="BCR #2" Canvas.Left="99" Canvas.Top="996" Style="{StaticResource BcrCanvasLabelStyle}"
+                                    Foreground="{Binding BcrStates[02].Foreground}" ToolTip="{Binding BcrStates[02].ToolTip}" Command="{Binding ToggleBcrCommand}" CommandParameter="2"/>
+                            <Button x:Name="BcrCanvasButton03" Content="BCR #3" Canvas.Left="441" Canvas.Top="996" Style="{StaticResource BcrCanvasLabelStyle}"
+                                    Foreground="{Binding BcrStates[03].Foreground}" ToolTip="{Binding BcrStates[03].ToolTip}" Command="{Binding ToggleBcrCommand}" CommandParameter="3"/>
+                            <Button x:Name="BcrCanvasButton04" Content="BCR #4" Canvas.Left="294" Canvas.Top="126" Style="{StaticResource BcrCanvasLabelStyle}"
+                                    Foreground="{Binding BcrStates[04].Foreground}" ToolTip="{Binding BcrStates[04].ToolTip}" Command="{Binding ToggleBcrCommand}" CommandParameter="4"/>
+                            <Control x:Name="UpArrow01복사__C_" Style="{StaticResource UpArrowStyle}" Canvas.Left="136" Canvas.Top="855" Panel.ZIndex="30"
+                                Visibility="{Binding Bank2InboundArrowVisibility}" ToolTip="{Binding Sc1ModeToolTip}" HorizontalAlignment="Center" VerticalAlignment="Top" Height="43" Width="14"/>
+
+                            <!-- 전체 화면 맞춤: 도면 콘텐츠는 Canvas.Top 0~1072 안에 배치 -->
+
+                        </Canvas>
+                    </Grid>
+                </Viewbox>
+
+                <!-- 트래킹 도면과 하단 정보 패널 사이 구분선 -->
+                <Grid x:Name="MonitorSectionDivider"
+                      Grid.Row="1"
+                      Height="16"
+                      Margin="16,-24,16,0"
+                      VerticalAlignment="Top"
+                      Panel.ZIndex="40"
+                      IsHitTestVisible="False">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Rectangle Grid.Column="0"
+                               Height="1"
+                               VerticalAlignment="Center"
+                               Fill="#A7BCD4"/>
+
+
+                    <Rectangle Grid.Column="2"
+                               Height="1"
+                               VerticalAlignment="Center"
+                               Fill="#A7BCD4"/>
+                </Grid>
+
+                <!-- 화면 하단 정보 영역: BCR / 설비 상태 / 적재 현황 -->
+                <Viewbox x:Name="MonitorInfoViewbox"
+                          Grid.Row="1"
+                          Margin="0"
+                          Stretch="Uniform"
+                          StretchDirection="Both"
+                          HorizontalAlignment="Left"
+                          VerticalAlignment="Top">
+
+                    <Grid x:Name="MonitorInfoGrid"
+                      Width="750"
+                      Height="150">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="185*"/>
+                            <ColumnDefinition Width="3"/>
+                            <ColumnDefinition Width="307*"/>
+                            <ColumnDefinition Width="8"/>
+                            <ColumnDefinition Width="247*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- 1. BCR 상태 -->
+                        <Border x:Name="BcrMonitorPanel"
+                            Grid.Column="0"
+                            Height="112"
+                            VerticalAlignment="Top"
+                            Background="Transparent"
+                            BorderThickness="0">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <Border Grid.Row="0" Margin="0,3" Background="#F2F7FF" BorderBrush="#AFC5E5" BorderThickness="1" CornerRadius="2">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="45"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Content="BCR #1" Style="{StaticResource BcrMonitorNameStyle}"/>
+                                        <TextBox x:Name="tbBcrMonitor01" Grid.Column="1" Text="{Binding BcrStates[01].Status, Mode=OneWay}" ToolTip="{Binding BcrStates[01].ToolTip}" Style="{StaticResource BcrMonitorMessageStyle}"/>
+                                    </Grid>
+                                </Border>
+                                <Border Grid.Row="1" Margin="0,3" Background="#F2F7FF" BorderBrush="#AFC5E5" BorderThickness="1" CornerRadius="2">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="45"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Content="BCR #2" Style="{StaticResource BcrMonitorNameStyle}"/>
+                                        <TextBox x:Name="tbBcrMonitor02" Grid.Column="1" Text="{Binding BcrStates[02].Status, Mode=OneWay}" ToolTip="{Binding BcrStates[02].ToolTip}" Style="{StaticResource BcrMonitorMessageStyle}"/>
+                                    </Grid>
+                                </Border>
+                                <Border Grid.Row="2" Margin="0,3" Background="#F2F7FF" BorderBrush="#AFC5E5" BorderThickness="1" CornerRadius="2">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="45"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Content="BCR #3" Style="{StaticResource BcrMonitorNameStyle}"/>
+                                        <TextBox x:Name="tbBcrMonitor03" Grid.Column="1" Text="{Binding BcrStates[03].Status, Mode=OneWay}" ToolTip="{Binding BcrStates[03].ToolTip}" Style="{StaticResource BcrMonitorMessageStyle}"/>
+                                    </Grid>
+                                </Border>
+                                <Border Grid.Row="3" Margin="0,3" Background="#F2F7FF" BorderBrush="#AFC5E5" BorderThickness="1" CornerRadius="2">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="45"/>
+                                            <ColumnDefinition Width="97*"/>
+                                            <ColumnDefinition Width="31*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Content="BCR #4" Style="{StaticResource BcrMonitorNameStyle}"/>
+                                        <TextBox x:Name="tbBcrMonitor04" Grid.Column="1" Text="{Binding BcrStates[04].Status, Mode=OneWay}" ToolTip="{Binding BcrStates[04].ToolTip}" Style="{StaticResource BcrMonitorMessageStyle}" Grid.ColumnSpan="2"/>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </Border>
+
+                        <!-- 2. 설비 상태 색상표 -->
+                        <Border x:Name="EquipmentLegendPanel"
+                                Grid.Column="2"
+                                Background="#F2F7FF"
+                                BorderBrush="#AFC5E5"
+                                BorderThickness="1"
+                                CornerRadius="4">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <Grid Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="76"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Content="RACK" Style="{StaticResource MonitorLegendNameStyle}"/>
+                                    <UniformGrid Grid.Column="1" Rows="1" Columns="3">
+                                        <ContentControl Content="정상" BorderBrush="#FFFFFF" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                        <ContentControl Content="공 출고" BorderBrush="#F000D0" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                        <ContentControl Content="이중 입고" BorderBrush="#76006F" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                    </UniformGrid>
+                                </Grid>
+
+                                <Grid Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="76"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Content="C/V DATA" Style="{StaticResource MonitorLegendNameStyle}"/>
+                                    <UniformGrid Grid.Column="1" Rows="1" Columns="4">
+                                        <ContentControl Content="PLT+DATA" BorderBrush="{StaticResource TrackingPalletAndDataBrush}" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                        <ContentControl Content="파렛트 유" BorderBrush="{StaticResource TrackingPalletOnlyBrush}" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                        <ContentControl Content="데이터 유" BorderBrush="{StaticResource TrackingDataOnlyBrush}" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                        <ContentControl Content="비어 있음" BorderBrush="{StaticResource OutboundTrackingEmptyBrush}" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                    </UniformGrid>
+                                </Grid>
+
+                                <Grid Grid.Row="2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="76"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Content="C/V" Style="{StaticResource MonitorLegendNameStyle}"/>
+                                    <UniformGrid Grid.Column="1" Rows="1" Columns="4">
+                                        <ContentControl Content="수동 상태" BorderBrush="#C7C7C7" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                        <ContentControl Content="공파렛트 매거진" FontSize="7" BorderBrush="#15989A" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                        <ContentControl Content="SIZE / WM" BorderBrush="#10258F" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                        <ContentControl Content="에러" BorderBrush="#F20D0D" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                    </UniformGrid>
+                                </Grid>
+
+                                <Grid Grid.Row="3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="76"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Content="Stacker Crane" Style="{StaticResource MonitorLegendNameStyle}"/>
+                                    <UniformGrid Grid.Column="1" Rows="1" Columns="4">
+                                        <ContentControl Content="준비 완료" BorderBrush="#00FF00" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                        <ContentControl Content="오프라인" BorderBrush="#F0F0F0" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                        <ContentControl Content="대기 아님" BorderBrush="#FFFF00" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                        <ContentControl Content="에러" BorderBrush="#FF0000" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                    </UniformGrid>
+                                </Grid>
+
+                                <Grid Grid.Row="4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="76"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Content="RGV" Style="{StaticResource MonitorLegendNameStyle}"/>
+                                    <UniformGrid Grid.Column="1" Rows="1" Columns="4">
+                                        <ContentControl Content="준비 완료" BorderBrush="{StaticResource RgvReadyBrush}" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                        <ContentControl Content="수동 상태" BorderBrush="{StaticResource RgvManualBrush}" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                        <ContentControl Content="작업중" BorderBrush="{StaticResource RgvWorkingBrush}" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                        <ContentControl Content="에러" BorderBrush="{StaticResource RgvErrorBrush}" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                    </UniformGrid>
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <!-- 3. 적재 현황 -->
+                        <Border x:Name="InventorySummaryPanel"
+                            Grid.Column="4"
+                            Background="#F7FAFF"
+                            BorderBrush="#AFC5E5"
+                            BorderThickness="1"
+                            CornerRadius="4">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Label Grid.Row="0" Grid.Column="0" Content="적재현황" Style="{StaticResource MonitorTableHeaderStyle}"/>
+                                <Label Grid.Row="0" Grid.Column="1" Content="전체 셀" Style="{StaticResource MonitorTableHeaderStyle}"/>
+                                <Label Grid.Row="0" Grid.Column="2" Content="사용 셀" Style="{StaticResource MonitorTableHeaderStyle}"/>
+                                <Label Grid.Row="0" Grid.Column="3" Content="빈 셀" Style="{StaticResource MonitorTableHeaderStyle}"/>
+                                <Label Grid.Row="0" Grid.Column="4" Content="적재율(%)" Style="{StaticResource MonitorTableHeaderStyle}"/>
+
+                                <Label Grid.Row="1" Grid.Column="0" Content="1호기" Style="{StaticResource MonitorTableHeaderStyle}"/>
+                                <Label x:Name="InventorySc01Total" Grid.Row="1" Grid.Column="1" Content="{Binding InventoryStates[01].TotalCells}" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventorySc01Used" Grid.Row="1" Grid.Column="2" Content="{Binding InventoryStates[01].UsedCells}" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventorySc01Empty" Grid.Row="1" Grid.Column="3" Content="{Binding InventoryStates[01].EmptyCells}" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventorySc01Rate" Grid.Row="1" Grid.Column="4" Content="{Binding InventoryStates[01].OccupancyRate, StringFormat={}{0:0.0}}" Style="{StaticResource MonitorTableCellStyle}"/>
+
+                                <Label Grid.Row="2" Grid.Column="0" Content="2호기" Style="{StaticResource MonitorTableHeaderStyle}"/>
+                                <Label x:Name="InventorySc02Total" Grid.Row="2" Grid.Column="1" Content="{Binding InventoryStates[02].TotalCells}" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventorySc02Used" Grid.Row="2" Grid.Column="2" Content="{Binding InventoryStates[02].UsedCells}" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventorySc02Empty" Grid.Row="2" Grid.Column="3" Content="{Binding InventoryStates[02].EmptyCells}" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventorySc02Rate" Grid.Row="2" Grid.Column="4" Content="{Binding InventoryStates[02].OccupancyRate, StringFormat={}{0:0.0}}" Style="{StaticResource MonitorTableCellStyle}"/>
+
+                                <Label Grid.Row="3" Grid.Column="0" Content="3호기" Style="{StaticResource MonitorTableHeaderStyle}"/>
+                                <Label x:Name="InventorySc03Total" Grid.Row="3" Grid.Column="1" Content="{Binding InventoryStates[03].TotalCells}" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventorySc03Used" Grid.Row="3" Grid.Column="2" Content="{Binding InventoryStates[03].UsedCells}" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventorySc03Empty" Grid.Row="3" Grid.Column="3" Content="{Binding InventoryStates[03].EmptyCells}" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventorySc03Rate" Grid.Row="3" Grid.Column="4" Content="{Binding InventoryStates[03].OccupancyRate, StringFormat={}{0:0.0}}" Style="{StaticResource MonitorTableCellStyle}"/>
+
+                                <Label Grid.Row="4" Grid.Column="0" Content="4호기" Style="{StaticResource MonitorTableHeaderStyle}"/>
+                                <Label x:Name="InventorySc04Total" Grid.Row="4" Grid.Column="1" Content="{Binding InventoryStates[04].TotalCells}" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventorySc04Used" Grid.Row="4" Grid.Column="2" Content="{Binding InventoryStates[04].UsedCells}" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventorySc04Empty" Grid.Row="4" Grid.Column="3" Content="{Binding InventoryStates[04].EmptyCells}" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventorySc04Rate" Grid.Row="4" Grid.Column="4" Content="{Binding InventoryStates[04].OccupancyRate, StringFormat={}{0:0.0}}" Style="{StaticResource MonitorTableCellStyle}"/>
+
+                                <Label Grid.Row="5" Grid.Column="0" Content="5호기" Style="{StaticResource MonitorTableHeaderStyle}"/>
+                                <Label x:Name="InventorySc05Total" Grid.Row="5" Grid.Column="1" Content="{Binding InventoryStates[05].TotalCells}" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventorySc05Used" Grid.Row="5" Grid.Column="2" Content="{Binding InventoryStates[05].UsedCells}" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventorySc05Empty" Grid.Row="5" Grid.Column="3" Content="{Binding InventoryStates[05].EmptyCells}" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventorySc05Rate" Grid.Row="5" Grid.Column="4" Content="{Binding InventoryStates[05].OccupancyRate, StringFormat={}{0:0.0}}" Style="{StaticResource MonitorTableCellStyle}"/>
+
+                                <Label Grid.Row="6" Grid.Column="0" Content="6호기" Style="{StaticResource MonitorTableHeaderStyle}"/>
+                                <Label x:Name="InventorySc06Total" Grid.Row="6" Grid.Column="1" Content="{Binding InventoryStates[06].TotalCells}" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventorySc06Used" Grid.Row="6" Grid.Column="2" Content="{Binding InventoryStates[06].UsedCells}" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventorySc06Empty" Grid.Row="6" Grid.Column="3" Content="{Binding InventoryStates[06].EmptyCells}" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventorySc06Rate" Grid.Row="6" Grid.Column="4" Content="{Binding InventoryStates[06].OccupancyRate, StringFormat={}{0:0.0}}" Style="{StaticResource MonitorTableCellStyle}"/>
+
+                                <Label Grid.Row="7" Grid.Column="0" Content="7호기" Style="{StaticResource MonitorTableHeaderStyle}"/>
+                                <Label x:Name="InventorySc07Total" Grid.Row="7" Grid.Column="1" Content="{Binding InventoryStates[07].TotalCells}" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventorySc07Used" Grid.Row="7" Grid.Column="2" Content="{Binding InventoryStates[07].UsedCells}" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventorySc07Empty" Grid.Row="7" Grid.Column="3" Content="{Binding InventoryStates[07].EmptyCells}" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventorySc07Rate" Grid.Row="7" Grid.Column="4" Content="{Binding InventoryStates[07].OccupancyRate, StringFormat={}{0:0.0}}" Style="{StaticResource MonitorTableCellStyle}"/>
+
+                                <Label Grid.Row="8" Grid.Column="0" Content="상품" Style="{StaticResource MonitorTableHeaderStyle}"/>
+                                <Label x:Name="InventoryGoodsTotal" Grid.Row="8" Grid.Column="1" Content="{Binding InventoryGoods.TotalCells}" Background="#EDF3FC" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventoryGoodsUsed" Grid.Row="8" Grid.Column="2" Content="{Binding InventoryGoods.UsedCells}" Background="#EDF3FC" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventoryGoodsEmpty" Grid.Row="8" Grid.Column="3" Content="{Binding InventoryGoods.EmptyCells}" Background="#EDF3FC" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventoryGoodsRate" Grid.Row="8" Grid.Column="4" Content="{Binding InventoryGoods.OccupancyRate, StringFormat={}{0:0.0}}" Background="#EDF3FC" Style="{StaticResource MonitorTableCellStyle}"/>
+
+                                <Label Grid.Row="9" Grid.Column="0" Content="제품" Style="{StaticResource MonitorTableHeaderStyle}"/>
+                                <Label x:Name="InventoryProductsTotal" Grid.Row="9" Grid.Column="1" Content="{Binding InventoryProducts.TotalCells}" Background="#EDF3FC" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventoryProductsUsed" Grid.Row="9" Grid.Column="2" Content="{Binding InventoryProducts.UsedCells}" Background="#EDF3FC" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventoryProductsEmpty" Grid.Row="9" Grid.Column="3" Content="{Binding InventoryProducts.EmptyCells}" Background="#EDF3FC" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventoryProductsRate" Grid.Row="9" Grid.Column="4" Content="{Binding InventoryProducts.OccupancyRate, StringFormat={}{0:0.0}}" Background="#EDF3FC" Style="{StaticResource MonitorTableCellStyle}"/>
+
+                                <Label Grid.Row="10" Grid.Column="0" Content="TOTAL" Style="{StaticResource MonitorTableHeaderStyle}"/>
+                                <Label x:Name="InventoryTotalCells" Grid.Row="10" Grid.Column="1" Content="{Binding InventoryTotal.TotalCells}" Background="#E3EBF8" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventoryUsedCells" Grid.Row="10" Grid.Column="2" Content="{Binding InventoryTotal.UsedCells}" Background="#E3EBF8" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventoryEmptyCells" Grid.Row="10" Grid.Column="3" Content="{Binding InventoryTotal.EmptyCells}" Background="#E3EBF8" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label x:Name="InventoryRate" Grid.Row="10" Grid.Column="4" Content="{Binding InventoryTotal.OccupancyRate, StringFormat={}{0:0.0}}" Background="#E3EBF8" Style="{StaticResource MonitorTableCellStyle}"/>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Viewbox>
+            </Grid>
+        </Border>
+
+        <!-- 우측 상세 영역 -->
+        <Border Grid.Column="1"
+                Margin="0,8,8,8"
+                Padding="12"
+                Background="White"
+                BorderBrush="#CBD1D8"
+                BorderThickness="1"
+                CornerRadius="5" Grid.RowSpan="2">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="12"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="2*"/>
+                </Grid.RowDefinitions>
+
+                <!-- 스택커 크레인 출고 예약 현황 -->
+                <Border Grid.Row="0"
+                        Style="{StaticResource MonitorRightSectionTitleStyle}">
+                    <TextBlock Text="스택커 크레인 출고 예약 현황"
+                               VerticalAlignment="Center"
+                               Foreground="White"
+                               FontSize="13"
+                               FontWeight="Bold"/>
+                </Border>
+
+                <DataGrid x:Name="StackerOutboundReservationGrid"
+                          Grid.Row="1"
+                          Margin="0,4,0,0"
+                          ItemsSource="{Binding Sc1OutboundReservations}"
+                          Style="{StaticResource MonitorDataGridStyle}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="출고 순번" Width="0.9*" MinWidth="85" Binding="{Binding OutboundSequence}"/>
+                        <DataGridTextColumn Header="호기" Width="0.55*" MinWidth="55" Binding="{Binding CraneNo}"/>
+                        <DataGridTextColumn Header="저장위치" Width="1.25*" MinWidth="125" Binding="{Binding StorageLocation}"/>
+                        <DataGridTextColumn Header="S/T" Width="0.55*" MinWidth="55" Binding="{Binding StockType}"/>
+                        <DataGridTextColumn Header="긴급" Width="0.55*" MinWidth="55" Binding="{Binding IsEmergency}"/>
+                        <DataGridTextColumn Header="지시일자" Width="1.15*" MinWidth="120" Binding="{Binding InstructionDate}"/>
+                        <DataGridTextColumn Header="지시시간" Width="1*" MinWidth="115" Binding="{Binding InstructionTime}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <!-- 컨베어 트랙킹 정보 -->
+                <Border Grid.Row="3"
+                        Style="{StaticResource MonitorRightSectionTitleStyle}">
+                    <TextBlock Text="컨베어 트랙킹 정보"
+                               VerticalAlignment="Center"
+                               Foreground="White"
+                               FontSize="13"
+                               FontWeight="Bold"/>
+                </Border>
+
+                <DataGrid x:Name="ConveyorTrackingGrid"
+                          Grid.Row="4"
+                          Margin="0,4,0,0"
+                          ItemsSource="{Binding Sc1TrackingItems}"
+                          Style="{StaticResource MonitorDataGridStyle}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="순번" Width="0.65*" MinWidth="70" Binding="{Binding Sequence}"/>
+                        <DataGridTextColumn Header="저장위치" Width="1.3*" MinWidth="150" Binding="{Binding StorageLocation}"/>
+                        <DataGridTextColumn Header="구분" Width="0.7*" MinWidth="80" Binding="{Binding Type}"/>
+                        <DataGridTextColumn Header="등록일자" Width="1.15*" MinWidth="150" Binding="{Binding RegisteredDate}"/>
+                        <DataGridTextColumn Header="등록시간" Width="1*" MinWidth="150" Binding="{Binding RegisteredTime}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+            </Grid>
+        </Border>
+
+    </Grid>
+</UserControl>
+
+

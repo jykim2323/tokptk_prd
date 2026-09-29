@@ -31,5 +31,5 @@ public abstract partial class DocumentViewModelBase : ObservableObject, IDisposa
     public string ContentId { get; protected set; } = "";
 
 
-    public void Dispose() { }
+    public virtual void Dispose() { }
 }

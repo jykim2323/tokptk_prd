@@ -1,0 +1,453 @@
+<UserControl x:Class="TOK.WMS.UI.Views.MainMenus.Controls.SystemOperationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Loaded="UserControl_Loaded"
+             Background="{DynamicResource AppBackgroundBrush}"
+             Foreground="{DynamicResource AppTextBrush}">
+
+    <UserControl.Resources>
+        <Style x:Key="SystemOperationModeRadioStyle" TargetType="RadioButton">
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="Margin" Value="0,1"/>
+            <Setter Property="Padding" Value="4,0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <Style x:Key="SystemOperationFieldLabelStyle" TargetType="Border">
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="MinWidth" Value="112"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="Background" Value="#243F64"/>
+            <Setter Property="BorderBrush" Value="#1C3555"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="4,0,0,4"/>
+        </Style>
+
+        <Style x:Key="SystemOperationValueTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="MinWidth" Value="105"/>
+            <Setter Property="Padding" Value="10,3"/>
+            <Setter Property="FontFamily" Value="Consolas"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Background" Value="{DynamicResource InputBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}"/>
+            <Setter Property="CaretBrush" Value="{DynamicResource AppTextBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- 화면 제목 및 DB 연동 상태 -->
+        <Border Grid.Row="0"
+                Padding="16,10"
+                Background="{DynamicResource AppSurfaceBrush}"
+                BorderBrush="{DynamicResource AppBorderBrush}"
+                BorderThickness="0,3,0,3">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="36" Height="36" CornerRadius="7"
+                            Background="#DCECF8"
+                            Margin="0,0,10,0">
+                        <TextBlock Text="🛠️"
+                                   FontFamily="Consolas"
+                                   FontSize="13"
+                                   FontWeight="Bold"
+                                   Foreground="#315F8B"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="시스템 운전 설정" FontSize="16" FontWeight="Bold"/>
+                        <!--<TextBlock Text="시스템 운전 설정."
+                                   Margin="0,2,0,0" FontSize="11"
+                                   Foreground="{DynamicResource AppTextSubBrush}"/>-->
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center">
+                    <Border Height="30"
+                            Padding="10,0"
+                            Margin="0,0,8,0"
+                            CornerRadius="15"
+                            Background="#E7F4EA"
+                            BorderBrush="#A8D3B3"
+                            BorderThickness="1">
+                        <TextBlock Text="현재 1층 운영"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="#25743A"
+                                   VerticalAlignment="Center"/>
+                    </Border>
+
+                    <Border Height="30"
+                            Padding="10,0"
+                            Margin="0,0,10,0"
+                            CornerRadius="15"
+                            Background="{DynamicResource AppSurface2Brush}"
+                            BorderBrush="{DynamicResource AppBorderBrush}"
+                            BorderThickness="1">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Ellipse Width="8" Height="8" Margin="0,0,7,0">
+                                <Ellipse.Style>
+                                    <Style TargetType="Ellipse">
+                                        <Setter Property="Fill" Value="{DynamicResource StatusIdleBrush}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                                                <Setter Property="Fill" Value="{DynamicResource StatusRunningBrush}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsConnected}" Value="False">
+                                                <Setter Property="Fill" Value="{DynamicResource StatusErrorBrush}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Ellipse.Style>
+                            </Ellipse>
+                            <StackPanel>
+                                <TextBlock Text="{Binding StatusMessage}"
+                                           MaxWidth="250"
+                                           FontSize="11"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <TextBlock FontSize="9"
+                                           Foreground="{DynamicResource AppTextSubBrush}">
+                                    <Run Text="최종 조회 "/>
+                                    <Run Text="{Binding LastUpdatedText}"/>
+                                </TextBlock>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Button Style="{StaticResource ScSignalRefreshButtonStyle}"
+                            Command="{Binding RefreshCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="↻" FontSize="15" Margin="0,0,6,0"/>
+                            <TextBlock Text="조 회" FontSize="12" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <ScrollViewer Grid.Row="1"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="16">
+
+                <!-- 현재는 1층만 표시한다. FloorSettings에 층을 추가하면 같은 UI가 자동 생성된다. -->
+                <ItemsControl ItemsSource="{Binding FloorSettings}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource ScSignalSectionCardStyle}"
+                                    Padding="16"
+                                    Margin="0,0,0,14">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <Grid Grid.Row="0" Margin="0,0,0,14">
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding DisplayName}"
+                                                           FontSize="17"
+                                                           FontWeight="Bold"
+                                                           VerticalAlignment="Center"/>
+                                                <Border Margin="9,0,0,0"
+                                                        Padding="8,2"
+                                                        CornerRadius="9"
+                                                        Background="#E7F4EA">
+                                                    <TextBlock Text="운영 중"
+                                                               FontSize="10"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="#25743A"/>
+                                                </Border>
+                                            </StackPanel>
+                                            <TextBlock Text="호기별 입고·출고 가능 상태를 선택한 뒤 수정 버튼을 눌러 적용합니다."
+                                                       FontSize="11"
+                                                       Margin="0,3,0,0"
+                                                       Foreground="{DynamicResource AppTextSubBrush}"/>
+                                        </StackPanel>
+
+                                        <Button HorizontalAlignment="Right"
+                                                VerticalAlignment="Center"
+                                                Style="{StaticResource ScSignalModifyButtonStyle}"
+                                                Command="{Binding DataContext.SaveFloorCommand,
+                                                    RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"
+                                                Content="수 정"/>
+                                    </Grid>
+
+                                    <ItemsControl Grid.Row="1" ItemsSource="{Binding Cranes}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <UniformGrid Columns="7"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Margin="4"
+                                                        Padding="12,10"
+                                                        MinHeight="157"
+                                                        Background="{DynamicResource AppSurface2Brush}"
+                                                        BorderBrush="{DynamicResource AppBorderBrush}"
+                                                        BorderThickness="1"
+                                                        CornerRadius="6">
+                                                    <StackPanel>
+                                                        <StackPanel Orientation="Horizontal"
+                                                                    Margin="0,0,0,7">
+                                                            <Border Width="26"
+                                                                    Height="26"
+                                                                    Margin="0,0,7,0"
+                                                                    CornerRadius="13"
+                                                                    Background="#315F8B">
+                                                                <TextBlock Text="{Binding CraneNo}"
+                                                                           FontSize="11"
+                                                                           FontWeight="Bold"
+                                                                           Foreground="White"
+                                                                           HorizontalAlignment="Center"
+                                                                           VerticalAlignment="Center"/>
+                                                            </Border>
+                                                            <TextBlock Text="{Binding DisplayName}"
+                                                                       FontSize="13"
+                                                                       FontWeight="Bold"
+                                                                       VerticalAlignment="Center"/>
+                                                        </StackPanel>
+
+                                                        <RadioButton Content="입고가능"
+                                                                     GroupName="{Binding GroupName}"
+                                                                     IsChecked="{Binding IsInboundAvailable, Mode=TwoWay}"
+                                                                     Foreground="{DynamicResource AppTextBrush}"
+                                                                     Style="{StaticResource SystemOperationModeRadioStyle}"/>
+                                                        <RadioButton Content="출고가능"
+                                                                     GroupName="{Binding GroupName}"
+                                                                     IsChecked="{Binding IsOutboundAvailable, Mode=TwoWay}"
+                                                                     Foreground="#159447"
+                                                                     Style="{StaticResource SystemOperationModeRadioStyle}"/>
+                                                        <RadioButton Content="입출고가능"
+                                                                     GroupName="{Binding GroupName}"
+                                                                     IsChecked="{Binding IsBothAvailable, Mode=TwoWay}"
+                                                                     Foreground="#2563EB"
+                                                                     Style="{StaticResource SystemOperationModeRadioStyle}"/>
+                                                        <RadioButton Content="입출고금지"
+                                                                     GroupName="{Binding GroupName}"
+                                                                     IsChecked="{Binding IsDisabled, Mode=TwoWay}"
+                                                                     Foreground="#E13232"
+                                                                     Style="{StaticResource SystemOperationModeRadioStyle}"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- 작업순번 -->
+                    <Border Grid.Column="0"
+                            Style="{StaticResource ScSignalSectionCardStyle}"
+                            Padding="16">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0" Margin="0,0,0,14">
+                                <StackPanel>
+                                    <TextBlock Text="작업순번"
+                                               FontSize="16"
+                                               FontWeight="Bold"/>
+                                    <TextBlock Text="다음 작업 생성에 사용할 순번을 관리합니다."
+                                               Margin="0,3,0,0"
+                                               FontSize="11"
+                                               Foreground="{DynamicResource AppTextSubBrush}"/>
+                                </StackPanel>
+                                <Button HorizontalAlignment="Right"
+                                        VerticalAlignment="Center"
+                                        Style="{StaticResource ScSignalModifyButtonStyle}"
+                                        Command="{Binding SaveSequencesCommand}"
+                                        Content="수 정"/>
+                            </Grid>
+
+                            <UniformGrid Grid.Row="1" Columns="2">
+                                <Grid Margin="4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border Style="{StaticResource SystemOperationFieldLabelStyle}">
+                                        <TextBlock Text="입고순번"
+                                                   Foreground="White"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"/>
+                                    </Border>
+                                    <TextBox Grid.Column="1"
+                                             MaxLength="18"
+                                             Style="{StaticResource SystemOperationValueTextBoxStyle}"
+                                             Text="{Binding WorkSequences.InboundSequence,
+                                                Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
+
+                                <Grid Margin="4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border Style="{StaticResource SystemOperationFieldLabelStyle}">
+                                        <TextBlock Text="재입고순번"
+                                                   Foreground="White"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"/>
+                                    </Border>
+                                    <TextBox Grid.Column="1"
+                                             MaxLength="18"
+                                             Style="{StaticResource SystemOperationValueTextBoxStyle}"
+                                             Text="{Binding WorkSequences.ReInboundSequence,
+                                                Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
+
+                                <Grid Margin="4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border Style="{StaticResource SystemOperationFieldLabelStyle}">
+                                        <TextBlock Text="출고순번"
+                                                   Foreground="White"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"/>
+                                    </Border>
+                                    <TextBox Grid.Column="1"
+                                             MaxLength="18"
+                                             Style="{StaticResource SystemOperationValueTextBoxStyle}"
+                                             Text="{Binding WorkSequences.OutboundSequence,
+                                                Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
+
+                                <Grid Margin="4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border Style="{StaticResource SystemOperationFieldLabelStyle}">
+                                        <TextBlock Text="공파레트순번"
+                                                   Foreground="White"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"/>
+                                    </Border>
+                                    <TextBox Grid.Column="1"
+                                             MaxLength="18"
+                                             Style="{StaticResource SystemOperationValueTextBoxStyle}"
+                                             Text="{Binding WorkSequences.EmptyPalletSequence,
+                                                Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
+                            </UniformGrid>
+                        </Grid>
+                    </Border>
+
+                    <!-- 입고호기 -->
+                    <Border Grid.Column="2"
+                            Style="{StaticResource ScSignalSectionCardStyle}"
+                            Padding="16">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0" Margin="0,0,0,14">
+                                <StackPanel>
+                                    <TextBlock Text="호기"
+                                               FontSize="16"
+                                               FontWeight="Bold"/>
+                                    <TextBlock Text="입고 작업을 우선 배정할 호기입니다."
+                                               Margin="0,3,0,0"
+                                               FontSize="11"
+                                               Foreground="{DynamicResource AppTextSubBrush}"/>
+                                </StackPanel>
+                                <Button HorizontalAlignment="Right"
+                                        VerticalAlignment="Center"
+                                        Style="{StaticResource ScSignalModifyButtonStyle}"
+                                        Command="{Binding SaveInboundCraneCommand}"
+                                        Content="수 정"/>
+                            </Grid>
+
+                            <Grid Grid.Row="1"
+                                  Margin="4"
+                                  MaxWidth="330"
+                                  HorizontalAlignment="Left"
+                                  VerticalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="150"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Style="{StaticResource SystemOperationFieldLabelStyle}">
+                                    <TextBlock Text="입고호기"
+                                               Foreground="White"
+                                               FontSize="12"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                                </Border>
+                                <TextBox Grid.Column="1"
+                                         MaxLength="1"
+                                         Style="{StaticResource SystemOperationValueTextBoxStyle}"
+                                         Text="{Binding InboundCrane,
+                                            Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <Border Margin="0,12,0,0"
+                        Padding="12,8"
+                        CornerRadius="5"
+                        Background="{DynamicResource AppSurface2Brush}"
+                        BorderBrush="{DynamicResource AppBorderBrush}"
+                        BorderThickness="1">
+                    <TextBlock FontSize="10.5"
+                               Foreground="{DynamicResource AppTextSubBrush}">
+                        <Run Text="※ 현재는 1층만 운영하며 스태커 크레인 1~7호기를 설정합니다. "/>
+                        <Run Text="2층은 현장 운영 및 DB 구조가 확정된 뒤 같은 형식으로 추가할 예정입니다."/>
+                    </TextBlock>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
