@@ -324,5 +324,25 @@ public partial class Frm6900ViewModel : DocumentViewModelBase
             _dialog.ShowMessage($"삭제 실패: {ex.Message}", "오류");
         }
     }
+
+    [RelayCommand]
+    private async Task MouseDoubleClick(Frm6900Dto.SubkDto item)
+    {
+        try
+        {
+            if (item == null && SubkItems != null)
+            {
+                item = (SubkItems.FirstOrDefault());
+            }
+            item?.Modify = true;
+            item.SubkLotno = SelectedSubkItem?.SubkLotno ?? SubkItems.FirstOrDefault()?.SubkLotno ?? item?.SubkLotno;
+            _windowService.ShowSFrm6130(item ?? new Frm6900Dto.SubkDto());
+            this.SearchCommand.Execute(null);
+        }
+        catch (Exception ex)
+        {
+            _dialog.ShowMessage($"화면 생성 실패: {ex.Message}", "오류");
+        }
+    }
 }
 

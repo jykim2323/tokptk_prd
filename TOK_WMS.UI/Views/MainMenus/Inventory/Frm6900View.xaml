@@ -217,7 +217,7 @@
                                 </DataGrid.Columns>
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="MouseDoubleClick">
-                                        <i:InvokeCommandAction Command="{Binding ModifyCommand}" CommandParameter="{Binding SelectedItem, ElementName=DB_Table1}" />
+                                        <i:InvokeCommandAction Command="{Binding ModifyCommand}" CommandParameter="{Binding SelectedSubkItem , Mode=TwoWay}" />
                                     </i:EventTrigger>
                                     <i:EventTrigger EventName="SelectionChanged">
                                         <i:InvokeCommandAction Command="{Binding SubkSearchCommand}" CommandParameter="{Binding SelectedItem, ElementName=DB_Table1}" />
