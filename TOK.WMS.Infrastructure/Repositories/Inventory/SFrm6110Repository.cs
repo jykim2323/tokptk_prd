@@ -16,7 +16,7 @@ public class SFrm6110Repository(DbConnectionFactory db) : ISFrm6110Repository
         using var conn = db.Create();
 
         var sql = @"
-                    UPDATE T1MILSTK
+                    UPDATE T2MILSTK
                     SET
                         LSTK_FLAG   = @_strFlag,
                         LSTK_INDATE = @_strInDate,

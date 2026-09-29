@@ -40,7 +40,7 @@ public class Frm4102Repository(
 
                 A.HO_FLAG      AS HoFlag
 
-            FROM T1HHOUPT A WITH (NOLOCK)
+            FROM T2HHOUPT A WITH (NOLOCK)
 
             LEFT OUTER JOIN MIMAST B WITH (NOLOCK)
                 ON B.MAST_CODE = A.HO_CODE
@@ -147,7 +147,7 @@ public class Frm4102Repository(
             const string duplicateSql = @"
                 SELECT COUNT(*)
 
-                FROM T1HHOUPT WITH (NOLOCK)
+                FROM T2HHOUPT WITH (NOLOCK)
 
                 WHERE HO_DATE = @HoDate
                   AND HO_CHASU = @HoChasu
@@ -187,7 +187,7 @@ public class Frm4102Repository(
             // =================================================
 
             await conn.ExecuteAsync(
-                "DELETE FROM T1TIODAT",
+                "DELETE FROM T2TIODAT",
                 transaction: tx);
 
 
@@ -223,7 +223,7 @@ public class Frm4102Repository(
 
                 // Delphi Output_Resv_Proc 마지막 HO_FLAG UPDATE
                 const string flagSql = @"
-                    UPDATE T1HHOUPT
+                    UPDATE T2HHOUPT
 
                     SET HO_FLAG = 'Y'
 
@@ -335,7 +335,7 @@ public class Frm4102Repository(
         //        STAT_ODATE AS StatOdate,
         //        ISNULL(STAT_OINDX, 1) AS StatOindx
 
-        //    FROM T1TBSTAT WITH (UPDLOCK, HOLDLOCK)
+        //    FROM T2TBSTAT WITH (UPDLOCK, HOLDLOCK)
 
         //    WHERE STAT_PSWD = 'JPLS'
         //";
@@ -349,7 +349,7 @@ public class Frm4102Repository(
                 STAT_ODATE AS StatOdate,
                 ISNULL(STAT_OINDX, 1) AS StatOindx
 
-            FROM T1TBSTAT WITH (UPDLOCK, HOLDLOCK)
+            FROM T2TBSTAT WITH (UPDLOCK, HOLDLOCK)
 
             WHERE STAT_PSWD = 'JPLS'
         ";
@@ -454,9 +454,9 @@ public class Frm4102Repository(
 
                 L.LSTK_FLAG   AS LstkFlag
 
-            FROM T1MISUBK S WITH (UPDLOCK, ROWLOCK)
+            FROM T2MISUBK S WITH (UPDLOCK, ROWLOCK)
 
-            INNER JOIN T1MILSTK L WITH (UPDLOCK, ROWLOCK)
+            INNER JOIN T2MILSTK L WITH (UPDLOCK, ROWLOCK)
                 ON L.LSTK_LOCA = S.SUBK_LOCA
 
             WHERE L.LSTK_FLAG = @LstkFlag
@@ -544,7 +544,7 @@ public class Frm4102Repository(
             // =============================================
 
             const string updateSubkSql = @"
-                UPDATE T1MISUBK
+                UPDATE T2MISUBK
 
                 SET
                     SUBK_FLAG = 'M',
@@ -588,7 +588,7 @@ public class Frm4102Repository(
 
             await conn.ExecuteAsync(
                 @"
-                    UPDATE T1MILSTK
+                    UPDATE T2MILSTK
 
                     SET LSTK_FLAG = 'M'
 
@@ -603,7 +603,7 @@ public class Frm4102Repository(
 
 
             // =============================================
-            // T1TIODAT
+            // T2TIODAT
             // =============================================
 
             await UpsertTiodatAsync(
@@ -736,7 +736,7 @@ public class Frm4102Repository(
                 SUBK_BOXNO  AS SubkBoxno,
                 SUBK_REMARK AS SubkRemark
 
-            FROM T1MISUBK WITH (UPDLOCK, ROWLOCK)
+            FROM T2MISUBK WITH (UPDLOCK, ROWLOCK)
 
             WHERE SUBK_PLTNO = @PltNo
               AND NOT
@@ -774,7 +774,7 @@ public class Frm4102Repository(
         {
             await conn.ExecuteAsync(
                 @"
-                    UPDATE T1MISUBK
+                    UPDATE T2MISUBK
 
                     SET SUBK_FLAG = 'M'
 
@@ -871,7 +871,7 @@ public class Frm4102Repository(
         const string existsSql = @"
             SELECT COUNT(*)
 
-            FROM T1TIODAT WITH (UPDLOCK, HOLDLOCK)
+            FROM T2TIODAT WITH (UPDLOCK, HOLDLOCK)
 
             WHERE ODAT_DATE = @Date
               AND ODAT_CHASU = @Chasu
@@ -905,7 +905,7 @@ public class Frm4102Repository(
 
 
             const string updateSql = @"
-                UPDATE T1TIODAT
+                UPDATE T2TIODAT
 
                 SET
                     ODAT_RQTY = @OutQty,
@@ -963,7 +963,7 @@ public class Frm4102Repository(
 
 
         const string insertSql = @"
-            INSERT INTO T1TIODAT
+            INSERT INTO T2TIODAT
             (
                 ODAT_DATE,
                 ODAT_CHASU,
@@ -1066,7 +1066,7 @@ public class Frm4102Repository(
 
 
     // =========================================================
-    // T1TIODAT → T1TISCHE1 / T1MIOUPT  
+    // T2TIODAT → T2TISCHE1 / T2MIOUPT  
     // =========================================================
 
     private static async Task CreateOutletDataAsync(
@@ -1096,9 +1096,9 @@ public class Frm4102Repository(
                 MAX(S.SUBK_PLTNO) AS SubkPltno,
                 MAX(S.SUBK_WGT) AS SubkWgt
 
-            FROM T1TIODAT O WITH (NOLOCK)
+            FROM T2TIODAT O WITH (NOLOCK)
 
-            LEFT JOIN T1MISUBK S WITH (NOLOCK)
+            LEFT JOIN T2MISUBK S WITH (NOLOCK)
                 ON S.SUBK_LOCA = O.ODAT_LOCA
                AND S.SUBK_CODE = O.ODAT_CODE
                AND S.SUBK_LOTNO = O.ODAT_LOTNO
@@ -1159,7 +1159,7 @@ public class Frm4102Repository(
                                 ISNULL(SUM(SUBK_WGT), 0) AS TotalQty,
                                 ISNULL(SUM(SUBK_RWGT), 0) AS TotalOutQty
 
-                            FROM T1MISUBK WITH (NOLOCK)
+                            FROM T2MISUBK WITH (NOLOCK)
 
                             WHERE SUBK_LOCA = @Loca
                         ",
@@ -1227,7 +1227,7 @@ public class Frm4102Repository(
 
 
             const string insertOutputSql = @"
-                INSERT INTO T1MIOUPT
+                INSERT INTO T2MIOUPT
                 (
                     OUPT_DATE,
                     OUPT_INDEX,
@@ -1379,7 +1379,7 @@ public class Frm4102Repository(
 
             await conn.ExecuteAsync(
                 @"
-                    UPDATE T1MILSTK
+                    UPDATE T2MILSTK
 
                     SET LSTK_FLAG = 'Y'
 
@@ -1408,7 +1408,7 @@ public class Frm4102Repository(
                 STAT_ODATE,
                 ISNULL(STAT_OINDX, 1) STAT_OINDX
 
-            FROM T1TBSTAT WITH (UPDLOCK, HOLDLOCK)
+            FROM T2TBSTAT WITH (UPDLOCK, HOLDLOCK)
 
             WHERE STAT_PSWD = 'JPLS'
         ";
@@ -1442,7 +1442,7 @@ public class Frm4102Repository(
 
             await conn.ExecuteAsync(
                 @"
-                    UPDATE T1TBSTAT
+                    UPDATE T2TBSTAT
 
                     SET STAT_OINDX =
                         CASE
@@ -1463,7 +1463,7 @@ public class Frm4102Repository(
 
             await conn.ExecuteAsync(
                 @"
-                    UPDATE T1TBSTAT
+                    UPDATE T2TBSTAT
 
                     SET
                         STAT_ODATE = @Today,
@@ -1498,7 +1498,7 @@ public class Frm4102Repository(
                 SELECT
                     ISNULL(MAX(OUPT_SEQNO), 0) + 1
 
-                FROM T1MIOUPT WITH (UPDLOCK, HOLDLOCK)
+                FROM T2MIOUPT WITH (UPDLOCK, HOLDLOCK)
 
                 WHERE OUPT_INDEX = @Index
             ",
@@ -1573,14 +1573,14 @@ public class Frm4102Repository(
             (
                 SELECT 1
 
-                FROM T1TISCHE1
+                FROM T2TISCHE1
 
                 WHERE SCHE_SC = @Sc
                   AND SCHE_INDEX = @Index
             )
             BEGIN
 
-                INSERT INTO T1TISCHE1
+                INSERT INTO T2TISCHE1
                 (
                     SCHE_SC,
                     SCHE_INDEX,
@@ -1658,7 +1658,7 @@ public class Frm4102Repository(
     {
         await conn.ExecuteAsync(
             @"
-                UPDATE T1MILSTK
+                UPDATE T2MILSTK
 
                 SET LSTK_FLAG = 'Y'
 
@@ -1669,7 +1669,7 @@ public class Frm4102Repository(
 
         await conn.ExecuteAsync(
             @"
-                UPDATE T1MISUBK
+                UPDATE T2MISUBK
 
                 SET SUBK_FLAG = 'Y'
 
@@ -1691,7 +1691,7 @@ public class Frm4102Repository(
 
 
         const string sql = @"
-            DELETE FROM T1HHOUPT
+            DELETE FROM T2HHOUPT
 
             WHERE HO_CHASU = @HoChasu
               AND HO_DATE = @HoDate
@@ -1736,6 +1736,6 @@ public class Frm4102Repository(
 
 
         return await conn.ExecuteAsync(
-            "DELETE FROM T1HHOUPT");
+            "DELETE FROM T2HHOUPT");
     }
 }

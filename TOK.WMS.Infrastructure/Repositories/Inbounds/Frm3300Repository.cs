@@ -35,7 +35,7 @@ public class Frm3300Repository(DbConnectionFactory db) : IFrm3300Repository
                 INPT_ID       AS InptId,
                 INPT_LABEL    AS InptLabel,
                 INPT_PLTNO    AS InptPltno
-            FROM T1MIINPT WITH (NOLOCK)
+            FROM T2MIINPT WITH (NOLOCK)
 
             LEFT OUTER JOIN MIMAST WITH (NOLOCK)
                 ON MAST_CODE = INPT_CODE
@@ -64,7 +64,7 @@ public class Frm3300Repository(DbConnectionFactory db) : IFrm3300Repository
         try
         {
             var deleteSql = @"
-                DELETE FROM T1MIINPT
+                DELETE FROM T2MIINPT
                 WHERE INPT_CODE  = @InptCode
                   AND INPT_LOTNO = @InptLotno
                   AND INPT_INDEX = @InptIndex
@@ -82,7 +82,7 @@ public class Frm3300Repository(DbConnectionFactory db) : IFrm3300Repository
 
 
             var updateSql = @"
-                UPDATE T1MILSTK
+                UPDATE T2MILSTK
 
                 SET
                     LSTK_FLAG = '0',
@@ -120,7 +120,7 @@ public class Frm3300Repository(DbConnectionFactory db) : IFrm3300Repository
         using var conn = db.Create();
 
         var sql = @"
-            UPDATE T1MIINPT
+            UPDATE T2MIINPT
 
             SET INPT_LABEL = 'N'
 
@@ -148,7 +148,7 @@ public class Frm3300Repository(DbConnectionFactory db) : IFrm3300Repository
         using var conn = db.Create();
 
         var sql = @"
-            UPDATE T1MIINPT
+            UPDATE T2MIINPT
 
             SET INPT_LABEL = 'Y'
 

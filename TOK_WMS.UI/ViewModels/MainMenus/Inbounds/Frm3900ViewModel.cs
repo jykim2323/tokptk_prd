@@ -290,7 +290,7 @@ public partial class Frm3900ViewModel : DocumentViewModelBase
 
 
             // =================================================
-            // 5. T1MISUBK 조회
+            // 5. T2MISUBK 조회
             // =================================================
 
             var result =

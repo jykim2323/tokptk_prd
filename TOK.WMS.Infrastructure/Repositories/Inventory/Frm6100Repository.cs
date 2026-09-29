@@ -31,7 +31,7 @@ public class Frm6100Repository(DbConnectionFactory db, ICoreRepository coreRepo)
                         LSTK_INDATE AS LstkIndate,
                         LSTK_INTIME AS LstkIntime,
                         LSTK_PLTNO AS LstkPltno
-                    FROM T1MILSTK WITH (NOLOCK)
+                    FROM T2MILSTK WITH (NOLOCK)
                     WHERE LSTK_LOCA >= @_lstkLoca";
 
         return await conn.QueryAsync<Frm6100Dto.ResDto>(sql, new
@@ -61,7 +61,7 @@ public class Frm6100Repository(DbConnectionFactory db, ICoreRepository coreRepo)
                         GUBN1_NAME     AS Gubn1Name,
                         GUBN2_NAME     AS Gubn2Name,
                         GUBN3_NAME     AS Gubn3Name
-                     FROM T1MISUBK WITH (NOLOCK)
+                     FROM T2MISUBK WITH (NOLOCK)
                      LEFT OUTER JOIN MIMAST WITH (NOLOCK)
                          ON MAST_CODE = SUBK_CODE
                      LEFT OUTER JOIN MIGUBN1 WITH (NOLOCK)
@@ -83,7 +83,7 @@ public class Frm6100Repository(DbConnectionFactory db, ICoreRepository coreRepo)
     {
         using var conn = db.Create();
         var sql = @"SELECT COUNT(*)
-                    FROM T1MISUBK WITH (NOLOCK)
+                    FROM T2MISUBK WITH (NOLOCK)
                     WHERE SUBK_LOCA = @lstkLoca";
         var count = await conn.QuerySingleAsync<int>(sql, new
         {
@@ -96,7 +96,7 @@ public class Frm6100Repository(DbConnectionFactory db, ICoreRepository coreRepo)
     {
         using var conn = db.Create();
 
-        var sql = @"DELETE FROM T1MISUBK WHERE SUBK_LOCA = @subkLoca";
+        var sql = @"DELETE FROM T2MISUBK WHERE SUBK_LOCA = @subkLoca";
 
         return await conn.ExecuteAsync(sql, new
         {
@@ -107,7 +107,7 @@ public class Frm6100Repository(DbConnectionFactory db, ICoreRepository coreRepo)
     {
         using var conn = db.Create();
 
-        var sql = @"Update  T1MILSTK Set 
+        var sql = @"Update  T2MILSTK Set 
                             LSTK_FLAG = '0', 
                             LSTK_INDATE = '', 
                             LSTK_INTIME = '',
@@ -124,7 +124,7 @@ public class Frm6100Repository(DbConnectionFactory db, ICoreRepository coreRepo)
     {
         using var conn = db.Create();
         var sql = @"SELECT COUNT(*)
-                    FROM T1LSTK WITH (NOLOCK)
+                    FROM T2LSTK WITH (NOLOCK)
                     WHERE LSTK_LOCA = @lstkLoca";
         var count = await conn.QuerySingleAsync<int>(sql, new
         {
@@ -171,7 +171,7 @@ public class Frm6100Repository(DbConnectionFactory db, ICoreRepository coreRepo)
         using var conn = db.Create();
 
         var sql = @"
-                    UPDATE T1MISUBK
+                    UPDATE T2MISUBK
                     SET
                         SUBK_LOCA   = '',
                         SUBK_FLAG = '0',
@@ -192,7 +192,7 @@ public class Frm6100Repository(DbConnectionFactory db, ICoreRepository coreRepo)
         using var conn = db.Create();
 
         var sql = @"
-                    UPDATE T1MILSTK
+                    UPDATE T2MILSTK
                     SET
                         LSTK_INDATE   = '',
                         LSTK_INTIME = '',
@@ -213,7 +213,7 @@ public class Frm6100Repository(DbConnectionFactory db, ICoreRepository coreRepo)
     {
         using var conn = db.Create();
 
-        var sql = @"DELETE FROM T1MISUBK 
+        var sql = @"DELETE FROM T2MISUBK 
                     WHERE SUBK_LOCA = @subkLoca
                     AND SUBK_CODE = @subkCode
                     AND ISNULL(SUBK_LOTNO, '') = @subkLotno";
@@ -230,7 +230,7 @@ public class Frm6100Repository(DbConnectionFactory db, ICoreRepository coreRepo)
     {
         using var conn = db.Create();
 
-        var sql = @"UPDATE T1MILSTK 
+        var sql = @"UPDATE T2MILSTK 
                     SET LSTK_FLAG = '0', LSTK_INDATE = '', LSTK_INTIME = '', LSTK_PLTNO = ''
                     WHERE LSTK_LOCA = @lstkLoca ";
 

@@ -145,7 +145,7 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
 
                 if (deleteCount <= 0)
                 {
-                    _dialog.ShowMessage($"재고위치(T1MISUBK) '{item.LstkLoca}' 삭제 {deleteCount} 건 오류", "오류");
+                    _dialog.ShowMessage($"재고위치(T2MISUBK) '{item.LstkLoca}' 삭제 {deleteCount} 건 오류", "오류");
                     return;
                 }
 
@@ -153,7 +153,7 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
 
                 if (lstkclearCount <= 0)
                 {
-                    _dialog.ShowMessage($"재고위치(T1MILSTK) '{item.LstkLoca}' 삭제 {deleteCount} 건 오류", "오류");
+                    _dialog.ShowMessage($"재고위치(T2MILSTK) '{item.LstkLoca}' 삭제 {deleteCount} 건 오류", "오류");
                     return;
                 }
 
@@ -260,8 +260,8 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
             }
 
             // 셀 재고 취소
-            // T1MISUBK loca '' 초기화 flag  '0' 초기화 gubun '' 초기화
-            // T1MILSTK LSTK_INDATE, LSTK_INTIME, LSTK_PLTNO '' , LSTK_FLAG  '0' 초기화
+            // T2MISUBK loca '' 초기화 flag  '0' 초기화 gubun '' 초기화
+            // T2MILSTK LSTK_INDATE, LSTK_INTIME, LSTK_PLTNO '' , LSTK_FLAG  '0' 초기화
 
             var result = await _frm6100Api.CancelSubkAsync(item?.LstkLoca ?? string.Empty);
 

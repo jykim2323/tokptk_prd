@@ -28,7 +28,7 @@ public class SFrm6120Repository(DbConnectionFactory db, ICoreRepository coreRepo
                         A.SUBK_REMARK AS SubkRemark,
                         A.SUBK_INDATE AS SubkIndate,
                         A.SUBK_INTIME AS SubkIntime
-                    FROM T1MISUBK A WITH (NOLOCK)
+                    FROM T2MISUBK A WITH (NOLOCK)
                     LEFT OUTER JOIN MIMAST B WITH (NOLOCK)
                         ON A.SUBK_CODE = B.MAST_CODE
                     WHERE A.SUBK_PLTNO = @_subkPltno
@@ -45,7 +45,7 @@ public class SFrm6120Repository(DbConnectionFactory db, ICoreRepository coreRepo
         using var conn = db.Create();
 
         var sql = @"
-                    UPDATE T1MILSTK
+                    UPDATE T2MILSTK
                     SET
                         LSTK_FLAG   = @_strFlag,
                         LSTK_INDATE = @_strInDate,
@@ -105,7 +105,7 @@ public class SFrm6120Repository(DbConnectionFactory db, ICoreRepository coreRepo
                         MAST_GUBN1     AS Gubn1Name,
                         MAST_GUBN2     AS Gubn2Name,
                         MAST_GUBN3     AS Gubn3Name
-                     FROM T1MISUBK A WITH (NOLOCK) 
+                     FROM T2MISUBK A WITH (NOLOCK) 
                      LEFT OUTER JOIN MIMAST B WITH (NOLOCK)
                          ON B.MAST_CODE = A.SUBK_CODE
                      WHERE A.SUBK_PLTNO = @_subkPltno
@@ -121,7 +121,7 @@ public class SFrm6120Repository(DbConnectionFactory db, ICoreRepository coreRepo
         using var conn = db.Create();
 
         var sql = $@"
-                    UPDATE T1MILSTK
+                    UPDATE T2MILSTK
                     SET
                         LSTK_FLAG   = @StrFlag,
                         LSTK_INDATE = @StrDate,
@@ -146,7 +146,7 @@ public class SFrm6120Repository(DbConnectionFactory db, ICoreRepository coreRepo
         using var conn = db.Create();
 
         var sql = $@"
-                    UPDATE T1MISUBK
+                    UPDATE T2MISUBK
                     SET
                         SUBK_LOCA   = @StrLoca,
                         SUBK_FLAG   = @StrFlag,

@@ -25,7 +25,7 @@ public class Frm4103Repository(
             SELECT
                 OUPT_CHASU AS Chasu
 
-            FROM T1MIOUPT WITH (NOLOCK)
+            FROM T2MIOUPT WITH (NOLOCK)
 
             WHERE OUPT_DATE = @OutDate
               AND ISNULL(OUPT_CHASU, '') <> ''
@@ -75,7 +75,7 @@ public class Frm4103Repository(
                     ELSE '완료'
                 END AS JobStatus
 
-            FROM T1MIOUPT WITH (NOLOCK)
+            FROM T2MIOUPT WITH (NOLOCK)
 
             WHERE OUPT_DATE = @OutDate
               AND ISNULL(OUPT_CHASU, '') <> ''
@@ -160,7 +160,7 @@ public class Frm4103Repository(
                 SCHE_TIME
                     AS ScheTime
 
-            FROM T1TISCHE1 WITH (NOLOCK)
+            FROM T2TISCHE1 WITH (NOLOCK)
 
             ORDER BY
                 SCHE_INDEX
@@ -218,13 +218,13 @@ public class Frm4103Repository(
 
             // =================================================
             // 1. 출고이력 삭제
-            // T2MIOUPT → T1MIOUPT
+            // T2MIOUPT → T2MIOUPT
             // =================================================
 
             var result =
                 await conn.ExecuteAsync(
                     @"
-                        DELETE FROM T1MIOUPT
+                        DELETE FROM T2MIOUPT
 
                         WHERE OUPT_INDEX = @Index
                     ",
@@ -245,7 +245,7 @@ public class Frm4103Repository(
 
             await conn.ExecuteAsync(
                 @"
-                    UPDATE T1MISUBK
+                    UPDATE T2MISUBK
 
                     SET
                         SUBK_RWGT = 0.00,
@@ -268,7 +268,7 @@ public class Frm4103Repository(
 
             await conn.ExecuteAsync(
                 @"
-                    UPDATE T1MILSTK
+                    UPDATE T2MILSTK
 
                     SET
                         LSTK_FLAG = '1'
@@ -290,7 +290,7 @@ public class Frm4103Repository(
 
             await conn.ExecuteAsync(
                 @"
-                    DELETE FROM T1TISCHE1
+                    DELETE FROM T2TISCHE1
 
                     WHERE SCHE_INDEX = @Index
                 ",
@@ -319,9 +319,9 @@ public class Frm4103Repository(
     // =========================================================
     // 출고 지시 확정
     //
-    // T1TISCHE1
+    // T2TISCHE1
     //      ↓
-    // T1TISCHE
+    // T2TISCHE
     // =========================================================
 
     public async Task<Frm4103Dto.ConfirmResultDto> ConfirmAsync(
@@ -347,7 +347,7 @@ public class Frm4103Repository(
             const string countSql = @"
                 SELECT COUNT(*)
 
-                FROM T1TISCHE1 WITH (
+                FROM T2TISCHE1 WITH (
                     UPDLOCK,
                     HOLDLOCK
                 )
@@ -385,7 +385,7 @@ public class Frm4103Repository(
             // =================================================
 
             const string insertSql = @"
-                INSERT INTO T1TISCHE
+                INSERT INTO T2TISCHE
                 (
                     SCHE_SC,
                     SCHE_INDEX,
@@ -409,7 +409,7 @@ public class Frm4103Repository(
                     SCHE_EMER,
                     SCHE_PLTNO
 
-                FROM T1TISCHE1
+                FROM T2TISCHE1
             ";
 
 
@@ -425,7 +425,7 @@ public class Frm4103Repository(
 
             await conn.ExecuteAsync(
                 @"
-                    DELETE FROM T1TISCHE1
+                    DELETE FROM T2TISCHE1
                 ",
                 transaction:
                     transaction);

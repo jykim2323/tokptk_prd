@@ -26,7 +26,7 @@ public class LocaAddRepository(DbConnectionFactory db, ICoreRepository coreRepo)
     {
         using var conn = db.Create();
 
-        var sql = @" INSERT INTO T1MISUBK
+        var sql = @" INSERT INTO T2MISUBK
                      (SUBK_LOCA, SUBK_CODE, SUBK_LOTNO, SUBK_PLTNO, 
                       SUBK_WGT, SUBK_RWGT, SUBK_FLAG, SUBK_GUBUN,
                       SUBK_REMARK, SUBK_BOXNO, SUBK_INDATE, SUBK_INTIME, SUBK_USERID)

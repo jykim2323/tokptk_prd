@@ -166,7 +166,7 @@ public class Frm3100Repository(DbConnectionFactory db, ICoreRepository coreRepo)
                     A.SUBK_REMARK AS SubkRemark,
                     A.SUBK_PLTNO  AS SubkPltno,
                     '1'           AS SubkRowState
-                    FROM T1MISUBK A WITH (NOLOCK)
+                    FROM T2MISUBK A WITH (NOLOCK)
                     LEFT OUTER JOIN MIMAST B WITH (NOLOCK) ON A.SUBK_CODE = B.MAST_CODE
                      WHERE A.SUBK_PLTNO = @sPltno";
 
@@ -183,7 +183,7 @@ public class Frm3100Repository(DbConnectionFactory db, ICoreRepository coreRepo)
         if (string.IsNullOrEmpty(sSubkcode) && string.IsNullOrEmpty(sSubklotno))
         {
             sql = @"
-                    DELETE FROM T1MISUBK
+                    DELETE FROM T2MISUBK
                     WHERE SUBK_PLTNO = @sPltno";
 
 
@@ -192,7 +192,7 @@ public class Frm3100Repository(DbConnectionFactory db, ICoreRepository coreRepo)
         else
         {
             sql = @"
-                    DELETE FROM T1MISUBK
+                    DELETE FROM T2MISUBK
                     WHERE SUBK_PLTNO = @sPltno
                     AND SUBK_CODE = @sSubkcode
                     AND SUBK_LOTNO = @sSubklotno";
@@ -211,7 +211,7 @@ public class Frm3100Repository(DbConnectionFactory db, ICoreRepository coreRepo)
 
         var subkWgt = resDto.SubkWgt?.Replace(".", "") ?? "";
         var sql = @"
-                     INSERT INTO T1MISUBK
+                     INSERT INTO T2MISUBK
                                         (
                                             SUBK_CODE, SUBK_LOTNO, SUBK_FLAG, SUBK_GUBUN,
                                             SUBK_WGT,SUBK_RWGT, SUBK_BOXNO,SUBK_REMARK,

@@ -43,7 +43,7 @@ public class Frm3400Repository(DbConnectionFactory db) : IFrm3400Repository
                 A.INPT_ID       AS InptId,
                 A.INPT_PLTNO    AS InptPltno
 
-            FROM T1MIINPT A WITH (NOLOCK)
+            FROM T2MIINPT A WITH (NOLOCK)
 
             LEFT OUTER JOIN MIMAST B WITH (NOLOCK)
                 ON B.MAST_CODE = A.INPT_CODE
@@ -152,7 +152,7 @@ public class Frm3400Repository(DbConnectionFactory db) : IFrm3400Repository
         using var conn = db.Create();
 
         var sql = @"
-            DELETE FROM T1MIINPT
+            DELETE FROM T2MIINPT
 
             WHERE INPT_CODE  = @InptCode
               AND INPT_INDEX = @InptIndex

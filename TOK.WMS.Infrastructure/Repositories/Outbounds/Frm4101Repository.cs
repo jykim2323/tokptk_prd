@@ -26,7 +26,7 @@ public class Frm4101Repository(
             // =====================================================
 
             const string deleteSql = @"
-                DELETE FROM T1HHOUPT
+                DELETE FROM T2HHOUPT
             ";
 
             await conn.ExecuteAsync(
@@ -74,7 +74,7 @@ public class Frm4101Repository(
                     STAT_CDATE AS StatCdate,
                     STAT_CINDX AS StatCindx
 
-                FROM T1TBSTAT WITH (UPDLOCK, HOLDLOCK)
+                FROM T2TBSTAT WITH (UPDLOCK, HOLDLOCK)
 
                 WHERE STAT_PSWD = 'JPLS'
             ";
@@ -88,7 +88,7 @@ public class Frm4101Repository(
             if (stat == null)
             {
                 throw new Exception(
-                    "T1TBSTAT의 JPLS 설정을 찾을 수 없습니다.");
+                    "T2TBSTAT의 JPLS 설정을 찾을 수 없습니다.");
             }
 
 
@@ -116,7 +116,7 @@ public class Frm4101Repository(
                 if (statIndex >= 998)
                 {
                     const string updateStatSql = @"
-                        UPDATE T1TBSTAT
+                        UPDATE T2TBSTAT
 
                         SET STAT_CINDX = 1
 
@@ -130,7 +130,7 @@ public class Frm4101Repository(
                 else
                 {
                     const string updateStatSql = @"
-                        UPDATE T1TBSTAT
+                        UPDATE T2TBSTAT
 
                         SET STAT_CINDX =
                             STAT_CINDX + 1
@@ -153,7 +153,7 @@ public class Frm4101Repository(
                 chasu = "001";
 
                 const string updateStatSql = @"
-                    UPDATE T1TBSTAT
+                    UPDATE T2TBSTAT
 
                     SET
                         STAT_CDATE = @WorkDate,
@@ -191,7 +191,7 @@ public class Frm4101Repository(
                 const string checkSql = @"
                     SELECT COUNT(*)
 
-                    FROM T1HHOUPT WITH (NOLOCK)
+                    FROM T2HHOUPT WITH (NOLOCK)
 
                     WHERE HO_DATE = @WorkDate
                       AND HO_CODE = @ItemCode
@@ -229,7 +229,7 @@ public class Frm4101Repository(
                 if (exists == 0)
                 {
                     const string insertSql = @"
-                        INSERT INTO T1HHOUPT
+                        INSERT INTO T2HHOUPT
                         (
                             HO_DATE,
                             HO_CHASU,
@@ -309,7 +309,7 @@ public class Frm4101Repository(
                 else
                 {
                     const string updateSql = @"
-                        UPDATE T1HHOUPT
+                        UPDATE T2HHOUPT
 
                         SET HO_QTY =
                             ISNULL(HO_QTY, 0) + @Qty

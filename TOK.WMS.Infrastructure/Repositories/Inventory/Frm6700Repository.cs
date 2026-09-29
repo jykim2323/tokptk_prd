@@ -31,7 +31,7 @@ public class Frm6700Repository(DbConnectionFactory db) : IFrm6700Repository
                                         MAX(GUBN2_NAME) AS Gubn2Name,
                                         MAX(GUBN3_NAME) AS Gubn3Name
 
-                                    FROM T1MIJEGO WITH (NOLOCK)
+                                    FROM T2MIJEGO WITH (NOLOCK)
 
                                     LEFT OUTER JOIN MIMAST WITH (NOLOCK)
                                         ON JEGO_CODE = MAST_CODE
@@ -125,7 +125,7 @@ public class Frm6700Repository(DbConnectionFactory db) : IFrm6700Repository
         //                                MAX(GUBN2_NAME) AS Gubn2Name,
         //                                MAX(GUBN3_NAME) AS Gubn3Name
 
-        //                            FROM T1MIJEGO WITH (NOLOCK)
+        //                            FROM T2MIJEGO WITH (NOLOCK)
 
         //                            LEFT OUTER JOIN MIMAST WITH (NOLOCK)
         //                                ON JEGO_CODE = MAST_CODE

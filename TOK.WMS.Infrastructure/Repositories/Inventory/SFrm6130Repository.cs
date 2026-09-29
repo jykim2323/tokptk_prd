@@ -28,7 +28,7 @@ public class SFrm6130Repository(DbConnectionFactory db, ICoreRepository coreRepo
         using var conn = db.Create();
 
         var sql = @"
-                    UPDATE T1MILSTK
+                    UPDATE T2MILSTK
                     SET
                         LSTK_FLAG   = @_strFlag,
                         LSTK_INDATE = @_strInDate,
@@ -53,7 +53,7 @@ public class SFrm6130Repository(DbConnectionFactory db, ICoreRepository coreRepo
         using var conn = db.Create();
 
         var sql = @"
-        INSERT INTO T1MISUBK
+        INSERT INTO T2MISUBK
         (
             SUBK_CODE,
             SUBK_LOCA,
@@ -111,7 +111,7 @@ public class SFrm6130Repository(DbConnectionFactory db, ICoreRepository coreRepo
         using var conn = db.Create();
 
         var sql = @"
-                    UPDATE T1MISUBK
+                    UPDATE T2MISUBK
                     SET
                         SUBK_FLAG   = @SubkFlag,
                         SUBK_RWGT   = @SubkRwgt,

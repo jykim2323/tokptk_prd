@@ -26,7 +26,7 @@ public class SFrm6910Repository(DbConnectionFactory db) : ISFrm6910Repository
             A.SUBK_BOXNO  AS SubkBoxno,
             A.SUBK_REMARK AS SubkRemark
 
-        FROM T1MISUBK A WITH (NOLOCK)
+        FROM T2MISUBK A WITH (NOLOCK)
 
         LEFT OUTER JOIN MIMAST B WITH (NOLOCK)
             ON A.SUBK_CODE = B.MAST_CODE
@@ -58,14 +58,14 @@ public class SFrm6910Repository(DbConnectionFactory db) : ISFrm6910Repository
         {
             var checkSql = @"
             SELECT COUNT(*)
-            FROM T1MISUBK WITH (UPDLOCK, HOLDLOCK)
+            FROM T2MISUBK WITH (UPDLOCK, HOLDLOCK)
             WHERE SUBK_PLTNO = @TargetPltNo
               AND SUBK_CODE  = @SubkCode
               AND SUBK_LOTNO = @SubkLotno
         ";
 
             var updateSql = @"
-            UPDATE T1MISUBK
+            UPDATE T2MISUBK
 
             SET SUBK_PLTNO = @TargetPltNo
 

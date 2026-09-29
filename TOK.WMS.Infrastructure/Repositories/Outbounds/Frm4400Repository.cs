@@ -62,7 +62,7 @@ public class Frm4400Repository(
 
                 A.OUPT_BOXNO1       AS OuptBoxno1
 
-            FROM T1MIOUPT A WITH (NOLOCK)
+            FROM T2MIOUPT A WITH (NOLOCK)
 
             LEFT JOIN MIMAST B WITH (NOLOCK)
                 ON B.MAST_CODE =
@@ -305,7 +305,7 @@ public class Frm4400Repository(
 
 
         const string sql = @"
-            DELETE FROM T1MIOUPT
+            DELETE FROM T2MIOUPT
 
             WHERE OUPT_INDEX =
                   @OuptIndex

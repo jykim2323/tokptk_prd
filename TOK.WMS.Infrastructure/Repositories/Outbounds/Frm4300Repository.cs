@@ -52,7 +52,7 @@ public class Frm4300Repository(
                 A.OUPT_CUST        AS OuptCust,
                 A.OUPT_PLTNO       AS OuptPltno
 
-            FROM T1MIOUPT A WITH (NOLOCK)
+            FROM T2MIOUPT A WITH (NOLOCK)
 
             LEFT JOIN MIMAST B WITH (NOLOCK)
                 ON B.MAST_CODE =
@@ -285,7 +285,7 @@ public class Frm4300Repository(
                 count +=
                     await conn.ExecuteAsync(
                         @"
-                        DELETE FROM T1MIOUPT
+                        DELETE FROM T2MIOUPT
 
                         WHERE OUPT_INDEX =
                               @Index
@@ -322,7 +322,7 @@ public class Frm4300Repository(
 
                 await conn.ExecuteAsync(
                     @"
-                    UPDATE T1MISUBK
+                    UPDATE T2MISUBK
 
                     SET
                         SUBK_RWGT = 0.00,
@@ -347,7 +347,7 @@ public class Frm4300Repository(
 
                 await conn.ExecuteAsync(
                     @"
-                    UPDATE T1MILSTK
+                    UPDATE T2MILSTK
 
                     SET LSTK_FLAG = '1'
 
@@ -370,7 +370,7 @@ public class Frm4300Repository(
 
                 await conn.ExecuteAsync(
                     @"
-                    UPDATE T1TBTRAK
+                    UPDATE T2TBTRAK
 
                     SET
                         TRAK_INDEX = '',
@@ -421,7 +421,7 @@ public class Frm4300Repository(
         const string sql = @"
             SELECT COUNT(*)
 
-            FROM T1MIOUPT WITH (NOLOCK)
+            FROM T2MIOUPT WITH (NOLOCK)
 
             WHERE OUPT_PLTNO =
                   @PltNo
@@ -508,7 +508,7 @@ public class Frm4300Repository(
                         SELECT
                             MAX(SUBK_PLTNO)
 
-                        FROM T1MISUBK WITH (NOLOCK)
+                        FROM T2MISUBK WITH (NOLOCK)
 
                         WHERE SUBK_LOCA =
                               @Loca
@@ -570,7 +570,7 @@ public class Frm4300Repository(
                             OUPT_CUST
                                 AS Cust
 
-                        FROM T1MIOUPT WITH (NOLOCK)
+                        FROM T2MIOUPT WITH (NOLOCK)
 
                         WHERE OUPT_INDEX =
                               @Index
@@ -619,7 +619,7 @@ public class Frm4300Repository(
 
                 await conn.ExecuteAsync(
                     @"
-                    UPDATE T1MISUBK
+                    UPDATE T2MISUBK
 
                     SET
                         SUBK_WGT =
@@ -662,7 +662,7 @@ public class Frm4300Repository(
 
                 await conn.ExecuteAsync(
                     @"
-                    UPDATE T1MIOUPT
+                    UPDATE T2MIOUPT
 
                     SET
                         OUPT_JOB_FLAG = 'C',
@@ -707,7 +707,7 @@ public class Frm4300Repository(
 
             await conn.ExecuteAsync(
                 @"
-                DELETE FROM T1MISUBK
+                DELETE FROM T2MISUBK
 
                 WHERE SUBK_PLTNO =
                       @PltNo
@@ -729,7 +729,7 @@ public class Frm4300Repository(
 
             await conn.ExecuteAsync(
                 @"
-                UPDATE T1MISUBK
+                UPDATE T2MISUBK
 
                 SET
                     SUBK_LOCA = '',
@@ -752,7 +752,7 @@ public class Frm4300Repository(
 
             await conn.ExecuteAsync(
                 @"
-                UPDATE T1MILSTK
+                UPDATE T2MILSTK
 
                 SET
                     LSTK_FLAG   = '0',
@@ -774,12 +774,12 @@ public class Frm4300Repository(
             // =====================================================
             // 6. 출고 Schedule 삭제
             //
-            // Delphi T2TISCHE1 → T1TISCHE1
+            // Delphi T2TISCHE1 → T2TISCHE1
             // =====================================================
 
             await conn.ExecuteAsync(
                 @"
-                DELETE FROM T1TISCHE1
+                DELETE FROM T2TISCHE1
 
                 WHERE SCHE_PLTNO =
                       @PltNo

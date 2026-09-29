@@ -25,7 +25,7 @@ public class Frm6300Repository(DbConnectionFactory db) : IFrm6300Repository
                                      MAX(GUBN1_NAME)  AS Gubn1Name,
                                      MAX(GUBN2_NAME)  AS Gubn2Name,
                                      MAX(GUBN3_NAME)  AS Gubn3Name
-                                     FROM T1SUBK_VIEW WITH (NOLOCK)
+                                     FROM T2SUBK_VIEW WITH (NOLOCK)
                                      LEFT OUTER JOIN MIMAST (NOLOCK) ON STK_CODE   = MAST_CODE
                                      LEFT OUTER JOIN MIGUBN1 (NOLOCK) ON GUBN1_CODE = MAST_GUBN1
                                      LEFT OUTER JOIN MIGUBN2 (NOLOCK) ON GUBN2_CODE = MAST_GUBN2
@@ -77,7 +77,7 @@ public class Frm6300Repository(DbConnectionFactory db) : IFrm6300Repository
                         STK_LOTNO      AS SubkLotno,
                         SUM(STK_TQTY) AS SubkTqty,
                         MAX(MAST_NAME)  AS MastName  
-                     FROM T1SUBK_VIEW WITH (NOLOCK)
+                     FROM T2SUBK_VIEW WITH (NOLOCK)
                      LEFT OUTER JOIN MIMAST WITH (NOLOCK)
                          ON STK_CODE = MAST_CODE
                      WHERE STK_CODE = @_subkCode

@@ -36,7 +36,7 @@ public class Frm3130Repository(DbConnectionFactory db) : IFrm3130Repository
                 A.SUBK_INDATE  AS SubkIndate,
                 A.SUBK_INTIME  AS SubkIntime
 
-            FROM T1MISUBK A WITH (NOLOCK)
+            FROM T2MISUBK A WITH (NOLOCK)
 
             LEFT OUTER JOIN MIMAST B WITH (NOLOCK)
                 ON A.SUBK_CODE = B.MAST_CODE
@@ -76,33 +76,33 @@ public class Frm3130Repository(DbConnectionFactory db) : IFrm3130Repository
 
                 (
                     SELECT COUNT(*)
-                    FROM T1TBTRAK WITH (NOLOCK)
+                    FROM T2TBTRAK WITH (NOLOCK)
                     WHERE TRAK_PLTNO = @PltNo
                 ) AS TrackingCount,
 
                 (
                     SELECT COUNT(*)
-                    FROM T1MILSTK WITH (NOLOCK)
+                    FROM T2MILSTK WITH (NOLOCK)
                     WHERE LSTK_PLTNO = @PltNo
                 ) AS LstkCount,
 
                 (
                     SELECT COUNT(*)
-                    FROM T1MISUBK WITH (NOLOCK)
+                    FROM T2MISUBK WITH (NOLOCK)
                     WHERE SUBK_PLTNO = @PltNo
                       AND ISNULL(SUBK_LOCA, '') <> ''
                 ) AS LocatedSubkCount,
 
                 (
                     SELECT TOP 1 SUBK_FLAG
-                    FROM T1MISUBK WITH (NOLOCK)
+                    FROM T2MISUBK WITH (NOLOCK)
                     WHERE SUBK_PLTNO = @PltNo
                       AND SUBK_FLAG IN ('X','1','Y','M')
                 ) AS BlockFlag,
 
                 (
                     SELECT MAX(ISNULL(SUBK_LOCA, ''))
-                    FROM T1MISUBK WITH (NOLOCK)
+                    FROM T2MISUBK WITH (NOLOCK)
                     WHERE SUBK_PLTNO = @PltNo
                 ) AS SubkLoca
         ";
@@ -129,7 +129,7 @@ public class Frm3130Repository(DbConnectionFactory db) : IFrm3130Repository
         const string duplicateSql = @"
             SELECT COUNT(*)
 
-            FROM T1MISUBK WITH (NOLOCK)
+            FROM T2MISUBK WITH (NOLOCK)
 
             WHERE SUBK_CODE = @SubkCode
               AND SUBK_LOTNO = @SubkLotno
@@ -163,7 +163,7 @@ public class Frm3130Repository(DbConnectionFactory db) : IFrm3130Repository
 
 
         const string insertSql = @"
-            INSERT INTO T1MISUBK
+            INSERT INTO T2MISUBK
             (
                 SUBK_CODE,
                 SUBK_LOTNO,
@@ -264,7 +264,7 @@ public class Frm3130Repository(DbConnectionFactory db) : IFrm3130Repository
                     0
                 )
 
-                FROM T1MISUBK WITH (UPDLOCK, HOLDLOCK)
+                FROM T2MISUBK WITH (UPDLOCK, HOLDLOCK)
 
                 WHERE SUBK_PLTNO = @PltNo
                   AND SUBK_CODE = 'EMPTY'
@@ -287,7 +287,7 @@ public class Frm3130Repository(DbConnectionFactory db) : IFrm3130Repository
             if (currentQty > 0)
             {
                 const string updateSql = @"
-                    UPDATE T1MISUBK
+                    UPDATE T2MISUBK
 
                     SET SUBK_WGT = @NewQty
 
@@ -307,7 +307,7 @@ public class Frm3130Repository(DbConnectionFactory db) : IFrm3130Repository
             else
             {
                 const string insertSql = @"
-                    INSERT INTO T1MISUBK
+                    INSERT INTO T2MISUBK
                     (
                         SUBK_CODE,
                         SUBK_LOTNO,
@@ -406,7 +406,7 @@ public class Frm3130Repository(DbConnectionFactory db) : IFrm3130Repository
         using var conn = db.Create();
 
         const string sql = @"
-            DELETE FROM T1MISUBK
+            DELETE FROM T2MISUBK
 
             WHERE SUBK_CODE = @SubkCode
               AND SUBK_LOTNO = @SubkLotno
@@ -436,7 +436,7 @@ public class Frm3130Repository(DbConnectionFactory db) : IFrm3130Repository
         using var conn = db.Create();
 
         const string sql = @"
-            DELETE FROM T1MISUBK
+            DELETE FROM T2MISUBK
 
             WHERE SUBK_PLTNO = @PltNo
         ";

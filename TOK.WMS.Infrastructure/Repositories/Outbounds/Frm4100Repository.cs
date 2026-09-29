@@ -38,13 +38,13 @@ public class Frm4100Repository(
                 A.SUBK_INDATE     AS SubkIndate,
                 A.SUBK_INTIME     AS SubkIntime
 
-            FROM T1MISUBK A WITH (NOLOCK)
+            FROM T2MISUBK A WITH (NOLOCK)
 
             LEFT JOIN MIMAST B WITH (NOLOCK)
                 ON B.MAST_CODE =
                    A.SUBK_CODE
 
-            LEFT JOIN T1MILSTK C WITH (NOLOCK)
+            LEFT JOIN T2MILSTK C WITH (NOLOCK)
                 ON C.LSTK_LOCA =
                    A.SUBK_LOCA
 
@@ -174,7 +174,7 @@ public class Frm4100Repository(
                 A.SUBK_INDATE     AS SubkIndate,
                 A.SUBK_INTIME     AS SubkIntime
 
-            FROM T1MISUBK A WITH (NOLOCK)
+            FROM T2MISUBK A WITH (NOLOCK)
 
             LEFT JOIN MIMAST B WITH (NOLOCK)
                 ON B.MAST_CODE =
@@ -276,7 +276,7 @@ public class Frm4100Repository(
                 SELECT TOP 1
                     CVC1_CH01
 
-                FROM T1TBCVC1 WITH (NOLOCK)
+                FROM T2TBCVC1 WITH (NOLOCK)
 
                 WHERE CVC1_SR = 'R'
             ";
@@ -320,7 +320,7 @@ public class Frm4100Repository(
                 SELECT TOP 1
                     CVC2_CH01
 
-                FROM T1TBCVC2 WITH (NOLOCK)
+                FROM T2TBCVC2 WITH (NOLOCK)
 
                 WHERE CVC2_SR = 'R'
             ";
@@ -364,7 +364,7 @@ public class Frm4100Repository(
                 SELECT TOP 1
                     CVC3_CH01
 
-                FROM T1TBCVC3 WITH (NOLOCK)
+                FROM T2TBCVC3 WITH (NOLOCK)
 
                 WHERE CVC3_SR = 'R'
             ";
@@ -672,7 +672,7 @@ public class Frm4100Repository(
                                 0
                             )
 
-                        FROM T1MISUBK WITH (NOLOCK)
+                        FROM T2MISUBK WITH (NOLOCK)
 
                         WHERE SUBK_LOCA =
                               @Loca
@@ -698,7 +698,7 @@ public class Frm4100Repository(
                                 0
                             )
 
-                        FROM T1MISUBK WITH (NOLOCK)
+                        FROM T2MISUBK WITH (NOLOCK)
 
                         WHERE SUBK_LOCA =
                               @Loca
@@ -819,7 +819,7 @@ public class Frm4100Repository(
 
                     await conn.ExecuteAsync(
                         @"
-                        INSERT INTO T1MIOUPT
+                        INSERT INTO T2MIOUPT
                         (
                             OUPT_DATE,
                             OUPT_INDEX,
@@ -948,7 +948,7 @@ public class Frm4100Repository(
 
                     await conn.ExecuteAsync(
                         @"
-                        UPDATE T1MISUBK
+                        UPDATE T2MISUBK
 
                         SET
                             SUBK_FLAG = 'M',
@@ -1023,7 +1023,7 @@ public class Frm4100Repository(
                             SUBK_REMARK
                                 AS SubkRemark
 
-                        FROM T1MISUBK WITH (NOLOCK)
+                        FROM T2MISUBK WITH (NOLOCK)
 
                         WHERE SUBK_PLTNO =
                               @PltNo
@@ -1077,7 +1077,7 @@ public class Frm4100Repository(
 
                     await conn.ExecuteAsync(
                         @"
-                        INSERT INTO T1MIOUPT
+                        INSERT INTO T2MIOUPT
                         (
                             OUPT_DATE,
                             OUPT_INDEX,
@@ -1188,7 +1188,7 @@ public class Frm4100Repository(
 
                     await conn.ExecuteAsync(
                         @"
-                        UPDATE T1MISUBK
+                        UPDATE T2MISUBK
 
                         SET SUBK_FLAG = 'M'
 
@@ -1225,7 +1225,7 @@ public class Frm4100Repository(
 
                 await conn.ExecuteAsync(
                     @"
-                    UPDATE T1MILSTK
+                    UPDATE T2MILSTK
 
                     SET LSTK_FLAG = 'M'
 
@@ -1350,7 +1350,7 @@ public class Frm4100Repository(
                     STAT_OINDX
                         AS OIndex
 
-                FROM T1TBSTAT WITH
+                FROM T2TBSTAT WITH
                 (
                     UPDLOCK,
                     ROWLOCK
@@ -1381,7 +1381,7 @@ public class Frm4100Repository(
 
             await conn.ExecuteAsync(
                 @"
-                UPDATE T1TBSTAT
+                UPDATE T2TBSTAT
 
                 SET STAT_OINDX =
                     @Next
@@ -1404,7 +1404,7 @@ public class Frm4100Repository(
 
             await conn.ExecuteAsync(
                 @"
-                UPDATE T1TBSTAT
+                UPDATE T2TBSTAT
 
                 SET
                     STAT_ODATE =
@@ -1447,7 +1447,7 @@ public class Frm4100Repository(
                     0
                 ) + 1
 
-            FROM T1MIOUPT WITH
+            FROM T2MIOUPT WITH
             (
                 UPDLOCK
             )
@@ -1465,7 +1465,7 @@ public class Frm4100Repository(
 
 
     // =========================================================
-    // T1TISCHE 생성
+    // T2TISCHE 생성
     // =========================================================
 
     private static async Task InsertScheduleAsync(
@@ -1526,7 +1526,7 @@ public class Frm4100Repository(
 
         await conn.ExecuteAsync(
             @"
-            INSERT INTO T1TISCHE
+            INSERT INTO T2TISCHE
             (
                 SCHE_SC,
                 SCHE_INDEX,
@@ -1602,14 +1602,14 @@ public class Frm4100Repository(
     {
         await conn.ExecuteAsync(
             @"
-            UPDATE T1MILSTK
+            UPDATE T2MILSTK
 
             SET LSTK_FLAG = 'Y'
 
             WHERE LSTK_FLAG = 'M';
 
 
-            UPDATE T1MISUBK
+            UPDATE T2MISUBK
 
             SET SUBK_FLAG = 'Y'
 
@@ -1621,7 +1621,7 @@ public class Frm4100Repository(
 
 
     // =========================================================
-    // T1TBSTAT 내부 DTO
+    // T2TBSTAT 내부 DTO
     // =========================================================
 
     private sealed class StatDto

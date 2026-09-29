@@ -49,7 +49,7 @@ public class Frm6900Repository(DbConnectionFactory db, ICoreRepository coreRepo)
                                             ELSE ''
                                         END AS InDateTime
 
-                                        FROM T1MISUBK A WITH (NOLOCK)
+                                        FROM T2MISUBK A WITH (NOLOCK)
                                         WHERE 1=1 ");
 
         var param = new DynamicParameters();
@@ -97,7 +97,7 @@ public class Frm6900Repository(DbConnectionFactory db, ICoreRepository coreRepo)
                         GUBN1_NAME     AS Gubn1Name,
                         GUBN2_NAME     AS Gubn2Name,
                         GUBN3_NAME     AS Gubn3Name
-                     FROM T1MISUBK WITH (NOLOCK)
+                     FROM T2MISUBK WITH (NOLOCK)
                      LEFT OUTER JOIN MIMAST WITH (NOLOCK)
                          ON MAST_CODE = SUBK_CODE
                      LEFT OUTER JOIN MIGUBN1 WITH (NOLOCK)
@@ -187,7 +187,7 @@ public class Frm6900Repository(DbConnectionFactory db, ICoreRepository coreRepo)
     {
         using var conn = db.Create();
 
-        var sql = @"DELETE FROM T1MISUBK WHERE SUBK_LOCA = @subkLoca";
+        var sql = @"DELETE FROM T2MISUBK WHERE SUBK_LOCA = @subkLoca";
 
         return await conn.ExecuteAsync(sql, new
         {
@@ -198,7 +198,7 @@ public class Frm6900Repository(DbConnectionFactory db, ICoreRepository coreRepo)
     {
         using var conn = db.Create();
 
-        var sql = @"Update  T1MILSTK Set 
+        var sql = @"Update  T2MILSTK Set 
                             LSTK_FLAG = '0', 
                             LSTK_INDATE = '', 
                             LSTK_INTIME = '',

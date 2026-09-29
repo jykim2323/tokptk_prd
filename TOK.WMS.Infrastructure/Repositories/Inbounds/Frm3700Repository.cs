@@ -26,7 +26,7 @@ public class Frm3700Repository(DbConnectionFactory db) : IFrm3700Repository
                 SUM(A.STK_TQTY)     AS StkTqty,
                 MAX(B.MAST_NAME)    AS MastName
 
-            FROM T1INPT_VIEW A WITH (NOLOCK)
+            FROM T2INPT_VIEW A WITH (NOLOCK)
 
             LEFT OUTER JOIN MIMAST B WITH (NOLOCK)
                 ON A.STK_CODE = B.MAST_CODE
@@ -88,7 +88,7 @@ public class Frm3700Repository(DbConnectionFactory db) : IFrm3700Repository
                 SUM(A.STK_TQTY)     AS StkTqty,
                 MAX(B.MAST_NAME)    AS MastName
 
-            FROM T1INPT_VIEW A WITH (NOLOCK)
+            FROM T2INPT_VIEW A WITH (NOLOCK)
 
             LEFT OUTER JOIN MIMAST B WITH (NOLOCK)
                 ON A.STK_CODE = B.MAST_CODE

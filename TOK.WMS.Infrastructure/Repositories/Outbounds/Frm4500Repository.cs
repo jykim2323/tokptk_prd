@@ -36,7 +36,7 @@ public class Frm4500Repository(
                     )
                 ) AS StkTqty
 
-            FROM T1OUPT_VIEW A WITH (NOLOCK)
+            FROM T2OUPT_VIEW A WITH (NOLOCK)
 
             LEFT JOIN MIMAST B WITH (NOLOCK)
                 ON A.STK_CODE =
@@ -155,7 +155,7 @@ public class Frm4500Repository(
                     )
                 ) AS StkTqty
 
-            FROM T1OUPT_VIEW A WITH (NOLOCK)
+            FROM T2OUPT_VIEW A WITH (NOLOCK)
 
             LEFT JOIN MIMAST B WITH (NOLOCK)
                 ON A.STK_CODE =

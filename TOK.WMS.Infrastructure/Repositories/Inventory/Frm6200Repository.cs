@@ -35,7 +35,7 @@ public class Frm6200Repository(DbConnectionFactory db) : IFrm6200Repository
                                             gubn1_name  AS Gubn1Name,
                                             gubn2_name  AS Gubn2Name,
                                             gubn3_name  AS Gubn3Name
-                                     FROM T1MISUBK WITH (NOLOCK)
+                                     FROM T2MISUBK WITH (NOLOCK)
 
                                      LEFT OUTER JOIN MIMAST WITH (NOLOCK)
                                          ON MAST_CODE = SUBK_CODE
@@ -127,7 +127,7 @@ public class Frm6200Repository(DbConnectionFactory db) : IFrm6200Repository
         using var conn = db.Create();
 
         var sql = @"
-                    UPDATE T1MILSTK
+                    UPDATE T2MILSTK
                     SET
                         LSTK_FLAG   = @_strFlag
                     WHERE LSTK_LOCA = @_strLoca";

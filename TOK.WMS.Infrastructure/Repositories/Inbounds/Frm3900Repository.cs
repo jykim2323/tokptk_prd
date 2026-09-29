@@ -50,7 +50,7 @@ public class Frm3900Repository(DbConnectionFactory db) : IFrm3900Repository
 
                 ISNULL(C.SUBK_WGT, 0) AS CurrWgt
 
-            FROM T1MIOUPT A WITH (NOLOCK)
+            FROM T2MIOUPT A WITH (NOLOCK)
 
             LEFT OUTER JOIN MIMAST B WITH (NOLOCK)
                 ON A.OUPT_CODE = B.MAST_CODE
@@ -62,7 +62,7 @@ public class Frm3900Repository(DbConnectionFactory db) : IFrm3900Repository
                     MAX(SUBK_LOCA) AS SUBK_LOCA,
                     SUM(SUBK_WGT) AS SUBK_WGT
 
-                FROM T1MISUBK WITH (NOLOCK)
+                FROM T2MISUBK WITH (NOLOCK)
 
                 GROUP BY SUBK_PLTNO
             ) C
@@ -180,7 +180,7 @@ public class Frm3900Repository(DbConnectionFactory db) : IFrm3900Repository
 
                 '1' AS Status
 
-            FROM T1MISUBK A WITH (NOLOCK)
+            FROM T2MISUBK A WITH (NOLOCK)
 
             LEFT OUTER JOIN MIMAST B WITH (NOLOCK)
                 ON A.SUBK_CODE = B.MAST_CODE
@@ -233,7 +233,7 @@ public class Frm3900Repository(DbConnectionFactory db) : IFrm3900Repository
                 COUNT(*) AS Count,
                 MAX(ISNULL(SUBK_LOCA, '')) AS SubkLoca
 
-            FROM T1MISUBK WITH (NOLOCK)
+            FROM T2MISUBK WITH (NOLOCK)
 
             WHERE SUBK_PLTNO = @PltNo
         ";
@@ -260,7 +260,7 @@ public class Frm3900Repository(DbConnectionFactory db) : IFrm3900Repository
             var affected = 0;
 
             const string deleteSql = @"
-                DELETE FROM T1MISUBK
+                DELETE FROM T2MISUBK
 
                 WHERE SUBK_PLTNO = @SubkPltno
                   AND SUBK_CODE = @SubkCode
@@ -281,7 +281,7 @@ public class Frm3900Repository(DbConnectionFactory db) : IFrm3900Repository
                 const string checkSql = @"
                     SELECT COUNT(*)
 
-                    FROM T1MISUBK WITH (NOLOCK)
+                    FROM T2MISUBK WITH (NOLOCK)
 
                     WHERE SUBK_PLTNO = @SubkPltno
                       AND SUBK_CODE = @SubkCode
@@ -303,7 +303,7 @@ public class Frm3900Repository(DbConnectionFactory db) : IFrm3900Repository
                 if (exists > 0)
                 {
                     const string updateSql = @"
-                        UPDATE T1MISUBK
+                        UPDATE T2MISUBK
 
                         SET
                             SUBK_WGT = @SubkWgt,
@@ -326,7 +326,7 @@ public class Frm3900Repository(DbConnectionFactory db) : IFrm3900Repository
                 else
                 {
                     const string insertSql = @"
-                        INSERT INTO T1MISUBK
+                        INSERT INTO T2MISUBK
                         (
                             SUBK_PLTNO,
                             SUBK_CODE,

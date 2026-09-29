@@ -188,7 +188,7 @@ public partial class SFrm6130ViewModel : ObservableObject
 
             if (!subkUpdateCheck)
             {
-                _dialog.ShowMessage($" 재고상세(T1MISUBK) 수정 에러!!!!", "오류");
+                _dialog.ShowMessage($" 재고상세(T2MISUBK) 수정 에러!!!!", "오류");
                 return false;
             }
 
@@ -196,7 +196,7 @@ public partial class SFrm6130ViewModel : ObservableObject
 
             if (!lstkUpdateCheck)
             {
-                _dialog.ShowMessage($" 재고위치(T1MILSTK)  ' + StrLoca + ' 상태변경 에러!!!!", "오류");
+                _dialog.ShowMessage($" 재고위치(T2MILSTK)  ' + StrLoca + ' 상태변경 에러!!!!", "오류");
                 return false;
             }
             _dialog.ShowMessage($" 재고 등록 완료 (PLT: {SubkPltno})!!!!", "완료");
@@ -233,7 +233,7 @@ public partial class SFrm6130ViewModel : ObservableObject
 
             if (!lstkUpdateCheck)
             {
-                _dialog.ShowMessage($" 재고위치(T1MILSTK)  ' + StrLoca + ' 상태변경 에러!!!!", "오류");
+                _dialog.ShowMessage($" 재고위치(T2MILSTK)  ' + StrLoca + ' 상태변경 에러!!!!", "오류");
                 return false;
             }
 
@@ -241,7 +241,7 @@ public partial class SFrm6130ViewModel : ObservableObject
 
             if (subkInsertCheck <= 0)
             {
-                _dialog.ShowMessage($" 재고상세(T1MISUBK) 등록 에러!!!!", "오류");
+                _dialog.ShowMessage($" 재고상세(T2MISUBK) 등록 에러!!!!", "오류");
                 return false;
             }
 

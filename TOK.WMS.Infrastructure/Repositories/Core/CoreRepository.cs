@@ -15,7 +15,7 @@ public class CoreRepository(DbConnectionFactory db) : ICoreRepository
         using var conn = db.Create();
 
         var trak_sql = @"SELECT COUNT(*)
-                    FROM T1TBTRAK WITH (NOLOCK)
+                    FROM T2TBTRAK WITH (NOLOCK)
                     WHERE TRAK_PLTNO = @sPltno";
 
         var trak_cnt = await conn.QuerySingleAsync<int>(trak_sql, new
@@ -36,7 +36,7 @@ public class CoreRepository(DbConnectionFactory db) : ICoreRepository
         using var conn = db.Create();
 
         var lstk_sql = @"SELECT COUNT(*)
-                    FROM T1MILSTK WITH (NOLOCK)
+                    FROM T2MILSTK WITH (NOLOCK)
                     WHERE LSTK_PLTNO = @sPltno";
 
         var lstk_cnt = await conn.QuerySingleAsync<int>(lstk_sql, new
@@ -57,7 +57,7 @@ public class CoreRepository(DbConnectionFactory db) : ICoreRepository
         using var conn = db.Create();
 
         var lstk_sql = @"SELECT COUNT(*)
-                    FROM T1MISUBK WITH (NOLOCK)
+                    FROM T2MISUBK WITH (NOLOCK)
                     WHERE SUBK_PLTNO = @sPltno";
 
         var lstk_cnt = await conn.QuerySingleAsync<int>(lstk_sql, new
@@ -78,7 +78,7 @@ public class CoreRepository(DbConnectionFactory db) : ICoreRepository
         using var conn = db.Create();
 
         var q = @"SELECT LSTK_PLTNO
-                         FROM T1MILSTK WITH (NOLOCK)
+                         FROM T2MILSTK WITH (NOLOCK)
                          WHERE LSTK_LOCA = @lstkloca";
 
         var result = await conn.QuerySingleOrDefaultAsync<string?>(q, new
@@ -99,7 +99,7 @@ public class CoreRepository(DbConnectionFactory db) : ICoreRepository
         using var conn = db.Create();
 
         var q = @"SELECT SUBK_LOCA
-                         FROM T1MISUBK WITH (NOLOCK)
+                         FROM T2MISUBK WITH (NOLOCK)
                          WHERE SUBK_PLTNO = @subkloca";
 
         var result = await conn.QueryFirstOrDefaultAsync<string?>(q, new
@@ -121,7 +121,7 @@ public class CoreRepository(DbConnectionFactory db) : ICoreRepository
 
         var sql = @"
                     SELECT A.SUBK_LOCA   AS SubkLoca
-                    FROM   T1MISUBK A WITH (NOLOCK)
+                    FROM   T2MISUBK A WITH (NOLOCK)
                     WHERE  A.SUBK_PLTNO = @_subkPltno";
 
 
@@ -143,7 +143,7 @@ public class CoreRepository(DbConnectionFactory db) : ICoreRepository
         using var conn = db.Create();
 
         var lstk_sql = @"SELECT COUNT(*)
-                    FROM T1MISUBK WITH (NOLOCK)
+                    FROM T2MISUBK WITH (NOLOCK)
                     WHERE SUBK_PLTNO = @sPltno
                     AND   SUBK_CODE  = @subkCode
                     AND   SUBK_LOTNO = @subkLotno";
