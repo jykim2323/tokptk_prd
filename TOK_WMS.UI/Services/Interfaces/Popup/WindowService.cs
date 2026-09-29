@@ -149,8 +149,6 @@ public class WindowService : IWindowService
         return vm.SelectedResult;
     }
 
-
-
     public void ShowTrackingInfo(string trackNo)
     {
         var popupKey = $"TRACK:{trackNo}";

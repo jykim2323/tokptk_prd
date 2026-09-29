@@ -9,7 +9,7 @@
     -->
     <Style x:Key="MonitoringPopupWindowStyle"
            TargetType="{x:Type Window}">
-        <Setter Property="FontFamily" Value="{StaticResource AppFont}"/>
+        <Setter Property="FontFamily" Value="{DynamicResource AppFont}"/>
         <Setter Property="WindowStyle" Value="None"/>
         <Setter Property="AllowsTransparency" Value="True"/>
         <Setter Property="Background" Value="Transparent"/>

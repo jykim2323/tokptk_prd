@@ -496,31 +496,31 @@ public partial class MonitoringViewModel : DocumentViewModelBase, IRefreshable
 
         // 위치는 별도의 고속 조회가 전담합니다. 전체 조회의 오래된 좌표가
         // 최신 위치를 되돌리지 않도록 여기서는 상태와 색상만 적용합니다.
-        ApplyCranes(cranes, updatePosition: false);
-        ApplyLineMode(snapshot.LineMode);
-        ApplyBcrs(bcrs);
-        ApplyOperators(controllers);
-        ApplyStationReadyStates(controllers);
-        ApplyRgvs(snapshot.Rgvs ?? [], snapshot.Tracks ?? [], updatePosition: false);
-        ApplyTracks(snapshot.Tracks ?? []);
-        ApplyInventory(inventories, snapshot.TotalInventorySummary);
-        ApplyRackBays(snapshot.RackBays ?? []);
+        //ApplyCranes(cranes, updatePosition: false);
+        //ApplyLineMode(snapshot.LineMode);
+        //ApplyBcrs(bcrs);
+        //ApplyOperators(controllers);
+        //ApplyStationReadyStates(controllers);
+        //ApplyRgvs(snapshot.Rgvs ?? [], snapshot.Tracks ?? [], updatePosition: false);
+        //ApplyTracks(snapshot.Tracks ?? []);
+        //ApplyInventory(inventories, snapshot.TotalInventorySummary);
+        //ApplyRackBays(snapshot.RackBays ?? []);
 
-        Sc1OutboundReservations = new ObservableCollection<Sc1OutboundReservationRow>(
-            (snapshot.OutboundSchedules ?? [])
-            .OrderBy(item => Clean(item.InstructionDate))
-            .ThenBy(item => Clean(item.InstructionTime))
-            .ThenBy(item => ToText(item.Sequence))
-            .Select(item => new Sc1OutboundReservationRow(
-                ToText(item.Sequence),
-                ToText(item.CraneNo),
-                Clean(item.Location),
-                Clean(item.WorkStation),
-                item.IsEmergency ? "긴급" : string.Empty,
-                Clean(item.InstructionDate),
-                Clean(item.InstructionTime),
-                Clean(item.PalletNo),
-                Clean(item.JobType))));
+        //Sc1OutboundReservations = new ObservableCollection<Sc1OutboundReservationRow>(
+        //    (snapshot.OutboundSchedules ?? [])
+        //    .OrderBy(item => Clean(item.InstructionDate))
+        //    .ThenBy(item => Clean(item.InstructionTime))
+        //    .ThenBy(item => ToText(item.Sequence))
+        //    .Select(item => new Sc1OutboundReservationRow(
+        //        ToText(item.Sequence),
+        //        ToText(item.CraneNo),
+        //        Clean(item.Location),
+        //        Clean(item.WorkStation),
+        //        item.IsEmergency ? "긴급" : string.Empty,
+        //        Clean(item.InstructionDate),
+        //        Clean(item.InstructionTime),
+        //        Clean(item.PalletNo),
+        //        Clean(item.JobType))));
     }
 
     private void ApplyEquipmentPositions(EquipmentPositionSnapshotDto snapshot)

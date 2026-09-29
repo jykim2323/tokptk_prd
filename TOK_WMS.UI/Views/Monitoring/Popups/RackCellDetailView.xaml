@@ -7,7 +7,7 @@
         Height="650"
         MinWidth="900"
         MinHeight="520"
-        Style="{StaticResource MonitoringPopupWindowStyle}"
+        Style="{DynamicResource MonitoringPopupWindowStyle}"
         Foreground="{DynamicResource AppTextBrush}"
         FontFamily="{StaticResource AppFont}">
 
@@ -180,7 +180,7 @@
                          HorizontalAlignment="Right"
                          VerticalAlignment="Center"
                          IsIndeterminate="True"
-                         Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                         Visibility="{Binding IsLoading, Converter={DynamicResource BooleanToVisibilityConverter}}"/>
         </Grid>
     </Grid>
 </Window>

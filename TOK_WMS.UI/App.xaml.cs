@@ -32,11 +32,13 @@ using TOK.WMS.UI.ViewModels.MainMenus.Controls;
 using TOK.WMS.UI.ViewModels.MainMenus.Inbounds;
 using TOK.WMS.UI.ViewModels.MainMenus.Inventory;
 using TOK.WMS.UI.ViewModels.MainMenus.Monitoring;
+using TOK.WMS.UI.ViewModels.MainMenus.Monitoring.Popups;
 using TOK.WMS.UI.ViewModels.MainMenus.Outbounds;
 using TOK.WMS.UI.ViewModels.MainMenus.Standards;
 using TOK.WMS.UI.Views.Login;
 using TOK.WMS.UI.Views.MainMenus.Inventory;
 using TOK.WMS.UI.Views.MainMenus.Standards;
+using TOK.WMS.UI.Views.Monitoring.Popups;
 
 namespace TOK.WMS.UI;
 
@@ -230,6 +232,17 @@ public partial class App : Application
         sc.AddTransient<SFrm1100ViewModel>();
         sc.AddTransient<MastDispView>();
         sc.AddTransient<MastDispViewModel>();
+
+
+        //팝업창 관리 - 시스템 제어 관리
+        sc.AddTransient<TrackingInfoView>();
+        sc.AddTransient<TrackingInfoViewModel>();
+        sc.AddTransient<StackerWorkView>();
+        sc.AddTransient<StackerWorkViewModel>();
+        sc.AddTransient<RackOverviewView>();
+        sc.AddTransient<RackOverviewViewModel>();
+        sc.AddTransient<RackCellDetailView>();
+        sc.AddTransient<RackCellDetailViewModel>();
 
 
 
