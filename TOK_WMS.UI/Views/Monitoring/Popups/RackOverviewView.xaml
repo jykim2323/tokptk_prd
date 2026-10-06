@@ -33,15 +33,15 @@
             <Setter Property="Margin" Value="1.5"/>
             <Setter Property="Padding" Value="3,2"/>
             <Setter Property="CornerRadius" Value="3"/>
-            <Setter Property="BorderBrush" Value="#94A3B8"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Background" Value="#FFF7ED"/>
-            <Setter Property="TextElement.Foreground" Value="#172B4D"/>
+            <Setter Property="Background" Value="{DynamicResource AppSurface2Brush}"/>
+            <Setter Property="TextElement.Foreground" Value="{DynamicResource AppTextBrush}"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Flag}" Value="0">
-                    <Setter Property="Background" Value="#F3F4F6"/>
-                    <Setter Property="TextElement.Foreground" Value="#334155"/>
+                    <Setter Property="Background" Value="{DynamicResource RackEmptyBrush}"/>
+                    <Setter Property="TextElement.Foreground" Value="{DynamicResource RackEmptyTextBrush}"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Flag}" Value="1">
                     <Setter Property="Background" Value="#1565C0"/>
@@ -72,9 +72,9 @@
                     <Setter Property="TextElement.Foreground" Value="White"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding IsAvailable}" Value="False">
-                    <Setter Property="Background" Value="#CBD5E1"/>
-                    <Setter Property="TextElement.Foreground" Value="#64748B"/>
-                    <Setter Property="BorderBrush" Value="#94A3B8"/>
+                    <Setter Property="Background" Value="{DynamicResource AppSurface2Brush}"/>
+                    <Setter Property="TextElement.Foreground" Value="{DynamicResource AppTextSubBrush}"/>
+                    <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
                     <Setter Property="Cursor" Value="Arrow"/>
                     <Setter Property="Opacity" Value="0.52"/>
                 </DataTrigger>
@@ -86,8 +86,8 @@
             <Setter Property="Height" Value="30"/>
             <Setter Property="Margin" Value="1.5"/>
             <Setter Property="CornerRadius" Value="3"/>
-            <Setter Property="Background" Value="#203B6A"/>
-            <Setter Property="BorderBrush" Value="#AFC5E5"/>
+            <Setter Property="Background" Value="{DynamicResource HeaderBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
         </Style>
     </Window.Resources>
@@ -113,10 +113,10 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="▦" FontSize="25" Foreground="White" Margin="0,0,8,0"/>
-                    <TextBlock Text="랙 현황" FontSize="22" FontWeight="Bold" Foreground="White"/>
+                    <TextBlock Text="▦" FontSize="25" Foreground="{DynamicResource AppTextOnPrimBrush}" Margin="0,0,8,0"/>
+                    <TextBlock Text="랙 현황" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource AppTextOnPrimBrush}"/>
                     <TextBlock Margin="12,5,0,0"
-                               Foreground="#EAF4FB"
+                               Foreground="{DynamicResource AppTextOnPrimBrush}"
                                Text="셀을 더블클릭하면 상세 정보를 열 수 있습니다."/>
                 </StackPanel>
                 <Button Grid.Column="1"
@@ -149,8 +149,9 @@
                           Margin="10,0,0,0"
                           Padding="8,3"
                           ItemsSource="{Binding BankOptions}"
-                          SelectedItem="{Binding SelectedBank, Mode=TwoWay}"
+                          SelectedItem="{Binding SelectedBank, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           Background="{DynamicResource InputBrush}"
+                          Foreground="{DynamicResource AppTextBrush}"
                           BorderBrush="{DynamicResource InputBorderBrush}"/>
                 <TextBlock Grid.Column="2" Margin="6,0,0,0" VerticalAlignment="Center" Text="열"/>
                 <TextBlock Grid.Column="3"
@@ -167,7 +168,7 @@
 
         <WrapPanel Grid.Row="2" Margin="0,0,0,10" VerticalAlignment="Center">
             <TextBlock Margin="0,0,10,0" VerticalAlignment="Center" FontWeight="SemiBold" Text="상태"/>
-            <Border Width="14" Height="14" Background="#F3F4F6" BorderBrush="#94A3B8" BorderThickness="1"/>
+            <Border Width="14" Height="14" Background="{DynamicResource RackEmptyBrush}" BorderBrush="{DynamicResource AppBorderBrush}" BorderThickness="1"/>
             <TextBlock Margin="4,0,10,0" Text="빈 셀"/>
             <Border Width="14" Height="14" Background="#1565C0"/>
             <TextBlock Margin="4,0,10,0" Text="적재"/>
@@ -181,7 +182,7 @@
             <TextBlock Margin="4,0,10,0" Text="공출고"/>
             <Border Width="14" Height="14" Background="#111827"/>
             <TextBlock Margin="4,0,10,0" Text="사용금지"/>
-            <Border Width="14" Height="14" Background="#CBD5E1" Opacity="0.52"/>
+            <Border Width="14" Height="14" Background="{DynamicResource AppSurface2Brush}" BorderBrush="{DynamicResource AppBorderBrush}" BorderThickness="1" Opacity="0.52"/>
             <TextBlock Margin="4,0,0,0" Text="제외 셀"/>
         </WrapPanel>
 
@@ -197,9 +198,9 @@
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Border Width="50" Height="30" Margin="1.5"
-                                Background="#203B6A" CornerRadius="3">
+                                Background="{DynamicResource HeaderBrush}" CornerRadius="3">
                             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
-                                       Foreground="White" FontWeight="Bold" Text="단 / 연"/>
+                                       Foreground="{DynamicResource AppTextOnPrimBrush}" FontWeight="Bold" Text="단 / 연"/>
                         </Border>
                         <ItemsControl ItemsSource="{Binding BayHeaders}">
                             <ItemsControl.ItemsPanel>
@@ -212,7 +213,7 @@
                                     <Border Style="{StaticResource RackHeaderBorderStyle}">
                                         <TextBlock HorizontalAlignment="Center"
                                                    VerticalAlignment="Center"
-                                                   Foreground="White"
+                                                   Foreground="{DynamicResource AppTextOnPrimBrush}"
                                                    FontWeight="Bold"
                                                    Text="{Binding Bay, StringFormat={}{0:00}연}"/>
                                     </Border>
@@ -226,13 +227,13 @@
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
                                     <Border Width="50" Height="52" Margin="1.5"
-                                            Background="#E8EEF8"
-                                            BorderBrush="#AFC5E5"
+                                            Background="{DynamicResource HeaderBrush}"
+                                            BorderBrush="{DynamicResource AppBorderBrush}"
                                             BorderThickness="1"
                                             CornerRadius="3">
                                         <TextBlock HorizontalAlignment="Center"
                                                    VerticalAlignment="Center"
-                                                   Foreground="#17345C"
+                                                   Foreground="{DynamicResource AppTextOnPrimBrush}"
                                                    FontWeight="Bold"
                                                    Text="{Binding Level, StringFormat={}{0:00}단}"/>
                                     </Border>
@@ -247,13 +248,17 @@
                                                 <Border Style="{StaticResource RackCellBorderStyle}"
                                                         MouseLeftButtonDown="RackCell_MouseLeftButtonDown">
                                                     <Border.ToolTip>
-                                                        <StackPanel>
-                                                            <TextBlock FontWeight="Bold" Text="{Binding DisplayLocation}"/>
-                                                            <TextBlock Text="{Binding StatusName}"/>
-                                                            <TextBlock Text="{Binding PalletNo, StringFormat='PLT-NO: {0}'}"/>
-                                                            <TextBlock Text="{Binding InDate, StringFormat='입고일자: {0}'}"/>
-                                                            <TextBlock Text="{Binding InTime, StringFormat='입고시간: {0}'}"/>
-                                                        </StackPanel>
+                                                        <ToolTip Background="{DynamicResource AppSurfaceBrush}"
+                                                                 BorderBrush="{DynamicResource AppBorderBrush}"
+                                                                 Foreground="{DynamicResource AppTextBrush}">
+                                                            <StackPanel>
+                                                                <TextBlock FontWeight="Bold" Text="{Binding DisplayLocation}"/>
+                                                                <TextBlock Text="{Binding StatusName}"/>
+                                                                <TextBlock Text="{Binding PalletNo, StringFormat='PLT-NO: {0}'}"/>
+                                                                <TextBlock Text="{Binding InDate, StringFormat='입고일자: {0}'}"/>
+                                                                <TextBlock Text="{Binding InTime, StringFormat='입고시간: {0}'}"/>
+                                                            </StackPanel>
+                                                        </ToolTip>
                                                     </Border.ToolTip>
                                                     <StackPanel VerticalAlignment="Center">
                                                         <TextBlock HorizontalAlignment="Center"

@@ -243,6 +243,8 @@ public partial class App : Application
         sc.AddTransient<RackOverviewViewModel>();
         sc.AddTransient<RackCellDetailView>();
         sc.AddTransient<RackCellDetailViewModel>();
+        sc.AddTransient<RackInventoryEditView>();
+        sc.AddTransient<RackInventoryEditViewModel>();
 
 
 

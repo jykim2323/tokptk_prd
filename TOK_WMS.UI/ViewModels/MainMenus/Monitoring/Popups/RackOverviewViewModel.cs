@@ -19,16 +19,25 @@ public partial class RackOverviewViewModel : ObservableObject
     private readonly IDialogService _dialog;
     private readonly IWindowService _windowService;
     private int _highlightedBay;
-    private int _requestedBank;
+    private bool _isInitializing;
+    private int _loadVersion;
+    private CancellationTokenSource? _loadCancellation;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(OpenCellCommand))]
     private int _selectedBank = FirstBank;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(SearchCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OpenCellCommand))]
     private bool _isLoading;
 
     [ObservableProperty]
-    private string _statusMessage = "열을 선택한 후 조회하세요.";
+    [NotifyCanExecuteChangedFor(nameof(OpenCellCommand))]
+    private int _displayedBank;
+
+    [ObservableProperty]
+    private string _statusMessage = "열을 선택하면 자동으로 조회합니다.";
 
     [ObservableProperty]
     private int _loadedCellCount;
@@ -53,37 +62,64 @@ public partial class RackOverviewViewModel : ObservableObject
 
     public void Initialize(int bank, int selectedBay)
     {
-        SelectedBank = Math.Clamp(bank, FirstBank, LastBank);
-        _requestedBank = SelectedBank;
-
-        var lastBay = GetLastBay(SelectedBank);
-        _highlightedBay = selectedBay >= 1 && selectedBay <= lastBay
-            ? selectedBay
-            : 0;
+        _isInitializing = true;
+        try
+        {
+            SelectedBank = Math.Clamp(bank, FirstBank, LastBank);
+            var lastBay = GetLastBay(SelectedBank);
+            _highlightedBay = selectedBay >= 1 && selectedBay <= lastBay
+                ? selectedBay
+                : 0;
+        }
+        finally
+        {
+            _isInitializing = false;
+        }
 
         _ = LoadCellsAsync();
     }
 
-    [RelayCommand]
+    partial void OnSelectedBankChanged(int value)
+    {
+        if (_isInitializing)
+            return;
+
+        _highlightedBay = 0;
+        _ = LoadCellsAsync();
+    }
+
+    public void RefreshForLocation(string location)
+    {
+        var normalized = location?.Trim() ?? string.Empty;
+        if (normalized.Length != 6 || normalized.Any(character => character is < '0' or > '9'))
+            return;
+
+        if (int.TryParse(normalized.AsSpan(0, 2), out var bank) && bank == SelectedBank)
+            _ = LoadCellsAsync();
+    }
+
+    private bool CanSearch() => !IsLoading;
+
+    [RelayCommand(CanExecute = nameof(CanSearch), AllowConcurrentExecutions = true)]
     private async Task SearchAsync()
     {
         if (IsLoading)
             return;
 
-        if (SelectedBank != _requestedBank)
-            _highlightedBay = 0;
-
-        _requestedBank = SelectedBank;
         await LoadCellsAsync();
     }
 
-    [RelayCommand]
+    private bool CanOpenCell(RackCellTile? tile) =>
+        !IsLoading && DisplayedBank == SelectedBank
+        && tile is { IsAvailable: true } && !string.IsNullOrWhiteSpace(tile.Location);
+
+    [RelayCommand(CanExecute = nameof(CanOpenCell))]
     private void OpenCell(RackCellTile? tile)
     {
-        if (tile is not { IsAvailable: true } || string.IsNullOrWhiteSpace(tile.Location))
+        if (!CanOpenCell(tile))
             return;
 
-        _windowService.ShowRackCellDetail(tile.Location);
+        _windowService.ShowRackCellDetail(tile!.Location);
     }
 
     [RelayCommand]
@@ -91,35 +127,57 @@ public partial class RackOverviewViewModel : ObservableObject
 
     private async Task LoadCellsAsync()
     {
-        if (IsLoading)
-            return;
+        var bank = SelectedBank;
+        var version = ++_loadVersion;
+        var cancellation = new CancellationTokenSource();
+        var previous = _loadCancellation;
+        _loadCancellation = cancellation;
+        previous?.Cancel();
 
         IsLoading = true;
-        StatusMessage = $"{SelectedBank}열 셀 현황을 조회하는 중입니다.";
+        StatusMessage = DisplayedBank > 0 && DisplayedBank != bank
+            ? $"{bank}열 조회 중 · {DisplayedBank}열 화면 유지"
+            : $"{bank}열 셀 현황을 조회하는 중입니다.";
 
         try
         {
-            var cells = await _api.GetRackCellsAsync(SelectedBank);
-            BuildRack(cells ?? []);
+            var cells = await _api.GetRackCellsAsync(bank, cancellation.Token);
+            if (version != _loadVersion)
+                return;
+
+            BuildRack(bank, cells ?? []);
+            DisplayedBank = bank;
             LoadedCellCount = cells?.Count ?? 0;
-            StatusMessage = $"{SelectedBank}열 · {LoadedCellCount:N0}개 셀";
+            StatusMessage = $"{bank}열 · {LoadedCellCount:N0}개 셀";
+        }
+        catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
+        {
         }
         catch (Exception ex)
         {
-            BuildRack([]);
-            LoadedCellCount = 0;
-            StatusMessage = $"{SelectedBank}열 조회에 실패했습니다.";
+            if (version != _loadVersion)
+                return;
+
+            StatusMessage = DisplayedBank > 0
+                ? $"{bank}열 조회 실패 · {DisplayedBank}열 화면 유지"
+                : $"{bank}열 조회에 실패했습니다.";
             _dialog.ShowMessage($"랙 셀 현황 조회 실패: {ex.Message}", "오류");
         }
         finally
         {
-            IsLoading = false;
+            if (version == _loadVersion)
+            {
+                _loadCancellation = null;
+                IsLoading = false;
+            }
+
+            cancellation.Dispose();
         }
     }
 
-    private void BuildRack(IReadOnlyCollection<MonitoringRackCellDto> cells)
+    private void BuildRack(int bank, IReadOnlyCollection<MonitoringRackCellDto> cells)
     {
-        var lastBay = GetLastBay(SelectedBank);
+        var lastBay = GetLastBay(bank);
         var cellsByCoordinate = cells
             .Select(cell => new
             {
@@ -131,26 +189,42 @@ public partial class RackOverviewViewModel : ObservableObject
             .GroupBy(item => (item.Bay, item.Level))
             .ToDictionary(group => group.Key, group => group.First().Cell);
 
-        BayHeaders.Clear();
-        for (var bay = 1; bay <= lastBay; bay++)
-            BayHeaders.Add(new RackBayHeader(bay, bay == _highlightedBay));
+        while (BayHeaders.Count > lastBay)
+            BayHeaders.RemoveAt(BayHeaders.Count - 1);
 
-        LevelRows.Clear();
+        for (var bay = 1; bay <= lastBay; bay++)
+        {
+            var header = new RackBayHeader(bay, bay == _highlightedBay);
+            if (BayHeaders.Count < bay)
+                BayHeaders.Add(header);
+            else if (BayHeaders[bay - 1] != header)
+                BayHeaders[bay - 1] = header;
+        }
+
         for (var level = LevelCount; level >= 1; level--)
         {
-            var tiles = new ObservableCollection<RackCellTile>();
+            var rowIndex = LevelCount - level;
+            if (LevelRows.Count <= rowIndex)
+                LevelRows.Add(new RackLevelRow(level, []));
+
+            var tiles = LevelRows[rowIndex].Cells;
+            while (tiles.Count > lastBay)
+                tiles.RemoveAt(tiles.Count - 1);
+
             for (var bay = 1; bay <= lastBay; bay++)
             {
                 cellsByCoordinate.TryGetValue((bay, level), out var cell);
-                tiles.Add(RackCellTile.Create(
-                    SelectedBank,
+                var tile = RackCellTile.Create(
+                    bank,
                     bay,
                     level,
                     cell,
-                    bay == _highlightedBay));
+                    bay == _highlightedBay);
+                if (tiles.Count < bay)
+                    tiles.Add(tile);
+                else
+                    tiles[bay - 1].UpdateFrom(tile);
             }
-
-            LevelRows.Add(new RackLevelRow(level, tiles));
         }
     }
 
@@ -166,17 +240,53 @@ public sealed record RackLevelRow(
     int Level,
     ObservableCollection<RackCellTile> Cells);
 
-public sealed record RackCellTile(
-    string Location,
-    string DisplayLocation,
-    string Flag,
-    string StatusName,
-    string PalletNo,
-    string InDate,
-    string InTime,
-    bool IsAvailable,
-    bool IsSelectedBay)
+public sealed partial class RackCellTile : ObservableObject
 {
+    [ObservableProperty] private string _location;
+    [ObservableProperty] private string _displayLocation;
+    [ObservableProperty] private string _flag;
+    [ObservableProperty] private string _statusName;
+    [ObservableProperty] private string _palletNo;
+    [ObservableProperty] private string _inDate;
+    [ObservableProperty] private string _inTime;
+    [ObservableProperty] private bool _isAvailable;
+    [ObservableProperty] private bool _isSelectedBay;
+
+    public RackCellTile(
+        string location,
+        string displayLocation,
+        string flag,
+        string statusName,
+        string palletNo,
+        string inDate,
+        string inTime,
+        bool isAvailable,
+        bool isSelectedBay)
+    {
+        _location = location;
+        _displayLocation = displayLocation;
+        _flag = flag;
+        _statusName = statusName;
+        _palletNo = palletNo;
+        _inDate = inDate;
+        _inTime = inTime;
+        _isAvailable = isAvailable;
+        _isSelectedBay = isSelectedBay;
+    }
+
+    internal void UpdateFrom(RackCellTile tile)
+    {
+        Location = tile.Location;
+        DisplayLocation = tile.DisplayLocation;
+        Flag = tile.Flag;
+        StatusName = tile.StatusName;
+        PalletNo = tile.PalletNo;
+        InDate = tile.InDate;
+        InTime = tile.InTime;
+        IsAvailable = tile.IsAvailable;
+        IsSelectedBay = tile.IsSelectedBay;
+    }
+
     public static RackCellTile Create(
         int bank,
         int bay,

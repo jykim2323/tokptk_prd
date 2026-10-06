@@ -211,10 +211,12 @@
 
 
                     <Grid DockPanel.Dock="Top"
+                          Background="{DynamicResource HeaderBrush}"
                           Height="40"
                           Margin="0,0,0,8">
 
                         <TextBlock Text="📋 사용자 목록"
+                                   Foreground="{DynamicResource AppTextOnPrimBrush}"
                                    FontSize="15"
                                    FontWeight="Bold"
                                    VerticalAlignment="Center"/>
@@ -225,7 +227,7 @@
                                    HorizontalAlignment="Right"
                                    VerticalAlignment="Center"
                                    FontWeight="Bold"
-                                   Foreground="{DynamicResource AppTextSubBrush}"/>
+                                   Foreground="{DynamicResource AppTextOnPrimBrush}"/>
 
                     </Grid>
 

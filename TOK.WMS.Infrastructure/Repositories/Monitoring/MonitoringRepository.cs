@@ -1,4 +1,7 @@
 using Dapper;
+using Microsoft.Data.SqlClient;
+using System.Data;
+using System.Globalization;
 using TOK.WMS.Core.DTOs.Monitoring;
 using TOK.WMS.Core.Interfaces.Monitoring;
 using TOK.WMS.Infrastructure.Data;
@@ -852,6 +855,425 @@ public sealed class MonitoringRepository(DbConnectionFactory db) : IMonitoringRe
         return cell is null
             ? null
             : new MonitoringRackCellDetailDto { Cell = cell, InventoryItems = items };
+    }
+
+    public async Task SetRackCellUsageAsync(
+        string location,
+        bool isProhibited,
+        CancellationToken cancellationToken = default)
+    {
+        var normalizedLocation = NormalizeLocation(location);
+        const string selectCellSql = """
+                                     SELECT 1
+                                     FROM dbo.T2MILSTK WITH (UPDLOCK, HOLDLOCK)
+                                     WHERE LSTK_LOCA = @Location;
+                                     """;
+        const string selectInventorySql = """
+                                          SELECT COUNT(*)
+                                          FROM dbo.T2MISUBK WITH (UPDLOCK, HOLDLOCK)
+                                          WHERE SUBK_LOCA = @Location;
+                                          """;
+        const string updateCellSql = """
+                                     UPDATE dbo.T2MILSTK
+                                        SET LSTK_FLAG = @Flag
+                                      WHERE LSTK_LOCA = @Location;
+                                     """;
+        const string clearCellSql = """
+                                    UPDATE dbo.T2MILSTK
+                                       SET LSTK_FLAG = '0',
+                                           LSTK_INDATE = '', LSTK_INTIME = '', LSTK_PLTNO = ''
+                                     WHERE LSTK_LOCA = @Location;
+                                    """;
+        const string updateInventorySql = """
+                                          UPDATE dbo.T2MISUBK
+                                             SET SUBK_FLAG = @Flag
+                                           WHERE SUBK_LOCA = @Location;
+                                          """;
+
+        using var connection = db.Create();
+        connection.Open();
+        using var transaction = connection.BeginTransaction();
+        try
+        {
+            var cellExists = await connection.QuerySingleOrDefaultAsync<int?>(
+                new CommandDefinition(
+                    selectCellSql,
+                    new { Location = normalizedLocation },
+                    transaction,
+                    cancellationToken: cancellationToken));
+
+            if (cellExists is null)
+                throw new InvalidOperationException($"저장위치 {normalizedLocation} 셀을 찾지 못했습니다.");
+
+            // 사용 처리의 빈 셀 판단부터 재고 상태 갱신까지 같은 위치의 행과 범위를 잠근다.
+            var inventoryCount = await connection.QuerySingleAsync<int>(
+                new CommandDefinition(
+                    selectInventorySql,
+                    new { Location = normalizedLocation },
+                    transaction,
+                    cancellationToken: cancellationToken));
+
+            var updatedCellCount = await connection.ExecuteAsync(new CommandDefinition(
+                !isProhibited && inventoryCount == 0 ? clearCellSql : updateCellSql,
+                new
+                {
+                    Location = normalizedLocation,
+                    Flag = isProhibited ? "N" : "1"
+                },
+                transaction,
+                cancellationToken: cancellationToken));
+
+            if (updatedCellCount != 1)
+                throw new InvalidOperationException($"저장위치 {normalizedLocation} 셀 상태를 변경하지 못했습니다.");
+
+            var updatedInventoryCount = await connection.ExecuteAsync(new CommandDefinition(
+                updateInventorySql,
+                new { Location = normalizedLocation, Flag = isProhibited ? "N" : "1" },
+                transaction,
+                cancellationToken: cancellationToken));
+
+            if (updatedInventoryCount != inventoryCount)
+                throw new InvalidOperationException($"저장위치 {normalizedLocation} 재고 상태를 변경하지 못했습니다.");
+
+            transaction.Commit();
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
+        }
+    }
+
+    public Task AddRackInventoryAsync(
+        string location,
+        MonitoringRackInventorySaveRequest request,
+        CancellationToken cancellationToken = default) =>
+        SaveRackInventoryAsync(location, request, isUpdate: false, cancellationToken);
+
+    public Task UpdateRackInventoryAsync(
+        string location,
+        MonitoringRackInventorySaveRequest request,
+        CancellationToken cancellationToken = default) =>
+        SaveRackInventoryAsync(location, request, isUpdate: true, cancellationToken);
+
+    private async Task SaveRackInventoryAsync(
+        string location,
+        MonitoringRackInventorySaveRequest request,
+        bool isUpdate,
+        CancellationToken cancellationToken)
+    {
+        var normalizedLocation = NormalizeRackInventoryLocation(location);
+        ArgumentNullException.ThrowIfNull(request);
+        var item = NormalizeRackInventory(request.Item, validateValues: true);
+        var userId = ValidateLength(request.UserId, 10, "사용자 ID");
+        var original = isUpdate
+            ? NormalizeRackInventory(request.Original
+                ?? throw new ArgumentException("수정할 원본 재고를 함께 보내 주세요."), validateValues: false)
+            : null;
+
+        if (original is not null &&
+            (item.ItemCode != original.ItemCode || item.LotNo != original.LotNo))
+            throw new ArgumentException("수정할 때 품번과 LOT-NO는 변경할 수 없습니다.");
+
+        const string duplicateSql = """
+                                    SELECT COUNT(*)
+                                    FROM dbo.T2MISUBK WITH (UPDLOCK, HOLDLOCK)
+                                    WHERE SUBK_PLTNO = @PalletNo
+                                      AND SUBK_CODE = @ItemCode AND SUBK_LOTNO = @LotNo
+                                      AND NOT (@IsUpdate = 1 AND SUBK_PLTNO = @OriginalPalletNo
+                                               AND SUBK_CODE = @OriginalItemCode
+                                               AND SUBK_LOTNO = @OriginalLotNo AND SUBK_LOCA = @Location);
+                                    """;
+        const string itemExistsSql = """
+                                     SELECT COUNT(*) FROM dbo.MIMAST WITH (HOLDLOCK)
+                                     WHERE MAST_CODE = @ItemCode;
+                                     """;
+        const string insertSql = """
+                                 INSERT INTO dbo.T2MISUBK
+                                     (SUBK_LOCA, SUBK_PLTNO, SUBK_CODE, SUBK_LOTNO,
+                                      SUBK_FLAG, SUBK_WGT, SUBK_RWGT, SUBK_BOXNO, SUBK_REMARK,
+                                      SUBK_INDATE, SUBK_INTIME, SUBK_GUBUN, SUBK_USERID)
+                                 VALUES
+                                     (@Location, @PalletNo, @ItemCode, @LotNo,
+                                      @Flag, @Quantity, @ReservedQuantity, @BoxNo, @Remark,
+                                      @InDate, @InTime, '', @UserId);
+                                 """;
+        const string updateSql = """
+                                 UPDATE dbo.T2MISUBK
+                                    SET SUBK_PLTNO = @PalletNo, SUBK_LOCA = @Location,
+                                        SUBK_FLAG = @Flag, SUBK_WGT = @Quantity,
+                                        SUBK_RWGT = @ReservedQuantity, SUBK_BOXNO = @BoxNo,
+                                        SUBK_REMARK = @Remark, SUBK_INDATE = @InDate,
+                                        SUBK_INTIME = @InTime, SUBK_USERID = @UserId
+                                  WHERE SUBK_LOCA = @Location AND SUBK_PLTNO = @OriginalPalletNo
+                                    AND SUBK_CODE = @OriginalItemCode AND SUBK_LOTNO = @OriginalLotNo;
+                                 """;
+
+        await ExecuteRackInventoryMutationAsync(normalizedLocation, async (connection, transaction, _) =>
+        {
+            if (original is not null)
+                await EnsureRackInventoryOriginalAsync(
+                    connection, transaction, normalizedLocation, original, cancellationToken);
+
+            var duplicateCount = await connection.QuerySingleAsync<int>(new CommandDefinition(
+                duplicateSql,
+                new
+                {
+                    Location = normalizedLocation, item.PalletNo, item.ItemCode, item.LotNo,
+                    IsUpdate = isUpdate,
+                    OriginalPalletNo = original?.PalletNo ?? string.Empty,
+                    OriginalItemCode = original?.ItemCode ?? string.Empty,
+                    OriginalLotNo = original?.LotNo ?? string.Empty
+                }, transaction, cancellationToken: cancellationToken));
+            if (duplicateCount > 0)
+                throw new InvalidOperationException("해당 PLT-NO에 동일 품번과 LOT-NO 재고가 이미 등록되어 있습니다.");
+
+            var itemCount = await connection.QuerySingleAsync<int>(new CommandDefinition(
+                itemExistsSql, new { item.ItemCode }, transaction, cancellationToken: cancellationToken));
+            if (itemCount == 0)
+                throw new InvalidOperationException("품목 코드에 등록되지 않은 품번입니다.");
+
+            var affected = await connection.ExecuteAsync(new CommandDefinition(
+                isUpdate ? updateSql : insertSql,
+                new
+                {
+                    Location = normalizedLocation, item.PalletNo, item.ItemCode, item.LotNo,
+                    item.Flag, item.Quantity, item.ReservedQuantity, item.BoxNo, item.Remark,
+                    item.InDate, item.InTime, UserId = userId,
+                    OriginalPalletNo = original?.PalletNo ?? string.Empty,
+                    OriginalItemCode = original?.ItemCode ?? string.Empty,
+                    OriginalLotNo = original?.LotNo ?? string.Empty
+                }, transaction, cancellationToken: cancellationToken));
+            if (affected != 1)
+                throw new InvalidOperationException("재고가 변경되었거나 삭제되었습니다. 다시 조회한 뒤 처리하세요.");
+
+            await SynchronizeRackCellAsync(connection, transaction, normalizedLocation,
+                item.Flag, item.PalletNo, item.InDate, item.InTime, cancellationToken);
+        }, cancellationToken);
+    }
+
+    public async Task DeleteRackInventoryAsync(
+        string location,
+        MonitoringRackInventoryDeleteRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var normalizedLocation = NormalizeRackInventoryLocation(location);
+        ArgumentNullException.ThrowIfNull(request);
+        var original = NormalizeRackInventory(request.Original, validateValues: false);
+        const string deleteSql = """
+                                 DELETE FROM dbo.T2MISUBK
+                                  WHERE SUBK_LOCA = @Location AND SUBK_PLTNO = @PalletNo
+                                    AND SUBK_CODE = @ItemCode AND SUBK_LOTNO = @LotNo;
+                                 """;
+        const string remainingSql = """
+                                    SELECT TOP (1)
+                                        LTRIM(RTRIM(COALESCE(SUBK_FLAG, ''))) AS Flag,
+                                        LTRIM(RTRIM(COALESCE(SUBK_PLTNO, ''))) AS PalletNo,
+                                        LTRIM(RTRIM(COALESCE(SUBK_INDATE, ''))) AS InDate,
+                                        LTRIM(RTRIM(COALESCE(SUBK_INTIME, ''))) AS InTime
+                                    FROM dbo.T2MISUBK WITH (UPDLOCK, HOLDLOCK)
+                                    WHERE SUBK_LOCA = @Location
+                                    ORDER BY SUBK_PLTNO, SUBK_CODE, SUBK_LOTNO;
+                                    """;
+
+        await ExecuteRackInventoryMutationAsync(normalizedLocation, async (connection, transaction, cell) =>
+        {
+            await EnsureRackInventoryOriginalAsync(
+                connection, transaction, normalizedLocation, original, cancellationToken);
+            var affected = await connection.ExecuteAsync(new CommandDefinition(
+                deleteSql, new { Location = normalizedLocation, original.PalletNo, original.ItemCode, original.LotNo },
+                transaction, cancellationToken: cancellationToken));
+            if (affected != 1)
+                throw new InvalidOperationException("재고가 변경되었거나 삭제되었습니다. 다시 조회한 뒤 처리하세요.");
+
+            var remaining = await connection.QuerySingleOrDefaultAsync<MonitoringRackInventoryDto>(
+                new CommandDefinition(remainingSql, new { Location = normalizedLocation },
+                    transaction, cancellationToken: cancellationToken));
+            var flag = string.Equals(cell.Flag, "N", StringComparison.OrdinalIgnoreCase)
+                ? "N" : remaining?.Flag ?? "0";
+            await SynchronizeRackCellAsync(connection, transaction, normalizedLocation,
+                flag, remaining?.PalletNo ?? string.Empty, remaining?.InDate ?? string.Empty,
+                remaining?.InTime ?? string.Empty, cancellationToken);
+        }, cancellationToken);
+    }
+
+    private async Task ExecuteRackInventoryMutationAsync(
+        string location,
+        Func<IDbConnection, IDbTransaction, MonitoringRackCellDto, Task> action,
+        CancellationToken cancellationToken)
+    {
+        const string cellSql = """
+                               SELECT LTRIM(RTRIM(COALESCE(LSTK_FLAG, ''))) AS Flag
+                               FROM dbo.T2MILSTK WITH (UPDLOCK, HOLDLOCK)
+                               WHERE LSTK_LOCA = @Location;
+                               """;
+        const string inventoryLockSql = """
+                                        SELECT COUNT(*) FROM dbo.T2MISUBK WITH (UPDLOCK, HOLDLOCK)
+                                        WHERE SUBK_LOCA = @Location;
+                                        """;
+        using var connection = db.Create();
+        connection.Open();
+        using var transaction = connection.BeginTransaction();
+        try
+        {
+            var cell = await connection.QuerySingleOrDefaultAsync<MonitoringRackCellDto>(
+                new CommandDefinition(cellSql, new { Location = location }, transaction,
+                    cancellationToken: cancellationToken));
+            if (cell is null)
+                throw new InvalidOperationException($"저장위치 {location} 셀을 찾지 못했습니다.");
+
+            // 해당 위치에 재고가 없는 경우에도 범위를 잠가 잔여 재고 판단과 셀 갱신을 함께 처리한다.
+            await connection.QuerySingleAsync<int>(new CommandDefinition(
+                inventoryLockSql, new { Location = location }, transaction, cancellationToken: cancellationToken));
+            await action(connection, transaction, cell);
+            transaction.Commit();
+        }
+        catch (SqlException ex)
+        {
+            RollbackRackInventoryTransaction(transaction);
+            var message = ex.Number switch
+            {
+                2601 or 2627 => "동일한 PLT-NO, 품번, LOT-NO 재고가 이미 등록되어 있습니다.",
+                8152 or 2628 => "입력한 값이 데이터베이스 필드의 허용 길이를 초과했습니다.",
+                1205 => "다른 재고 작업과 겹쳐 처리하지 못했습니다. 다시 조회한 뒤 처리하세요.",
+                _ => "재고 처리 중 데이터베이스 오류가 발생했습니다. 다시 조회한 뒤 처리하세요."
+            };
+            throw new InvalidOperationException(message, ex);
+        }
+        catch
+        {
+            RollbackRackInventoryTransaction(transaction);
+            throw;
+        }
+    }
+
+    private static void RollbackRackInventoryTransaction(IDbTransaction transaction)
+    {
+        try
+        {
+            transaction.Rollback();
+        }
+        catch (InvalidOperationException)
+        {
+            // SQL Server가 교착 상태 등으로 이미 롤백한 트랜잭션은 다시 롤백할 수 없다.
+        }
+    }
+
+    private static async Task EnsureRackInventoryOriginalAsync(
+        IDbConnection connection,
+        IDbTransaction transaction,
+        string location,
+        MonitoringRackInventoryDto original,
+        CancellationToken cancellationToken)
+    {
+        const string sql = """
+                           SELECT LTRIM(RTRIM(COALESCE(SUBK_FLAG, ''))) AS Flag,
+                                  LTRIM(RTRIM(COALESCE(SUBK_PLTNO, ''))) AS PalletNo,
+                                  LTRIM(RTRIM(COALESCE(SUBK_CODE, ''))) AS ItemCode,
+                                  LTRIM(RTRIM(COALESCE(SUBK_LOTNO, ''))) AS LotNo,
+                                  COALESCE(SUBK_WGT, 0) AS Quantity,
+                                  COALESCE(SUBK_RWGT, 0) AS ReservedQuantity,
+                                  LTRIM(RTRIM(COALESCE(SUBK_BOXNO, ''))) AS BoxNo,
+                                  LTRIM(RTRIM(COALESCE(SUBK_REMARK, ''))) AS Remark,
+                                  LTRIM(RTRIM(COALESCE(SUBK_INDATE, ''))) AS InDate,
+                                  LTRIM(RTRIM(COALESCE(SUBK_INTIME, ''))) AS InTime
+                           FROM dbo.T2MISUBK WITH (UPDLOCK, HOLDLOCK)
+                           WHERE SUBK_LOCA = @Location AND SUBK_PLTNO = @PalletNo
+                             AND SUBK_CODE = @ItemCode AND SUBK_LOTNO = @LotNo;
+                           """;
+        var rows = (await connection.QueryAsync<MonitoringRackInventoryDto>(new CommandDefinition(
+            sql, new { Location = location, original.PalletNo, original.ItemCode, original.LotNo },
+            transaction, cancellationToken: cancellationToken))).AsList();
+        if (rows.Count != 1)
+            throw new InvalidOperationException("선택한 재고가 변경되었거나 삭제되었습니다. 다시 조회한 뒤 처리하세요.");
+
+        var current = rows[0];
+        if (current.PalletNo != original.PalletNo || current.ItemCode != original.ItemCode
+            || current.LotNo != original.LotNo || current.Flag != original.Flag
+            || current.Quantity != original.Quantity || current.ReservedQuantity != original.ReservedQuantity
+            || current.BoxNo != original.BoxNo || current.Remark != original.Remark
+            || current.InDate != original.InDate || current.InTime != original.InTime)
+            throw new InvalidOperationException("다른 작업에서 재고가 변경되었습니다. 다시 조회한 뒤 처리하세요.");
+    }
+
+    private static async Task SynchronizeRackCellAsync(
+        IDbConnection connection,
+        IDbTransaction transaction,
+        string location,
+        string flag,
+        string palletNo,
+        string inDate,
+        string inTime,
+        CancellationToken cancellationToken)
+    {
+        const string sql = """
+                           UPDATE dbo.T2MILSTK
+                              SET LSTK_FLAG = @Flag, LSTK_PLTNO = @PalletNo,
+                                  LSTK_INDATE = @InDate, LSTK_INTIME = @InTime
+                            WHERE LSTK_LOCA = @Location;
+                           """;
+        var affected = await connection.ExecuteAsync(new CommandDefinition(
+            sql, new { Location = location, Flag = flag, PalletNo = palletNo, InDate = inDate, InTime = inTime },
+            transaction, cancellationToken: cancellationToken));
+        if (affected != 1)
+            throw new InvalidOperationException("셀 상태가 변경되었습니다. 다시 조회한 뒤 처리하세요.");
+    }
+
+    private static MonitoringRackInventoryDto NormalizeRackInventory(
+        MonitoringRackInventoryDto item,
+        bool validateValues)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        var normalized = new MonitoringRackInventoryDto
+        {
+            PalletNo = ValidateLength(item.PalletNo, 12, "PLT-NO"),
+            ItemCode = ValidateLength(item.ItemCode, 18, "품번"),
+            LotNo = ValidateLength(item.LotNo, 20, "LOT-NO"),
+            Flag = validateValues ? ValidateLength(item.Flag, 1, "상태") : item.Flag?.Trim() ?? string.Empty,
+            Quantity = item.Quantity,
+            ReservedQuantity = item.ReservedQuantity,
+            BoxNo = validateValues ? ValidateLength(item.BoxNo, 30, "BOX-NO") : item.BoxNo?.Trim() ?? string.Empty,
+            Remark = validateValues ? ValidateLength(item.Remark, 30, "비고") : item.Remark?.Trim() ?? string.Empty,
+            InDate = validateValues ? ValidateLength(item.InDate, 8, "입고일자") : item.InDate?.Trim() ?? string.Empty,
+            InTime = validateValues ? ValidateLength(item.InTime, 6, "입고시간") : item.InTime?.Trim() ?? string.Empty
+        };
+        if (normalized.ItemCode.Length == 0)
+            throw new ArgumentException("품번을 입력해 주세요.");
+
+        if (validateValues)
+        {
+            if (normalized.PalletNo.Length == 0)
+                throw new ArgumentException("PLT-NO를 입력해 주세요.");
+            normalized.Flag = normalized.Flag.ToUpperInvariant();
+            // 레거시 등록·수정과 동일하게 재고 행이 존재하면 빈 셀로 저장하지 않는다.
+            if (normalized.Flag == "0")
+                normalized.Flag = "1";
+            if (normalized.Flag is not ("0" or "1" or "X" or "Y" or "W" or "E" or "N"))
+                throw new ArgumentException("상태는 0, 1, X, Y, W, E, N 중에서 선택해 주세요.");
+            if (normalized.Quantity < 0 || normalized.Quantity > 99999.99m
+                || decimal.Round(normalized.Quantity, 2) != normalized.Quantity
+                || normalized.ReservedQuantity < 0 || normalized.ReservedQuantity > normalized.Quantity
+                || decimal.Round(normalized.ReservedQuantity, 2) != normalized.ReservedQuantity)
+                throw new ArgumentException("중량은 0~99999.99의 소수 두 자리까지 입력하고, 예약 중량은 재고 중량 이하여야 합니다.");
+            if (normalized.InDate.Length != 8
+                || !DateTime.TryParseExact(normalized.InDate, "yyyyMMdd", CultureInfo.InvariantCulture,
+                    DateTimeStyles.None, out _))
+                throw new ArgumentException("입고일자는 올바른 yyyyMMdd 형식으로 입력해 주세요.");
+            if (normalized.InTime.Length != 6
+                || !TimeOnly.TryParseExact(normalized.InTime, "HHmmss", CultureInfo.InvariantCulture,
+                    DateTimeStyles.None, out _))
+                throw new ArgumentException("입고시간은 올바른 HHmmss 형식으로 입력해 주세요.");
+        }
+
+        return normalized;
+    }
+
+    private static string NormalizeRackInventoryLocation(string location)
+    {
+        var normalized = NormalizeLocation(location);
+        if (normalized.Any(character => character is < '0' or > '9'))
+            throw new ArgumentException("저장위치는 0~9 숫자 6자리(BBYYLL)여야 합니다.", nameof(location));
+        return normalized;
     }
 
     private async Task UpdateStackerAsync(

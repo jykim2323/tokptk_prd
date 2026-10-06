@@ -42,6 +42,14 @@
             <Setter Property="Background" Value="{DynamicResource BtnPrimaryBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource BtnPrimaryTextBrush}"/>
         </Style>
+
+        <Style x:Key="CellActionButtonStyle" TargetType="Button"
+               BasedOn="{StaticResource ToolbarButtonStyle}">
+            <Setter Property="Background" Value="{DynamicResource AppSurface2Brush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
     </Window.Resources>
 
     <Grid Margin="16">
@@ -70,17 +78,27 @@
                     <TextBlock Text="셀 정보"
                                FontSize="22"
                                FontWeight="Bold"
-                               Foreground="White"/>
+                               Foreground="{DynamicResource AppTextOnPrimBrush}"/>
                     <TextBlock Margin="0,3,0,0"
-                               Foreground="#EAF4FB"
-                               Text="T2 셀 상태와 품목별 재고를 조회합니다."/>
+                               Foreground="{DynamicResource AppTextOnPrimBrush}"
+                               Text="T2 셀 상태와 품목별 재고를 관리합니다."/>
                 </StackPanel>
 
-                <Button Grid.Column="1"
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="등록" Command="{Binding AddCommand}"
+                            CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                            Style="{StaticResource ToolbarButtonStyle}" Background="#44FFFFFF"/>
+                    <Button Content="수정" Command="{Binding EditCommand}"
+                            CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                            Style="{StaticResource ToolbarButtonStyle}" Background="#44FFFFFF"/>
+                    <Button Content="삭제" Command="{Binding DeleteCommand}"
+                            Style="{StaticResource ToolbarButtonStyle}" Background="#44FFFFFF"/>
+                    <Button
                         Content="조회"
                         Command="{Binding SearchCommand}"
                         Style="{StaticResource ToolbarButtonStyle}"
                         Background="#44FFFFFF"/>
+                </StackPanel>
                 <Button Grid.Column="2"
                         Content="✕"
                         Command="{Binding CloseCommand}"
@@ -97,11 +115,9 @@
                 CornerRadius="5">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1.05*"/>
-                    <ColumnDefinition Width="0.8*"/>
-                    <ColumnDefinition Width="1.05*"/>
-                    <ColumnDefinition Width="1.2*"/>
-                    <ColumnDefinition Width="1.25*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0" Margin="0,0,10,0">
@@ -109,20 +125,32 @@
                     <TextBox Text="{Binding DisplayLocation}" Style="{StaticResource ReadOnlyFieldStyle}"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Margin="0,0,10,0">
-                    <TextBlock Text="상태 코드" Style="{StaticResource FieldLabelStyle}"/>
-                    <TextBox Text="{Binding CellFlag}" Style="{StaticResource ReadOnlyFieldStyle}"/>
-                </StackPanel>
-                <StackPanel Grid.Column="2" Margin="0,0,10,0">
                     <TextBlock Text="셀 상태" Style="{StaticResource FieldLabelStyle}"/>
                     <TextBox Text="{Binding CellStatusName}" Style="{StaticResource ReadOnlyFieldStyle}"/>
                 </StackPanel>
-                <StackPanel Grid.Column="3" Margin="0,0,10,0">
-                    <TextBlock Text="PLT-NO" Style="{StaticResource FieldLabelStyle}"/>
-                    <TextBox Text="{Binding CellPalletNo}" Style="{StaticResource ReadOnlyFieldStyle}"/>
-                </StackPanel>
-                <StackPanel Grid.Column="4">
-                    <TextBlock Text="입고일시" Style="{StaticResource FieldLabelStyle}"/>
-                    <TextBox Text="{Binding CellInboundAt}" Style="{StaticResource ReadOnlyFieldStyle}"/>
+
+                <StackPanel Grid.Column="2"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom">
+                    <Button Command="{Binding ProhibitCommand}"
+                            Style="{StaticResource CellActionButtonStyle}">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="8" Height="8" Margin="0,0,7,0"
+                                     VerticalAlignment="Center"
+                                     Fill="{DynamicResource StatusErrorBrush}"/>
+                            <TextBlock Text="금지" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding EnableCommand}"
+                            Style="{StaticResource CellActionButtonStyle}">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="8" Height="8" Margin="0,0,7,0"
+                                     VerticalAlignment="Center"
+                                     Fill="{DynamicResource MonitoringBcrEnabledTextBrush}"/>
+                            <TextBlock Text="사용" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
             </Grid>
         </Border>
@@ -148,6 +176,7 @@
                 BorderThickness="1"
                 CornerRadius="5">
             <DataGrid ItemsSource="{Binding InventoryItems}"
+                      SelectedItem="{Binding SelectedInventoryItem, Mode=TwoWay}"
                       Style="{StaticResource ListDataGridStyle}"
                       AutoGenerateColumns="False"
                       IsReadOnly="True"
@@ -175,12 +204,6 @@
             <TextBlock VerticalAlignment="Center"
                        Foreground="{DynamicResource AppTextSubBrush}"
                        Text="{Binding StatusMessage}"/>
-            <ProgressBar Width="170"
-                         Height="5"
-                         HorizontalAlignment="Right"
-                         VerticalAlignment="Center"
-                         IsIndeterminate="True"
-                         Visibility="{Binding IsLoading, Converter={DynamicResource BooleanToVisibilityConverter}}"/>
         </Grid>
     </Grid>
 </Window>

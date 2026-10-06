@@ -63,6 +63,26 @@ public interface ISc1LineApi
     Task<MonitoringRackCellDetailDto?> GetRackCellDetailAsync(
         string location,
         CancellationToken cancellationToken = default);
+
+    Task SetRackCellUsageAsync(
+        string location,
+        bool isProhibited,
+        CancellationToken cancellationToken = default);
+
+    Task AddRackInventoryAsync(
+        string location,
+        MonitoringRackInventorySaveRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task UpdateRackInventoryAsync(
+        string location,
+        MonitoringRackInventorySaveRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task DeleteRackInventoryAsync(
+        string location,
+        MonitoringRackInventoryDeleteRequest request,
+        CancellationToken cancellationToken = default);
 }
 
 /// <summary>상품·제품창고 전체 모니터링 조회 및 BCR 운전 제어 API.</summary>
@@ -209,6 +229,52 @@ public sealed class Sc1LineApiClient(HttpClient http) : ISc1LineApi
         await EnsureSuccessAsync(response, cancellationToken);
         return await response.Content.ReadFromJsonAsync<MonitoringRackCellDetailDto>(
             cancellationToken: cancellationToken);
+    }
+
+    public async Task SetRackCellUsageAsync(
+        string location,
+        bool isProhibited,
+        CancellationToken cancellationToken = default)
+    {
+        var action = isProhibited ? "prohibit" : "enable";
+        using var response = await http.PostAsync(
+            $"api/monitoring/rack/cells/{Uri.EscapeDataString(location)}/{action}",
+            null,
+            cancellationToken);
+        await EnsureSuccessAsync(response, cancellationToken);
+    }
+
+    public async Task AddRackInventoryAsync(
+        string location,
+        MonitoringRackInventorySaveRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await http.PostAsJsonAsync(
+            $"api/monitoring/rack/cells/{Uri.EscapeDataString(location)}/inventory",
+            request, cancellationToken);
+        await EnsureSuccessAsync(response, cancellationToken);
+    }
+
+    public async Task UpdateRackInventoryAsync(
+        string location,
+        MonitoringRackInventorySaveRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await http.PutAsJsonAsync(
+            $"api/monitoring/rack/cells/{Uri.EscapeDataString(location)}/inventory",
+            request, cancellationToken);
+        await EnsureSuccessAsync(response, cancellationToken);
+    }
+
+    public async Task DeleteRackInventoryAsync(
+        string location,
+        MonitoringRackInventoryDeleteRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await http.PostAsJsonAsync(
+            $"api/monitoring/rack/cells/{Uri.EscapeDataString(location)}/inventory/delete",
+            request, cancellationToken);
+        await EnsureSuccessAsync(response, cancellationToken);
     }
 
     private async Task PostStackerActionAsync(

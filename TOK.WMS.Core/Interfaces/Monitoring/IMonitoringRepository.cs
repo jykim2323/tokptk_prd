@@ -60,4 +60,24 @@ public interface IMonitoringRepository
     Task<MonitoringRackCellDetailDto?> GetRackCellDetailAsync(
         string location,
         CancellationToken cancellationToken = default);
+
+    Task SetRackCellUsageAsync(
+        string location,
+        bool isProhibited,
+        CancellationToken cancellationToken = default);
+
+    Task AddRackInventoryAsync(
+        string location,
+        MonitoringRackInventorySaveRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task UpdateRackInventoryAsync(
+        string location,
+        MonitoringRackInventorySaveRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task DeleteRackInventoryAsync(
+        string location,
+        MonitoringRackInventoryDeleteRequest request,
+        CancellationToken cancellationToken = default);
 }

@@ -9,13 +9,7 @@
          ═══════════════════════════════════════ -->
 
     <!-- Header -->
-    <LinearGradientBrush x:Key="HeaderBrush"
-                         StartPoint="0,0"
-                         EndPoint="1,0">
-        <GradientStop Color="#263746" Offset="0"/>
-        <GradientStop Color="#5D89B7" Offset="0.65"/>
-        <GradientStop Color="#6AA7DF" Offset="1"/>
-    </LinearGradientBrush>
+    <SolidColorBrush x:Key="HeaderBrush" Color="#163272"/>
 
     <!-- Surfaces -->
     <SolidColorBrush x:Key="AppBackgroundBrush" Color="#111820"/>
@@ -63,7 +57,7 @@
     <SolidColorBrush x:Key="GridRowBrush" Color="#18222C"/>
     <SolidColorBrush x:Key="GridAltRowBrush" Color="#202D39"/>
 
-    <SolidColorBrush x:Key="GridHeaderBrush" Color="#5D89B7"/>
+    <SolidColorBrush x:Key="GridHeaderBrush" Color="#163272"/>
     <SolidColorBrush x:Key="GridHeaderTextBrush" Color="#FFFFFF"/>
 
     <!-- Buttons -->
@@ -71,6 +65,65 @@
     <SolidColorBrush x:Key="BtnPrimaryTextBrush" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="BtnHoverBrush" Color="#E47848"/>
     <SolidColorBrush x:Key="BtnStadardBrush" Color="#718292"/>
+
+    <!-- Monitoring: neutral surfaces update with the active theme; equipment state colors stay distinct. -->
+    <SolidColorBrush x:Key="MonitoringBackgroundBrush" Color="#111820"/>
+    <SolidColorBrush x:Key="MonitoringEquipmentBackgroundBrush" Color="#18222C"/>
+    <SolidColorBrush x:Key="MonitoringRackBackplateBrush" Color="#202D39"/>
+    <SolidColorBrush x:Key="MonitoringCellBrush" Color="#243440"/>
+    <SolidColorBrush x:Key="MonitoringCellBorderBrush" Color="#516677"/>
+    <SolidColorBrush x:Key="MonitoringTextBrush" Color="#EDF4FA"/>
+    <SolidColorBrush x:Key="MonitoringColumnHeaderBrush" Color="#163272"/>
+    <SolidColorBrush x:Key="MonitoringColumnBorderBrush" Color="#5E7587"/>
+    <SolidColorBrush x:Key="MonitoringTrackingSlotBrush" Color="#203B52"/>
+    <SolidColorBrush x:Key="MonitoringTrackingSlotBorderBrush" Color="#6AA7DF"/>
+    <SolidColorBrush x:Key="MonitoringTrackingSlotTextBrush" Color="#B9DEFF"/>
+    <SolidColorBrush x:Key="MonitoringTitleBrush" Color="#263746"/>
+    <SolidColorBrush x:Key="MonitoringTitleBorderBrush" Color="#718797"/>
+    <SolidColorBrush x:Key="MonitoringDividerBrush" Color="#526B80"/>
+    <SolidColorBrush x:Key="MonitoringStatusPanelBrush" Color="#202D39"/>
+    <SolidColorBrush x:Key="MonitoringStatusTextBrush" Color="#DFECF7"/>
+    <SolidColorBrush x:Key="MonitoringPanelHeaderBrush" Color="#163272"/>
+    <SolidColorBrush x:Key="MonitoringPanelHeaderBorderBrush" Color="#4B657B"/>
+    <SolidColorBrush x:Key="MonitoringBcrHeaderBrush" Color="#163272"/>
+    <SolidColorBrush x:Key="MonitoringTableBackgroundBrush" Color="#18222C"/>
+    <SolidColorBrush x:Key="MonitoringTableBorderBrush" Color="#3C5060"/>
+    <SolidColorBrush x:Key="MonitoringRightTitleBrush" Color="#163272"/>
+    <SolidColorBrush x:Key="MonitoringRightTitleBorderBrush" Color="#5E7587"/>
+    <SolidColorBrush x:Key="MonitoringRaisedCellBorderBrush" Color="#718797"/>
+    <SolidColorBrush x:Key="MonitoringRaisedCellShadowBrush" Color="#90000000"/>
+    <SolidColorBrush x:Key="MonitoringRaisedCellHighlightBrush" Color="#50647C8D"/>
+    <SolidColorBrush x:Key="MonitoringRaisedCellShadeBrush" Color="#70000000"/>
+    <SolidColorBrush x:Key="MonitoringIndicatorOffBrush" Color="#283643"/>
+    <SolidColorBrush x:Key="MonitoringIndicatorBorderBrush" Color="#5A7082"/>
+    <SolidColorBrush x:Key="MonitoringIndicatorFrameBrush" Color="#3A4B59"/>
+    <SolidColorBrush x:Key="MonitoringIndicatorInsetBrush" Color="#18222C"/>
+    <SolidColorBrush x:Key="MonitoringIndicatorHighlightBrush" Color="#637786"/>
+    <SolidColorBrush x:Key="MonitoringSignalCaseBrush" Color="#293A47"/>
+    <SolidColorBrush x:Key="MonitoringSignalCaseBorderBrush" Color="#5D7284"/>
+    <SolidColorBrush x:Key="MonitoringSignalInsetBorderBrush" Color="#7185A0"/>
+    <SolidColorBrush x:Key="MonitoringLegendBorderBrush" Color="#8296A8"/>
+    <SolidColorBrush x:Key="MonitoringLabelHoverBrush" Color="#306AA7DF"/>
+    <SolidColorBrush x:Key="RgvUnknownBrush" Color="#3A4B59"/>
+    <SolidColorBrush x:Key="RgvManualBrush" Color="#465A6B"/>
+
+    <SolidColorBrush x:Key="MonitoringPanelBorderBrush" Color="#3C5060"/>
+    <SolidColorBrush x:Key="MonitoringCellShadowBrush" Color="#80000000"/>
+    <SolidColorBrush x:Key="MonitoringCellHighlightBrush" Color="#50647C8D"/>
+    <SolidColorBrush x:Key="MonitoringCellLowlightBrush" Color="#70000000"/>
+    <SolidColorBrush x:Key="MonitoringEquipmentOutlineBrush" Color="#8096A9"/>
+    <SolidColorBrush x:Key="MonitoringCraneRailBrush" Color="#8C9EAC"/>
+    <SolidColorBrush x:Key="MonitoringCarrierRailBrush" Color="#8096A9"/>
+    <SolidColorBrush x:Key="MonitoringBcrConnectorBrush" Color="#546B7D"/>
+    <SolidColorBrush x:Key="MonitoringSectionDividerBrush" Color="#4B657B"/>
+    <SolidColorBrush x:Key="MonitoringModeTextBrush" Color="#8FC3FF"/>
+    <SolidColorBrush x:Key="MonitoringModeHoverBrush" Color="#293F54"/>
+    <SolidColorBrush x:Key="MonitoringModePressedBrush" Color="#365573"/>
+    <SolidColorBrush x:Key="MonitoringSubtotalBrush" Color="#263746"/>
+    <SolidColorBrush x:Key="MonitoringTotalBrush" Color="#2C4050"/>
+
+    <SolidColorBrush x:Key="MonitoringBcrEnabledTextBrush" Color="#80BFFF"/>
+    <SolidColorBrush x:Key="MonitoringBcrDisabledTextBrush" Color="#FF7D7D"/>
 
     <!-- Theme -->
     <sys:String x:Key="ThemeToggleIcon">🌙</sys:String>

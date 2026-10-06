@@ -217,6 +217,8 @@
 
                 <Grid DockPanel.Dock="Top"
                       Height="50"
+                      Background="{DynamicResource HeaderBrush}"
+                      TextElement.Foreground="{DynamicResource AppTextOnPrimBrush}"
                       Margin="0,0,0,8">
 
                     <TextBlock Text="📌 출고 대기 현황"

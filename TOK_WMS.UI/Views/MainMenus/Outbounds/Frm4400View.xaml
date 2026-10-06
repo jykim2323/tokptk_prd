@@ -373,6 +373,8 @@
 
                 <Grid DockPanel.Dock="Top"
                       Height="40"
+                      Background="{DynamicResource HeaderBrush}"
+                      TextElement.Foreground="{DynamicResource AppTextOnPrimBrush}"
                       Margin="0,0,0,7">
 
                     <TextBlock Text="📋 출고 이력"
@@ -386,7 +388,7 @@
                                HorizontalAlignment="Right"
                                VerticalAlignment="Center"
                                FontWeight="Bold"
-                               Foreground="{DynamicResource AppTextSubBrush}"/>
+                               Foreground="{DynamicResource AppTextOnPrimBrush}"/>
 
                 </Grid>
 

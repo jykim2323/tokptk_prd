@@ -8,7 +8,7 @@
         FontWeight="Medium"
         WindowStyle="None"
         ResizeMode="CanResize"
-        Width="1050"
+        Width="1200"
         Height="720"
         MinWidth="850"
         MinHeight="550">
@@ -250,10 +250,12 @@
 
 
                 <Grid DockPanel.Dock="Top"
+                      Background="{DynamicResource HeaderBrush}"
                       Height="40"
                       Margin="0,0,0,7">
 
                     <TextBlock Text="📋 품목 목록"
+                               Foreground="{DynamicResource AppTextOnPrimBrush}"
                                VerticalAlignment="Center"
                                FontSize="15"
                                FontWeight="Bold"/>
@@ -264,7 +266,7 @@
                                HorizontalAlignment="Right"
                                VerticalAlignment="Center"
                                FontWeight="Bold"
-                               Foreground="{DynamicResource AppTextSubBrush}"/>
+                               Foreground="{DynamicResource AppTextOnPrimBrush}"/>
 
                 </Grid>
 
@@ -280,7 +282,7 @@
                           CanUserSortColumns="True"
                           SelectionMode="Single"
                           SelectionUnit="FullRow"
-                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          ScrollViewer.VerticalScrollBarVisibility="Visible"
                           ScrollViewer.HorizontalScrollBarVisibility="Auto">
 
 
@@ -316,7 +318,8 @@
 
                         <DataGridTextColumn Header="품 목 명"
                                             Binding="{Binding MastName}"
-                                            Width="*"/>
+                                            Width="240"
+                                            MinWidth="180"/>
 
 
                         <!-- 단위 -->

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using TOK.WMS.Core.DTOs.Inventory;
 using TOK.WMS.Core.DTOs.Standards;
+using TOK.WMS.Core.DTOs.Monitoring;
+using System.Windows;
 
 namespace TOK.WMS.UI.Services.Interfaces.Popup;
 
@@ -19,4 +21,5 @@ public interface IWindowService
     void ShowStackerWork(int craneNo);
     void ShowRackOverview(int bank, int selectedBay);
     void ShowRackCellDetail(string location);
+    bool ShowRackInventoryEdit(string location, MonitoringRackInventoryDto? original = null, Window? owner = null);
 }

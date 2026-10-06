@@ -101,7 +101,9 @@
                TargetType="Border">
 
             <Setter Property="Background"
-                    Value="#ebf4fc"/>
+                    Value="{DynamicResource HeaderBrush}"/>
+            <Setter Property="TextElement.Foreground"
+                    Value="{DynamicResource AppTextOnPrimBrush}"/>
 
             <Setter Property="BorderBrush"
                     Value="{DynamicResource AppBorderBrush}"/>
@@ -561,7 +563,7 @@
                         <TextBlock Text="PLT 품목 현황"
                                    FontSize="16"
                                    FontWeight="Bold"
-                                   Foreground="{DynamicResource AppTextBrush}"
+                                   Foreground="{DynamicResource AppTextOnPrimBrush}"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"/>
 

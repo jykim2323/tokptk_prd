@@ -95,6 +95,20 @@ public sealed class MonitoringRackInventoryDto
     public string InTime { get; set; } = string.Empty;
 }
 
+/// <summary>셀 재고 등록·수정 값과 수정 전 조회한 원본.</summary>
+public sealed class MonitoringRackInventorySaveRequest
+{
+    public MonitoringRackInventoryDto Item { get; set; } = new();
+    public MonitoringRackInventoryDto? Original { get; set; }
+    public string UserId { get; set; } = string.Empty;
+}
+
+/// <summary>셀 재고 삭제 전에 조회한 원본.</summary>
+public sealed class MonitoringRackInventoryDeleteRequest
+{
+    public MonitoringRackInventoryDto Original { get; set; } = new();
+}
+
 /// <summary>셀 마스터와 그 셀의 실제 재고를 함께 내려 주는 상세 정보.</summary>
 public sealed class MonitoringRackCellDetailDto
 {

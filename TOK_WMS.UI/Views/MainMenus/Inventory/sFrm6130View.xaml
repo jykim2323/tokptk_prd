@@ -37,7 +37,8 @@
         </Style>
 
         <Style x:Key="Header" TargetType="Border">
-            <Setter Property="Background" Value="#ebf4fc"/>
+            <Setter Property="Background" Value="{DynamicResource HeaderBrush}"/>
+            <Setter Property="TextElement.Foreground" Value="{DynamicResource AppTextOnPrimBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
             <Setter Property="BorderThickness" Value="2,2,2,2"/>
         </Style>

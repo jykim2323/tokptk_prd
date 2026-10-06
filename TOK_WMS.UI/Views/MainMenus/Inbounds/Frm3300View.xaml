@@ -117,7 +117,9 @@
                TargetType="Border">
 
             <Setter Property="Background"
-                    Value="#ebf4fc"/>
+                    Value="{DynamicResource HeaderBrush}"/>
+            <Setter Property="TextElement.Foreground"
+                    Value="{DynamicResource AppTextOnPrimBrush}"/>
 
             <Setter Property="BorderBrush"
                     Value="{DynamicResource AppBorderBrush}"/>
@@ -357,7 +359,7 @@
                             <TextBlock Text="미 입고 현황 :"
                                        FontSize="13"
                                        FontWeight="Bold"
-                                       Foreground="{DynamicResource AppTextBrush}"
+                                       Foreground="{DynamicResource AppTextOnPrimBrush}"
                                        VerticalAlignment="Center"/>
 
 
@@ -365,8 +367,8 @@
                                      Margin="10,0,0,0"
                                      FontSize="13"
                                      FontWeight="Bold"
-                                     Foreground="{DynamicResource AppTextBrush}"
-                                     Background="#ebf4fc"
+                                     Foreground="{DynamicResource AppTextOnPrimBrush}"
+                                     Background="{DynamicResource HeaderBrush}"
                                      BorderThickness="0"
                                      IsReadOnly="True"/>
 

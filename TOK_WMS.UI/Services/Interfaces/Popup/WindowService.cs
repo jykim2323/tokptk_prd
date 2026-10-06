@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows;
 using TOK.WMS.Core.DTOs.Inventory;
 using TOK.WMS.Core.DTOs.Standards;
+using TOK.WMS.Core.DTOs.Monitoring;
 using TOK.WMS.UI.ViewModels.MainMenus.Inventory;
 using TOK.WMS.UI.ViewModels.MainMenus.Monitoring.Popups;
 using TOK.WMS.UI.ViewModels.MainMenus.Standards;
@@ -193,8 +194,37 @@ public class WindowService : IWindowService
 
         var view = _services.GetRequiredService<RackCellDetailView>();
         if (view.DataContext is RackCellDetailViewModel vm)
+        {
+            vm.CellUsageChanged += RefreshRackOverviews;
+            view.Closed += (_, _) => vm.CellUsageChanged -= RefreshRackOverviews;
             vm.Initialize(location);
+        }
         ShowOwnedPopup(popupKey, view);
+    }
+
+    public bool ShowRackInventoryEdit(
+        string location,
+        MonitoringRackInventoryDto? original = null,
+        Window? owner = null)
+    {
+        var view = _services.GetRequiredService<RackInventoryEditView>();
+        if (view.DataContext is not RackInventoryEditViewModel vm)
+            return false;
+
+        vm.Initialize(location, original);
+        view.Owner = owner ?? Application.Current.MainWindow;
+        view.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+        view.ShowDialog();
+        return vm.IsSaved;
+    }
+
+    private void RefreshRackOverviews(string location)
+    {
+        foreach (var popup in _openMonitoringPopups.Values.ToArray())
+        {
+            if (popup.DataContext is RackOverviewViewModel vm)
+                vm.RefreshForLocation(location);
+        }
     }
 
     private bool TryActivatePopup(string popupKey)

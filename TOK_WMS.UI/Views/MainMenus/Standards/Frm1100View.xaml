@@ -274,10 +274,12 @@
 
 
                 <Grid DockPanel.Dock="Top"
+                      Background="{DynamicResource HeaderBrush}"
                       Height="40"
                       Margin="0,0,0,7">
 
                     <TextBlock Text="📋 품목 코드 현황"
+                               Foreground="{DynamicResource AppTextOnPrimBrush}"
                                FontSize="15"
                                FontWeight="Bold"
                                VerticalAlignment="Center"/>
@@ -288,7 +290,7 @@
                                HorizontalAlignment="Right"
                                VerticalAlignment="Center"
                                FontWeight="Bold"
-                               Foreground="{DynamicResource AppTextSubBrush}"/>
+                               Foreground="{DynamicResource AppTextOnPrimBrush}"/>
 
                 </Grid>
 

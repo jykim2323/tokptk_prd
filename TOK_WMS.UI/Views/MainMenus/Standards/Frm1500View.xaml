@@ -233,6 +233,8 @@
 
                     <TextBlock DockPanel.Dock="Top"
                                Text="⚠️ 위험물 - 구분#1"
+                               Background="{DynamicResource HeaderBrush}"
+                               Foreground="{DynamicResource AppTextOnPrimBrush}"
                                FontSize="16"
                                FontWeight="Bold"
                                Margin="0,0,0,10"/>
@@ -376,6 +378,8 @@
 
                     <TextBlock DockPanel.Dock="Top"
                                Text="🛢️ 석유류 - 구분#2"
+                               Background="{DynamicResource HeaderBrush}"
+                               Foreground="{DynamicResource AppTextOnPrimBrush}"
                                FontSize="16"
                                FontWeight="Bold"
                                Margin="0,0,0,10"/>
@@ -513,6 +517,8 @@
 
                     <TextBlock DockPanel.Dock="Top"
                                Text="💧 수용성 - 구분#3"
+                               Background="{DynamicResource HeaderBrush}"
+                               Foreground="{DynamicResource AppTextOnPrimBrush}"
                                FontSize="16"
                                FontWeight="Bold"
                                Margin="0,0,0,10"/>

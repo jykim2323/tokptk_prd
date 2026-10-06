@@ -1,4 +1,5 @@
 using System.Windows;
+using System.ComponentModel;
 using TOK.WMS.UI.ViewModels.MainMenus.Monitoring.Popups;
 
 namespace TOK.WMS.UI.Views.Monitoring.Popups;
@@ -15,4 +16,11 @@ public partial class RackCellDetailView : Window
     }
 
     public void Initialize(string location) => _viewModel.Initialize(location);
+
+    protected override void OnClosing(CancelEventArgs e)
+    {
+        base.OnClosing(e);
+        if (_viewModel.IsMutating)
+            e.Cancel = true;
+    }
 }

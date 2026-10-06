@@ -526,6 +526,8 @@
 
                     <Grid DockPanel.Dock="Top"
                           Height="38"
+                          Background="{DynamicResource HeaderBrush}"
+                          TextElement.Foreground="{DynamicResource AppTextOnPrimBrush}"
                           Margin="0,0,0,7">
 
                         <TextBlock Text="📦 재고 자료 정보"
@@ -538,7 +540,7 @@
                                    HorizontalAlignment="Right"
                                    VerticalAlignment="Center"
                                    FontWeight="Bold"
-                                   Foreground="{DynamicResource AppTextSubBrush}"/>
+                                   Foreground="{DynamicResource AppTextOnPrimBrush}"/>
 
                     </Grid>
 
@@ -644,6 +646,8 @@
                                Text="📦 팔레트 자료 정보"
                                FontSize="15"
                                FontWeight="Bold"
+                               Background="{DynamicResource HeaderBrush}"
+                               Foreground="{DynamicResource AppTextOnPrimBrush}"
                                Margin="0,3,0,8"/>
 
 
@@ -739,6 +743,8 @@
 
                     <Grid DockPanel.Dock="Top"
                           Height="42"
+                          Background="{DynamicResource HeaderBrush}"
+                          TextElement.Foreground="{DynamicResource AppTextOnPrimBrush}"
                           Margin="0,0,0,8">
 
                         <TextBlock Text="📌 출고예약 데이터"

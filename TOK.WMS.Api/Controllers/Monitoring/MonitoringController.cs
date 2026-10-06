@@ -177,6 +177,58 @@ public sealed class MonitoringController(IMonitoringRepository repository) : Con
         return item is null ? NotFound() : Ok(item);
     }
 
+    [HttpPost("rack/cells/{location}/prohibit")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ProhibitRackCellAsync(
+        string location,
+        CancellationToken cancellationToken)
+    {
+        return await ExecuteMutationAsync(
+            () => repository.SetRackCellUsageAsync(location, true, cancellationToken));
+    }
+
+    [HttpPost("rack/cells/{location}/enable")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> EnableRackCellAsync(
+        string location,
+        CancellationToken cancellationToken)
+    {
+        return await ExecuteMutationAsync(
+            () => repository.SetRackCellUsageAsync(location, false, cancellationToken));
+    }
+
+    [HttpPost("rack/cells/{location}/inventory")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> AddRackInventoryAsync(
+        string location,
+        [FromBody] MonitoringRackInventorySaveRequest request,
+        CancellationToken cancellationToken) =>
+        await ExecuteMutationAsync(
+            () => repository.AddRackInventoryAsync(location, request, cancellationToken));
+
+    [HttpPut("rack/cells/{location}/inventory")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> UpdateRackInventoryAsync(
+        string location,
+        [FromBody] MonitoringRackInventorySaveRequest request,
+        CancellationToken cancellationToken) =>
+        await ExecuteMutationAsync(
+            () => repository.UpdateRackInventoryAsync(location, request, cancellationToken));
+
+    [HttpPost("rack/cells/{location}/inventory/delete")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> DeleteRackInventoryAsync(
+        string location,
+        [FromBody] MonitoringRackInventoryDeleteRequest request,
+        CancellationToken cancellationToken) =>
+        await ExecuteMutationAsync(
+            () => repository.DeleteRackInventoryAsync(location, request, cancellationToken));
+
     private async Task<IActionResult> ExecuteMutationAsync(Func<Task> action)
     {
         try

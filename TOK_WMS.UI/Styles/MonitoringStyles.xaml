@@ -15,8 +15,6 @@
     <SolidColorBrush x:Key="TrackingDarkForegroundBrush" Color="#172B4D"/>
     <SolidColorBrush x:Key="TrackingLightForegroundBrush" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="SpecialTrackingBorderBrush" Color="#F59E0B"/>
-    <SolidColorBrush x:Key="RgvUnknownBrush" Color="#F7F8F9"/>
-    <SolidColorBrush x:Key="RgvManualBrush" Color="#F0F0F0"/>
     <SolidColorBrush x:Key="RgvReadyBrush" Color="#00FF00"/>
     <SolidColorBrush x:Key="RgvWorkingBrush" Color="#FFFF00"/>
     <SolidColorBrush x:Key="RgvErrorBrush" Color="#FF0000"/>
@@ -30,8 +28,9 @@
 
     <!-- 트래킹 공통 입체 셀 -->
     <Style x:Key="RaisedCellBaseStyle" TargetType="{x:Type Label}">
-        <Setter Property="Background" Value="#FFFFFF"/>
-        <Setter Property="BorderBrush" Value="#7D8995"/>
+        <Setter Property="Background" Value="{DynamicResource MonitoringCellBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource MonitoringRaisedCellBorderBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource MonitoringTextBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="0"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -43,13 +42,13 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Label}">
                     <Grid Background="Transparent" SnapsToDevicePixels="True">
-                        <Border Margin="2,2,0,0" Background="#48172B4D" CornerRadius="3"/>
+                        <Border Margin="2,2,0,0" Background="{DynamicResource MonitoringRaisedCellShadowBrush}" CornerRadius="3"/>
                         <Border Margin="0,0,2,2" Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="3">
                             <Grid>
-                                <Border BorderBrush="#D8FFFFFF" BorderThickness="1.5,1.5,0,0" CornerRadius="2" IsHitTestVisible="False"/>
-                                <Border BorderBrush="#60000000" BorderThickness="0,0,1.5,1.5" CornerRadius="2" IsHitTestVisible="False"/>
+                                <Border BorderBrush="{DynamicResource MonitoringRaisedCellHighlightBrush}" BorderThickness="1.5,1.5,0,0" CornerRadius="2" IsHitTestVisible="False"/>
+                                <Border BorderBrush="{DynamicResource MonitoringRaisedCellShadeBrush}" BorderThickness="0,0,1.5,1.5" CornerRadius="2" IsHitTestVisible="False"/>
                                 <ContentPresenter Content="{TemplateBinding Content}"
                                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
@@ -65,7 +64,7 @@
     <!-- 상·하부 트래킹 구간 공통 스타일 -->
     <Style x:Key="TrackingSectionStyle" TargetType="{x:Type Label}"
            BasedOn="{StaticResource RaisedCellBaseStyle}">
-        <Setter Property="BorderBrush" Value="#66727E"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource MonitoringTitleBorderBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource TrackingDarkForegroundBrush}"/>
         <Setter Property="Opacity" Value="1"/>
         <Setter Property="FontSize" Value="8"/>
@@ -121,8 +120,8 @@
     <Style x:Key="TrackingCornerIndicatorStyle" TargetType="{x:Type ToggleButton}">
         <Setter Property="Width" Value="14"/>
         <Setter Property="Height" Value="7"/>
-        <Setter Property="Background" Value="#F3F5F6"/>
-        <Setter Property="BorderBrush" Value="#AAB4BC"/>
+        <Setter Property="Background" Value="{DynamicResource MonitoringIndicatorOffBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource MonitoringIndicatorBorderBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="IsChecked" Value="False"/>
         <Setter Property="IsHitTestVisible" Value="False"/>
@@ -131,14 +130,14 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ToggleButton}">
-                    <Grid Background="#D9DEE2">
+                    <Grid Background="{DynamicResource MonitoringIndicatorFrameBrush}">
                         <!-- 위·왼쪽의 어두운 선: 패널 안으로 들어간 그림자 -->
-                        <Border BorderBrush="#7F8992"
+                        <Border BorderBrush="{DynamicResource MonitoringIndicatorInsetBrush}"
                                 BorderThickness="1,1,0,0"
                                 IsHitTestVisible="False"/>
 
                         <!-- 아래·오른쪽의 밝은 선: 바깥 테두리의 반사광 -->
-                        <Border BorderBrush="#F9FAFB"
+                        <Border BorderBrush="{DynamicResource MonitoringIndicatorHighlightBrush}"
                                 BorderThickness="0,0,1,1"
                                 IsHitTestVisible="False"/>
 
@@ -356,13 +355,13 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Control}">
-                    <Border Background="#F1F2F3"
-                            BorderBrush="#D5D9DD"
+                    <Border Background="{DynamicResource MonitoringSignalCaseBrush}"
+                            BorderBrush="{DynamicResource MonitoringSignalCaseBorderBrush}"
                             BorderThickness="0.5"
                             CornerRadius="0.5">
                         <Border Margin="1"
                                 Background="{TemplateBinding Background}"
-                                BorderBrush="#737D98"
+                                BorderBrush="{DynamicResource MonitoringSignalInsetBorderBrush}"
                                 BorderThickness="0.75"
                                 CornerRadius="0.5"/>
                     </Border>
@@ -376,6 +375,7 @@
            TargetType="{x:Type Button}">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{DynamicResource MonitoringTextBrush}"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Padding" Value="5"/>
         <Setter Property="MinWidth" Value="0"/>
@@ -399,12 +399,20 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="HoverSurface" Property="Background" Value="#182E68DE"/>
+                            <Setter TargetName="HoverSurface" Property="Background" Value="{DynamicResource MonitoringLabelHoverBrush}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Tag.Foreground.Color, RelativeSource={RelativeSource Self}}" Value="Blue">
+                <Setter Property="Foreground" Value="{DynamicResource MonitoringBcrEnabledTextBrush}"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Tag.Foreground.Color, RelativeSource={RelativeSource Self}}" Value="Red">
+                <Setter Property="Foreground" Value="{DynamicResource MonitoringBcrDisabledTextBrush}"/>
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
 
     <!-- BCR 상태 문구 박스 -->
@@ -450,9 +458,9 @@
     <!-- 하단 BCR 상태 패널의 BCR 번호 영역 -->
     <Style x:Key="BcrMonitorNameStyle"
            TargetType="{x:Type Label}">
-        <Setter Property="Background" Value="#274C87"/>
-        <Setter Property="Foreground" Value="White"/>
-        <Setter Property="BorderBrush" Value="#AFC5E5"/>
+        <Setter Property="Background" Value="{DynamicResource MonitoringBcrHeaderBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource AppTextOnPrimBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource MonitoringPanelHeaderBorderBrush}"/>
         <Setter Property="BorderThickness" Value="0,0,1,0"/>
         <Setter Property="Padding" Value="0"/>
         <Setter Property="FontSize" Value="10"/>
@@ -465,8 +473,8 @@
     <!-- 하단 BCR 상태 패널의 메시지 영역 -->
     <Style x:Key="BcrMonitorMessageStyle"
            TargetType="{x:Type TextBox}">
-        <Setter Property="Background" Value="#F2F7FF"/>
-        <Setter Property="Foreground" Value="#17345C"/>
+        <Setter Property="Background" Value="{DynamicResource MonitoringStatusPanelBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource MonitoringStatusTextBrush}"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Padding" Value="8,0"/>
         <Setter Property="FontSize" Value="10"/>
@@ -481,9 +489,9 @@
     <!-- 설비 상태표의 왼쪽 설비명 -->
     <Style x:Key="MonitorLegendNameStyle"
            TargetType="{x:Type Label}">
-        <Setter Property="Background" Value="#203B6A"/>
-        <Setter Property="Foreground" Value="White"/>
-        <Setter Property="BorderBrush" Value="#AFC5E5"/>
+        <Setter Property="Background" Value="{DynamicResource MonitoringPanelHeaderBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource AppTextOnPrimBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource MonitoringPanelHeaderBorderBrush}"/>
         <Setter Property="BorderThickness" Value="0,0,1,1"/>
         <Setter Property="Padding" Value="2,0"/>
         <Setter Property="FontSize" Value="10"/>
@@ -496,15 +504,15 @@
     <!-- 설비 상태표의 색상 한 칸 -->
     <Style x:Key="MonitorLegendItemStyle"
            TargetType="{x:Type ContentControl}">
-        <Setter Property="Foreground" Value="#17345C"/>
+        <Setter Property="Foreground" Value="{DynamicResource MonitoringStatusTextBrush}"/>
         <Setter Property="FontSize" Value="9"/>
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="Focusable" Value="False"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ContentControl}">
-                    <Border Background="#F2F7FF"
-                            BorderBrush="#AFC5E5"
+                    <Border Background="{DynamicResource MonitoringStatusPanelBrush}"
+                            BorderBrush="{DynamicResource MonitoringPanelHeaderBorderBrush}"
                             BorderThickness="0,0,1,1">
                         <Grid Margin="3,0">
                             <Grid.ColumnDefinitions>
@@ -516,7 +524,7 @@
                                     Height="12"
                                     VerticalAlignment="Center"
                                     Background="{TemplateBinding BorderBrush}"
-                                    BorderBrush="#8A98A8"
+                                    BorderBrush="{DynamicResource MonitoringLegendBorderBrush}"
                                     BorderThickness="0.5"/>
                             <ContentPresenter Grid.Column="1"
                                               Margin="3,0,0,0"
@@ -532,9 +540,9 @@
     <!-- 적재 현황 표 머리글 및 행 이름 -->
     <Style x:Key="MonitorTableHeaderStyle"
            TargetType="{x:Type Label}">
-        <Setter Property="Background" Value="#203B6A"/>
-        <Setter Property="Foreground" Value="White"/>
-        <Setter Property="BorderBrush" Value="#AFC5E5"/>
+        <Setter Property="Background" Value="{DynamicResource MonitoringPanelHeaderBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource AppTextOnPrimBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource MonitoringPanelHeaderBorderBrush}"/>
         <Setter Property="BorderThickness" Value="0,0,1,1"/>
         <Setter Property="Padding" Value="1,0"/>
         <Setter Property="FontSize" Value="9"/>
@@ -547,9 +555,9 @@
     <!-- 적재 현황 숫자 셀 -->
     <Style x:Key="MonitorTableCellStyle"
            TargetType="{x:Type Label}">
-        <Setter Property="Background" Value="#F7FAFF"/>
-        <Setter Property="Foreground" Value="#17345C"/>
-        <Setter Property="BorderBrush" Value="#C3D2E6"/>
+        <Setter Property="Background" Value="{DynamicResource MonitoringTableBackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource MonitoringStatusTextBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource MonitoringTableBorderBrush}"/>
         <Setter Property="BorderThickness" Value="0,0,1,1"/>
         <Setter Property="Padding" Value="1,0"/>
         <Setter Property="FontSize" Value="9"/>
@@ -563,8 +571,8 @@
     <Style x:Key="MonitorRightSectionTitleStyle"
            TargetType="{x:Type Border}">
         <Setter Property="Height" Value="30"/>
-        <Setter Property="Background" Value="#1F3F7F"/>
-        <Setter Property="BorderBrush" Value="#17345C"/>
+        <Setter Property="Background" Value="{DynamicResource MonitoringRightTitleBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource MonitoringRightTitleBorderBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="CornerRadius" Value="3"/>
         <Setter Property="Padding" Value="10,0"/>
@@ -581,14 +589,14 @@
         <Setter Property="CanUserResizeRows" Value="False"/>
         <Setter Property="HeadersVisibility" Value="Column"/>
         <Setter Property="GridLinesVisibility" Value="All"/>
-        <Setter Property="HorizontalGridLinesBrush" Value="#C3D2E6"/>
-        <Setter Property="VerticalGridLinesBrush" Value="#C3D2E6"/>
-        <Setter Property="BorderBrush" Value="#AFC5E5"/>
+        <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource MonitoringTableBorderBrush}"/>
+        <Setter Property="VerticalGridLinesBrush" Value="{DynamicResource MonitoringTableBorderBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource MonitoringPanelHeaderBorderBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Background" Value="#F7FAFF"/>
-        <Setter Property="RowBackground" Value="#FFFFFF"/>
-        <Setter Property="AlternatingRowBackground" Value="#F2F7FF"/>
-        <Setter Property="Foreground" Value="#17345C"/>
+        <Setter Property="Background" Value="{DynamicResource MonitoringTableBackgroundBrush}"/>
+        <Setter Property="RowBackground" Value="{DynamicResource GridRowBrush}"/>
+        <Setter Property="AlternatingRowBackground" Value="{DynamicResource MonitoringStatusPanelBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource MonitoringStatusTextBrush}"/>
         <Setter Property="FontSize" Value="10"/>
         <Setter Property="RowHeight" Value="27"/>
         <Setter Property="ColumnHeaderHeight" Value="29"/>
@@ -598,9 +606,9 @@
         <Setter Property="ColumnHeaderStyle">
             <Setter.Value>
                 <Style TargetType="{x:Type DataGridColumnHeader}">
-                    <Setter Property="Background" Value="#203B6A"/>
-                    <Setter Property="Foreground" Value="White"/>
-                    <Setter Property="BorderBrush" Value="#AFC5E5"/>
+                    <Setter Property="Background" Value="{DynamicResource MonitoringPanelHeaderBrush}"/>
+                    <Setter Property="Foreground" Value="{DynamicResource AppTextOnPrimBrush}"/>
+                    <Setter Property="BorderBrush" Value="{DynamicResource MonitoringPanelHeaderBorderBrush}"/>
                     <Setter Property="BorderThickness" Value="0,0,1,1"/>
                     <Setter Property="FontSize" Value="10"/>
                     <Setter Property="FontWeight" Value="SemiBold"/>
@@ -614,7 +622,7 @@
             <Setter.Value>
                 <Style TargetType="{x:Type DataGridCell}">
                     <Setter Property="Background" Value="Transparent"/>
-                    <Setter Property="BorderBrush" Value="#C3D2E6"/>
+                    <Setter Property="BorderBrush" Value="{DynamicResource MonitoringTableBorderBrush}"/>
                     <Setter Property="BorderThickness" Value="0,0,1,1"/>
                     <Setter Property="Padding" Value="4,0"/>
                     <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -629,7 +637,8 @@
            TargetType="{x:Type ContentControl}">
         <Setter Property="Width" Value="58"/>
         <Setter Property="Height" Value="40"/>
-        <Setter Property="Background" Value="#F7F8F9"/>
+        <Setter Property="Background" Value="{DynamicResource RgvUnknownBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource MonitoringCarrierRailBrush}"/>
         <Setter Property="Foreground" Value="#102038"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="FontWeight" Value="Bold"/>
@@ -651,13 +660,13 @@
                                 Grid.Column="0"
                                 Margin="0,5,0,5"
                                 Background="{TemplateBinding Background}"
-                                BorderBrush="#20252A"
+                                BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="2"/>
                         <Border x:Name="RightCarrierFrame"
                                 Grid.Column="2"
                                 Margin="0,5,0,5"
                                 Background="{TemplateBinding Background}"
-                                BorderBrush="#20252A"
+                                BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="2"/>
 
                         <!-- 왼쪽 구동부 -->
@@ -668,7 +677,7 @@
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
                                 Background="{TemplateBinding Background}"
-                                BorderBrush="#20252A"
+                                BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="1.5"
                                 CornerRadius="2">
                             <Rectangle Width="2"
@@ -741,28 +750,31 @@
         <Style.Triggers>
             <DataTrigger Binding="{Binding Tag.VisualState, RelativeSource={RelativeSource Self}}"
                          Value="{x:Static monitoringModels:RgvVisualState.Unknown}">
-                <Setter Property="Background" Value="{StaticResource RgvUnknownBrush}"/>
+                <Setter Property="Background" Value="{DynamicResource RgvUnknownBrush}"/>
                 <Setter Property="Foreground" Value="{StaticResource TrackingDarkForegroundBrush}"/>
                 <Setter Property="Opacity" Value="0.7"/>
             </DataTrigger>
             <DataTrigger Binding="{Binding Tag.VisualState, RelativeSource={RelativeSource Self}}"
                          Value="{x:Static monitoringModels:RgvVisualState.Manual}">
-                <Setter Property="Background" Value="{StaticResource RgvManualBrush}"/>
+                <Setter Property="Background" Value="{DynamicResource RgvManualBrush}"/>
                 <Setter Property="Foreground" Value="{StaticResource TrackingDarkForegroundBrush}"/>
             </DataTrigger>
             <DataTrigger Binding="{Binding Tag.VisualState, RelativeSource={RelativeSource Self}}"
                          Value="{x:Static monitoringModels:RgvVisualState.Ready}">
                 <Setter Property="Background" Value="{StaticResource RgvReadyBrush}"/>
+                <Setter Property="BorderBrush" Value="#20252A"/>
                 <Setter Property="Foreground" Value="{StaticResource TrackingDarkForegroundBrush}"/>
             </DataTrigger>
             <DataTrigger Binding="{Binding Tag.VisualState, RelativeSource={RelativeSource Self}}"
                          Value="{x:Static monitoringModels:RgvVisualState.Working}">
                 <Setter Property="Background" Value="{StaticResource RgvWorkingBrush}"/>
+                <Setter Property="BorderBrush" Value="#20252A"/>
                 <Setter Property="Foreground" Value="{StaticResource TrackingDarkForegroundBrush}"/>
             </DataTrigger>
             <DataTrigger Binding="{Binding Tag.VisualState, RelativeSource={RelativeSource Self}}"
                          Value="{x:Static monitoringModels:RgvVisualState.Error}">
                 <Setter Property="Background" Value="{StaticResource RgvErrorBrush}"/>
+                <Setter Property="BorderBrush" Value="#20252A"/>
                 <Setter Property="Foreground" Value="{StaticResource TrackingLightForegroundBrush}"/>
             </DataTrigger>
         </Style.Triggers>

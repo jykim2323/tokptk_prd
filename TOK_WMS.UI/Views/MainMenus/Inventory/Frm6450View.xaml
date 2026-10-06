@@ -44,7 +44,8 @@
         </Style>
 
         <Style x:Key="Header" TargetType="Border">
-            <Setter Property="Background" Value="#ebf4fc"/>
+            <Setter Property="Background" Value="{DynamicResource HeaderBrush}"/>
+            <Setter Property="TextElement.Foreground" Value="{DynamicResource AppTextOnPrimBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
             <Setter Property="BorderThickness" Value="2,2,2,2"/>
         </Style>
@@ -265,7 +266,7 @@
                         <Border DockPanel.Dock="Top" Height="40" Style="{StaticResource Header}"
                                  BorderThickness="1" CornerRadius="5" Padding="12,10" Margin="0,0,0,8">
                             <TextBlock Text="재고 현황" FontSize="15" FontWeight="Bold" 
-                                            Foreground="{DynamicResource AppTextBrush}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                            Foreground="{DynamicResource AppTextOnPrimBrush}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                         </Border>
 
                         <!-- 결과 그리드: 컬럼이 데이터 길이에 맞춰 자동 너비 -->

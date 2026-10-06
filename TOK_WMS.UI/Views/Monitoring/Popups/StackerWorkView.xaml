@@ -15,8 +15,8 @@
             <Setter Property="Height" Value="27"/>
             <Setter Property="Margin" Value="0,2,8,2"/>
             <Setter Property="Padding" Value="10,0"/>
-            <Setter Property="Background" Value="#203A60"/>
-            <Setter Property="BorderBrush" Value="#172C49"/>
+            <Setter Property="Background" Value="{DynamicResource AppSurface2Brush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="2"/>
         </Style>
@@ -26,7 +26,7 @@
             <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="FontSize" Value="12.5"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}"/>
         </Style>
 
         <Style x:Key="ReadOnlyFieldStyle" TargetType="TextBox">
@@ -93,7 +93,7 @@
                     <TextBlock Text="{Binding SelectedCraneNo, StringFormat={}{0}호기 현재 작업 상태}"
                                Margin="0,2,0,0"
                                FontSize="11.5"
-                               Foreground="#EAF4FB"/>
+                               Foreground="{DynamicResource AppTextOnPrimBrush}"/>
                 </StackPanel>
 
                 <Button Grid.Column="1"

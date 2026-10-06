@@ -357,6 +357,8 @@
 
                     <Grid DockPanel.Dock="Top"
                           Height="40"
+                          Background="{DynamicResource HeaderBrush}"
+                          TextElement.Foreground="{DynamicResource AppTextOnPrimBrush}"
                           Margin="0,0,0,7">
 
                         <StackPanel Orientation="Horizontal"
@@ -390,7 +392,7 @@
                             <TextBlock Text="{Binding TotalQty,
                                                       StringFormat={}{0:N2}}"
                                        FontWeight="Bold"
-                                       Foreground="{DynamicResource BtnPrimaryBrush}"/>
+                                       Foreground="{DynamicResource AppTextOnPrimBrush}"/>
 
                         </StackPanel>
 
@@ -481,6 +483,8 @@
 
                     <Grid DockPanel.Dock="Top"
                           Height="40"
+                          Background="{DynamicResource HeaderBrush}"
+                          TextElement.Foreground="{DynamicResource AppTextOnPrimBrush}"
                           Margin="0,0,0,7">
 
                         <TextBlock Text="📋 LOT-NO별"
@@ -510,7 +514,7 @@
                             <TextBlock Text="{Binding LotTotalQty,
                                                       StringFormat={}{0:N2}}"
                                        FontWeight="Bold"
-                                       Foreground="{DynamicResource BtnPrimaryBrush}"/>
+                                       Foreground="{DynamicResource AppTextOnPrimBrush}"/>
 
                         </StackPanel>
 

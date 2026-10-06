@@ -123,15 +123,15 @@
                                         <RowDefinition Height="*"/>
                                     </Grid.RowDefinitions>
 
-                                    <Border Grid.Row="0" Background="#5D89B7" CornerRadius="6,6,0,0" Padding="12,0">
+                                    <Border Grid.Row="0" Background="{DynamicResource HeaderBrush}" CornerRadius="6,6,0,0" Padding="12,0">
                                         <Grid>
                                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                                <TextBlock Text="▼" Foreground="White" FontSize="12" Margin="0,0,7,0"/>
-                                                <TextBlock Text="수신 (PLC → COM)" Foreground="White"
+                                                <TextBlock Text="▼" Foreground="{DynamicResource AppTextOnPrimBrush}" FontSize="12" Margin="0,0,7,0"/>
+                                                <TextBlock Text="수신 (PLC → COM)" Foreground="{DynamicResource AppTextOnPrimBrush}"
                                                            FontSize="12" FontWeight="Bold"/>
                                             </StackPanel>
                                             <TextBlock Text="신호 편집" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                                       Foreground="#DCEAF7" FontSize="10.5"/>
+                                                       Foreground="{DynamicResource AppTextOnPrimBrush}" FontSize="10.5"/>
                                         </Grid>
                                     </Border>
 
@@ -233,15 +233,15 @@
                                         <RowDefinition Height="*"/>
                                     </Grid.RowDefinitions>
 
-                                    <Border Grid.Row="0" Background="#5C7C99" CornerRadius="6,6,0,0" Padding="12,0">
+                                    <Border Grid.Row="0" Background="{DynamicResource HeaderBrush}" CornerRadius="6,6,0,0" Padding="12,0">
                                         <Grid>
                                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                                <TextBlock Text="▲" Foreground="White" FontSize="12" Margin="0,0,7,0"/>
-                                                <TextBlock Text="송신 (COM → PLC)" Foreground="White"
+                                                <TextBlock Text="▲" Foreground="{DynamicResource AppTextOnPrimBrush}" FontSize="12" Margin="0,0,7,0"/>
+                                                <TextBlock Text="송신 (COM → PLC)" Foreground="{DynamicResource AppTextOnPrimBrush}"
                                                            FontSize="12" FontWeight="Bold"/>
                                             </StackPanel>
                                             <TextBlock Text="신호 편집" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                                       Foreground="#E3EDF5" FontSize="10.5"/>
+                                                       Foreground="{DynamicResource AppTextOnPrimBrush}" FontSize="10.5"/>
                                         </Grid>
                                     </Border>
 

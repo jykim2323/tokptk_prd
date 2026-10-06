@@ -91,7 +91,9 @@
                TargetType="Border">
 
             <Setter Property="Background"
-                    Value="#ebf4fc"/>
+                    Value="{DynamicResource HeaderBrush}"/>
+            <Setter Property="TextElement.Foreground"
+                    Value="{DynamicResource AppTextOnPrimBrush}"/>
 
             <Setter Property="BorderBrush"
                     Value="{DynamicResource AppBorderBrush}"/>
@@ -320,7 +322,7 @@
                                    FontWeight="Bold"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
-                                   Foreground="{DynamicResource AppTextBrush}"/>
+                                   Foreground="{DynamicResource AppTextOnPrimBrush}"/>
 
 
                         <TextBlock Text="{Binding Items.Count,
@@ -329,7 +331,7 @@
                                    VerticalAlignment="Center"
                                    Margin="0,0,15,0"
                                    FontWeight="Bold"
-                                   Foreground="{DynamicResource AppTextSubBrush}"/>
+                                   Foreground="{DynamicResource AppTextOnPrimBrush}"/>
 
                     </Grid>
 

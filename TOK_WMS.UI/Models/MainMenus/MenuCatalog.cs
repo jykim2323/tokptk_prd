@@ -44,12 +44,12 @@ public static class MenuCatalog
         }},
         new MenuGroup { Title = "시스템제어관리", IconKey = "🛠️", Items = new[]
         {
-            new MenuLeaf { Title = "시스템운전 설정", MenuKey = DocumentKeys.Frm6100 },
-            new MenuLeaf { Title = "스택커 예약현황", MenuKey = DocumentKeys.Frm6200 },
-            new MenuLeaf { Title = "입출고 완료 대기", MenuKey = DocumentKeys.Frm6300 },
-            new MenuLeaf { Title = "스택커 신호 관리", MenuKey = DocumentKeys.Frm6900 },
-            new MenuLeaf { Title = "컨베어 신호 관리", MenuKey = DocumentKeys.Frm6450 },
-            new MenuLeaf { Title = "에러 이력 현황", MenuKey = DocumentKeys.Frm6550 }
+            new MenuLeaf { Title = "시스템운전 설정", MenuKey = DocumentKeys.Frm2100 },
+            new MenuLeaf { Title = "스태커 예약 현황", MenuKey = DocumentKeys.Frm2200 },
+            new MenuLeaf { Title = "입출고 완료 대기", MenuKey = DocumentKeys.Frm2300 },
+            new MenuLeaf { Title = "스태커 신호 관리", MenuKey = DocumentKeys.Frm2400 },
+            new MenuLeaf { Title = "컨베어 신호 관리", MenuKey = DocumentKeys.Frm2500 },
+            new MenuLeaf { Title = "에러 이력 현황", MenuKey = DocumentKeys.Frm2700 }
         }},
         new MenuGroup { Title = "전일 재고 작성", IconKey = "🏭", Items = new[]
         {

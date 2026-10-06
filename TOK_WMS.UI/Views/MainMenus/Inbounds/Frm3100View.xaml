@@ -33,7 +33,8 @@
         </Style>
 
         <Style x:Key="Header" TargetType="Border">
-            <Setter Property="Background" Value="#ebf4fc"/>
+            <Setter Property="Background" Value="{DynamicResource HeaderBrush}"/>
+            <Setter Property="TextElement.Foreground" Value="{DynamicResource AppTextOnPrimBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
             <Setter Property="BorderThickness" Value="2,2,2,2"/>
         </Style>
@@ -145,7 +146,7 @@
                         BorderThickness="1" CornerRadius="5" Padding="12,10" Margin="0,0,0,8">
                         <TextBlock Text="품목 조회" 
                             FontSize="18" FontWeight="Bold" 
-                            Foreground="{DynamicResource AppTextBrush}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            Foreground="{DynamicResource AppTextOnPrimBrush}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     </Border>
                     <!-- 결과 그리드: 컬럼이 데이터 길이에 맞춰 자동 너비 -->
                     <DataGrid x:Name="MimastDB_Table" ItemsSource="{Binding Items}"
@@ -186,7 +187,7 @@
                     <DockPanel>
                         <Border DockPanel.Dock="Top" Height="40" Style="{StaticResource Header}" Margin="0,20,0,8">
                             <TextBlock Text="입고 상세 입력" 
-                                FontSize="18" FontWeight="Bold" Foreground="{DynamicResource AppTextBrush}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                FontSize="18" FontWeight="Bold" Foreground="{DynamicResource AppTextOnPrimBrush}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                         </Border>
                         <Grid Margin="0,10,0,0">
                             <Grid.RowDefinitions>
@@ -279,7 +280,7 @@
                     <DockPanel>
 
                         <Border DockPanel.Dock="Top" Height="40" Style="{StaticResource Header}"  Margin="0,20,0,8">
-                            <TextBlock Text="입고 예정" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource AppTextBrush}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Text="입고 예정" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource AppTextOnPrimBrush}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                         </Border>
 
                         <Grid Margin="0,10,0,0">

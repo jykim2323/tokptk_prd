@@ -80,7 +80,7 @@
                     <TextBlock Margin="0,3,0,0"
                                Text="T2 콘베이어 구간의 현재 추적 정보를 조회하고 수정합니다."
                                FontSize="11"
-                               Foreground="#EAF4FB"/>
+                               Foreground="{DynamicResource AppTextOnPrimBrush}"/>
                 </StackPanel>
 
                 <TextBlock Grid.Column="1"
@@ -88,7 +88,7 @@
                            Text="{Binding StatusMessage}"
                            TextTrimming="CharacterEllipsis"
                            VerticalAlignment="Center"
-                           Foreground="#EAF4FB"/>
+                           Foreground="{DynamicResource AppTextOnPrimBrush}"/>
                 <Button Grid.Column="2"
                         Content="✕"
                         Style="{StaticResource PopupCloseButtonStyle}"
@@ -228,8 +228,8 @@
         <Border Grid.Row="2"
                 Margin="0,0,0,12"
                 Padding="12,9"
-                Background="#EEF5FC"
-                BorderBrush="#AFC5E5"
+                Background="{DynamicResource AppSurface2Brush}"
+                BorderBrush="{DynamicResource AppBorderBrush}"
                 BorderThickness="1"
                 CornerRadius="6"
                 Visibility="{Binding IsMoveTargetVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
