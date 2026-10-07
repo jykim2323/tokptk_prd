@@ -13,7 +13,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- 화면 제목 및 갱신 상태 -->
+        <!-- 화면 제목 및 조회 -->
         <Border Grid.Row="0" Padding="16,10"
                 Background="{DynamicResource AppSurfaceBrush}"
                 BorderBrush="{DynamicResource AppBorderBrush}"
@@ -40,41 +40,6 @@
                     <TextBlock Text="조회 중..." Margin="0,0,12,0"
                                Foreground="#315F8B" FontSize="11" VerticalAlignment="Center"
                                Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-
-                    <Border Height="32" CornerRadius="16" Padding="11,0" Margin="0,0,10,0">
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Setter Property="Background" Value="#FDECEC"/>
-                                <Setter Property="BorderBrush" Value="#F3B8B8"/>
-                                <Setter Property="BorderThickness" Value="1"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsConnected}" Value="True">
-                                        <Setter Property="Background" Value="#E7F7ED"/>
-                                        <Setter Property="BorderBrush" Value="#9AD7AE"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <Ellipse Width="8" Height="8" Margin="0,0,7,0">
-                                <Ellipse.Style>
-                                    <Style TargetType="Ellipse">
-                                        <Setter Property="Fill" Value="#D94343"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsConnected}" Value="True">
-                                                <Setter Property="Fill" Value="#22A956"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Ellipse.Style>
-                            </Ellipse>
-                            <StackPanel>
-                                <TextBlock Text="{Binding StatusMessage}" FontSize="10.5"/>
-                                <TextBlock Text="{Binding LastUpdatedText, StringFormat=최근 갱신: {0}}"
-                                           FontSize="9.5" Foreground="{DynamicResource AppTextSubBrush}"/>
-                            </StackPanel>
-                        </StackPanel>
-                    </Border>
 
                     <CheckBox Content="자동 갱신" IsChecked="{Binding IsAutoRefresh}"
                               VerticalAlignment="Center" Margin="0,0,12,0"

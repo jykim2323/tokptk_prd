@@ -9,117 +9,124 @@
              d:DesignHeight="900">
 
     <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- 화면을 단독으로 분석할 때도 공통 스타일을 찾을 수 있도록 직접 병합한다.
+                     테마 색상은 App 리소스의 DynamicResource를 사용한다. -->
+                <ResourceDictionary Source="/TOK.WMS.UI;component/Styles/MonitoringStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
 
-        <!-- 랙 셀: 공통 입체감 + 위쪽 보라색 표시선 -->
-        <Style x:Key="RackCellStyle"
-               TargetType="{x:Type Label}"
-               BasedOn="{StaticResource RaisedCellBaseStyle}">
-            <Setter Property="Background" Value="{DynamicResource MonitoringCellBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource MonitoringCellBorderBrush}"/>
-            <Setter Property="Foreground" Value="{DynamicResource MonitoringTextBrush}"/>
-            <Setter Property="FontSize" Value="10"/>
-            <Setter Property="FontWeight" Value="Bold"/>
+            <!-- 랙 셀: 공통 입체감 + 위쪽 보라색 표시선 -->
+            <Style x:Key="RackCellStyle"
+                   TargetType="{x:Type Label}"
+                   BasedOn="{StaticResource RaisedCellBaseStyle}">
+                <Setter Property="Background" Value="{DynamicResource MonitoringCellBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource MonitoringCellBorderBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource MonitoringTextBrush}"/>
+                <Setter Property="FontSize" Value="10"/>
+                <Setter Property="FontWeight" Value="Bold"/>
 
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Label}">
-                        <Grid Background="Transparent"
-                              SnapsToDevicePixels="True">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Label}">
+                            <Grid Background="Transparent"
+                                  SnapsToDevicePixels="True">
 
-                            <Border Margin="1,1,0,0"
-                                    Background="{DynamicResource MonitoringCellShadowBrush}"
-                                    CornerRadius="2"/>
+                                <Border Margin="1,1,0,0"
+                                        Background="{DynamicResource MonitoringCellShadowBrush}"
+                                        CornerRadius="2"/>
 
-                            <Border Margin="0,0,1,1"
-                                    Background="{TemplateBinding Background}"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    CornerRadius="2">
+                                <Border Margin="0,0,1,1"
+                                        Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        CornerRadius="2">
 
-                                <Grid>
-                                    <Rectangle Height="4"
-                                               Margin="1,1,1,0"
-                                               VerticalAlignment="Top"
-                                               Fill="#980098"
-                                               RadiusX="1"
-                                               RadiusY="1"/>
+                                    <Grid>
+                                        <Rectangle Height="4"
+                                                   Margin="1,1,1,0"
+                                                   VerticalAlignment="Top"
+                                                   Fill="#980098"
+                                                   RadiusX="1"
+                                                   RadiusY="1"/>
 
-                                    <Border BorderBrush="{DynamicResource MonitoringCellHighlightBrush}"
-                                            BorderThickness="1,1,0,0"
-                                            CornerRadius="1"/>
+                                        <Border BorderBrush="{DynamicResource MonitoringCellHighlightBrush}"
+                                                BorderThickness="1,1,0,0"
+                                                CornerRadius="1"/>
 
-                                    <Border BorderBrush="{DynamicResource MonitoringCellLowlightBrush}"
-                                            BorderThickness="0,0,1,1"
-                                            CornerRadius="1"/>
+                                        <Border BorderBrush="{DynamicResource MonitoringCellLowlightBrush}"
+                                                BorderThickness="0,0,1,1"
+                                                CornerRadius="1"/>
 
-                                    <ContentPresenter
-                                        Content="{TemplateBinding Content}"
-                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                        Margin="0,3,0,0"/>
-                                </Grid>
-                            </Border>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+                                        <ContentPresenter
+                                            Content="{TemplateBinding Content}"
+                                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                            Margin="0,3,0,0"/>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
 
-        <!-- 메인 모니터링 랙 셀은 테마와 작업·이상 상태에 관계없이 흰 배경을 유지한다. -->
-        <Style x:Key="RackStateCellStyle"
-               TargetType="{x:Type Label}"
-               BasedOn="{StaticResource RackCellStyle}">
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="Foreground" Value="{StaticResource TrackingDarkForegroundBrush}"/>
-        </Style>
+            <!-- 메인 모니터링 랙 셀은 테마와 작업·이상 상태에 관계없이 흰 배경을 유지한다. -->
+            <Style x:Key="RackStateCellStyle"
+                   TargetType="{x:Type Label}"
+                   BasedOn="{StaticResource RackCellStyle}">
+                <Setter Property="Background" Value="White"/>
+                <Setter Property="Foreground" Value="{StaticResource TrackingDarkForegroundBrush}"/>
+            </Style>
 
-        <!-- 3~13열의 1연 위치에 표시하는 트래킹 구간 -->
-        <Style x:Key="TrackingSlotStyle"
-               TargetType="{x:Type Label}"
-               BasedOn="{StaticResource RaisedCellBaseStyle}">
-            <Setter Property="Background" Value="{DynamicResource MonitoringTrackingSlotBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource MonitoringTrackingSlotBorderBrush}"/>
-            <Setter Property="Foreground" Value="{DynamicResource MonitoringTrackingSlotTextBrush}"/>
-            <Setter Property="FontSize" Value="8"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-        </Style>
+            <!-- 3~13열의 1연 위치에 표시하는 트래킹 구간 -->
+            <Style x:Key="TrackingSlotStyle"
+                   TargetType="{x:Type Label}"
+                   BasedOn="{StaticResource RaisedCellBaseStyle}">
+                <Setter Property="Background" Value="{DynamicResource MonitoringTrackingSlotBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource MonitoringTrackingSlotBorderBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource MonitoringTrackingSlotTextBrush}"/>
+                <Setter Property="FontSize" Value="8"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+            </Style>
 
-        <Style x:Key="ColumnHeaderStyle" TargetType="Label">
-            <Setter Property="Background" Value="{DynamicResource MonitoringColumnHeaderBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource MonitoringColumnBorderBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="0"/>
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Foreground" Value="{DynamicResource AppTextOnPrimBrush}"/>
-            <Setter Property="FontSize" Value="9"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Focusable" Value="False"/>
-        </Style>
+            <Style x:Key="ColumnHeaderStyle" TargetType="Label">
+                <Setter Property="Background" Value="{DynamicResource MonitoringColumnHeaderBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource MonitoringColumnBorderBrush}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Foreground" Value="{DynamicResource AppTextOnPrimBrush}"/>
+                <Setter Property="FontSize" Value="9"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="Focusable" Value="False"/>
+            </Style>
 
-        <Style x:Key="CraneStyle" TargetType="Label">
-            <Setter Property="BorderBrush" Value="{DynamicResource MonitoringTextBrush}"/>
-            <Setter Property="BorderThickness" Value="2"/>
-            <Setter Property="Padding" Value="0"/>
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontSize" Value="13"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Focusable" Value="False"/>
-        </Style>
+            <Style x:Key="CraneStyle" TargetType="Label">
+                <Setter Property="BorderBrush" Value="{DynamicResource MonitoringTextBrush}"/>
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="Focusable" Value="False"/>
+            </Style>
 
-        <Style x:Key="AreaTitleStyle" TargetType="Label">
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="0"/>
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Foreground" Value="{DynamicResource MonitoringTextBrush}"/>
-            <Setter Property="FontSize" Value="12"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Focusable" Value="False"/>
-        </Style>
+            <Style x:Key="AreaTitleStyle" TargetType="Label">
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Foreground" Value="{DynamicResource MonitoringTextBrush}"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="Focusable" Value="False"/>
+            </Style>
 
+        </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid Background="{DynamicResource MonitoringBackgroundBrush}">

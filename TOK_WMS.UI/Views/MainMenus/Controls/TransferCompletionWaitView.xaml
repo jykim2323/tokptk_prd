@@ -78,7 +78,7 @@
                 Background="{DynamicResource AppSurfaceBrush}"
                 BorderBrush="{DynamicResource AppBorderBrush}"
                 BorderThickness="1" CornerRadius="6">
-            <DockPanel LastChildFill="True">
+            <DockPanel LastChildFill="False">
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"
                             VerticalAlignment="Bottom" Margin="18,0,0,0">
                     <Button Content="조회" Command="{Binding SearchCommand}"
@@ -91,14 +91,6 @@
                             Visibility="{Binding CanDelete, Converter={StaticResource BooleanToVisibilityConverter}}"
                             Background="{DynamicResource StatusErrorBrush}"
                             Style="{StaticResource ActionButtonStyle}"/>
-                </StackPanel>
-
-                <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="입·출고 설비 완료 후 후속 처리를 기다리는 데이터입니다."
-                               FontWeight="SemiBold"/>
-                    <TextBlock Text="삭제하면 재고 및 완료 처리가 진행되지 않을 수 있으므로 관리자만 삭제할 수 있습니다."
-                               Margin="0,3,0,0" FontSize="11"
-                               Foreground="{DynamicResource StatusErrorBrush}"/>
                 </StackPanel>
             </DockPanel>
         </Border>

@@ -49,7 +49,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- 화면 제목 및 DB 연동 상태 -->
+        <!-- 화면 제목 및 조회 -->
         <Border Grid.Row="0"
                 Padding="16,10"
                 Background="{DynamicResource AppSurfaceBrush}"
@@ -81,68 +81,15 @@
                     </StackPanel>
                 </StackPanel>
 
-                <StackPanel Grid.Column="1"
-                            Orientation="Horizontal"
-                            VerticalAlignment="Center">
-                    <Border Height="30"
-                            Padding="10,0"
-                            Margin="0,0,8,0"
-                            CornerRadius="15"
-                            Background="#E7F4EA"
-                            BorderBrush="#A8D3B3"
-                            BorderThickness="1">
-                        <TextBlock Text="현재 1층 운영"
-                                   FontSize="11"
-                                   FontWeight="SemiBold"
-                                   Foreground="#25743A"
-                                   VerticalAlignment="Center"/>
-                    </Border>
-
-                    <Border Height="30"
-                            Padding="10,0"
-                            Margin="0,0,10,0"
-                            CornerRadius="15"
-                            Background="{DynamicResource AppSurface2Brush}"
-                            BorderBrush="{DynamicResource AppBorderBrush}"
-                            BorderThickness="1">
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <Ellipse Width="8" Height="8" Margin="0,0,7,0">
-                                <Ellipse.Style>
-                                    <Style TargetType="Ellipse">
-                                        <Setter Property="Fill" Value="{DynamicResource StatusIdleBrush}"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsConnected}" Value="True">
-                                                <Setter Property="Fill" Value="{DynamicResource StatusRunningBrush}"/>
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding IsConnected}" Value="False">
-                                                <Setter Property="Fill" Value="{DynamicResource StatusErrorBrush}"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Ellipse.Style>
-                            </Ellipse>
-                            <StackPanel>
-                                <TextBlock Text="{Binding StatusMessage}"
-                                           MaxWidth="250"
-                                           FontSize="11"
-                                           TextTrimming="CharacterEllipsis"/>
-                                <TextBlock FontSize="9"
-                                           Foreground="{DynamicResource AppTextSubBrush}">
-                                    <Run Text="최종 조회 "/>
-                                    <Run Text="{Binding LastUpdatedText}"/>
-                                </TextBlock>
-                            </StackPanel>
-                        </StackPanel>
-                    </Border>
-
-                    <Button Style="{StaticResource ScSignalRefreshButtonStyle}"
-                            Command="{Binding RefreshCommand}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="↻" FontSize="15" Margin="0,0,6,0"/>
-                            <TextBlock Text="조 회" FontSize="12" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
+                <Button Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Style="{StaticResource ScSignalRefreshButtonStyle}"
+                        Command="{Binding RefreshCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="↻" FontSize="15" Margin="0,0,6,0"/>
+                        <TextBlock Text="조 회" FontSize="12" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
             </Grid>
         </Border>
 
@@ -165,27 +112,10 @@
                                     </Grid.RowDefinitions>
 
                                     <Grid Grid.Row="0" Margin="0,0,0,14">
-                                        <StackPanel>
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock Text="{Binding DisplayName}"
-                                                           FontSize="17"
-                                                           FontWeight="Bold"
-                                                           VerticalAlignment="Center"/>
-                                                <Border Margin="9,0,0,0"
-                                                        Padding="8,2"
-                                                        CornerRadius="9"
-                                                        Background="#E7F4EA">
-                                                    <TextBlock Text="운영 중"
-                                                               FontSize="10"
-                                                               FontWeight="SemiBold"
-                                                               Foreground="#25743A"/>
-                                                </Border>
-                                            </StackPanel>
-                                            <TextBlock Text="호기별 입고·출고 가능 상태를 선택한 뒤 수정 버튼을 눌러 적용합니다."
-                                                       FontSize="11"
-                                                       Margin="0,3,0,0"
-                                                       Foreground="{DynamicResource AppTextSubBrush}"/>
-                                        </StackPanel>
+                                        <TextBlock Text="{Binding DisplayName}"
+                                                   FontSize="17"
+                                                   FontWeight="Bold"
+                                                   VerticalAlignment="Center"/>
 
                                         <Button HorizontalAlignment="Right"
                                                 VerticalAlignment="Center"
@@ -285,7 +215,7 @@
                                     <TextBlock Text="작업순번"
                                                FontSize="16"
                                                FontWeight="Bold"/>
-                                    <TextBlock Text="다음 작업 생성에 사용할 순번을 관리합니다."
+                                    <TextBlock Text=""
                                                Margin="0,3,0,0"
                                                FontSize="11"
                                                Foreground="{DynamicResource AppTextSubBrush}"/>
@@ -396,7 +326,7 @@
                                     <TextBlock Text="호기"
                                                FontSize="16"
                                                FontWeight="Bold"/>
-                                    <TextBlock Text="입고 작업을 우선 배정할 호기입니다."
+                                    <TextBlock Text=""
                                                Margin="0,3,0,0"
                                                FontSize="11"
                                                Foreground="{DynamicResource AppTextSubBrush}"/>
@@ -435,18 +365,7 @@
                     </Border>
                 </Grid>
 
-                <Border Margin="0,12,0,0"
-                        Padding="12,8"
-                        CornerRadius="5"
-                        Background="{DynamicResource AppSurface2Brush}"
-                        BorderBrush="{DynamicResource AppBorderBrush}"
-                        BorderThickness="1">
-                    <TextBlock FontSize="10.5"
-                               Foreground="{DynamicResource AppTextSubBrush}">
-                        <Run Text="※ 현재는 1층만 운영하며 스태커 크레인 1~7호기를 설정합니다. "/>
-                        <Run Text="2층은 현장 운영 및 DB 구조가 확정된 뒤 같은 형식으로 추가할 예정입니다."/>
-                    </TextBlock>
-                </Border>
+                
             </StackPanel>
         </ScrollViewer>
     </Grid>
