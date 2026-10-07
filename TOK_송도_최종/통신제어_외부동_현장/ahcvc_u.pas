@@ -1,0 +1,754 @@
+unit ahcvc_u;
+
+interface
+
+uses
+  Windows, Classes, SysUtils, Dialogs, dbtables;
+
+type
+  ahcvc_T = class(TThread)
+  private
+
+    pb_img_ok:  Boolean;
+
+    Send_ok :   Boolean;
+
+    ps_r_ch01: String[16];    ps_r_ch02: String[16];    ps_r_ch03: String[16];
+    ps_r_ch04: String[16];    ps_r_ch05: String[16];
+    
+    pa_r_ch01: array [1..16] of Char;    pa_r_ch02: array [1..16] of Char;
+    pa_r_ch03: array [1..16] of Char;    pa_r_ch04: array [1..16] of Char;
+    pa_r_ch05: array [1..16] of Char;
+    ps_w_ch01: String[16];    ps_w_ch02: String[16];    ps_w_ch03: String[16];
+
+    pa_w_ch01: array [1..16] of Char;    pa_w_ch02: array [1..16] of Char;
+    pa_w_ch03: array [1..16] of Char;
+
+
+    ps_no, ps_from, ps_to, Pos_no : String;
+
+    Trak_index   : Array[1..25] of String[13];       Trak_pltid   : Array[1..25] of String[10];
+    Trak_gubun   : Array[1..25] of String[1];        Trak_picking : Array[1..25] of String[1];
+    Trak_date    : Array[1..25] of String[8];        Trak_Time    : Array[1..25] of String[6];
+    Trak_Flag    : Array[1..25] of String[1];        Trak_LOCA    : Array[1..25] of String[5];
+
+  protected
+    function Func_ReInPut_Proc : Boolean;
+    procedure Execute; override;
+
+    procedure main_cntl_proc;
+
+    procedure Cntl_TBCVCTableSelect;
+    procedure Cntl_TBCVCTableUpdate;  
+
+    procedure Cntl_StrToArrayProc;
+    procedure Cntl_TrakMove_Proc;
+    procedure Cntl_TrakOneDelete_Proc;
+  end;
+var
+  cvc_pgm : char;
+  cvc_step: Integer;
+
+  Plt_Exist : Array[1..25] of Char;
+  From_Pos, To_Pos, Cmd_Pos, Cmd_jisi: Integer;
+  Str_Cmd : Array[1..6] of Char;
+  Str_End : Array[1..6] of Char;
+  IntPos : Integer;
+
+
+implementation
+
+uses ahcomm_u, Convision_u, DB, ADODB;
+
+procedure ahcvc_T.Execute;
+begin
+  cvc_pgm := 'T';
+  pb_img_ok := False;
+
+  ahcomm_f.cvcEdit.Text := '통신개시 작업을 하였습니다.!!';
+  For IntPos := 1 to 25 do
+   Begin
+     Trak_index[IntPos]   := '';       Trak_pltid[IntPos]    := '';
+     Trak_gubun[IntPos]   := '';       Trak_picking[IntPos]  := '';
+     Trak_date[IntPos]    := '';       Trak_Time[IntPos]     := '';
+     Trak_Flag[IntPos]    := '';       Trak_LOCA[IntPos]     := '';
+  End;
+            
+//  Sleep(1000);
+  While (Not (cvc_T.Terminated)) And (cvc_pgm = 'T') Do Begin       
+    If pb_img_ok = True Then Begin
+      pb_img_ok := False;
+      ahcomm_f.cvcimg.Visible := False;
+    End Else Begin
+      pb_img_ok := True;
+      ahcomm_f.cvcimg.Visible := True;
+    End;
+    main_cntl_proc;
+    Sleep(300);
+  End;
+// 통신 port를 close 한다.
+
+  ahcomm_f.cvcEdit.Text := '통신종료 작업을 하였습니다.!!';
+  cvc_pgm := 'F';
+end;
+
+procedure ahcvc_T.main_cntl_proc;
+begin
+  ahcomm_f.cvcEdit.Text := 'Main Control Processing.!!';
+  Cntl_TBCVCTableSelect;
+  sleep(200);
+  Cntl_TBCVCTableUpdate;
+end;
+
+procedure ahcvc_T.Cntl_TBCVCTableSelect;
+var
+  BoolRept : Boolean;
+  ls_sql : String;
+begin
+  ahcomm_f.cvcEdit.Text := 'Cntl_TBCVCTableSelect.!!';
+  ls_sql := ' Select *  From STK1_TBCVC1 (NOLOCK) ';
+  ls_sql := ls_sql + ' Where CVC1_Sr = ''R'' ';
+  With ahcomm_f.CVCQuery Do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(ls_sql);
+    Open;
+
+    If Eof Then Exit;
+    ps_r_ch01 := FieldByName('CVC1_CH01').AsString;
+    ps_r_ch02 := FieldByName('CVC1_CH02').AsString;
+    ps_r_ch03 := FieldByName('CVC1_CH03').AsString;
+    ps_r_ch04 := FieldByName('CVC1_CH04').AsString;
+    ps_r_ch05 := FieldByName('CVC1_CH05').AsString;
+  End;
+
+  ls_sql := ' Select CVC1_CH01, CVC1_CH02, CVC1_CH03 From STK1_TBCVC1 (NOLOCK) ';
+  ls_sql := ls_sql + ' Where CVC1_Sr = ''S'' ';
+
+  With ahcomm_f.CVCQuery Do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(ls_sql);
+    Open;
+
+    If Eof Then Exit;
+    ps_w_ch01 := FieldByName('CVC1_CH01').AsString;
+    ps_w_ch02 := FieldByName('CVC1_CH02').AsString;
+    ps_w_ch03 := FieldByName('CVC1_CH03').AsString;
+  End;
+  Cntl_StrToArrayProc;
+
+ 
+  For IntPos := 1 to 16 do
+  begin
+     Plt_Exist[IntPos]   := pa_r_ch02[IntPos];
+  end;
+
+  For IntPos := 1 to 9 do
+  begin
+     Plt_Exist[IntPos+16] := pa_r_ch03[IntPos];
+  end;
+
+  For IntPos := 1 to 6 do
+  begin          
+     Str_End[IntPos]    := pa_r_ch04[IntPos];
+     Str_Cmd[IntPos]    := pa_w_ch01[IntPos];
+  end;
+
+  ls_sql := ' Select * From STK1_TBTRAK (NOLOCK)   ';
+  ls_sql := ls_sql + ' Where TRAK_NO BETWEEN ''01'' AND ''25'' ';
+  ls_sql := ls_sql + ' ORDER BY TRAK_NO ';
+  With ahcomm_f.cvcQuery Do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(ls_sql);
+    Open;
+    First;
+
+    While Not Eof Do
+    Begin
+     IntPos     := FieldByNAme('TRAK_NO').AsInteger;
+
+     Trak_index[IntPos] := Trim(FieldByName('TRAK_INDEX').AsString);   Trak_pltid[IntPos]   := Trim(FieldByName('TRAK_PLTID').AsString);
+     Trak_gubun[IntPos] := Trim(FieldByName('TRAK_GUBUN').AsString);   Trak_picking[IntPos] := Trim(FieldByName('TRAK_PICKING').AsString);
+     Trak_date[IntPos]  := Trim(FieldByName('TRAK_DATE').AsString);    Trak_time[IntPos]    := Trim(FieldByName('TRAK_TIME').AsString);
+     Trak_Flag[IntPos]  := Trim(FieldByName('TRAK_FLAG').AsString);    Trak_Loca[IntPos]    := Trim(FieldByName('TRAK_LOCA').AsString);
+     Next;
+   End;  
+  End;
+
+
+   For IntPos := 25  Downto 1 Do
+   Begin
+      Case IntPos of
+         1..2, 5..6, 8..9, 12..13, 15..18, 21..24 :   // Tracking 이동 구간
+         Begin
+            From_Pos := IntPos;  To_Pos := IntPos + 1;
+            if (Trak_index[From_Pos] <> '') And (Trak_index[To_Pos] = '')  Then Cntl_TrakMove_Proc;
+         End;
+
+
+         3,10,19: // 직진 지시
+         Begin
+            From_Pos := IntPos;
+            To_Pos   := IntPos + 1;
+            If      IntPos = 3  then begin Cmd_pos := 1; Cmd_jisi := 1;  end
+            Else If IntPos = 10 then begin Cmd_pos := 3; Cmd_jisi := 2;  end
+            Else If IntPos = 19 then begin Cmd_pos := 5; Cmd_jisi := 3;  end;
+
+            // 직진 완료 처리
+            If (Trak_index[From_Pos] <> '') And (Trak_index[To_Pos] = '')     And
+               (Str_Cmd[Cmd_Pos] = '1')     And (Str_End[Cmd_Pos] = '1')  Then
+            Begin
+               Cntl_TrakMove_Proc;
+               Str_Cmd[Cmd_Pos] := '0';
+            End;
+
+            // 직진 지령 처리
+            If (Trak_index[From_Pos] <> '') And (Trak_index[To_Pos]  = '')   And
+               (Plt_Exist[From_Pos] = '1')  And (Plt_Exist[To_Pos]  = '0')   And
+               (Str_Cmd[Cmd_Pos] = '0')     And (Str_End[Cmd_Pos] = '0')     And
+               (pa_r_ch05[Cmd_jisi] = '0')  Then
+            Begin
+               Str_Cmd[Cmd_Pos] := '1';
+               // 작업등 작업 구분 Lamp를 켜기 위함
+               if  (From_Pos = 3) then
+               begin
+//                 pa_w_ch03[01] := '0';  pa_w_ch03[02] := '0';   pa_w_ch03[03] := '0';
+
+                 pa_w_ch02[01] := '0';
+                 pa_w_ch02[02] := '0';
+                 if      (Trak_gubun[From_Pos] = 'P') then pa_w_ch02[01] := '1'
+                 else if (Trak_gubun[From_Pos] = 'T') then pa_w_ch02[02] := '1'
+                 else if (Trak_gubun[From_Pos] = 'U') or (Trak_gubun[From_Pos] = 'V') then pa_w_ch02[03] := '1';
+               end
+               else if  (From_Pos = 10) then
+               begin
+//                 pa_w_ch03[05] := '0';  pa_w_ch03[06] := '0';   pa_w_ch03[07] := '0';
+
+                 pa_w_ch02[04] := '0';
+                 pa_w_ch02[05] := '0';
+                 if      (Trak_gubun[From_Pos] = 'P') then pa_w_ch02[04] := '1'
+                 else if (Trak_gubun[From_Pos] = 'T') then pa_w_ch02[05] := '1'
+                 else if (Trak_gubun[From_Pos] = 'U') or (Trak_gubun[From_Pos] = 'V') then pa_w_ch02[06] := '1';
+               end
+               else if  (From_Pos = 19) then
+               begin
+//                 pa_w_ch03[10] := '0';  pa_w_ch03[11] := '0';   pa_w_ch03[12] := '0';
+
+                 pa_w_ch02[07] := '0';
+                 pa_w_ch02[08] := '0';
+                 if      (Trak_gubun[From_Pos] = 'P') then pa_w_ch02[07] := '1'
+                 else if (Trak_gubun[From_Pos] = 'T') then pa_w_ch02[08] := '1'
+                 else if (Trak_gubun[From_Pos] = 'U') or (Trak_gubun[From_Pos] = 'V') then pa_w_ch02[09] := '1';
+               end;
+            End;
+         End;
+
+         4:
+         Begin
+            From_Pos := IntPos;
+            To_Pos   := IntPos + 1;
+            Cmd_pos  := 2;
+{
+            // RFid Lamp
+
+            If (Trak_Flag[From_Pos]  = '1') or  (Trak_Flag[From_Pos]  = '2') or
+               (Trak_Flag[From_Pos]  = '3') or  (Trak_Flag[From_Pos]  = '4') Then
+            begin
+               pa_w_ch03[01] := '0';  pa_w_ch03[02] := '0';   pa_w_ch03[03] := '1';
+            end;
+
+
+            If (Trak_Flag[From_Pos]  = 'W')   Then
+            begin
+               pa_w_ch03[01] := '1';  pa_w_ch03[02] := '0';   pa_w_ch03[03] := '0';
+            end;
+}
+
+            // 직진 완료 처리
+            If (Trak_index[From_Pos] <> '') And (Trak_index[To_Pos] = '')     And
+               (Str_Cmd[Cmd_Pos] = '1')     And (Str_End[Cmd_Pos] = '1')  Then
+            Begin
+               Cntl_TrakMove_Proc;
+
+               Str_Cmd[Cmd_Pos] := '0';
+//               pa_w_ch03[01] := '0';  pa_w_ch03[02] := '0';   pa_w_ch03[03] := '0';
+
+               pa_w_ch02[01] := '0';
+               pa_w_ch02[02] := '0';
+               pa_w_ch02[03] := '0';
+            End;
+
+            // 완전 출고
+            If (Trak_index[From_Pos] <> '') And (Plt_Exist[From_Pos] = '1') And
+               (Str_Cmd[Cmd_Pos] = '0')     And (Str_End[Cmd_Pos] = '0') And
+               (pa_r_ch05[01] = '1')        And (pa_w_ch02[02] = '1') And
+//               (Copy(Trak_index[From_Pos],9,1) = 'O')  And (Trak_FLAG[From_Pos] = 'W')  Then
+               (Copy(Trak_index[From_Pos],9,1) = 'O') Then
+            Begin
+
+               BoolRept := False;
+               If (Trak_gubun[From_Pos] = 'T') then
+               begin
+                  BoolRept := False;
+                  BoolRept := Func_ReInPut_Proc;
+               end;
+               if BoolRept = False then Continue;
+
+               Str_Cmd[Cmd_Pos] := '1';
+               pa_w_ch02[01] := '0';   pa_w_ch02[02] := '0';   pa_w_ch02[03] := '0';
+//               pa_w_ch03[01] := '0';   pa_w_ch03[02] := '0';   pa_w_ch03[03] := '0';
+
+//               If (Trak_gubun[From_Pos] <> 'T') Then Continue;
+//               Cntl_TrakOneDelete_Proc;
+
+//               pa_w_ch02[01] := '0';   pa_w_ch02[02] := '0';   pa_w_ch02[03] := '0';
+            End;
+
+            // 부분 완료, 보충 완료
+            If (Trak_index[From_Pos] <> '') And (Trak_index[To_Pos] = '') And
+               (Plt_Exist[From_Pos] = '1')  And (Plt_Exist[To_Pos] = '0') And
+               (Str_Cmd[Cmd_Pos] = '0')     And (Str_End[Cmd_Pos] = '0')  And
+               (pa_r_ch05[01] = '1')        And (pa_w_ch02[01] = '1')     And
+ //              (Copy(Trak_index[From_Pos],9,1) = 'O')  And (Trak_FLAG[From_Pos] = 'W')  Then
+                (Copy(Trak_index[From_Pos],9,1) = 'O') Then
+            Begin
+               BoolRept := False;
+               If (Trak_gubun[From_Pos] = 'P')  then
+               begin
+                  BoolRept := False;
+                  BoolRept := Func_ReInPut_Proc;
+               end;
+               if BoolRept = False then Continue;
+
+               Str_Cmd[Cmd_Pos] := '1';
+               pa_w_ch02[01] := '0';   pa_w_ch02[02] := '0';   pa_w_ch02[03] := '0';
+//               pa_w_ch03[01] := '0';   pa_w_ch03[02] := '0';   pa_w_ch03[03] := '0';
+            End;
+
+            If (Trak_index[From_Pos] <> '') And (Trak_index[To_Pos] = '') And
+               (Plt_Exist[From_Pos] = '1')  And (Plt_Exist[To_Pos] = '0') And
+               (Str_Cmd[Cmd_Pos] = '0')     And (Str_End[Cmd_Pos] = '0')  And
+               (pa_r_ch05[01] = '1')        And (pa_w_ch02[03] = '1')     And
+               (Copy(Trak_index[From_Pos],9,1) = 'O') Then
+            Begin
+               BoolRept := False;
+               If  (Trak_gubun[From_Pos] = 'V') then
+               begin
+                  BoolRept := False;
+                  BoolRept := Func_ReInPut_Proc;
+               end;
+               if BoolRept = False then Continue;
+
+               Str_Cmd[Cmd_Pos] := '1';
+               pa_w_ch02[01] := '0';   pa_w_ch02[02] := '0';   pa_w_ch02[03] := '0';
+//               pa_w_ch03[01] := '0';   pa_w_ch03[02] := '0';   pa_w_ch03[03] := '0';
+            End;
+
+
+
+            // 입고지시
+            If (Trak_index[From_Pos] <> '') And (Trak_index[To_Pos] = '') And
+               (Plt_Exist[From_Pos] = '1')  And (Plt_Exist[To_Pos] = '0') And
+               (Str_Cmd[Cmd_Pos] = '0')     And (Str_End[Cmd_Pos] = '0')  And
+//               (pa_r_ch05[06] = '0')        And (Trak_FLAG[From_Pos] = 'W')  Then
+               (pa_r_ch05[06] = '0')        And (pa_r_ch05[01] = '1')     Then
+            Begin
+                if Not((Copy(Trak_index[From_Pos],9,1) = 'I') or (Copy(Trak_index[From_Pos],9,1) = 'R')) then Continue;
+                if Not((Trak_gubun[From_Pos] = 'I') or (Trak_gubun[From_Pos] = 'R') or (Trak_gubun[From_Pos] = 'A')) Then Continue;
+
+                 Str_Cmd[Cmd_Pos] := '1';
+                 pa_w_ch02[01] := '0';   pa_w_ch02[02] := '0';  pa_w_ch02[03] := '0';
+//                 pa_w_ch03[01] := '0';   pa_w_ch03[02] := '0';  pa_w_ch03[03] := '0';
+            End;
+         End;
+
+         11:
+         Begin
+            From_Pos := IntPos;
+            To_Pos   := IntPos + 1;
+            Cmd_pos := 4;
+{
+            If (Trak_Flag[From_Pos]  = '1') or  (Trak_Flag[From_Pos]  = '2') or
+               (Trak_Flag[From_Pos]  = '3') or  (Trak_Flag[From_Pos]  = '4') Then
+            begin
+               pa_w_ch03[05] := '0';  pa_w_ch03[06] := '0';   pa_w_ch03[07] := '1';
+            end;
+
+
+            If (Trak_Flag[From_Pos]  = 'W')  Then
+            begin
+               pa_w_ch03[05] := '1';  pa_w_ch03[06] := '0';   pa_w_ch03[07] := '0';
+            end;
+}
+            // 직진 완료 처리
+            If (Trak_index[From_Pos] <> '') And (Trak_index[To_Pos] = '')     And
+               (Str_Cmd[Cmd_Pos] = '1')     And (Str_End[Cmd_Pos] = '1')  Then
+            Begin
+               Cntl_TrakMove_Proc;
+               Str_Cmd[Cmd_Pos] := '0';
+
+               pa_w_ch02[04] := '0';
+               pa_w_ch02[05] := '0';
+               pa_w_ch02[06] := '0';
+//               pa_w_ch03[05] := '0';  pa_w_ch03[06] := '0';   pa_w_ch03[07] := '0';
+            End;
+
+            // Full PLT Picking 완료
+            If (Trak_index[From_Pos] <> '') And (Plt_Exist[From_Pos] = '1') And
+               (Str_Cmd[Cmd_Pos] = '0')     And (Str_End[Cmd_Pos] = '0') And
+               (pa_r_ch05[02] = '1')        And (pa_w_ch02[05] = '1') And
+               (Copy(Trak_index[From_Pos],9,1) = 'O')   Then
+//               (Copy(Trak_index[From_Pos],9,1) = 'O') And (Trak_FLAG[From_Pos] = 'W')  Then
+            Begin
+
+               BoolRept := False;
+               If (Trak_gubun[From_Pos] = 'T') then
+               begin
+                  BoolRept := False;
+                  BoolRept := Func_ReInPut_Proc;
+               end;
+               if BoolRept = False then Continue;
+
+               Str_Cmd[Cmd_Pos] := '1';
+               pa_w_ch02[04] := '0';   pa_w_ch02[05] := '0';  pa_w_ch02[06] := '0';
+//               pa_w_ch03[05] := '0';   pa_w_ch03[06] := '0';  pa_w_ch03[07] := '0';
+
+
+
+//               If (Trak_gubun[From_Pos] <> 'T') Then Continue;
+//               Cntl_TrakOneDelete_Proc;
+
+//                pa_w_ch02[04] := '0';   pa_w_ch02[05] := '0';  pa_w_ch02[06] := '0';
+
+            End;
+
+            // Picking 완료
+            If (Trak_index[From_Pos] <> '') And (Trak_index[To_Pos] = '') And
+               (Plt_Exist[From_Pos] = '1')  And (Plt_Exist[To_Pos] = '0') And
+               (Str_Cmd[Cmd_Pos] = '0')     And (Str_End[Cmd_Pos] = '0')  And
+               (pa_r_ch05[02] = '1')        And (pa_w_ch02[04] = '1')     And
+               (Copy(Trak_index[From_Pos],9,1) = 'O') Then
+//               (Copy(Trak_index[From_Pos],9,1) = 'O') And (Trak_FLAG[From_Pos] = 'W') Then
+            Begin
+               BoolRept := False;
+               If (Trak_gubun[From_Pos] = 'P') then
+               begin
+                  BoolRept := False;
+                  BoolRept := Func_ReInPut_Proc;
+               end;
+               if BoolRept = False then Continue;
+
+               Str_Cmd[Cmd_Pos] := '1';
+               pa_w_ch02[04] := '0';   pa_w_ch02[05] := '0';  pa_w_ch02[06] := '0';
+//               pa_w_ch03[05] := '0';   pa_w_ch03[06] := '0';  pa_w_ch03[07] := '0';
+            End;
+
+            // 보충 완료
+            If (Trak_index[From_Pos] <> '') And (Trak_index[To_Pos] = '') And
+               (Plt_Exist[From_Pos] = '1')  And (Plt_Exist[To_Pos] = '0') And
+               (Str_Cmd[Cmd_Pos] = '0')     And (Str_End[Cmd_Pos] = '0')  And
+               (pa_r_ch05[02] = '1')        And (pa_w_ch02[06] = '1')     And
+               (Copy(Trak_index[From_Pos],9,1) = 'O') Then
+            Begin
+               BoolRept := False;
+               If (Trak_gubun[From_Pos] = 'V') then
+               begin
+                  BoolRept := False;
+                  BoolRept := Func_ReInPut_Proc;
+               end;
+               if BoolRept = False then Continue;
+
+               Str_Cmd[Cmd_Pos] := '1';
+               pa_w_ch02[04] := '0';   pa_w_ch02[05] := '0';  pa_w_ch02[06] := '0';
+//               pa_w_ch03[05] := '0';   pa_w_ch03[06] := '0';  pa_w_ch03[07] := '0';
+            End;
+
+            // 입고지시                                               
+            If (Trak_index[From_Pos] <> '') And (Trak_index[To_Pos] = '') And
+               (Plt_Exist[From_Pos] = '1')  And (Plt_Exist[To_Pos] = '0') And
+               (Str_Cmd[Cmd_Pos] = '0')     And (Str_End[Cmd_Pos] = '0')  And
+//               (pa_r_ch05[07] = '0')        And (Trak_FLAG[From_Pos] = 'W') Then
+               (pa_r_ch05[02] = '1')    Then
+            Begin
+                 if Not((Copy(Trak_index[From_Pos],9,1) = 'I') or (Copy(Trak_index[From_Pos],9,1) = 'R')) then Continue;
+                 if Not((Trak_gubun[From_Pos] = 'I') or (Trak_gubun[From_Pos] = 'R') or (Trak_gubun[From_Pos] = 'A')) Then Continue;
+
+                 Str_Cmd[Cmd_Pos] := '1';
+                 pa_w_ch02[04] := '0';   pa_w_ch02[05] := '0';  pa_w_ch02[06] := '0';
+//                 pa_w_ch03[05] := '0';   pa_w_ch03[06] := '0';  pa_w_ch03[07] := '0';
+            End;
+         End;
+
+         20:
+         Begin
+            From_Pos := IntPos;
+            To_Pos   := IntPos + 1;
+            Cmd_pos := 6;
+{
+            If (Trak_Flag[From_Pos]  = '1') or  (Trak_Flag[From_Pos]  = '2') or
+               (Trak_Flag[From_Pos]  = '3') or  (Trak_Flag[From_Pos]  = '4') Then
+            begin
+               pa_w_ch03[10] := '0';  pa_w_ch03[11] := '0';   pa_w_ch03[12] := '1';
+            end;
+
+
+            If (Trak_Flag[From_Pos]  = 'W')  Then
+            begin
+               pa_w_ch03[10] := '1';  pa_w_ch03[11] := '0';   pa_w_ch03[12] := '0';
+            end;
+}
+            // 직진 완료 처리
+            If (Trak_index[From_Pos] <> '') And (Trak_index[To_Pos] = '')     And
+               (Str_Cmd[Cmd_Pos] = '1')     And (Str_End[Cmd_Pos] = '1')  Then
+            Begin
+               Cntl_TrakMove_Proc;
+               Str_Cmd[Cmd_Pos] := '0';
+
+               pa_w_ch02[07] := '0';
+               pa_w_ch02[08] := '0';
+               pa_w_ch02[09] := '0';
+//               pa_w_ch03[10] := '0';  pa_w_ch03[11] := '0';   pa_w_ch03[12] := '0';
+            End;
+
+            // Full PLT Picking 완료
+            If (Trak_index[From_Pos] <> '') And (Plt_Exist[From_Pos] = '1') And
+               (Str_Cmd[Cmd_Pos] = '0')     And (Str_End[Cmd_Pos] = '0') And
+               (pa_r_ch05[03] = '1')        And (pa_w_ch02[08] = '1')  And
+               (Copy(Trak_index[From_Pos],9,1) = 'O')  Then
+//               (Copy(Trak_index[From_Pos],9,1) = 'O') And (Trak_FLAG[From_Pos] = 'W') Then
+            Begin
+
+               BoolRept := False;
+               If (Trak_gubun[From_Pos] = 'T') then
+               begin
+                  BoolRept := False;
+                  BoolRept := Func_ReInPut_Proc;
+               end;
+               if BoolRept = False then Continue;
+
+               Str_Cmd[Cmd_Pos] := '1';
+               pa_w_ch02[07] := '0';   pa_w_ch02[08] := '0';  pa_w_ch02[09] := '0';
+//               pa_w_ch03[10] := '0';   pa_w_ch03[11] := '0';  pa_w_ch03[12] := '0';
+
+
+//               If (Trak_gubun[From_Pos] <> 'T') Then Continue;
+//               Cntl_TrakOneDelete_Proc;
+
+//               pa_w_ch02[07] := '0';   pa_w_ch02[08] := '0';  pa_w_ch02[09] := '0';
+            End;
+
+            // Picking 완료
+            If (Trak_index[From_Pos] <> '') And (Trak_index[To_Pos] = '') And
+               (Plt_Exist[From_Pos] = '1')  And (Plt_Exist[To_Pos] = '0') And
+               (Str_Cmd[Cmd_Pos] = '0')     And (Str_End[Cmd_Pos] = '0')  And
+               (pa_r_ch05[03] = '1')        And (pa_w_ch02[07] = '1')     And
+               (Copy(Trak_index[From_Pos],9,1) = 'O')  Then
+            Begin
+               BoolRept := False;
+               If (Trak_gubun[From_Pos] = 'P')  then
+               begin
+                  BoolRept := False;
+                  BoolRept := Func_ReInPut_Proc;
+               end;
+               if BoolRept = False then Continue;
+
+               Str_Cmd[Cmd_Pos] := '1';
+               pa_w_ch02[07] := '0';   pa_w_ch02[08] := '0';  pa_w_ch02[09] := '0';
+//               pa_w_ch03[10] := '0';   pa_w_ch03[11] := '0';  pa_w_ch03[12] := '0';
+            End;
+
+            // 보충  완료
+            If (Trak_index[From_Pos] <> '') And (Trak_index[To_Pos] = '') And
+               (Plt_Exist[From_Pos] = '1')  And (Plt_Exist[To_Pos] = '0') And
+               (Str_Cmd[Cmd_Pos] = '0')     And (Str_End[Cmd_Pos] = '0')  And
+               (pa_r_ch05[03] = '1')        And (pa_w_ch02[09] = '1')     And
+               (Copy(Trak_index[From_Pos],9,1) = 'O')  Then
+            Begin
+               BoolRept := False;
+               If  (Trak_gubun[From_Pos] = 'V') then
+               begin
+                  BoolRept := False;
+                  BoolRept := Func_ReInPut_Proc;
+               end;
+               if BoolRept = False then Continue;
+
+               Str_Cmd[Cmd_Pos] := '1';
+               pa_w_ch02[07] := '0';   pa_w_ch02[08] := '0';  pa_w_ch02[09] := '0';
+//               pa_w_ch03[10] := '0';   pa_w_ch03[11] := '0';  pa_w_ch03[12] := '0';
+            End;
+
+            // 입고지시
+            If (Trak_index[From_Pos] <> '') And (Trak_index[To_Pos] = '') And
+               (Plt_Exist[From_Pos] = '1')  And (Plt_Exist[To_Pos] = '0') And
+               (Str_Cmd[Cmd_Pos] = '0')     And (Str_End[Cmd_Pos] = '0')  And
+//               (Trak_FLAG[From_Pos] = 'W')  then
+               (pa_r_ch05[03] = '1')        Then
+            Begin
+                if Not((Copy(Trak_index[From_Pos],9,1) = 'I') or (Copy(Trak_index[From_Pos],9,1) = 'R')) then Continue;
+                if Not((Trak_gubun[From_Pos] = 'I') or (Trak_gubun[From_Pos] = 'R') or (Trak_gubun[From_Pos] = 'A')) Then Continue;
+
+                Str_Cmd[Cmd_Pos] := '1';
+                pa_w_ch02[07] := '0';   pa_w_ch02[08] := '0';  pa_w_ch02[09] := '0';
+//                pa_w_ch03[10] := '0';   pa_w_ch03[11] := '0';  pa_w_ch03[12] := '0';
+            End;
+         End;
+      End;
+  End;
+
+  For IntPos := 1 to 6 do   Begin  pa_w_ch01[IntPos] := Str_Cmd[IntPos];   End;
+end;
+
+
+
+procedure ahcvc_T.Cntl_StrToArrayProc;
+var
+  IntCnt : Integer;
+begin
+  MV_NDATA(@pa_r_ch01[1], @ps_r_ch01[1], 16);  MV_NDATA(@pa_r_ch02[1], @ps_r_ch02[1], 16);
+  MV_NDATA(@pa_r_ch03[1], @ps_r_ch03[1], 16);  MV_NDATA(@pa_r_ch04[1], @ps_r_ch04[1], 16);
+  MV_NDATA(@pa_r_ch05[1], @ps_r_ch05[1], 16);
+
+  MV_NDATA(@pa_w_ch01[1], @ps_w_ch01[1], 16);  MV_NDATA(@pa_w_ch02[1], @ps_w_ch02[1], 16);
+  MV_NDATA(@pa_w_ch03[1], @ps_w_ch03[1], 16);
+end;
+
+procedure ahcvc_T.Cntl_TrakMove_Proc;
+Var
+   ls_PosNo, ls_sql : String;
+begin
+   ls_PosNo := Format('%2.2d', [To_Pos]);
+
+   ls_sql := ' update stk1_tbtrak set ';
+   ls_sql := ls_sql + ' Trak_index   = '''+Trak_index[From_Pos]+''',   Trak_pltid    = '''+Trak_pltid[From_Pos]+''',   ';
+   ls_sql := ls_sql + ' Trak_gubun   = '''+Trak_gubun[From_Pos]+''',   Trak_picking  = '''+Trak_picking[From_Pos]+''',   ';
+   ls_sql := ls_sql + ' Trak_date    = '''+Trak_date[From_Pos]+''',    Trak_time     = '''+Trak_time[From_Pos]+''',   ';
+   ls_sql := ls_sql + ' Trak_Flag    = '''+Trak_flag[From_Pos]+''',     Trak_Loca    = '''+Trak_Loca[From_Pos]+''' ';
+   ls_sql := ls_sql + ' where trak_no = '''+ls_PosNo+''' ';
+  Try
+   With ahcomm_f.CvcUpdtQuery do
+   Begin
+        Close;
+        SQL.Clear;
+        SQL.Add(ls_sql);
+        ExecSQL;
+   End;
+
+   ls_PosNo   := Format('%2.2d', [From_Pos]);
+   ls_sql := ' update stk1_tbtrak set ';
+   ls_sql := ls_sql + ' Trak_index  = '''',   Trak_pltid = '''',    Trak_gubun  = '''',      Trak_picking = '''',  ';
+   ls_sql := ls_sql + ' Trak_date  = '''',    Trak_time = '''',     Trak_Flag    = '''',     Trak_Loca    = ''''   ';
+   ls_sql := ls_sql + ' where trak_no = '''+ls_PosNo+''' ';
+   With ahcomm_f.CvcUpdtQuery do
+   Begin
+        Close;
+        SQL.Clear;
+        SQL.Add(ls_sql);
+        ExecSQL;
+   End;
+
+  Except
+    ahcomm_f.Memo1.Lines.Add(' Update error = ' + ls_sql);
+  End;
+end;
+
+procedure ahcvc_T.Cntl_TrakOneDelete_Proc;
+Var
+   ls_PosNo, ls_sql : String;
+begin
+   ls_PosNo   := Format('%2.2d', [From_Pos]);
+
+   ls_sql := ' update stk1_tbtrak set ';
+   ls_sql := ls_sql + ' Trak_index  = '''',   Trak_pltid = '''',    Trak_gubun  = '''',      Trak_picking = '''',  ';
+   ls_sql := ls_sql + ' Trak_date  = '''',    Trak_time = '''',     Trak_Flag    = '''',     Trak_LOCA  = ''''  ';
+   ls_sql := ls_sql + ' where trak_no = '''+ls_PosNo+''' ';
+   With ahcomm_f.CvcUpdtQuery do
+   Begin
+      Try
+        Close;
+        SQL.Clear;
+        SQL.Add(ls_sql);
+       ExecSQL;
+      Except
+      End;
+   End;
+end;
+//////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
+procedure ahcvc_T.Cntl_TBCVCTableUpdate;
+var
+  ls_sql : String;
+  li_i   : Integer;
+begin
+  ahcomm_f.cvcEdit.Text := 'Cntl_TBCVCTableUpdate.!!';
+  ps_w_ch01 := '0000000000000000';   ps_w_ch02 := '0000000000000000';
+  ps_w_ch03 := '0000000000000000';
+
+  For li_i := 1 To 16 Do Begin
+    ps_w_ch01[li_i] := pa_w_ch01[li_i];
+    ps_w_ch02[li_i] := pa_w_ch02[li_i];
+    ps_w_ch03[li_i] := pa_w_ch03[li_i];
+  End;
+
+  ls_sql := ' Update STK1_TBCVC1 Set ';
+  ls_sql := ls_sql + ' CVC1_CH01 = '''+ps_w_ch01+''', CVC1_CH02 = '''+ps_w_ch02+''', ';
+  ls_sql := ls_sql + ' CVC1_CH03 = '''+ps_w_ch03+''' ';
+  ls_sql := ls_sql + ' Where CVC1_Sr = ''S'' ';
+  Try
+    With ahcomm_f.CVCUpdtQuery Do Begin
+      Close;
+      SQL.Clear;
+      SQL.Add(ls_sql);
+      ExecSQL;
+    End;
+  Except
+    ahcomm_f.Memo1.Lines.Add('[*] CVC 통신: Table 수정중 에러 발생 ' + ls_sql);
+  End;
+end;    
+//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
+function ahcvc_T.Func_ReInPut_Proc: Boolean;
+var
+  IntHogi : Integer;
+  ls_PosNo, StrHogi, StrTo, ls_sql, StrFrom, StrIndex, StrCh4 : String;
+begin
+  Func_ReInPut_Proc := False;
+
+  ls_PosNo   := Format('%2.2d', [From_Pos]);
+
+  ls_sql := ' Select REPT_INDEX From STK1_MIREPT (NOLOCK) Where REPT_PLTID = '''+Trak_pltid[From_Pos]+''' ';
+  ls_sql := ls_sql + '    And REPT_OINDEX = '''+Trak_index[From_Pos]+''' ';
+
+  ahcomm_f.CvcQuery.Close;;
+  ahcomm_f.CvcQuery.SQL.Clear;
+  ahcomm_f.CvcQuery.SQL.Add(ls_sql);
+  ahcomm_f.CvcQuery.Open;
+
+  if ahcomm_f.CvcQuery.RecordCount = 0  then
+  begin
+    ahcomm_f.Memo1.Lines.Add('재입고이력이 존재하지않음 ' + Trak_index[From_Pos]);
+    exit;
+  end;
+  StrIndex := ahcomm_f.CvcQuery.FieldByName('REPT_INDEX').AsString;
+////////////////////////////
+  if  Length(StrIndex) = 0  then  exit;
+//////////////////////////////
+ Try
+   ls_sql := ' Update STK1_TBTRAK Set TRAK_INDEX = '''+StrIndex+''',  TRAK_GUBUN = ''R'',    ';
+   ls_sql := ls_sql + ' TRAK_PICKING = ''R'',  TRAK_FLAG = ''I'' ';
+   ls_sql := ls_sql + ' Where TRAK_NO = '''+ls_PosNo+''' ';
+
+   ahcomm_f.CVCUpdtQuery.Close;;
+   ahcomm_f.CVCUpdtQuery.SQL.Clear;
+   ahcomm_f.CVCUpdtQuery.SQL.Add(ls_sql);
+   ahcomm_f.CVCUpdtQuery.ExecSql;
+  except
+      ahcomm_f.Memo1.Lines.Add('CVC1 CNTL STEP=' + ls_sql);       exit;
+  end;
+
+  Func_ReInPut_Proc := True;
+end;
+
+
+end.

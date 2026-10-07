@@ -1,0 +1,82 @@
+use tokstk_db
+set nocount on
+Go
+
+
+PRINT '----------------------------------------------'
+PRINT 'Drop SUBK_VIEW1_VIEW VIEW Table'
+PRINT '----------------------------------------------'
+PRINT ''
+DROP   view  SUBK_ALL
+GO
+
+PRINT 'Starting CREATION OF LINE_VIEW1 VIEW'
+PRINT '----------------------------------------------'
+PRINT ''
+GO
+CREATE VIEW  SUBK_ALL
+(
+       STK_WH, STK_CODE, STK_LOTNO, STK_SQTY, STK_WQTY, STK_AQTY, STK_BQTY, STK_CQTY,STK_DQTY,STK_EQTY, STK_FQTY, STK_TQTY
+)
+AS
+( 
+  SELECT 'S', SUBK_CODE, SUBK_LOTNO,  SUM(SUBK_WGT), 0, 0,0,0,0,0, 0,SUM(SUBK_WGT)
+  FROM   MISUBK (NOLOCK)
+  WHERE  ISNULL(SUBK_CODE, '') <> ''  
+  GROUP BY SUBK_CODE, SUBK_LOTNO    
+
+  UNION
+
+  SELECT 'W', SUBK_CODE, SUBK_LOTNO,  0, SUM(SUBK_WGT), 0,0,0,0,0, 0, SUM(SUBK_WGT)
+  FROM   T2MISUBK (NOLOCK)
+  WHERE  ISNULL(SUBK_CODE, '') <> ''  
+  GROUP BY SUBK_CODE, SUBK_LOTNO    
+
+  UNION
+
+  SELECT 'A', SUBK_CODE, SUBK_LOTNO,  0, 0, SUM(SUBK_WGT), 0,0,0,0, SUM(SUBK_WGT), SUM(SUBK_WGT)
+  FROM   MISUBK1 (NOLOCK)
+  WHERE  ISNULL(SUBK_CODE, '') <> ''  And Substring(SUBK_LOCA,1,1) = 'A'
+  GROUP BY SUBK_CODE, SUBK_LOTNO    
+
+  UNION
+
+  SELECT 'B', SUBK_CODE, SUBK_LOTNO,  0, 0, 0, SUM(SUBK_WGT), 0,0,0, SUM(SUBK_WGT),SUM(SUBK_WGT)
+  FROM   MISUBK1 
+  WHERE  SUBK_CODE <> '' And Substring(SUBK_LOCA,1,1) = 'B'
+  GROUP BY SUBK_CODE, SUBK_LOTNO
+
+  UNION
+
+  SELECT  'C', SUBK_CODE, SUBK_LOTNO,  0, 0, 0, 0, SUM(SUBK_WGT), 0,0, SUM(SUBK_WGT),SUM(SUBK_WGT)
+  FROM   MISUBK1 
+  WHERE  SUBK_CODE <> '' And Substring(SUBK_LOCA,1,1) = 'C'
+  GROUP BY SUBK_CODE, SUBK_LOTNO
+
+
+  UNION
+
+  SELECT 'D', SUBK_CODE, SUBK_LOTNO,  0, 0, 0, 0, 0, SUM(SUBK_WGT), 0, SUM(SUBK_WGT),SUM(SUBK_WGT)
+  FROM   MISUBK1 
+  WHERE  SUBK_CODE <> '' And Substring(SUBK_LOCA,1,1) = 'D'
+  GROUP BY SUBK_CODE, SUBK_LOTNO
+
+  UNION
+
+  SELECT 'E', SUBK_CODE, SUBK_LOTNO,  0, 0, 0, 0, 0, 0, SUM(SUBK_WGT), SUM(SUBK_WGT),SUM(SUBK_WGT)
+  FROM   MISUBK1 
+  WHERE  SUBK_CODE <> '' And Substring(SUBK_LOCA,1,1) = 'E'
+  GROUP BY SUBK_CODE, SUBK_LOTNO
+
+
+
+)
+GO
+PRINT 'SUBK_VIEW VIEW1 creation completed !!'
+PRINT '----------------------------------------------'
+PRINT ''
+GO
+
+select * from SUBK_ALL
+go
+

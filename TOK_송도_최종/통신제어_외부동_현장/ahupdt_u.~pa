@@ -1,0 +1,1226 @@
+unit ahsrc2_u;
+
+interface
+
+uses
+Windows, Classes, Messages, SysUtils, Dialogs, dbtables;
+
+type
+  ahsrc2_T = class(TThread)
+  private
+///// communication state definition area /////
+    send_buff, recv_buff                     : string;
+    init_start, send_check, recv_ok, send_ok : integer;
+///// control buff checking area          /////
+    seq_no, sc_cnt, l_step                              : integer;
+    send_scno, send_seq, recv_seq, recv_mode, e_code    : string;
+    sc_no, sc_io, cv_no, i_rdy4, o_rdy4, i_trk4, o_trk4 : String;
+/// Only SRC2
+    i_rdy1, o_rdy3, o_rdy6, o_rdy5, ws_no : String;
+    i_trk1, o_trk3, o_trk6, o_trk5        : String;
+///// program variable definition area    /////
+    s_scno, s_cycle1, s_cycle2, s_ack, s_load, s_unload, s_loc, s_wsno : string;
+    s_boxid, s_onoff, s_scplt, s_scpos, s_error, s_errcode, s_reset    : string;
+///////////////////////////////////////////////
+    ps_cposi: String[03];  ps_iodest: String[03];  ps_sposi: String[03];  ps_kind: String[02];
+    pi_outlet_search_ok: Integer;
+    ps_shap_no: String[02];
+  protected
+    procedure Execute; override;
+    procedure init_setting_proc;
+    procedure init_select_proc;
+    procedure scrc_select_proc;
+    procedure scrc_update_proc;
+    procedure lstk_update_proc;
+    procedure boxm_update_proc;
+    procedure trak_update_proc;
+    procedure main_recv_proc;
+    procedure recv_action_proc;
+    procedure recv_ackcheck_proc;
+    procedure recv_posicheck_proc;
+    procedure recv_jobcheck_proc;
+    procedure recv_errorcheck_proc;
+    procedure main_cntl_proc;
+    procedure cntl_iodirect_proc;
+    procedure cntl_load_proc;
+    procedure cntl_unload_proc;
+    procedure cntl_iochange_proc;
+    procedure cntl_iosearch_proc;
+    procedure cntl_ijobfetch_proc;
+    procedure cntl_ojobfetch_proc;
+    procedure cntl_ioerror_proc;
+    procedure main_send_proc;
+    procedure send_action_proc;
+
+    procedure Cntl_HistSettingProc;
+    procedure Cntl_ojobfetch1_shap_proc;
+    procedure Cntl_ojobfetch2_shap_proc;
+    procedure Cntl_Shap1CmdCheck_Proc;
+    procedure Cntl_Shap2CmdCheck_Proc;
+  end;
+///// src interface data format   area    /////
+type Track = record
+  stx, serial, mode, code, etx : string;
+end;
+type Trstart = record
+  stx, serial, mode, etx : string;
+end;
+type Triojob = record
+  stx, serial, mode, scc, wsno, loc, etx : string;
+end;
+type Trerror = record
+  stx, serial, mode, scc, errcode, loc, etx : string;
+end;
+type Trposi = record
+  stx, serial, mode, onoff, scplt, zero, pos1, pos2, pos3, pos4, etx : string;
+end;
+
+type Tsack = record
+  stx, serial, mode, code, etx : string;
+end;
+type Tsstart = record
+  stx, serial, mode, etx : string;
+end;
+type Tsiojob = record
+  stx, serial, mode, scc, wsno, loc, etx : string;
+end;
+///// program initial definition area     /////
+const
+  pgm_id  : string  = 'SRC2';
+  min_sc  : integer = 2;
+  max_sc  : integer = 2;
+  gap_sc  : integer = 1;
+  hax_bin : integer = 8421;
+///////////////////////////////////////////////
+var
+  src2_pgm  : char;
+  src2_step : integer;
+  src2_ok : integer;
+
+  rack      : Track;
+  rstart    : Trstart;
+  riojob    : Triojob;
+  rposi     : Trposi;
+  rerror    : Trerror;
+  sack      : Tsack;
+  sstart    : Tsstart;
+  siojob    : Tsiojob;
+implementation
+
+uses ahcomm_u;
+
+/////////////////////////////////////////////////////////////////////////////////
+procedure ahsrc2_T.Execute;
+begin
+  src2_pgm := 'T';
+  src2_step := 0;
+  ahcomm_f.src2Edit.Text := '통신개시 작업을 하였습니다.!!';
+  sleep(1000);
+  init_setting_proc;
+  sleep(1000);
+
+  While (not (src2_T.Terminated)) and (src2_pgm = 'T') do
+  begin
+    main_recv_proc;
+    ahcomm_f.src2Edit.Text := 'RECV:'+recv_buff;
+    sleep(300);
+    sc_cnt := min_sc;
+    While sc_cnt <= max_sc do
+    begin
+      main_cntl_proc;
+      ahcomm_f.src2Edit.Text := 'CNTL:'+s_cycle1+s_cycle2+'-'+s_ack+'-'+s_load+'-'+s_unload+'-'+s_loc+'-'+s_wsno+'-'+s_error+'-'+s_reset+'-'+s_onoff;
+      sleep(200);
+      sc_cnt := sc_cnt + 1;
+    end;
+    main_send_proc;
+    ahcomm_f.src2Edit.Text := 'SEND:'+send_buff;
+    sleep(200);
+  end;
+
+  ahcomm_f.CommSrc2.Close;
+  ahcomm_f.src2Edit.Text := '통신종료 작업을 하였습니다.!!';
+  src2_pgm := 'F';
+end;
+
+/////////////////////////////////////////////////////////////////////////////////
+procedure ahsrc2_T.main_recv_proc;
+begin
+  src2_step := 10;
+  recv_action_proc;
+  if (recv_ok <> 1) then exit;
+
+  send_buff := '';
+  recv_seq := copy(recv_buff,2,2);
+  recv_mode := copy(recv_buff,4,1);
+  sack.code := '00';
+  sack.serial := recv_seq;
+  if (copy(recv_buff,1,1) <> #02) then sack.code := '01';
+  send_buff := sack.stx + sack.serial + sack.mode + sack.code + sack.etx;
+  if (recv_mode <> 'R') then send_action_proc;
+
+  if      (recv_mode = 'R') then recv_ackcheck_proc
+  else if (recv_mode = 'H') or (recv_mode = 'C') then recv_posicheck_proc
+  else if (recv_mode = 'F') or (recv_mode = 'L') or (recv_mode = 'U') then recv_jobcheck_proc
+  else if (recv_mode = 'E') then recv_errorcheck_proc
+  else if (recv_mode = 'S') and (recv_seq <> '00') then exit
+  else if (recv_mode = 'S') or (recv_mode = 'Q') then init_start := 0
+  else ahcomm_f.src2Edit.Text := 'STEP:10 SRC2->HOST Receive data error.!!';
+end;
+
+procedure ahsrc2_T.recv_action_proc;
+var
+  recv_char : Char;
+  c_cnt, i_cnt, r_cnt : integer;
+begin
+  src2_step := 11;
+  recv_ok := 0;
+  recv_buff := '';
+
+  i_cnt := ahcomm_f.CommSrc2.Read(recv_char, 1);
+  if (i_cnt <> 1) then exit;
+  if (recv_char <> #2) then begin recv_buff := ''; exit; end; // 선두코드가 STX(#02) 가 아니면 무처리
+
+  recv_buff := recv_char; //RECV_BUFF 첫번째에 저장(STX:상관없슴)
+  for c_cnt := 1 to 1000 do
+  begin
+    for r_cnt := 1 to 20 do //첫번째에 저장후 다음Data가 없을시 Retry 20번
+    begin
+      i_cnt := ahcomm_f.CommSrc2.Read(recv_char, 1);
+      if (i_cnt = 1) then break;
+      sleep(100);
+    end;
+    if (r_cnt >= 20) then break;
+
+    if (recv_char = #3) then //RECV_BUFF 마지막에 저장(ETX까지)
+    begin
+      recv_buff :=  recv_buff + recv_char;
+      recv_ok := 1;
+      break;
+    end
+    else recv_buff :=  recv_buff + recv_char; //RECV_BUFF 계속 저장
+  end;
+end;
+
+procedure ahsrc2_T.recv_ackcheck_proc;
+begin
+  src2_step := 12;
+  rack.code := copy(recv_buff,5,2);
+  if (rack.code <> '00') or (send_seq <> recv_seq) then exit;
+  if (init_start = 2) and (send_ok <> 0) then
+  begin
+    send_ok := 0;
+    seq_no := seq_no + 1;
+    if (seq_no >= 100) then seq_no := 0;
+    sc_no := send_scno;
+    recv_jobcheck_proc;
+  end
+  else if (init_start = 0) then init_start := 1;
+end;
+
+procedure ahsrc2_T.recv_posicheck_proc;
+begin
+  src2_step := 13;
+  init_start := 2;
+  rposi.onoff  := copy(recv_buff,5,1);
+  rposi.scplt  := copy(recv_buff,6,1);
+  rposi.pos1   := copy(recv_buff,10,5);
+
+  sc_no := IntToStr(min_sc);
+  scrc_select_proc;
+  if (rposi.onoff = '0') then s_onoff := '0'
+  else s_onoff := '1';
+  if (rposi.scplt = '0') then s_scplt := '0'
+  else s_scplt := '1';
+  s_scpos := rposi.pos1;
+  scrc_update_proc;
+end;
+
+procedure ahsrc2_T.recv_jobcheck_proc;
+begin
+  if src2_step <> 12 then sc_no := copy(recv_buff,6,1);
+  src2_step := 14;
+  sc_no := IntToStr(StrToInt(sc_no)+gap_sc);
+  scrc_select_proc;
+  if      (recv_mode = 'R') and (s_cycle2 = '0') and (s_ack = '0') then  s_ack := '1'
+  else if (recv_mode = 'L') and (s_cycle2 = '1') and (s_load = '0') then  s_load := '1'
+  else if (recv_mode = 'U') and (s_cycle2 = '2') and (s_unload = '0') then  s_unload := '1'
+  else exit;
+  scrc_update_proc;
+end;
+
+procedure ahsrc2_T.recv_errorcheck_proc;
+begin
+  src2_step := 15;
+  ahcomm_f.src2Edit.Text := 'STEP:15 SRC2->HOST Error code received.!!';
+  sc_no := copy(recv_buff,5,1);
+  sc_no := IntToStr(StrToInt(sc_no)+gap_sc);
+  rerror.errcode := copy(recv_buff,6,4);
+  if      (rerror.errcode = '0000') then e_code := '0'
+  else if (rerror.errcode = '6000') then e_code := 'W'
+  else if (rerror.errcode = '6100') then e_code := 'E'
+  else e_code := 'G';
+
+  scrc_select_proc;
+  if (s_error <> 'W') and (s_error <> 'E') then s_error := e_code;
+  if (e_code = '0') then s_reset := '0'
+  else s_reset := '1';
+  s_errcode := rerror.errcode;
+  scrc_update_proc;
+  if (e_code = 'E') or (e_code = 'W') then lstk_update_proc;
+end;
+
+/////////////////////////////////////////////////////////////////////////////////
+procedure ahsrc2_T.main_cntl_proc;
+begin
+  src2_step := 30;
+  sc_no := IntToStr(sc_cnt);
+  scrc_select_proc;
+  init_select_proc;
+  if      (s_reset  = '1') or  (s_error <> '0') then cntl_ioerror_proc
+  else if (s_cycle2 = '0') and (s_ack    = '0') then cntl_iodirect_proc
+  else if (s_cycle2 = '0') and (s_ack    = '1') then s_cycle2 := '1'
+  else if (s_cycle2 = '1') and (s_load   = '1') then cntl_load_proc
+  else if (s_cycle2 = '2') and (s_unload = '1') then cntl_unload_proc
+  else if (s_cycle2 = '3') and (s_unload = '1') then cntl_iochange_proc
+  else if (s_cycle2 = '3') and (s_unload = '0') then cntl_iosearch_proc
+  else exit;
+  scrc_update_proc;
+end;
+
+procedure ahsrc2_T.cntl_iodirect_proc;
+begin
+  src2_step := 31;
+  if (init_start <> 2) or (send_check = 2) or (s_onoff = '0') then exit;
+  send_scno := IntToStr(sc_cnt-gap_sc);
+  siojob.serial := IntToStr(seq_no);
+  if (seq_no < 10) then siojob.serial := '0'+ IntToStr(seq_no);
+  siojob.mode   := s_cycle1;
+  siojob.scc    := send_scno;
+  siojob.wsno   := s_wsno;
+  siojob.loc    := s_loc;
+  send_check := 2;
+end;
+
+procedure ahsrc2_T.cntl_load_proc;
+begin
+  src2_step := 32;
+  s_cycle2 := '2';
+  s_ack := '0';
+  if (s_cycle1 = 'I') then trak_update_proc;
+end;
+
+procedure ahsrc2_T.cntl_unload_proc;
+begin
+  src2_step := 33;
+  s_cycle2 := '3';
+  s_load := '0';
+  trak_update_proc;
+  lstk_update_proc;
+  boxm_update_proc;
+end;
+
+procedure ahsrc2_T.cntl_iochange_proc;
+begin
+  src2_step := 34;
+  if (s_cycle1 = 'I') then s_cycle1 := 'O'
+  else s_cycle1 := 'I';
+  s_cycle2 := '3';   s_ack := '0';   s_load := '0';   s_unload := '0';
+  s_loc := '000000'; s_wsno := '00'; s_boxid := '';   s_error  := '0';
+  s_reset := '0';    s_errcode := '0000';
+end;
+
+procedure ahsrc2_T.cntl_iosearch_proc;
+begin
+  src2_step := 35;
+  if      (s_ack = '1') or (s_load = '1') then exit;
+  if ((init_start <> 2) or (send_check <> 0) or (send_ok <> 0)) and (s_onoff = '0') then
+  begin
+    cntl_iochange_proc;
+    exit;
+  end;
+
+  if (send_check = 0) and (s_cycle1 = 'O') and // 세정기 1-6 출고
+     ((sc_io = '2') or (sc_io = '3')) and (o_rdy3 = '1') and (o_trk3 <  '0') then
+  begin
+    ws_no := '03';
+    cntl_ojobfetch1_shap_proc;
+  end;
+  if (send_check = 0) and (s_cycle1 = 'O') and // 세정기 7-12 출고
+     ((sc_io = '2') or (sc_io = '3')) and (o_rdy5 = '1') and (o_trk5 <  '0') then
+  begin
+    ws_no := '05';
+    cntl_ojobfetch2_shap_proc;
+  end;
+  if (send_check = 0) and (s_cycle1 = 'O') and // 비상출고
+     ((sc_io = '2') or (sc_io = '3')) and (o_rdy4 = '1') and (o_trk4 <  '0') then
+  begin
+    ws_no := '04';
+    cntl_ojobfetch_proc;
+  end;
+  if (send_check = 0) and (s_cycle1 = 'O') and // 공BOX 출고
+     ((sc_io = '2') or (sc_io = '3')) and (o_rdy6 = '1') and (o_trk6 <  '0') then
+  begin
+    ws_no := '06';
+    cntl_ojobfetch_proc;
+  end;
+
+  if (send_check = 0) and (s_cycle1 = 'I') and // 비상 입고
+     ((sc_io = '1') or (sc_io = '3')) and (i_rdy4 = '1') and (i_trk4 >= '0') then
+  begin
+    ws_no := '04';
+    cntl_ijobfetch_proc;
+  end;
+  if (send_check = 0) and (s_cycle1 = 'I') and // 실BOX 입고
+     ((sc_io = '1') or (sc_io = '3')) and (i_rdy1 = '1') and (i_trk1 >= '0') then
+  begin
+    ws_no := '01';
+    cntl_ijobfetch_proc;
+  end;
+
+  if (send_check = 0) then cntl_iochange_proc;
+end;
+
+procedure ahsrc2_T.cntl_ojobfetch_proc;
+var
+  l_serial, l_boxid, l_loc, l_wsno : string;
+begin
+  src2_step := 36;
+  try
+    ahcomm_f.Query2.Close;
+    ahcomm_f.Query2.SQL.Clear;
+    ahcomm_f.Query2.SQL.Add (' select sche_serial, sche_boxid, sche_loc, sche_wsno from tbsche ');
+    ahcomm_f.Query2.SQL.Add (' where (sche_emg not in(''1'')) and (sche_wsno = '''+ws_no+''') ');
+    ahcomm_f.Query2.SQL.Add (' and  ((substr(sche_loc, 1, 1) = ''3'') or (substr(sche_loc, 1, 1) = ''4'')) ');
+    ahcomm_f.Query2.SQL.Add (' order by sche_emg, sche_serial ');
+    ahcomm_f.Query2.Open;
+    l_serial := ahcomm_f.Query2.Fields[0].AsString;  l_boxid := ahcomm_f.Query2.Fields[1].AsString;
+    l_loc    := ahcomm_f.Query2.Fields[2].AsString;  l_wsno  := ahcomm_f.Query2.Fields[3].AsString;
+  except
+    ahcomm_f.src2Edit.Text := 'STEP:36 TBSCHE Select error.!!';
+  end;
+
+  if (l_loc < '300101') then exit;
+  s_cycle1 := 'O';  s_cycle2 := '0';  s_loc := l_loc;  s_wsno := l_wsno;  s_boxid := l_boxid;
+  send_check := 1;
+  try
+    ahcomm_f.Query2.Close;
+    ahcomm_f.Query2.SQL.Clear;
+    ahcomm_f.Query2.SQL.Add(' delete from tbsche where sche_serial = '''+l_serial+''' ');
+    ahcomm_f.Query2.ExecSQL;
+    ahcomm_f.src2_db.Commit;
+  except
+    ahcomm_f.src2Edit.Text := 'STEP:36 TBSCHE Delete error.!!';
+  end;
+end;
+
+procedure ahsrc2_T.Cntl_Shap1CmdCheck_Proc;
+var
+  li_i, li_j, li_trak_cnt, li_boxid_cnt, li_shap_ok: Integer;
+  li_boxm_exist: Integer;
+  ls_shap_in, ls_shap_rdy: String[01];
+
+  ls_shap_fb: String[01];
+  ls_trak_no: String[02];
+  ls_trak_boxid, ls_shap_boxid: String[15];
+  ls_boxm_iodest: String[03];
+begin
+  try
+// 세정기 실 box 투입조건 select
+    for li_i := 1 to 6 do  //start for 1
+    begin
+      li_boxid_cnt  := 0;  li_shap_ok := 0;    pi_outlet_search_ok := 0;
+      ls_shap_in := '0';  ls_shap_rdy := '0';
+
+      ahcomm_f.Query2.Close;
+      ahcomm_f.Query2.SQL.Clear;
+      ahcomm_f.Query2.SQL.Add (' select cvc2_ch08, cvc2_ch09 from tbcvc2 where cvc2_sr = ''R'' ');
+      ahcomm_f.Query2.Open;
+      ls_shap_in  := copy(ahcomm_f.Query2.Fields[0].AsString, li_i,  1); // 세정기 입고가능유
+      ls_shap_rdy := copy(ahcomm_f.Query2.Fields[1].AsString, li_i,  1); // 세정기 ready유
+
+      if (ls_shap_in = '1') and (ls_shap_rdy = '1') then
+        begin
+           ps_shap_no := '0' + IntToStr(li_i);
+           li_shap_ok := 1;
+        end
+      else  continue;
+
+
+      if (li_shap_ok = 1) then
+      begin
+        for li_trak_cnt := 44 to 46 do  //start for 2
+        begin
+          li_boxm_exist  := 0;
+          ps_iodest := '';
+
+          ls_trak_no := IntToStr(li_trak_cnt);
+
+          ahcomm_f.Query2.Close;
+          ahcomm_f.Query2.SQL.Clear;
+          ahcomm_f.Query2.SQL.Add (' select trak_boxid from tbtrak ');
+          ahcomm_f.Query2.SQL.Add (' where trak_no = '''+ls_trak_no+''' ');
+          ahcomm_f.Query2.Open;
+          ls_trak_boxid := ahcomm_f.Query2.Fields[0].AsString; // tracking 구간 boxid select
+
+          if (Length(ls_trak_boxid) <> 0) then
+          begin
+            ls_boxm_iodest := '';
+            ahcomm_f.Query2.Close;
+            ahcomm_f.Query2.SQL.Clear;
+            ahcomm_f.Query2.SQL.Add (' select boxm_iodest from miboxm ');
+            ahcomm_f.Query2.SQL.Add (' where boxm_boxid = '''+ls_trak_boxid+''' ');
+            ahcomm_f.Query2.SQL.Add (' and   boxm_jobqty between to_number(''1'') and to_number(''99'') ');
+            ahcomm_f.Query2.Open;
+            ls_boxm_iodest := ahcomm_f.Query2.Fields[0].AsString; // boxm의 최종목적지를 select
+
+            ps_iodest := ls_boxm_iodest;
+
+            li_boxm_exist := 0;
+            if      (ls_boxm_iodest = '2C1') and (ps_shap_no = '01') then li_boxm_exist := 1
+            else if (ls_boxm_iodest = '2C2') and (ps_shap_no = '02') then li_boxm_exist := 1
+            else if (ls_boxm_iodest = '2C3') and (ps_shap_no = '03') then li_boxm_exist := 1
+            else if (ls_boxm_iodest = '2C4') and (ps_shap_no = '04') then li_boxm_exist := 1
+            else if (ls_boxm_iodest = '2C5') and (ps_shap_no = '05') then li_boxm_exist := 1
+            else if (ls_boxm_iodest = '2C6') and (ps_shap_no = '06') then li_boxm_exist := 1;
+          end;
+          if (li_boxm_exist = 1) then li_boxid_cnt := li_boxid_cnt + 1;
+        end;
+
+        for li_j := 1 to 2 do   //start for 3
+        begin
+          ls_shap_boxid := '';
+          ls_shap_fb := IntToStr(li_j);
+          ahcomm_f.Query2.Close;
+          ahcomm_f.Query2.SQL.Clear;
+          ahcomm_f.Query2.SQL.Add (' select shap_boxid from tbshap ');
+          ahcomm_f.Query2.SQL.Add (' where shap_no = '''+ps_shap_no+''' ');
+          ahcomm_f.Query2.SQL.Add (' and   shap_fb = '''+ls_shap_fb+''' ');
+          ahcomm_f.Query2.Open;
+          ls_shap_boxid := ahcomm_f.Query2.Fields[0].AsString; // 세정기 boxid select
+          if (Length(ls_shap_boxid) <> 0) then li_boxid_cnt := li_boxid_cnt + 1;
+        end; // end for 3
+
+        if (li_boxid_cnt < 2) then
+        begin
+          ahcomm_f.Query2.Close;
+          ahcomm_f.Query2.SQL.Clear;
+          ahcomm_f.Query2.SQL.Add (' select count(sche_serial) from tbsche ');
+          ahcomm_f.Query2.SQL.Add (' where (sche_emg not in(''1'')) and (sche_wsno = '''+ws_no+''') ');
+          ahcomm_f.Query2.SQL.Add (' and   (sche_shap_no = '''+ps_shap_no+''') ');
+          ahcomm_f.Query2.SQL.Add (' and  ((substr(sche_loc, 1, 1) = ''3'') or (substr(sche_loc, 1, 1) = ''4'')) ');
+          ahcomm_f.Query2.SQL.Add (' order by sche_emg, sche_serial ');
+          ahcomm_f.Query2.Open;
+
+          pi_outlet_search_ok := ahcomm_f.Query2.Fields[0].AsInteger;
+        end;
+      end;
+      if (pi_outlet_search_ok > 0) then break;
+    end; // end for 1
+  except
+  end;
+end;
+
+procedure ahsrc2_T.cntl_ojobfetch1_shap_proc;
+var
+  l_serial, l_boxid, l_loc, l_wsno: string;
+begin
+  src2_step := 36;
+  try
+    Cntl_Shap1CmdCheck_Proc;
+    if (pi_outlet_search_ok = 0) then exit;
+
+    ahcomm_f.Query2.Close;
+    ahcomm_f.Query2.SQL.Clear;
+    ahcomm_f.Query2.SQL.Add (' select sche_serial, sche_boxid, sche_loc, sche_wsno from tbsche ');
+    ahcomm_f.Query2.SQL.Add (' where (sche_emg not in(''1'')) and (sche_wsno = '''+ws_no+''') ');
+    ahcomm_f.Query2.SQL.Add (' and  ((substr(sche_loc, 1, 1) = ''3'') or (substr(sche_loc, 1, 1) = ''4'')) ');
+    ahcomm_f.Query2.SQL.Add (' and   (sche_shap_no = '''+ps_shap_no+''') ');
+    ahcomm_f.Query2.SQL.Add (' order by sche_emg, sche_serial ');
+    ahcomm_f.Query2.Open;
+    l_serial := ahcomm_f.Query2.Fields[0].AsString;  l_boxid := ahcomm_f.Query2.Fields[1].AsString;
+    l_loc    := ahcomm_f.Query2.Fields[2].AsString;  l_wsno  := ahcomm_f.Query2.Fields[3].AsString;
+  except
+    ahcomm_f.src2Edit.Text := 'STEP:36 TBSCHE Select error.!!';
+  end;
+
+  if (l_loc < '300101') then exit;
+  s_cycle1 := 'O';  s_cycle2 := '0';  s_loc := l_loc;  s_wsno := l_wsno;  s_boxid := l_boxid;
+  send_check := 1;
+  try
+    ahcomm_f.Query2.Close;
+    ahcomm_f.Query2.SQL.Clear;
+    ahcomm_f.Query2.SQL.Add(' delete from tbsche where sche_serial = '''+l_serial+''' ');
+    ahcomm_f.Query2.ExecSQL;
+    ahcomm_f.src2_db.Commit;
+  except
+    ahcomm_f.src2Edit.Text := 'STEP:36 TBSCHE Delete error.!!';
+  end;
+end;
+
+procedure ahsrc2_T.Cntl_Shap2CmdCheck_Proc;
+var
+  li_i, li_j, li_x, li_trak_cnt, li_boxid_cnt, li_shap_ok: Integer;
+  li_boxm_exist: Integer;
+  ls_shap_in, ls_shap_rdy: String[01];
+
+  ls_shap_fb: String[01];
+  ls_trak_no: String[02];
+  ls_trak_boxid, ls_shap_boxid: String[15];
+  ls_boxm_iodest: String[03];
+begin
+  try
+    for li_i := 1 to 6 do  //start for 1
+    begin
+      li_boxid_cnt  := 0;  li_shap_ok := 0;    pi_outlet_search_ok := 0;
+      ls_shap_in := '0';  ls_shap_rdy := '0';
+
+// 세정기 실 box 투입조건 select
+      ahcomm_f.Query2.Close;
+      ahcomm_f.Query2.SQL.Clear;
+      ahcomm_f.Query2.SQL.Add (' select cvc2_ch20, cvc2_ch21 from tbcvc2 where cvc2_sr = ''R'' ');
+      ahcomm_f.Query2.Open;
+      ls_shap_in  := copy(ahcomm_f.Query2.Fields[0].AsString, li_i,  1); // 세정기 입고가능유
+      ls_shap_rdy := copy(ahcomm_f.Query2.Fields[1].AsString, li_i,  1); // 세정기 ready유
+
+      if (ls_shap_in = '1') and (ls_shap_rdy = '1') then
+        begin
+           li_x := li_i + 6;
+           if   li_x < 10 then ps_shap_no := '0' + IntToStr(li_x)
+           else ps_shap_no := IntToStr(li_x);
+
+           li_shap_ok := 1;
+         end
+      else  continue;
+
+      if (li_shap_ok = 1) then
+      begin
+        for li_trak_cnt := 47 to 49 do  //start for 2
+        begin
+          li_boxm_exist  := 0;   ps_iodest := '';
+
+          ls_trak_no := IntToStr(li_trak_cnt);
+
+          ahcomm_f.Query2.Close;
+          ahcomm_f.Query2.SQL.Clear;
+          ahcomm_f.Query2.SQL.Add (' select trak_boxid from tbtrak ');
+          ahcomm_f.Query2.SQL.Add (' where trak_no = '''+ls_trak_no+''' ');
+          ahcomm_f.Query2.Open;
+          ls_trak_boxid := ahcomm_f.Query2.Fields[0].AsString; // tracking 구간 boxid select
+
+          if (Length(ls_trak_boxid) <> 0) then
+          begin
+            ls_boxm_iodest := '';
+
+            ahcomm_f.Query2.Close;
+            ahcomm_f.Query2.SQL.Clear;
+            ahcomm_f.Query2.SQL.Add (' select boxm_iodest from miboxm ');
+            ahcomm_f.Query2.SQL.Add (' where boxm_boxid = '''+ls_trak_boxid+''' ');
+            ahcomm_f.Query2.SQL.Add (' and   boxm_jobqty between to_number(''1'') and to_number(''99'') ');
+            ahcomm_f.Query2.Open;
+            ls_boxm_iodest := ahcomm_f.Query2.Fields[0].AsString; // boxm의 최종목적지를 select
+
+            ps_iodest := ls_boxm_iodest;
+
+            li_boxm_exist := 0;
+            if      (ls_boxm_iodest = '2C7') and (ps_shap_no = '07') then li_boxm_exist := 1
+            else if (ls_boxm_iodest = '2C8') and (ps_shap_no = '08') then li_boxm_exist := 1
+            else if (ls_boxm_iodest = '2C9') and (ps_shap_no = '09') then li_boxm_exist := 1
+            else if (ls_boxm_iodest = '2CA') and (ps_shap_no = '10') then li_boxm_exist := 1
+            else if (ls_boxm_iodest = '2CB') and (ps_shap_no = '11') then li_boxm_exist := 1
+            else if (ls_boxm_iodest = '2CC') and (ps_shap_no = '12') then li_boxm_exist := 1;
+          end;
+          if (li_boxm_exist = 1) then li_boxid_cnt  := li_boxid_cnt + 1;
+        end;
+
+        for li_j := 1 to 2 do   //start for 3
+        begin
+          ls_shap_boxid := '';
+
+          ls_shap_fb := IntToStr(li_j);
+          ahcomm_f.Query2.Close;
+          ahcomm_f.Query2.SQL.Clear;
+          ahcomm_f.Query2.SQL.Add (' select shap_boxid from tbshap ');
+          ahcomm_f.Query2.SQL.Add (' where shap_no = '''+ps_shap_no+''' ');
+          ahcomm_f.Query2.SQL.Add (' and   shap_fb = '''+ls_shap_fb+''' ');
+          ahcomm_f.Query2.Open;
+          ls_shap_boxid := ahcomm_f.Query2.Fields[0].AsString; // 세정기 boxid select
+          if (Length(ls_shap_boxid) <> 0) then li_boxid_cnt := li_boxid_cnt + 1;
+        end; // end for 3
+
+        if (li_boxid_cnt < 2) then
+        begin
+          ahcomm_f.Query2.Close;
+          ahcomm_f.Query2.SQL.Clear;
+          ahcomm_f.Query2.SQL.Add (' select count(sche_serial) from tbsche ');
+          ahcomm_f.Query2.SQL.Add (' where (sche_emg not in(''1'')) and (sche_wsno = '''+ws_no+''') ');
+          ahcomm_f.Query2.SQL.Add (' and  ((substr(sche_loc, 1, 1) = ''3'') or (substr(sche_loc, 1, 1) = ''4'')) ');
+          ahcomm_f.Query2.SQL.Add (' and   (sche_shap_no = '''+ps_shap_no+''') ');
+          ahcomm_f.Query2.SQL.Add (' order by sche_emg, sche_serial ');
+          ahcomm_f.Query2.Open;
+          pi_outlet_search_ok := ahcomm_f.Query2.Fields[0].AsInteger;
+        end;
+      end;
+      if (pi_outlet_search_ok > 0) then break;
+    end; // end for 1
+  except
+  end;
+end;
+
+procedure ahsrc2_T.cntl_ojobfetch2_shap_proc;
+var
+  l_serial, l_boxid, l_loc, l_wsno: string;
+begin
+  src2_step := 36;
+  try
+    Cntl_Shap2CmdCheck_Proc;
+    if (pi_outlet_search_ok = 0) then exit;
+
+    ahcomm_f.Query2.Close;
+    ahcomm_f.Query2.SQL.Clear;
+    ahcomm_f.Query2.SQL.Add (' select sche_serial, sche_boxid, sche_loc, sche_wsno from tbsche ');
+    ahcomm_f.Query2.SQL.Add (' where (sche_emg not in(''1'')) and (sche_wsno = '''+ws_no+''') ');
+    ahcomm_f.Query2.SQL.Add (' and  ((substr(sche_loc, 1, 1) = ''3'') or (substr(sche_loc, 1, 1) = ''4'')) ');
+    ahcomm_f.Query2.SQL.Add (' and   (sche_shap_no = '''+ps_shap_no+''') ');
+    ahcomm_f.Query2.SQL.Add (' order by sche_emg, sche_serial ');
+    ahcomm_f.Query2.Open;
+    l_serial := ahcomm_f.Query2.Fields[0].AsString;  l_boxid := ahcomm_f.Query2.Fields[1].AsString;
+    l_loc    := ahcomm_f.Query2.Fields[2].AsString;  l_wsno  := ahcomm_f.Query2.Fields[3].AsString;
+  except
+    ahcomm_f.src2Edit.Text := 'STEP:36 TBSCHE Select error.!!';
+  end;
+
+  if (l_loc < '300101') then exit;
+  s_cycle1 := 'O';  s_cycle2 := '0';  s_loc := l_loc;  s_wsno := l_wsno;  s_boxid := l_boxid;
+  send_check := 1;
+  try
+    src2_ok := 0;
+    ahcomm_f.Query2.Close;
+    ahcomm_f.Query2.SQL.Clear;
+    ahcomm_f.Query2.SQL.Add(' delete from tbsche where sche_serial = '''+l_serial+''' ');
+    ahcomm_f.Query2.ExecSQL;
+    ahcomm_f.src2_db.Commit;
+    src2_ok := 1;
+  except
+    ahcomm_f.src2Edit.Text := 'STEP:36 TBSCHE Delete error.!!';
+  end;
+end;
+
+procedure ahsrc2_T.cntl_ijobfetch_proc;
+var
+  l_loc : string;
+  ls_type: String[01];
+  ls_boxid: String[15];
+  ls_lv: String[02];
+begin
+  src2_step := 37;
+  try
+    ahcomm_f.Query2.Close;
+    ahcomm_f.Query2.SQL.Clear;
+    ahcomm_f.Query2.SQL.Add (' select lstk_loc from milstk ');
+    ahcomm_f.Query2.SQL.Add (' where (lstk_stat = ''0'') and ((lstk_bk = ''3'') or (lstk_bk = ''4'')) ');
+    ahcomm_f.Query2.SQL.Add (' order by lstk_lv, lstk_by, lstk_bk ');
+    ahcomm_f.Query2.Open;
+    ahcomm_f.Query2.First;
+
+// D-BOX 때문에 수정함
+    if (ws_no = '04') then ls_boxid := i_trk4   // 비상입고
+    else ls_boxid := i_trk1;                    //실BOX입고
+    ls_type := Copy(ls_boxid, 2, 1);
+    while True do
+    begin
+      l_loc := ahcomm_f.Query2.Fields[0].AsString;
+      ls_lv := Copy(l_loc, 5, 2);
+      if (ahcomm_f.Query2.Eof) then break;
+      if ((ls_type = 'D') or (ls_type = 'X')) and (ls_lv = '03') then ahcomm_f.Query2.Next
+      else break;
+    end;
+  except
+    ahcomm_f.src2Edit.Text := 'STEP:37 MILSTK Select error.!!';
+  end;
+
+// 전체 cell full 일경우 그냥 지나간다.
+  if (Length(l_loc) = 0) or (l_loc = '') then exit;
+
+  if (l_loc < '300101') then exit;
+
+  s_cycle1 := 'I';  s_cycle2 := '0';  s_loc := l_loc;  s_wsno := ws_no;
+  if (ws_no = '04') then begin s_boxid := i_trk4; ps_sposi := '2EM'; end // 비상입고
+  else s_boxid := i_trk1;  //실BOX입고
+  send_check := 1;
+  lstk_update_proc;
+end;
+
+procedure ahsrc2_T.cntl_ioerror_proc;
+var
+  l_loc : string;
+
+  ls_type: String[01];
+  ls_lv: String[02];
+  ls_boxid: String[15];
+begin
+  src2_step := 38;
+  if (s_error = 'G') or (s_reset = '1') then exit;
+  if (s_cycle1 = 'I') and (s_cycle2 = '2') and (s_error = 'W') then // 이중격납
+  begin
+    try
+      ahcomm_f.Query2.Close;
+      ahcomm_f.Query2.SQL.Clear;
+      ahcomm_f.Query2.SQL.Add (' select lstk_loc from milstk ');
+      ahcomm_f.Query2.SQL.Add (' where (lstk_stat = ''0'') and ((lstk_bk = ''3'') or (lstk_bk = ''4'')) ');
+      ahcomm_f.Query2.SQL.Add (' order by lstk_lv, lstk_by, lstk_bk ');
+      ahcomm_f.Query2.Open;
+
+// D-BOX 때문에 수정함
+      ahcomm_f.Query2.First;
+      if (ws_no = '04') then ls_boxid := i_trk4   // 비상입고
+      else ls_boxid := i_trk1;                    //실BOX입고
+      ls_type := Copy(ls_boxid, 2, 1);
+      while True do
+      begin
+        l_loc := ahcomm_f.Query2.Fields[0].AsString;
+        ls_lv := Copy(l_loc, 5, 2);
+        if (ahcomm_f.Query2.Eof) then break;
+        if ((ls_type = 'D') or (ls_type = 'X')) and (ls_lv = '03') then ahcomm_f.Query2.Next
+        else break;
+      end;
+    except
+      ahcomm_f.src2Edit.Text := 'STEP:38 MILSTK Select error.!!';
+    end;
+
+    // 전체 cell full 일경우 그냥 지나간다.
+    if (Length(l_loc) = 0) or (l_loc = '') then exit;
+
+    if (l_loc < '300101') then s_reset := '1';
+    begin
+      s_cycle1 := 'I';  s_cycle2 := '0';  s_load := '1';  s_loc := l_loc;  s_error  := '0';
+      lstk_update_proc;
+    end;
+  end
+
+  else if (s_cycle1 = 'O') and (s_cycle2 = '1') and (s_error = 'E') then // 공출고
+  begin
+    // 공출고 배당 있을경우 삽입하세요.
+    cntl_iochange_proc;
+  end
+  else exit;
+end;
+
+/////////////////////////////////////////////////////////////////////////////////
+procedure ahsrc2_T.main_send_proc;
+var
+  ls_s_bk: String[01];
+  ls_s_bylv: String[05];
+begin
+  src2_step := 20;
+  send_buff := '';
+  if init_start = 0 then //기동지시
+  begin
+    send_buff := sstart.stx + sstart.serial + sstart.mode + '00000000000000000' + sstart.etx;
+    seq_no := 1;
+    send_ok := 0;
+    sleep(3000);
+  end
+  else if (init_start = 2) and (send_ok > 5) then //입출고 송신후 Rerty
+  begin
+    ahcomm_f.src2Edit.Text := 'SRC2->HOST Send ack not received.!!';
+    send_ok := 1;
+
+    ls_s_bk   := Copy(siojob.loc, 1, 1);
+    ls_s_bylv := Copy(siojob.loc, 2, 5);
+    if      (ls_s_bk = '3') then ls_s_bk := '1'
+    else if (ls_s_bk = '4') then ls_s_bk := '2';
+
+    send_buff := siojob.stx + siojob.serial + siojob.mode + siojob.scc + siojob.wsno + ls_s_bk + ls_s_bylv + '00000000' + siojob.etx;
+    sleep(3000);
+  end
+  else if (init_start = 2) and (send_check = 2) then //입출고 송신
+  begin
+    send_ok := send_ok +1;
+
+    ls_s_bk   := Copy(siojob.loc, 1, 1);
+    ls_s_bylv := Copy(siojob.loc, 2, 5);
+    if      (ls_s_bk = '3') then ls_s_bk := '1'
+    else if (ls_s_bk = '4') then ls_s_bk := '2';
+    send_buff := siojob.stx + siojob.serial + siojob.mode + siojob.scc + siojob.wsno + ls_s_bk + ls_s_bylv + '00000000' + siojob.etx;
+  end
+  else //작업 없을경우
+  begin
+    send_ok := 0;
+    exit;
+  end;
+
+  send_check := 0;
+  send_seq := copy(send_buff,2,2);
+  send_action_proc;
+end;
+
+procedure ahsrc2_T.send_action_proc;
+begin
+  src2_step := 21;
+  ahcomm_f.CommSrc2.Write(send_buff[1], length(send_buff));
+end;
+
+/////////////////////////////////////////////////////////////////////////////////
+procedure ahsrc2_T.init_setting_proc;
+begin
+  src2_step  := 1;
+  src2_ok    := 1;
+  init_start := 0 ;  send_check := 0;  send_ok := 0;  seq_no := 0;
+  sack.stx   := #2;                          sack.mode   := 'R';  sack.etx   := #3;
+  sstart.stx := #2;  sstart.serial := '00';  sstart.mode := 'S';  sstart.etx := #3;
+  siojob.stx := #2;                                               siojob.etx := #3;
+  try
+    ahcomm_f.CommSrc2.Open;
+    ahcomm_f.src2Edit.Text := 'Connected to SRC2.!!';
+  except
+    ahcomm_f.src2Edit.Text := 'Connection Error to SRC2.!!';
+    src2_pgm := 'F';
+  end;
+end;
+
+procedure ahsrc2_T.init_select_proc;
+begin
+  l_step := src2_step;
+  src2_step := 2;
+  try
+    ahcomm_f.Query2.Close; //입출고 가능 Select
+    ahcomm_f.Query2.SQL.Clear;
+    ahcomm_f.Query2.SQL.Add (' select stat_sc2io from tbstat where stat_pswd = ''LGIS'' ');
+    ahcomm_f.Query2.Open;
+    sc_io := ahcomm_f.Query2.Fields[0].AsString;
+
+    ahcomm_f.Query2.Close; //입출고 Ready Select
+    ahcomm_f.Query2.SQL.Clear;
+    ahcomm_f.Query2.SQL.Add (' select cvc2_ch04 from tbcvc2 where cvc2_sr = ''R'' ');
+    ahcomm_f.Query2.Open;
+    i_rdy1 := copy(ahcomm_f.Query2.Fields[0].AsString, 1,  1); // rdy(N)이 ST/NO 번호
+    o_rdy3 := copy(ahcomm_f.Query2.Fields[0].AsString, 3,  1);
+    o_rdy6 := copy(ahcomm_f.Query2.Fields[0].AsString, 4,  1);
+    o_rdy5 := copy(ahcomm_f.Query2.Fields[0].AsString, 5,  1);
+    i_rdy4 := copy(ahcomm_f.Query2.Fields[0].AsString, 6,  1);
+    o_rdy4 := copy(ahcomm_f.Query2.Fields[0].AsString, 7,  1);
+
+    cv_no := '44'; //출고 WS/NO Tracking Data Select
+    ahcomm_f.Query2.Close;
+    ahcomm_f.Query2.SQL.Clear;
+    ahcomm_f.Query2.SQL.Add (' select trak_boxid from tbtrak where trak_no = '''+cv_no+''' ');
+    ahcomm_f.Query2.Open;
+    o_trk3 := ahcomm_f.Query2.Fields[0].AsString;
+
+    cv_no := '84'; //출고 WS/NO Tracking Data Select
+    ahcomm_f.Query2.Close;
+    ahcomm_f.Query2.SQL.Clear;
+    ahcomm_f.Query2.SQL.Add (' select trak_boxid from tbtrak where trak_no = '''+cv_no+''' ');
+    ahcomm_f.Query2.Open;
+    o_trk6 := ahcomm_f.Query2.Fields[0].AsString;
+
+    cv_no := '47'; //출고 WS/NO Tracking Data Select
+    ahcomm_f.Query2.Close;
+    ahcomm_f.Query2.SQL.Clear;
+    ahcomm_f.Query2.SQL.Add (' select trak_boxid from tbtrak where trak_no = '''+cv_no+''' ');
+    ahcomm_f.Query2.Open;
+    o_trk5 := ahcomm_f.Query2.Fields[0].AsString;
+
+    cv_no := '85'; //출고 WS/NO Tracking Data Select
+    ahcomm_f.Query2.Close;
+    ahcomm_f.Query2.SQL.Clear;
+    ahcomm_f.Query2.SQL.Add (' select trak_boxid from tbtrak where trak_no = '''+cv_no+''' ');
+    ahcomm_f.Query2.Open;
+    o_trk4 := ahcomm_f.Query2.Fields[0].AsString;
+
+    cv_no := '41'; //입고 WS/NO Tracking Data Select
+    ahcomm_f.Query2.Close;
+    ahcomm_f.Query2.SQL.Clear;
+    ahcomm_f.Query2.SQL.Add (' select trak_boxid from tbtrak where trak_no = '''+cv_no+''' ');
+    ahcomm_f.Query2.Open;
+    i_trk1 := ahcomm_f.Query2.Fields[0].AsString;
+
+    cv_no := '85'; //입고 WS/NO Tracking Data Select
+    ahcomm_f.Query2.Close;
+    ahcomm_f.Query2.SQL.Clear;
+    ahcomm_f.Query2.SQL.Add (' select trak_boxid from tbtrak where trak_no = '''+cv_no+''' ');
+    ahcomm_f.Query2.Open;
+    i_trk4 := ahcomm_f.Query2.Fields[0].AsString;
+  except
+    ahcomm_f.src2Edit.Text := 'STEP:2 STAT,LINK,TRAK Select error.!!';
+  end;
+  src2_step := l_step;
+end;
+
+procedure ahsrc2_T.scrc_select_proc;
+var
+  s_cycle  : string;
+begin
+  l_step := src2_step;
+  src2_step := 3;
+  try
+    ahcomm_f.Query2.Close; //SCRC Table Select
+    ahcomm_f.Query2.SQL.Clear;
+    ahcomm_f.Query2.SQL.Add (' select * from tbscrc where scrc_no = '''+sc_no+''' ');
+    ahcomm_f.Query2.Open;
+    s_scno   := ahcomm_f.Query2.Fields[0].AsString;  s_cycle   := ahcomm_f.Query2.Fields[1].AsString;
+    s_ack    := ahcomm_f.Query2.Fields[2].AsString;  s_load    := ahcomm_f.Query2.Fields[3].AsString;
+    s_unload := ahcomm_f.Query2.Fields[4].AsString;  s_loc     := ahcomm_f.Query2.Fields[5].AsString;
+    s_wsno   := ahcomm_f.Query2.Fields[6].AsString;  s_boxid   := ahcomm_f.Query2.Fields[7].AsString;
+    s_onoff  := ahcomm_f.Query2.Fields[8].AsString;  s_scplt   := ahcomm_f.Query2.Fields[9].AsString;
+    s_scpos  := ahcomm_f.Query2.Fields[10].AsString; s_error   := ahcomm_f.Query2.Fields[11].AsString;
+    s_reset  := ahcomm_f.Query2.Fields[12].AsString; s_errcode := ahcomm_f.Query2.Fields[13].AsString;
+    s_cycle1 := copy(s_cycle,1,1);
+    s_cycle2 := copy(s_cycle,2,1);
+  except
+    ahcomm_f.src2Edit.Text := 'STEP:3 TBSCRC Select error.!!';
+  end;
+  src2_step := l_step;
+end;
+
+procedure ahsrc2_T.scrc_update_proc;
+var
+  s_cycle : string;
+begin
+  l_step := src2_step;
+  src2_step := 4;
+  s_cycle := s_cycle1 + s_cycle2;
+  try
+    src2_ok := 0;
+    ahcomm_f.Query2.Close; //SCRC Table Update
+    ahcomm_f.Query2.SQL.Clear;
+    ahcomm_f.Query2.SQL.Add(' update tbscrc set ');
+    ahcomm_f.Query2.SQL.Add(' scrc_cycle   = '''+s_cycle+''',  scrc_ack    = '''+s_ack+''', ');
+    ahcomm_f.Query2.SQL.Add(' scrc_load    = '''+s_load+''',   scrc_unload = '''+s_unload+''', ');
+    ahcomm_f.Query2.SQL.Add(' scrc_loc     = '''+s_loc+''',    scrc_wsno   = '''+s_wsno+''', ');
+    ahcomm_f.Query2.SQL.Add(' scrc_boxid   = '''+s_boxid+''',  scrc_onoff  = '''+s_onoff+''', ');
+    ahcomm_f.Query2.SQL.Add(' scrc_scplt   = '''+s_scplt+''',  scrc_scpos  = '''+s_scpos+''', ');
+    ahcomm_f.Query2.SQL.Add(' scrc_error   = '''+s_error+''',  scrc_reset  = '''+s_reset+''', ');
+    ahcomm_f.Query2.SQL.Add(' scrc_errcode = '''+s_errcode+''' ');
+    ahcomm_f.Query2.SQL.Add(' where scrc_no = '''+sc_no+''' ');
+    ahcomm_f.Query2.ExecSQL;
+    ahcomm_f.src2_db.Commit;
+    src2_ok := 1;
+  except
+    ahcomm_f.src2Edit.Text := 'STEP:4 TBSCRC Update error.!!';
+  end;
+  src2_step := l_step;
+end;
+
+procedure ahsrc2_T.trak_update_proc;
+var
+  l_boxid, l_se, l_cntl, l_iodest : string;
+  l_jobqty : integer;
+begin
+  l_step := src2_step;
+  src2_step := 5;
+  if ((s_cycle1 = 'I') and (s_wsno = '01') and (s_boxid <> i_trk1)) or
+     ((s_cycle1 = 'I') and (s_wsno = '04') and (s_boxid <> i_trk4)) then  //입고 Loading 완료시 Data불일치
+  begin
+    src2_step := l_step;
+    exit;
+  end;
+  if (s_cycle1 = 'I') then //입고 Loading, UnLoading 완료
+  begin
+    if (s_wsno = '01') then cv_no := '41';
+    if (s_wsno = '04') then cv_no := '85';
+    l_boxid := ''; l_se := ''; l_cntl := '';
+  end;
+
+  if (s_cycle1 = 'O') then  //출고 UnLoading 완료
+  begin
+    if      (s_wsno = '03') then cv_no := '44'  // 세정기 1-6 출고
+    else if (s_wsno = '06') then cv_no := '84'  // 공BOX 출고
+    else if (s_wsno = '05') then cv_no := '47'  // 세정기 7-12 출고
+    else if (s_wsno = '04') then cv_no := '85'; // 비상출고
+    l_boxid := s_boxid; l_se := 'E'; l_cntl := '';
+
+    ahcomm_f.Query2.Close;
+    ahcomm_f.Query2.SQL.Clear;
+    ahcomm_f.Query2.SQL.Add (' select boxm_jobqty, boxm_iodest from miboxm where boxm_boxid = '''+s_boxid+''' ');
+    ahcomm_f.Query2.Open;
+    l_jobqty  := ahcomm_f.Query2.Fields[0].AsInteger;
+    l_iodest  := ahcomm_f.Query2.Fields[1].AsString;
+    ps_iodest := l_iodest;
+
+    if (l_jobqty > 0) then l_se := 'S'; //출고시 실Box 일경우
+    if (s_wsno = '04') or (l_iodest = '2EM') then l_cntl := 'B'; // 비상Line 출고시 후진명령
+  end;
+
+  try
+    src2_ok := 0;
+    ahcomm_f.Query2.Close;
+    ahcomm_f.Query2.SQL.Clear;
+    ahcomm_f.Query2.SQL.Add(' update tbtrak set trak_boxid = '''+l_boxid+''', ');
+    ahcomm_f.Query2.SQL.Add(' trak_se = '''+l_se+''', trak_cntl = '''+l_cntl+''' ');
+    ahcomm_f.Query2.SQL.Add(' where trak_no = '''+cv_no+''' ');
+    ahcomm_f.Query2.ExecSQL;
+    ahcomm_f.src2_db.Commit;
+    src2_ok := 1;
+  except
+    ahcomm_f.src2Edit.Text := 'STEP:5 TBTRAK Update error.!!';
+  end;
+  src2_step := l_step;
+end;
+
+procedure ahsrc2_T.lstk_update_proc;
+var
+  l_stat : string;
+begin
+  l_step := src2_step;
+  src2_step := 6;
+  try
+    if (l_step = 33) and (s_cycle1 = 'O') then //출고완료
+    begin
+      src2_ok := 0;
+      ahcomm_f.Query2.Close;
+      ahcomm_f.Query2.SQL.Clear;
+      ahcomm_f.Query2.SQL.Add(' update milstk set lstk_stat = ''0'', ');
+      ahcomm_f.Query2.SQL.Add(' lstk_boxid = null, lstk_date = null ');
+      ahcomm_f.Query2.SQL.Add(' where lstk_loc = '''+s_loc+''' ');
+      ahcomm_f.Query2.ExecSQL;
+      ahcomm_f.src2_db.Commit;
+      src2_ok := 1;
+    end
+
+    else if (l_step = 15) or (l_step = 33) then //입고완료, 이중격납 Error 발생
+    begin
+      if (l_step = 15) then l_stat := e_code;
+      if (l_step = 33) then l_stat := '1';
+      src2_ok := 0;
+      ahcomm_f.Query2.Close;
+      ahcomm_f.Query2.SQL.Clear;
+      ahcomm_f.Query2.SQL.Add(' update milstk set lstk_stat = '''+l_stat+''', ');
+      ahcomm_f.Query2.SQL.Add(' lstk_date = sysdate ');
+      ahcomm_f.Query2.SQL.Add(' where lstk_loc = '''+s_loc+''' ');
+      ahcomm_f.Query2.ExecSQL;
+      ahcomm_f.src2_db.Commit;
+      src2_ok := 1;
+    end
+
+    else if (l_step = 37) or (l_step = 38) then //입고예약, 이중격납 재할당
+    begin
+      src2_ok := 0;
+      ahcomm_f.Query2.Close;
+      ahcomm_f.Query2.SQL.Clear;
+      ahcomm_f.Query2.SQL.Add(' update milstk set lstk_stat = ''%'', ');
+      ahcomm_f.Query2.SQL.Add(' lstk_boxid = '''+s_boxid+''', lstk_date = sysdate ');
+      ahcomm_f.Query2.SQL.Add(' where lstk_loc = '''+s_loc+''' ');
+      ahcomm_f.Query2.ExecSQL;
+      ahcomm_f.src2_db.Commit;
+      src2_ok := 1;
+    end;
+  except
+    ahcomm_f.src2Edit.Text := 'STEP:6 MILSTK Update error.!!';
+  end;
+  src2_step := l_step;
+end;
+
+procedure ahsrc2_T.boxm_update_proc;
+var
+  l_stat, l_kind, l_cposi : string;
+begin
+  l_step := src2_step;
+  src2_step := 7;
+  try
+    if (s_cycle1 = 'O') then //출고완료
+    begin
+      l_stat := '20';
+
+      if      (s_wsno = '03') then l_cposi := '2B5'  // 세정기 1-6 출고
+      else if (s_wsno = '06') then l_cposi := '2OT'  // 공BOX 출고
+      else if (s_wsno = '05') then l_cposi := '2B6'  // 세정기 7-12 출고
+      else if (s_wsno = '04') then l_cposi := '2EM'; // 비상출고
+
+      ahcomm_f.Query2.Close;
+      ahcomm_f.Query2.SQL.Clear;
+      ahcomm_f.Query2.SQL.Add (' select boxm_sposi, boxm_kind from miboxm where boxm_boxid = '''+s_boxid+''' ');
+      ahcomm_f.Query2.Open;
+      ps_kind   := ahcomm_f.Query2.Fields[1].AsString;
+
+      if (s_wsno = '04') then // 비상출고
+      begin
+        ps_iodest := l_cposi;
+
+        ahcomm_f.Query2.Close;
+        ahcomm_f.Query2.SQL.Clear;
+        ahcomm_f.Query2.SQL.Add(' delete from miboxm ');
+        ahcomm_f.Query2.SQL.Add(' where boxm_boxid = '''+s_boxid+''' ');
+        ahcomm_f.Query2.ExecSQL;
+        ahcomm_f.src2_db.Commit;
+      end
+      else
+      begin
+        ahcomm_f.Query2.Close;
+        ahcomm_f.Query2.SQL.Clear;
+        ahcomm_f.Query2.SQL.Add(' update miboxm set boxm_stat = '''+l_stat+''', ');
+        ahcomm_f.Query2.SQL.Add(' boxm_cposi = '''+l_cposi+''', boxm_order = ''*'', ');
+        ahcomm_f.Query2.SQL.Add(' boxm_curr_date = sysdate ');
+        ahcomm_f.Query2.SQL.Add(' where boxm_boxid = '''+s_boxid+''' ');
+        ahcomm_f.Query2.ExecSQL;
+        ahcomm_f.src2_db.Commit;
+      end;
+
+      ps_cposi  := l_cposi;
+      ps_sposi  := '2RK';
+      Cntl_HistSettingProc;
+    end
+
+    else if (s_cycle1 = 'I') then //입고완료
+    begin
+      l_stat := '21';  l_cposi := '2RK';
+
+      ahcomm_f.Query2.Close;
+      ahcomm_f.Query2.SQL.Clear;
+      ahcomm_f.Query2.SQL.Add (' select boxm_sposi, boxm_kind from miboxm where boxm_boxid = '''+s_boxid+''' ');
+      ahcomm_f.Query2.Open;
+      ps_sposi := ahcomm_f.Query2.Fields[0].AsString;
+      l_kind   := ahcomm_f.Query2.Fields[1].AsString;
+
+      if (l_kind <> 'RR') then l_kind := '00';
+
+      ahcomm_f.Query2.Close;
+      ahcomm_f.Query2.SQL.Clear;
+      ahcomm_f.Query2.SQL.Add(' update miboxm set boxm_stat = '''+l_stat+''', boxm_kind = '''+l_kind+''', ');
+      ahcomm_f.Query2.SQL.Add(' boxm_cposi = '''+l_cposi+''', boxm_order = boxm_fact, ');
+      ahcomm_f.Query2.SQL.Add(' boxm_curr_date = sysdate ');
+      ahcomm_f.Query2.SQL.Add(' where boxm_boxid = '''+s_boxid+''' ');
+      ahcomm_f.Query2.ExecSQL;
+      ahcomm_f.src2_db.Commit;
+
+      ps_cposi  := l_cposi;
+      ps_iodest := '2RK';
+      ps_kind := l_kind;
+      Cntl_HistSettingProc;
+    end;
+  except
+    ahcomm_f.src2Edit.Text := 'STEP:7 MIBOXM Update error.!!';
+  end;
+  src2_step := l_step;
+end;
+
+procedure ahsrc2_T.Cntl_HistSettingProc;
+var
+  ls_fact: String[01];
+  ls_qty: String[02];
+begin
+  ls_fact  := Copy(s_boxid,  1, 1);
+  ls_qty   := Copy(s_boxid, 14, 2);
+
+  if ls_fact = 'X' then exit;
+
+  with ahcomm_f do
+  begin
+    try
+      Query2.SQL.Clear;
+      Query2.SQL.Add(' insert into mihist ');
+      Query2.SQL.Add(' (hist_w_date,   hist_boxid,       hist_stat,       hist_order,     hist_kind, ');
+      Query2.SQL.Add('  hist_jobqty,   hist_loc,         hist_cposi,      hist_iodest, ');
+      Query2.SQL.Add('  hist_sposi,    hist_init_date,   hist_curr_date,  hist_date) ');
+      Query2.SQL.Add(' values (sysdate, '''+s_boxid+''', ''21'', '''+ls_fact+''', '''+ps_kind+''', ');
+      Query2.SQL.Add(' to_number('''+ls_qty+'''), '''+s_loc+''', '''+ps_cposi+''', '''+ps_iodest+''', ');
+      Query2.SQL.Add(' '''+ps_sposi+''', sysdate, sysdate, NULL) ');
+
+      Query2.ExecSQL;
+      src2_db.Commit;
+    except
+    end;
+  end;
+end;
+
+end.

@@ -1,0 +1,759 @@
+object Frm_4201: TFrm_4201
+  Left = 1
+  Top = 1
+  AutoScroll = False
+  Caption = 'Frm_4201'
+  ClientHeight = 687
+  ClientWidth = 1014
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  Font.Style = []
+  FormStyle = fsStayOnTop
+  OldCreateOrder = False
+  Position = poMainFormCenter
+  OnClose = FormClose
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Panel19: TPanel
+    Left = 432
+    Top = 41
+    Width = 785
+    Height = 688
+    Caption = 'Panel19'
+    TabOrder = 1
+    object Panel3: TPanel
+      Left = -24
+      Top = 8
+      Width = 793
+      Height = 713
+      BevelOuter = bvLowered
+      Caption = 'Panel3'
+      TabOrder = 0
+      object Panel10: TPanel
+        Left = 25
+        Top = 1
+        Width = 760
+        Height = 24
+        Alignment = taLeftJustify
+        Caption = '        BC '#49688#49888' '#51221#48372
+        Color = 12615808
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWhite
+        Font.Height = -13
+        Font.Name = #44404#47548
+        Font.Style = [fsBold]
+        ParentFont = False
+        TabOrder = 0
+        object Label1: TLabel
+          Left = 385
+          Top = 7
+          Width = 102
+          Height = 13
+          Caption = 'COMMIT_NO : '
+        end
+        object Panel13: TPanel
+          Left = 1
+          Top = 0
+          Width = 32
+          Height = 33
+          BevelOuter = bvLowered
+          Color = 16744448
+          TabOrder = 0
+        end
+        object CommitEdit: TEdit
+          Left = 472
+          Top = 2
+          Width = 57
+          Height = 21
+          Font.Charset = ANSI_CHARSET
+          Font.Color = clNavy
+          Font.Height = -13
+          Font.Name = #44404#47548
+          Font.Style = [fsBold]
+          ImeName = #54620#44397#50612'('#54620#44544') (MS-IME98)'
+          MaxLength = 4
+          ParentFont = False
+          TabOrder = 1
+        end
+      end
+      object Panel14: TPanel
+        Left = 25
+        Top = 249
+        Width = 760
+        Height = 24
+        Alignment = taLeftJustify
+        Caption = '        '#51116#44256#54788#54889
+        Color = clNavy
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWhite
+        Font.Height = -13
+        Font.Name = #44404#47548
+        Font.Style = [fsBold]
+        ParentFont = False
+        TabOrder = 1
+        object Panel15: TPanel
+          Left = 1
+          Top = 1
+          Width = 32
+          Height = 22
+          Align = alLeft
+          BevelOuter = bvLowered
+          Color = 16244697
+          TabOrder = 0
+        end
+      end
+      object DBGrid: TDBGrid
+        Left = 25
+        Top = 275
+        Width = 760
+        Height = 368
+        DataSource = DataSource1
+        ImeName = #54620#44397#50612'('#54620#44544') (MS-IME98)'
+        Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit]
+        TabOrder = 2
+        TitleFont.Charset = DEFAULT_CHARSET
+        TitleFont.Color = clWindowText
+        TitleFont.Height = -11
+        TitleFont.Name = 'MS Sans Serif'
+        TitleFont.Style = []
+        OnDrawColumnCell = DBGridDrawColumnCell
+        Columns = <
+          item
+            Alignment = taCenter
+            Color = clInfoBk
+            Expanded = False
+            FieldName = 'LOCA'
+            Font.Charset = ANSI_CHARSET
+            Font.Color = clNavy
+            Font.Height = -13
+            Font.Name = #44404#47548#52404
+            Font.Style = [fsBold]
+            Title.Alignment = taCenter
+            Title.Caption = #50676'-'#50672'-'#45800
+            Title.Color = clBackground
+            Title.Font.Charset = ANSI_CHARSET
+            Title.Font.Color = clWhite
+            Title.Font.Height = -13
+            Title.Font.Name = #44404#47548#52404
+            Title.Font.Style = [fsBold]
+            Width = 71
+            Visible = True
+          end
+          item
+            Alignment = taCenter
+            Expanded = False
+            FieldName = 'FLAG'
+            Font.Charset = ANSI_CHARSET
+            Font.Color = clNavy
+            Font.Height = -13
+            Font.Name = #44404#47548#52404
+            Font.Style = [fsBold]
+            Title.Alignment = taCenter
+            Title.Caption = #49345#53468
+            Title.Color = clBackground
+            Title.Font.Charset = ANSI_CHARSET
+            Title.Font.Color = clWhite
+            Title.Font.Height = -13
+            Title.Font.Name = #44404#47548#52404
+            Title.Font.Style = [fsBold]
+            Visible = True
+          end
+          item
+            Alignment = taCenter
+            Expanded = False
+            FieldName = 'WCODE'
+            Font.Charset = ANSI_CHARSET
+            Font.Color = clNavy
+            Font.Height = -13
+            Font.Name = #44404#47548#52404
+            Font.Style = [fsBold]
+            Title.Alignment = taCenter
+            Title.Caption = #50756#51228#54408#53076#46300
+            Title.Color = clBackground
+            Title.Font.Charset = ANSI_CHARSET
+            Title.Font.Color = clWhite
+            Title.Font.Height = -13
+            Title.Font.Name = #44404#47548#52404
+            Title.Font.Style = [fsBold]
+            Width = 122
+            Visible = True
+          end
+          item
+            Alignment = taCenter
+            Expanded = False
+            FieldName = 'PCODE'
+            Font.Charset = ANSI_CHARSET
+            Font.Color = clNavy
+            Font.Height = -13
+            Font.Name = #44404#47548#52404
+            Font.Style = [fsBold]
+            Title.Alignment = taCenter
+            Title.Caption = #54036#47112#53944#53076#46300
+            Title.Color = clBackground
+            Title.Font.Charset = ANSI_CHARSET
+            Title.Font.Color = clWhite
+            Title.Font.Height = -13
+            Title.Font.Name = #44404#47548#52404
+            Title.Font.Style = [fsBold]
+            Width = 117
+            Visible = True
+          end
+          item
+            Alignment = taCenter
+            Expanded = False
+            FieldName = 'NAME'
+            Font.Charset = ANSI_CHARSET
+            Font.Color = clNavy
+            Font.Height = -13
+            Font.Name = #44404#47548#52404
+            Font.Style = [fsBold]
+            Title.Alignment = taCenter
+            Title.Caption = #54036#47112#53944#47749
+            Title.Color = clBackground
+            Title.Font.Charset = ANSI_CHARSET
+            Title.Font.Color = clWhite
+            Title.Font.Height = -13
+            Title.Font.Name = #44404#47548#52404
+            Title.Font.Style = [fsBold]
+            Width = 125
+            Visible = True
+          end
+          item
+            Alignment = taCenter
+            Expanded = False
+            FieldName = 'PLTID'
+            Font.Charset = ANSI_CHARSET
+            Font.Color = clNavy
+            Font.Height = -13
+            Font.Name = #44404#47548#52404
+            Font.Style = [fsBold]
+            Title.Alignment = taCenter
+            Title.Caption = 'PLT-ID'
+            Title.Color = clBackground
+            Title.Font.Charset = ANSI_CHARSET
+            Title.Font.Color = clWhite
+            Title.Font.Height = -13
+            Title.Font.Name = #44404#47548#52404
+            Title.Font.Style = [fsBold]
+            Width = 97
+            Visible = True
+          end
+          item
+            Alignment = taCenter
+            Expanded = False
+            FieldName = 'PLTSN'
+            Font.Charset = ANSI_CHARSET
+            Font.Color = clNavy
+            Font.Height = -13
+            Font.Name = #44404#47548#52404
+            Font.Style = [fsBold]
+            Title.Alignment = taCenter
+            Title.Caption = 'PLT'#49692#48264
+            Title.Color = clBackground
+            Title.Font.Charset = ANSI_CHARSET
+            Title.Font.Color = clWhite
+            Title.Font.Height = -13
+            Title.Font.Name = #44404#47548#52404
+            Title.Font.Style = [fsBold]
+            Width = 90
+            Visible = True
+          end
+          item
+            Alignment = taCenter
+            Expanded = False
+            FieldName = 'INDATE'
+            Font.Charset = ANSI_CHARSET
+            Font.Color = clNavy
+            Font.Height = -13
+            Font.Name = #44404#47548#52404
+            Font.Style = [fsBold]
+            Title.Alignment = taCenter
+            Title.Caption = #51077#44256#51068#51088
+            Title.Color = clBackground
+            Title.Font.Charset = ANSI_CHARSET
+            Title.Font.Color = clWhite
+            Title.Font.Height = -13
+            Title.Font.Name = #44404#47548#52404
+            Title.Font.Style = [fsBold]
+            Width = 157
+            Visible = True
+          end>
+      end
+      object SGrid1: TStringGrid
+        Left = 26
+        Top = 26
+        Width = 759
+        Height = 207
+        BiDiMode = bdLeftToRight
+        ColCount = 9
+        DefaultColWidth = 14
+        DefaultRowHeight = 18
+        FixedColor = clBackground
+        RowCount = 9
+        Font.Charset = HANGEUL_CHARSET
+        Font.Color = clNavy
+        Font.Height = -13
+        Font.Name = #44404#47548#52404
+        Font.Style = [fsBold]
+        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goRowSelect]
+        ParentBiDiMode = False
+        ParentFont = False
+        TabOrder = 3
+        OnClick = SGrid1Click
+        OnDblClick = SGrid1DblClick
+        OnDrawCell = SGrid1DrawCell
+        ColWidths = (
+          14
+          32
+          164
+          37
+          51
+          149
+          157
+          46
+          37)
+      end
+    end
+  end
+  object Panel6: TPanel
+    Left = 0
+    Top = 0
+    Width = 1014
+    Height = 41
+    Align = alTop
+    TabOrder = 0
+    object GradRoundBtn1: TGradRoundBtn
+      left = 1
+      top = 1
+      width = 304
+      height = 39
+      Align = alLeft
+      BeginColor = clWhite
+      Caption = #51665#44228#54364' '#46321#47197
+      HighLightLineColor = clWhite
+      ShadowLineColor = clBlack
+      EndColor = clBackground
+      Font.Charset = HANGEUL_CHARSET
+      Font.Color = clWhite
+      Font.Height = -19
+      Font.Name = #44404#47548#52404
+      Font.Style = [fsBold]
+      GradType = gtVert
+      ImageIndex = 0
+      RoundDegree = 2
+      TextOffSetX = 0
+      MouseInBeginColor = clWhite
+      MouseInEndColor = clBackground
+    end
+    object InsertBtn: TGradRoundBtn
+      left = 819
+      top = 1
+      width = 97
+      height = 39
+      Cursor = crHandPoint
+      Align = alRight
+      BeginColor = clWhite
+      Caption = #51665#44228#54364#46321#47197
+      HighLightLineColor = clWhite
+      ShadowLineColor = clBlack
+      EndColor = 14348255
+      Font.Charset = HANGEUL_CHARSET
+      Font.Color = clNavy
+      Font.Height = -13
+      Font.Name = #44404#47548#52404
+      Font.Style = [fsBold]
+      GradType = gtVert
+      ImageIndex = 0
+      RoundDegree = 3
+      TextOffSetX = 0
+      MouseInBeginColor = clWhite
+      MouseInEndColor = 13495034
+      OnClick = InsertBtnClick
+    end
+    object CloseBtn: TGradRoundBtn
+      left = 916
+      top = 1
+      width = 97
+      height = 39
+      Cursor = crHandPoint
+      Align = alRight
+      BeginColor = clWhite
+      Caption = #51333' '#47308
+      HighLightLineColor = clWhite
+      ShadowLineColor = clBlack
+      EndColor = 14348255
+      Font.Charset = HANGEUL_CHARSET
+      Font.Color = clNavy
+      Font.Height = -13
+      Font.Name = #44404#47548#52404
+      Font.Style = [fsBold]
+      GradType = gtVert
+      ImageIndex = 0
+      RoundDegree = 3
+      TextOffSetX = 0
+      MouseInBeginColor = clWhite
+      MouseInEndColor = 13495034
+      OnClick = CloseBtnClick
+    end
+    object BcStratBtn: TGradRoundBtn
+      left = 722
+      top = 1
+      width = 97
+      height = 39
+      Cursor = crHandPoint
+      Align = alRight
+      BeginColor = clWhite
+      Caption = 'BC'#49688#49888#51312#54924
+      HighLightLineColor = clWhite
+      ShadowLineColor = clBlack
+      EndColor = 14348255
+      Font.Charset = HANGEUL_CHARSET
+      Font.Color = clNavy
+      Font.Height = -13
+      Font.Name = #44404#47548#52404
+      Font.Style = [fsBold]
+      GradType = gtVert
+      ImageIndex = 0
+      RoundDegree = 3
+      TextOffSetX = 0
+      MouseInBeginColor = clWhite
+      MouseInEndColor = 13495034
+      OnClick = BcStratBtnClick
+    end
+  end
+  object MesgStatusBar: TStatusBar
+    Left = 0
+    Top = 666
+    Width = 1014
+    Height = 21
+    Panels = <>
+    SimplePanel = False
+  end
+  object Panel16: TPanel
+    Left = 0
+    Top = 41
+    Width = 425
+    Height = 625
+    Align = alLeft
+    BevelInner = bvLowered
+    Caption = 'Panel16'
+    TabOrder = 3
+    object Panel17: TPanel
+      Left = 2
+      Top = 161
+      Width = 421
+      Height = 32
+      Align = alTop
+      Alignment = taLeftJustify
+      Caption = '  '#52636#44256' '#50696#50557' '#54788#54889
+      Color = 15113096
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clWhite
+      Font.Height = -13
+      Font.Name = #44404#47548#52404
+      Font.Style = [fsBold]
+      ParentFont = False
+      TabOrder = 0
+      object InitBtn: TGradRoundBtn
+        left = 323
+        top = 1
+        width = 97
+        height = 30
+        Cursor = crHandPoint
+        Align = alRight
+        BeginColor = clWhite
+        Caption = #52488#44592#54868
+        HighLightLineColor = clWhite
+        ShadowLineColor = clBlack
+        EndColor = 14348255
+        Font.Charset = HANGEUL_CHARSET
+        Font.Color = clNavy
+        Font.Height = -13
+        Font.Name = #44404#47548#52404
+        Font.Style = [fsBold]
+        GradType = gtVert
+        ImageIndex = 0
+        RoundDegree = 3
+        TextOffSetX = 0
+        MouseInBeginColor = clWhite
+        MouseInEndColor = 13495034
+        OnClick = InitBtnClick
+      end
+      object AutoBtn: TGradRoundBtn
+        left = 226
+        top = 1
+        width = 97
+        height = 30
+        Cursor = crHandPoint
+        Align = alRight
+        BeginColor = clWhite
+        Caption = #51088#46041#49444#51221
+        HighLightLineColor = clWhite
+        ShadowLineColor = clBlack
+        EndColor = 14348255
+        Font.Charset = HANGEUL_CHARSET
+        Font.Color = clNavy
+        Font.Height = -13
+        Font.Name = #44404#47548#52404
+        Font.Style = [fsBold]
+        GradType = gtVert
+        ImageIndex = 0
+        RoundDegree = 3
+        TextOffSetX = 0
+        MouseInBeginColor = clWhite
+        MouseInEndColor = 13495034
+        OnClick = AutoBtnClick
+      end
+    end
+    object SGrid: TStringGrid
+      Left = 2
+      Top = 193
+      Width = 421
+      Height = 430
+      Align = alClient
+      ColCount = 7
+      DefaultColWidth = 30
+      DefaultRowHeight = 20
+      RowCount = 17
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clNavy
+      Font.Height = -13
+      Font.Name = #44404#47548#52404
+      Font.Style = [fsBold]
+      Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goRowSelect]
+      ParentFont = False
+      TabOrder = 1
+      OnDrawCell = SGridDrawCell
+      ColWidths = (
+        30
+        71
+        31
+        51
+        80
+        146
+        226)
+    end
+    object Panel11: TPanel
+      Left = 2
+      Top = 2
+      Width = 421
+      Height = 159
+      Align = alTop
+      TabOrder = 2
+      object DateTimePk: TDateTimePicker
+        Left = 116
+        Top = 40
+        Width = 113
+        Height = 21
+        CalAlignment = dtaLeft
+        Date = 38692.6294334028
+        Time = 38692.6294334028
+        DateFormat = dfShort
+        DateMode = dmComboBox
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = #44404#47548#52404
+        Font.Style = [fsBold]
+        ImeName = #54620#44397#50612'('#54620#44544') (MS-IME98)'
+        Kind = dtkDate
+        ParseInput = False
+        ParentFont = False
+        TabOrder = 0
+      end
+      object Panel2: TPanel
+        Left = 16
+        Top = 40
+        Width = 97
+        Height = 21
+        BevelOuter = bvNone
+        Caption = #51068'  '#51088
+        Color = clBackground
+        Font.Charset = HANGEUL_CHARSET
+        Font.Color = clWhite
+        Font.Height = -13
+        Font.Name = #44404#47548#52404
+        Font.Style = [fsBold]
+        ParentFont = False
+        TabOrder = 1
+      end
+      object Panel8: TPanel
+        Left = 16
+        Top = 64
+        Width = 97
+        Height = 21
+        BevelOuter = bvNone
+        Caption = #52264#47049#49692#48264
+        Color = clBackground
+        Font.Charset = HANGEUL_CHARSET
+        Font.Color = clWhite
+        Font.Height = -13
+        Font.Name = #44404#47548#52404
+        Font.Style = [fsBold]
+        ParentFont = False
+        TabOrder = 2
+      end
+      object JpNoEdit: TEdit
+        Left = 117
+        Top = 64
+        Width = 81
+        Height = 21
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = #44404#47548#52404
+        Font.Style = [fsBold]
+        ImeName = #54620#44397#50612'('#54620#44544') (MS-IME98)'
+        MaxLength = 4
+        ParentFont = False
+        TabOrder = 3
+      end
+      object GateCB: TComboBox
+        Left = 118
+        Top = 88
+        Width = 57
+        Height = 21
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = #44404#47548#52404
+        Font.Style = [fsBold]
+        ImeName = #54620#44397#50612'('#54620#44544') (MS-IME98)'
+        ItemHeight = 13
+        MaxLength = 1
+        ParentFont = False
+        TabOrder = 4
+        Items.Strings = (
+          '1'
+          '2')
+      end
+      object Panel5: TPanel
+        Left = 16
+        Top = 88
+        Width = 97
+        Height = 21
+        BevelOuter = bvNone
+        Caption = 'GATE'
+        Color = clBackground
+        Font.Charset = HANGEUL_CHARSET
+        Font.Color = clWhite
+        Font.Height = -13
+        Font.Name = #44404#47548#52404
+        Font.Style = [fsBold]
+        ParentFont = False
+        TabOrder = 5
+      end
+      object Panel12: TPanel
+        Left = 1
+        Top = 1
+        Width = 419
+        Height = 24
+        Align = alTop
+        Alignment = taLeftJustify
+        Caption = '  '#46321#47197' '#51221#48372
+        Color = 15113096
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWhite
+        Font.Height = -13
+        Font.Name = #44404#47548
+        Font.Style = [fsBold]
+        ParentFont = False
+        TabOrder = 6
+      end
+    end
+  end
+  object Frm4201_db: TADOConnection
+    ConnectionString = 
+      'Provider=SQLOLEDB.1;Password=stk;Persist Security Info=True;User' +
+      ' ID=sa;Initial Catalog=MSeatStk_DB;Data Source=MSEATSTK'
+    LoginPrompt = False
+    Provider = 'SQLOLEDB.1'
+    Left = 344
+    Top = 8
+  end
+  object BCQuery: TADOQuery
+    Connection = Frm4201_db
+    Parameters = <>
+    Left = 376
+    Top = 8
+  end
+  object Query2: TADOQuery
+    Connection = Frm4201_db
+    Parameters = <>
+    SQL.Strings = (
+      '')
+    Left = 592
+    Top = 8
+  end
+  object Query3: TADOQuery
+    Connection = Frm4201_db
+    Parameters = <>
+    SQL.Strings = (
+      '')
+    Left = 624
+    Top = 8
+  end
+  object updateQuery: TADOQuery
+    Connection = Frm4201_db
+    Parameters = <>
+    SQL.Strings = (
+      '')
+    Left = 560
+    Top = 8
+  end
+  object DataSource1: TDataSource
+    DataSet = LocaQuery
+    Left = 496
+    Top = 8
+  end
+  object LocaQuery: TADOQuery
+    Connection = Frm4201_db
+    Parameters = <>
+    SQL.Strings = (
+      'SELECT T1.LOCA, T1.FLAG, T1.WCODE, T1.PCODE, '
+      '  T2.NAME AS NAME, T1.PLTID, T1.PLTSN, INDATE  '
+      '  FROM   MILSTK T1 (NOLOCK) LEFT OUTER JOIN '
+      '     MIMAST T2 ON T2.WCODE = T1.WCODE ')
+    Left = 528
+    Top = 8
+    object LocaQueryLOCA: TStringField
+      FieldName = 'LOCA'
+      EditMask = 'AA-AA-AA;0;_'
+      FixedChar = True
+      Size = 6
+    end
+    object LocaQueryFLAG: TStringField
+      FieldName = 'FLAG'
+      Size = 1
+    end
+    object LocaQueryWCODE: TStringField
+      FieldName = 'WCODE'
+      Size = 18
+    end
+    object LocaQueryPCODE: TStringField
+      FieldName = 'PCODE'
+      Size = 18
+    end
+    object LocaQueryNAME: TStringField
+      FieldName = 'NAME'
+    end
+    object LocaQueryPLTID: TStringField
+      FieldName = 'PLTID'
+      Size = 10
+    end
+    object LocaQueryPLTSN: TStringField
+      FieldName = 'PLTSN'
+      Size = 12
+    end
+    object LocaQueryINDATE: TStringField
+      FieldName = 'INDATE'
+      EditMask = 'AAAA-AA-AA-AA:AA:AA;0;_'
+      Size = 14
+    end
+  end
+end

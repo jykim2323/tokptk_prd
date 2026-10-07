@@ -1,0 +1,1518 @@
+unit Frm6900;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
+  Dialogs, Grids, DBGrids, StdCtrls, Mask, Buttons, ExtCtrls, DB, ADODB,
+  DBTables, QRCtrls, QuickRpt, BaseGrid, AdvGrid;
+
+type
+  TFrm_6900 = class(TForm)
+    GroupBox1: TGroupBox;
+    Panel12: TPanel;
+    LocaMEd: TMaskEdit;
+    DBGrid1: TDBGrid;
+    DataSource1: TDataSource;
+    DataSource2: TDataSource;
+    Panel2: TPanel;
+    Shape2: TShape;
+    Label1: TLabel;
+    Panel4: TPanel;
+    Panel1: TPanel;
+    StartSpdBtn: TBitBtn;
+    DeleteBitBtn: TBitBtn;
+    Panel6: TPanel;
+    StockEd: TEdit;
+    SubkQuery: TADOQuery;
+    UpdtQuery: TADOQuery;
+    SubkQuery2: TADOQuery;
+    SubkQuery2SUBK_LOCA: TStringField;
+    SubkQuery2SUBK_FLAG: TStringField;
+    SubkQuery2SUBK_CODE: TStringField;
+    SubkQuery2SUBK_GUBUN: TStringField;
+    SubkQuery2SUBK_INDATE: TStringField;
+    SubkQuery2SUBK_INTIME: TStringField;
+    SubkQuery2MAST_NAME: TStringField;
+    SubkQuery2SUBK_WGT: TBCDField;
+    SubkQuery2SUBK_RWGT: TBCDField;
+    SubkQuery2SUBK_LOTNO: TStringField;
+    ExitBitBtn: TBitBtn;
+    QuickRep1: TQuickRep;
+    QRBand2: TQRBand;
+    QRExpr1: TQRExpr;
+    QRBand3: TQRBand;
+    QRDBText1: TQRDBText;
+    QRDBText2: TQRDBText;
+    QRDBText3: TQRDBText;
+    QRDBText5: TQRDBText;
+    QRDBText8: TQRDBText;
+    QRDBText9: TQRDBText;
+    QRDBText4: TQRDBText;
+    QRDBText6: TQRDBText;
+    QRDBText7: TQRDBText;
+    QRBand4: TQRBand;
+    QRLbl_DateTime: TQRLabel;
+    QRBand1: TQRBand;
+    QRLabel11: TQRLabel;
+    QRLbl_Code: TQRLabel;
+    QRBand5: TQRBand;
+    QRLabel3: TQRLabel;
+    QRLabel8: TQRLabel;
+    QRLabel6: TQRLabel;
+    QRLabel12: TQRLabel;
+    QRLabel13: TQRLabel;
+    QRLabel2: TQRLabel;
+    QRLabel5: TQRLabel;
+    QRLabel9: TQRLabel;
+    QRLabel1: TQRLabel;
+    QRLabel4: TQRLabel;
+    QRDBText10: TQRDBText;
+    SubkQuery2subk_remark: TStringField;
+    SubkQuery2GUBN1_Name: TStringField;
+    SubkQuery2GUBN2_Name: TStringField;
+    SubkQuery2GUBN3_Name: TStringField;
+    QRLabel7: TQRLabel;
+    QRLabel14: TQRLabel;
+    QRLabel15: TQRLabel;
+    QRDBText11: TQRDBText;
+    QRDBText12: TQRDBText;
+    QRDBText13: TQRDBText;
+    SubkQuery2SUBK_BOXNO: TStringField;
+    SubkQuery2SUBK_PLTNO: TStringField;
+    SubkQuerySUBK_PLTNO: TStringField;
+    SubkQuerySUBK_FLAG: TStringField;
+    SubkQuerySUBK_LOCA: TStringField;
+    SubkQueryCODE_CNT: TIntegerField;
+    SubkQueryIN_DATE_TIME: TStringField;
+    Panel3: TPanel;
+    PltNoEdit: TEdit;
+    InsertBitBtn: TBitBtn;
+    MilstkBitBtn: TBitBtn;
+    AddBitBtn: TBitBtn;
+    AdvSGrid: TAdvStringGrid;
+    ChkQuery: TADOQuery;
+    UpdateBitBtn: TBitBtn;
+    regBitBtn: TBitBtn;
+    SB_AllView: TSpeedButton;
+    procedure FormCreate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormDestroy(Sender: TObject);
+    procedure StartSpdBtnClick(Sender: TObject);
+    procedure DataSource1DataChange(Sender: TObject; Field: TField);
+    procedure T2Misubk_Select_Proc;
+    procedure lstkDeleteBitBtnClick(Sender: TObject);
+    procedure DataSource2DataChange(Sender: TObject; Field: TField);
+    procedure InsertBitBtnClick(Sender: TObject);
+    procedure UpdateBitBtnClick(Sender: TObject);
+    procedure DeleteBitBtnClick(Sender: TObject);
+    procedure PrintBitBtnClick(Sender: TObject);
+    procedure ExitBitBtnClick(Sender: TObject);
+    procedure Cntl_LocationSelect_proc;
+    procedure LocaMEdKeyPress(Sender: TObject; var Key: Char);
+    procedure SubkQueryLSTK_FLAGGetText(Sender: TField; var Text: String;
+      DisplayText: Boolean);
+    procedure SubkQuery2SUBK_GUBUNGetText(Sender: TField; var Text: String;
+      DisplayText: Boolean);
+    procedure SeltCBChange(Sender: TObject);
+    procedure SubkQuery2SUBK_FLAGGetText(Sender: TField; var Text: String;
+      DisplayText: Boolean);
+    procedure DBGrid1DrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure PltNoEditKeyPress(Sender: TObject; var Key: Char);
+    procedure MilstkBitBtnClick(Sender: TObject);
+    procedure AddBitBtnClick(Sender: TObject);
+    procedure AdvSGridCheckBoxClick(Sender: TObject; ACol, ARow: Integer;
+      State: Boolean);
+    procedure AdvSGridGetAlignment(Sender: TObject; ARow, ACol: Integer;
+      var HAlign: TAlignment; var VAlign: TVAlignment);
+    procedure AdvSGridDrawCell(Sender: TObject; ACol, ARow: Integer;
+      Rect: TRect; State: TGridDrawState);
+    procedure AdvSGridClick(Sender: TObject);
+    procedure UseConfirmBtnClick(Sender: TObject);
+    procedure UseCloseBtnClick(Sender: TObject);
+    procedure regBitBtnClick(Sender: TObject);
+    procedure AdvSGridGetCellColor(Sender: TObject; ARow, ACol: Integer;
+      AState: TGridDrawState; ABrush: TBrush; AFont: TFont);
+    procedure SB_AllViewClick(Sender: TObject);
+  private
+    { Private declarations }
+    procedure Data_Grid_Clear;
+    function Check_Plt_Validity(sPltNo: String): Boolean; // 유효성 검사
+  public
+    { Public declarations }
+  end;
+
+var
+  Frm_6900: TFrm_6900;
+
+  StrCode : String;
+  Var_Form : TForm;
+  Bol_Modal : Boolean;
+  Bol_Data_Ok : Boolean;
+
+  var_SelForm : TForm;
+  var_Modal : Boolean;
+
+  s_loca, s_pltno, s_code, s_cvcod, s_lotno, s_ttl_qty, s_flag, var_lot : String;
+  lk_qty, lk_amt, sk_qty, sk_amt : Real;
+
+implementation
+
+uses WinLib, FrmPrompt, FrmError, SFrm6110, SFrm6120,  SFrm6130, FrmProgress, MainMenu_u,
+  SFrm6910;
+
+{$R *.dfm}
+
+procedure TFrm_6900.FormCreate(Sender: TObject);
+begin
+
+  // 혹시 모를 추가 설정
+  AdvSGrid.Options := AdvSGrid.Options + [goEditing];
+
+  if (jj_kind <> '50') then
+  begin
+    InsertBitBtn.Visible      := False;
+    DeleteBitBtn.Visible      := False;
+  end;
+
+  Data_Grid_Clear;
+
+
+  StartSpdBtnClick(Self);
+end;
+
+procedure TFrm_6900.SeltCBChange(Sender: TObject);
+begin
+   StartSpdBtnClick(Self);
+end;
+
+procedure TFrm_6900.Data_Grid_Clear;
+begin
+  With AdvSGrid Do Begin
+    Clear;
+    RowCount := 2;
+    ColCount := 8;
+    
+    FixedRows := 1;
+    FixedCols := 0;
+
+    Cells[1,0] := 'NO';
+    Cells[2,0] := '선 택';
+    Cells[3,0] := 'PLT-NO';
+    Cells[4,0] := '상 태';
+    Cells[5,0] := '위 치';
+    Cells[6,0] := '품목수';
+    Cells[7,0] := '입고일시';
+
+    ColWidths[0] := 0;    
+    ColWidths[1] := 40;
+    ColWidths[2] := 50;
+    ColWidths[3] := 120;
+    ColWidths[4] := 0;
+    ColWidths[5] := 90;   
+    ColWidths[6] := 60;
+    ColWidths[7] := 140;  
+  End;
+end;
+
+{
+procedure TFrm_6900.StartSpdBtnClick(Sender: TObject);
+var
+  iRow : Integer;
+  ls_sql : String;
+  ls_locamed, ls_pltno : String;
+  ls_loca_fmt, ls_org_loca : String;
+begin
+  Data_Grid_Clear;
+
+  ls_locamed := Trim(LocaMEd.Text);
+  ls_pltno   := Trim(PltNoEdit.Text);
+  While Pos('-', ls_locamed ) > 0  Do Begin Delete(ls_locamed,  Pos('-', ls_locamed),  1); End;
+
+  ls_sql := ' SELECT ';
+  ls_sql := ls_sql + '   A.SUBK_PLTNO, ';
+  ls_sql := ls_sql + '   CASE ';
+  //ls_sql := ls_sql + '     WHEN SUM(CASE WHEN A.SUBK_FLAG = ''Y'' THEN 1 ELSE 0 END) > 0 THEN ''Y'' ';
+  //ls_sql := ls_sql + '     ELSE '''' END AS SUBK_FLAG, ';
+  ls_sql := ls_sql + '     WHEN SUM(CASE WHEN A.SUBK_FLAG = ''N'' THEN 1 ELSE 0 END) > 0 THEN ''N'' ';
+  ls_sql := ls_sql + '     ELSE '''' END AS SUBK_FLAG, ';
+  //ls_sql := ls_sql + '   A.SUBK_FLAG, ';
+  ls_sql := ls_sql + '   A.SUBK_LOCA, ';
+  ls_sql := ls_sql + '   COUNT(A.SUBK_CODE) AS CODE_CNT, ';
+  ls_sql := ls_sql + '   CASE WHEN LEN(RTRIM(ISNULL(MAX(A.SUBK_INDATE),''''))) = 8 ';
+  ls_sql := ls_sql + '        THEN SUBSTRING(RTRIM(MAX(A.SUBK_INDATE)),1,4)+''-''+SUBSTRING(RTRIM(MAX(A.SUBK_INDATE)),5,2)+''-''+SUBSTRING(RTRIM(MAX(A.SUBK_INDATE)),7,2) ';
+  ls_sql := ls_sql + '        ELSE NULL END AS IN_DATE_TIME ';
+  ls_sql := ls_sql + ' FROM T2MISUBK A WITH (NOLOCK) WHERE 1=1 ';
+
+
+  // [수정 핵심] 검색 조건 분기 처리
+  
+  // 1. PLTNO가 입력된 경우 -> PLTNO 검색 우선 (보통 특정 파렛트를 찾으려는 목적이므로)
+  if ls_pltno <> '' then
+  begin
+     ls_sql := ls_sql + ' AND A.SUBK_PLTNO LIKE ''%' + ls_pltno + '%'' ';
+     
+     // PLTNO 검색 시에도 LOCA 조건을 범위로 걸고 싶다면 아래 주석 해제
+     // if ls_locamed <> '' then ls_sql := ls_sql + ' AND A.SUBK_LOCA >= ''' + ls_locamed + ''' ';
+  end
+  // 2. PLTNO 없고, LOCA만 입력된 경우 -> Frm6100처럼 해당 위치부터 쭉 조회 (범위 검색)
+  else if ls_locamed <> '' then
+  begin
+     ls_sql := ls_sql + ' AND A.SUBK_LOCA >= ''' + ls_locamed + ''' ';
+  end;
+
+  // (둘 다 비어있으면 전체 조회가 되거나, 기본 위치부터 조회됨)
+
+  ls_sql := ls_sql + ' GROUP BY A.SUBK_PLTNO, A.SUBK_LOCA ';
+  ls_sql := ls_sql + ' ORDER BY A.SUBK_LOCA, A.SUBK_PLTNO ';
+  with subkQuery do 
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add(ls_sql);
+    Open;
+    First;
+
+    iRow := 0;
+
+    while True do
+    begin
+      if Eof = True then break;
+      inc(iRow);
+      
+      AdvSGrid.Cells[1, iRow] := IntToStr(iRow);
+      AdvSGrid.Cells[3, iRow] := FieldByName('SUBK_PLTNO').AsString;
+      AdvSGrid.Cells[4, iRow] := FieldByName('SUBK_FLAG').AsString;
+      
+      ls_org_loca := Trim(FieldByName('SUBK_LOCA').AsString);
+
+      if Length(ls_org_loca) = 4 then
+        ls_loca_fmt := Copy(ls_org_loca, 1, 1) + '-' + Copy(ls_org_loca, 2, 2) + '-' + Copy(ls_org_loca, 4, 1)
+      else
+        ls_loca_fmt := ls_org_loca;
+      AdvSGrid.Cells[5, iRow] := ls_loca_fmt;
+      AdvSGrid.Cells[6, iRow] := FieldByName('CODE_CNT').AsString;
+      AdvSGrid.Cells[7, iRow] := FieldByName('IN_DATE_TIME').AsString;
+
+      AdvSGrid.AddCheckBox(2, iRow, False, False);
+      AdvSGrid.RowCount := iRow + 1;
+      
+      Next;
+    end;
+    
+    if RecordCount > 0 then
+    begin
+       First;
+       ls_org_loca := Trim(FieldByName('SUBK_LOCA').AsString);
+
+       // [수정 코드]
+       // 마스크 에디트는 '하이픈을 뺀 알맹이 데이터'만 넣어주면 알아서 포맷을 맞춥니다.
+       // 그냥 DB값 그대로 넣으세요.
+       LocaMEd.Text := ls_org_loca;
+
+    end;
+  end;
+
+
+  T2MISUBK_Select_Proc;
+end;
+}
+
+procedure TFrm_6900.StartSpdBtnClick(Sender: TObject);
+var
+  iRow : Integer;
+  ls_sql : String;
+  ls_locamed, ls_pltno : String;
+  ls_loca_fmt, ls_org_loca : String;
+begin
+  Data_Grid_Clear; // 상단 그리드 초기화
+
+  // 1. 입력값 정리 (공백 및 특수문자 제거)
+  ls_locamed := Trim(LocaMEd.Text);
+  ls_pltno   := Trim(PltNoEdit.Text);
+  
+  // 탭, 엔터 등 보이지 않는 문자 제거 (복사 붙여넣기 오류 방지)
+  ls_pltno := StringReplace(ls_pltno, #13, '', [rfReplaceAll]);
+  ls_pltno := StringReplace(ls_pltno, #10, '', [rfReplaceAll]);
+  
+  While Pos('-', ls_locamed ) > 0  Do Begin Delete(ls_locamed,  Pos('-', ls_locamed),  1); End;
+
+  // 2. 기본 쿼리 생성 (날짜 변환 안전장치 포함)
+  ls_sql := ' SELECT ';
+  ls_sql := ls_sql + '   A.SUBK_PLTNO, ';
+  ls_sql := ls_sql + '   CASE ';
+  ls_sql := ls_sql + '      WHEN SUM(CASE WHEN A.SUBK_FLAG = ''N'' THEN 1 ELSE 0 END) > 0 THEN ''N'' ';
+  ls_sql := ls_sql + '      ELSE '''' END AS SUBK_FLAG, ';
+  ls_sql := ls_sql + '   A.SUBK_LOCA, ';
+  ls_sql := ls_sql + '   COUNT(A.SUBK_CODE) AS CODE_CNT, ';
+  
+  // [데이터 안전장치] 날짜 컬럼에 이상한 값이 있어도 에러 안 나게 처리
+  ls_sql := ls_sql + '   CASE ';
+  ls_sql := ls_sql + '      WHEN LEN(RTRIM(ISNULL(MAX(A.SUBK_INDATE),''''))) = 8 ';
+  ls_sql := ls_sql + '           AND ISNUMERIC(MAX(A.SUBK_INDATE)) = 1 '; // 숫자인지 확인
+  ls_sql := ls_sql + '      THEN SUBSTRING(RTRIM(MAX(A.SUBK_INDATE)),1,4)+''-''+SUBSTRING(RTRIM(MAX(A.SUBK_INDATE)),5,2)+''-''+SUBSTRING(RTRIM(MAX(A.SUBK_INDATE)),7,2) ';
+  ls_sql := ls_sql + '      ELSE '''' END AS IN_DATE_TIME '; 
+  
+  ls_sql := ls_sql + ' FROM T2MISUBK A WITH (NOLOCK) WHERE 1=1 '; // 무조건 참인 조건 추가 (뒤에 AND 붙이기 용이함)
+
+  // ===========================================================================
+  // [수정된 조회 조건 로직]
+  // 1. PLTNO가 있으면 -> PLTNO로 검색 (LOCA 무시)
+  // 2. PLTNO가 없고, LOCA가 있으면 -> LOCA로 검색
+  // 3. 둘 다 없으면 -> WHERE 1=1 상태 유지 (전체 조회)
+  // ===========================================================================
+  
+  if ls_pltno <> '' then
+  begin
+      // PLT 번호가 입력된 경우
+      ls_sql := ls_sql + ' AND A.SUBK_PLTNO LIKE ''%' + ls_pltno + '%'' ';
+  end
+  else 
+  begin
+      // PLT 번호가 없는 경우 -> LOCA 확인
+      if ls_locamed <> '' then
+      begin
+          // LOCA가 있으면 해당 위치부터 조회 (범위 검색)
+          ls_sql := ls_sql + ' AND A.SUBK_LOCA >= ''' + ls_locamed + ''' ';
+      end;
+      
+      // LOCA도 없으면? -> 아무 조건도 안 붙음 -> 전체 조회 (WHERE 1=1)
+  end;
+  
+  ls_sql := ls_sql + ' GROUP BY A.SUBK_PLTNO, A.SUBK_LOCA ';
+  ls_sql := ls_sql + ' ORDER BY A.SUBK_LOCA, A.SUBK_PLTNO ';
+
+  with subkQuery do 
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add(ls_sql);
+    
+    // [에러 확인용] 작업자 PC 에러 시 메시지 출력
+    try
+      Open;
+    except
+      on E: Exception do
+      begin
+         ShowMessage('조회 중 에러 발생(캡처 요망): ' + E.Message); 
+         Exit;
+      end;
+    end;
+    
+    First;
+
+    iRow := 0;
+
+    while not Eof do
+    begin
+      inc(iRow);
+      
+      AdvSGrid.Cells[1, iRow] := IntToStr(iRow);
+      AdvSGrid.Cells[3, iRow] := FieldByName('SUBK_PLTNO').AsString;
+      AdvSGrid.Cells[4, iRow] := FieldByName('SUBK_FLAG').AsString;
+      
+      ls_org_loca := Trim(FieldByName('SUBK_LOCA').AsString);
+
+      // 위치 포맷팅 (4자리일 경우 1-11-1 형식)
+      if Length(ls_org_loca) = 4 then
+        ls_loca_fmt := Copy(ls_org_loca, 1, 1) + '-' + Copy(ls_org_loca, 2, 2) + '-' + Copy(ls_org_loca, 4, 1)
+      else
+        ls_loca_fmt := ls_org_loca;
+        
+      AdvSGrid.Cells[5, iRow] := ls_loca_fmt;
+      AdvSGrid.Cells[6, iRow] := FieldByName('CODE_CNT').AsString;
+      AdvSGrid.Cells[7, iRow] := FieldByName('IN_DATE_TIME').AsString;
+
+      AdvSGrid.AddCheckBox(2, iRow, False, False);
+      AdvSGrid.RowCount := iRow + 1;
+      
+      Next;
+    end;
+    
+    // 조회 결과가 있으면 첫 번째 행의 위치값을 에디트 박스에 표시 (편의 기능)
+    if RecordCount > 0 then
+    begin
+       First;
+       ls_org_loca := Trim(FieldByName('SUBK_LOCA').AsString);
+       
+       // 단, 사용자가 LOCA를 입력해서 조회했을 때만 갱신 (전체 조회나 PLT 조회 시에는 유지하거나 비움)
+       if ls_locamed <> '' then 
+          LocaMEd.Text := ls_org_loca;
+    end;
+  end;
+
+  // =========================================================
+  // [수정] 상세 내역 조회 분기 처리 (없는 파렛트 조회 시 하단 초기화)
+  // =========================================================
+  if subkQuery.RecordCount > 0 then
+  begin
+     // 데이터가 있으면 상세 조회 실행 (DBGrid1 갱신)
+     T2MISUBK_Select_Proc;
+  end
+  else
+  begin
+     // [추가] 데이터가 없으면 하단 그리드(DBGrid1) 및 재고량 초기화
+     SubkQuery2.Close;   // 쿼리를 닫으면 DBGrid1도 빈 화면이 됨
+     StockEd.Text := ''; // 재고 수량 에디트 초기화
+  end;
+end;
+function TFrm_6900.Check_Plt_Validity(sPltNo: String): Boolean;
+var
+  ls_sql: String;
+  li_cnt: Integer;
+begin
+  Result := False;
+  if Trim(sPltNo) = '' then Exit;
+
+  // 1. T2TBTRAK 확인 (이동 중 여부)
+  ls_sql := 'SELECT COUNT(*) AS CNT FROM T2TBTRAK WITH (NOLOCK) ' +
+            ' WHERE TRAK_PLTNO = ''' + sPltNo + ''' ';
+  with ChkQuery do
+  begin
+    Close; SQL.Clear; SQL.Add(ls_sql); Open;
+    li_cnt := Fields[0].AsInteger;
+  end;
+
+  if li_cnt > 0 then
+  begin
+    WinLib_ErrorForm('[' + sPltNo + '] 해당 PLT-NO는 현재 입/출고 작업이 진행 중입니다.');
+    Exit;
+  end;
+
+  // 2. T2MILSTK 확인 (재고 등록 여부)
+  ls_sql := 'SELECT COUNT(*) AS CNT FROM T2MILSTK WITH (NOLOCK) ' +
+            ' WHERE LSTK_PLTNO = ''' + sPltNo + ''' ';
+  with ChkQuery do
+  begin
+    Close; SQL.Clear; SQL.Add(ls_sql); Open;
+    li_cnt := Fields[0].AsInteger;
+  end;
+  
+  // (질문 의도대로 재고 테이블에 있으면 안됨)
+  if li_cnt > 0 then
+  begin
+    //WinLib_ErrorForm('[' + sPltNo + '] 이미 랙 재고로 등록된 파레트입니다.');      // 고객사 요청으로 주석
+    Exit;
+  end;
+  
+  // 3. T2MISUBK 위치 확인 (LOCA가 비어있지 않으면 에러)
+  ls_sql := ' SELECT TOP 1 SUBK_LOCA FROM T2MISUBK WITH (NOLOCK) ' +
+            ' WHERE SUBK_PLTNO = ''' + sPltNo + ''' ';
+  with ChkQuery do
+  begin
+    Close; SQL.Clear; SQL.Add(ls_sql); Open;
+    
+    if RecordCount > 0 then
+    begin
+       // 위치 정보가 있으면(랙에 있거나 지정된 위치가 있으면) 불가
+       if Trim(FieldByName('SUBK_LOCA').AsString) <> '' then
+       begin
+          WinLib_ErrorForm('[' + sPltNo + '] 위치(' + FieldByName('SUBK_LOCA').AsString + ')가 지정된 파레트는 선택할 수 없습니다.');
+          Exit;
+       end;
+    end;
+  end;
+
+  Result := True;
+end;
+
+procedure TFrm_6900.AdvSGridCheckBoxClick(Sender: TObject; ACol, ARow: Integer; State: Boolean);
+var
+  i, CheckCnt: Integer;
+  sSelPlt: String;
+  TempState: Boolean;
+begin
+  if ACol <> 2 then Exit;
+
+
+  // 체크 해제 시 처리
+  if not State then
+  begin
+    // 현재 남은 체크 개수 확인 (자기 자신은 이미 False로 넘어왔지만 안전하게 다시 루프)
+    CheckCnt := 0;
+    for i := 1 to AdvSGrid.RowCount - 1 do
+    begin
+      if (i <> ARow) then // 자기 자신 제외하고 카운트
+      begin
+        if AdvSGrid.GetCheckBoxState(2, i, TempState) and TempState then
+          Inc(CheckCnt);
+      end;
+    end;
+  end;
+
+  // 체크 시도 시 처리
+
+  // 현재 체크된 개수 확인
+  CheckCnt := 0;
+  for i := 1 to AdvSGrid.RowCount - 1 do
+  begin
+    if (i <> ARow) then // 자기 자신 제외
+    begin
+      if AdvSGrid.GetCheckBoxState(2, i, TempState) and TempState then
+        Inc(CheckCnt);
+    end;
+  end;
+
+  // 2개 초과 제한
+  if CheckCnt >= 2 then
+  begin
+    //WinLib_ErrorForm('최대 2개까지만 선택할 수 있습니다.');  // 고객사 요청
+    AdvSGrid.SetCheckBoxState(2, ARow, False);
+    Exit;
+  end;
+
+  // B-3. 선택한 PLTNO 유효성 검사
+  sSelPlt := AdvSGrid.Cells[3, ARow]; // 3번 컬럼이 PLT-NO
+
+  if not Check_Plt_Validity(sSelPlt) then
+  begin
+    AdvSGrid.SetCheckBoxState(2, ARow, False); // 실패 시 체크 해제
+    Exit;
+  end;
+end;
+
+procedure TFrm_6900.AdvSGridGetAlignment(Sender: TObject; ARow, ACol: Integer;
+  var HAlign: TAlignment; var VAlign: TVAlignment);
+begin
+  if ARow = 0 then HAlign := taCenter // 헤더
+  else
+  begin
+    // 데이터 셀 정렬
+    if ACol in [3, 5, 7] then HAlign := taCenter
+    else if ACol in [6] then HAlign := taRightJustify // 수량
+    else HAlign := taCenter;
+  end;
+end;
+
+procedure TFrm_6900.T2MISUBK_Select_Proc;
+var
+  li_Bqty, li_qty, bi_qty, bi_bqty : Real;
+  ls_locaMed, ls_pltno : String;
+begin
+    ls_locaMed := Trim(locaMEd.Text);
+    ls_pltno   := Trim(PltNoEdit.Text);
+    
+    While Pos('-', ls_locaMed) > 0 Do Begin Delete(ls_locaMed, Pos('-', ls_locaMed), 1); End;
+
+    with subkQuery2 do Begin
+      Close;
+      SQL.Clear;
+      SQL.Add(' SELECT SUBK_LOCA, SUBK_FLAG, SUBK_CODE, SUBK_GUBUN,  ');
+      SQL.Add('        SUBK_WGT, SUBK_RWGT, SUBK_LOTNO, SUBK_REMARK, SUBK_BOXNO, SUBK_PLTNO, ');
+      SQL.Add('        SUBK_INDATE, SUBK_INTIME, MAST_NAME, GUBN1_NAME, GUBN2_NAME, GUBN3_NAME ');
+      SQL.Add(' FROM T2MISUBK (NOLOCK)                                     ');
+      SQL.Add(' LEFT OUTER JOIN MIMAST  (NOLOCK) ON MAST_CODE = subk_code     ');
+      SQL.Add(' LEFT OUTER JOIN MIGUBN1 (NOLOCK) ON GUBN1_CODE = MAST_GUBN1  ');
+      SQL.Add(' LEFT OUTER JOIN MIGUBN2 (NOLOCK) ON GUBN2_CODE = MAST_GUBN2  ');
+      SQL.Add(' LEFT OUTER JOIN MIGUBN3 (NOLOCK) ON GUBN3_CODE = MAST_GUBN3  ');
+      SQL.Add(' WHERE SUBK_LOCA = ''' + ls_locaMed + ''' AND SUBK_PLTNO = ''' + ls_pltno + ''' ');
+      SQL.Add(' Order By subk_loca, subk_code                        ');
+      Open;
+      First;
+
+      li_qty := 0; // 초기화 습관
+      While Not Eof Do Begin
+        bi_qty  := FieldByName('SUBK_WGT').AsFloat;
+        li_qty  := li_qty + bi_qty;
+        Next;
+      End;
+    End;
+
+    StockEd.Text := FormatFloat('#,###,##0.00',li_qty);
+end;
+
+procedure TFrm_6900.DataSource1DataChange(Sender: TObject; Field: TField);
+begin
+    LocaMEd.Text  := subkQuery.FieldByName('SUBK_LOCA').AsString;
+    PltNoEdit.Text := subkQuery.FieldByName('SUBK_PLTNO').AsString;
+
+    s_Flag        := subkQuery.FieldByName('SUBK_FLAG').AsString;
+end;
+
+procedure TFrm_6900.lstkDeleteBitBtnClick(Sender: TObject);
+var
+  var_Msg : String;
+begin
+  var_Msg := ' 정말로 확정 합니까.?';
+  if WinLib_ConfirmForm( var_Msg ) then
+  begin
+    var_sql := ' Select * From T2MISUBK (NOLOCK) Where SUBK_LOCA   = '''+LocaMEd.Text+'''  ';
+    With UpdtQuery Do
+    Begin
+      Close;
+      SQL.Clear;
+      SQL.Add( var_sql );
+      Open;
+      if RecordCount > 0   then
+      Begin
+        var_Msg := ' 재고가 있습니다.확정 합니까? (재고가 지워집니다)';
+        if WinLib_ConfirmForm( var_Msg ) then
+        begin
+           var_sql := ' Delete From T2MISUBK Where SUBK_LOCA = '''+LocaMEd.Text+'''  ';
+           With UpdtQuery Do
+           Try
+             Close;
+             SQL.Clear;
+             SQL.Add( var_sql );
+             ExecSql;
+           Except
+             WinLib_ErrorForm('재고위치(T2MISUBK) ' + s_loca + ' 삭제 에러!!!! ');
+             Exit;
+           End;
+        end;
+      end;
+    End;
+
+    var_sql := 'Update T2MILSTK Set ';
+    var_sql := var_sql + ' LSTK_FLAG = ''0'',               ';   
+    var_sql := var_sql + ' LSTK_INDATE  = '''',             LSTK_INTIME  = '''' ';
+    var_sql := var_sql + ' , LSTK_PLTNO = '''' ';                   
+    var_sql := var_sql + ' Where LSTK_LOCA = '''+LocaMEd.Text+''' ';
+    With UpdtQuery Do
+    Try
+      Close;
+      SQL.Clear;
+      SQL.Add( var_sql );
+      ExecSql;
+    Except
+      WinLib_ErrorForm('재고위치 ' + LocaMEd.Text + ' 삭제 에러!!!! ');
+      Exit;
+    End;
+    subkQuery.ReQuery;
+//    StartSpdBtnClick(Self);
+  end;
+end;
+
+procedure TFrm_6900.DataSource2DataChange(Sender: TObject; Field: TField);
+begin
+   s_loca     := SubkQuery2.FieldByName('Subk_loca').AsString;
+   s_code     := SubkQuery2.FieldByName('Subk_code').AsString;
+   s_lotno    := SubkQuery2.FieldByName('Subk_lotno').AsString;
+   sk_qty     := SubkQuery2.FieldByName('SUBK_wgt').AsFloat;
+
+   s_pltno    := SubkQuery2.FieldByName('SUBK_PLTNO').AsString;
+end;
+
+procedure TFrm_6900.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action := caFree;
+end;
+
+procedure TFrm_6900.FormDestroy(Sender: TObject);
+begin
+  Frm_6900 := Nil;
+end;
+
+procedure TFrm_6900.Cntl_LocationSelect_proc;
+var
+  ls_date, ls_gubun, ls_flag : string;
+begin
+  //SFrm_6130.InTimeEd.Text       := SubkQuery.FieldByName('SUBK_INTIME').AsString;
+  SFrm_6130.InTimeEd.Text       := SubkQuery.FieldByName('IN_DATE_TIME').AsString;
+  //if SubkQuery.FieldByName('SUBK_INDATE').AsString <> '' Then
+  if SubkQuery.FieldByName('IN_DATE_TIME').AsString <> '' Then
+  begin
+    //ls_date := SubkQuery.FieldByName('SUBK_INDATE').AsString;
+    ls_date := SubkQuery.FieldByName('IN_DATE_TIME').AsString;
+
+    //ls_date := Copy(ls_date, 1, 4) + '-' +  Copy(ls_date, 5, 2) + '-' + Copy(ls_date, 7, 2);
+    SFrm_6130.InDateDTP.Date := StrToDate(ls_date);
+  end
+  else SFrm_6130.InDateDTP.Date := Now;
+
+
+  ls_flag  := SubkQuery.FieldByName('SUBK_FLAG').AsString;
+
+  if ls_flag = '0' then SFrm_6130.FlagCB.ItemIndex := 0 // 비어있음
+  else if ls_flag = '1' then SFrm_6130.FlagCB.ItemIndex := 1 // 재고있음
+  else if ls_flag = 'X' then SFrm_6130.FlagCB.ItemIndex := 2 // 입고대기
+  else if ls_flag = 'R' then SFrm_6130.FlagCB.ItemIndex := 3 // 재입고 대기
+  else if ls_flag = 'N' then SFrm_6130.FlagCB.ItemIndex := 4 // 금지
+  else SFrm_6130.FlagCB.ItemIndex := -1; // 기본값
+
+end;
+
+procedure TFrm_6900.InsertBitBtnClick(Sender: TObject);
+begin
+  MainMenu_f.MenuSelect(MainMenu_f.Mnu_3100);
+end;
+
+{
+procedure TFrm_6900.UpdateBitBtnClick(Sender: TObject);
+begin
+  Bol_Data_Ok := True;
+  Bol_Modal   := False;
+  Var_Form    := Nil;
+
+  SFrm_6130  := TSFrm_6130.Create(Application);
+  Bol_Modal := True;
+
+  SFrm_6130.Bol_Insert := False;
+  SFrm_6130.Bol_Update := True;
+  SFrm_6130.TitleLbl.Caption := '재고 데이터 수정';
+
+  SFrm_6130.LocaMed.Text :=LocaMEd.Text;
+  SFrm_6130.LocaMed.Enabled := False;
+
+  Cntl_LocationSelect_proc;
+
+  If SFrm_6130 <> Nil Then
+    With TForm(SFrm_6130) Do Begin
+      if Bol_Modal Then ShowModal
+      Else Begin
+        BorderIcons := [];
+        Show;
+      End;
+      SFrm_6130.Free;
+    End;
+    StartSpdBtnClick(Self);
+end;
+}
+
+procedure TFrm_6900.UpdateBitBtnClick(Sender: TObject);
+var
+  sDate, sFlag : String;
+  y, m, d : Word;
+begin
+  // 1. 선택된 데이터가 있는지 확인 (DBGrid1의 데이터셋인 SubkQuery2 기준)
+  if (SubkQuery2.Active = False) or (SubkQuery2.RecordCount = 0) then
+  begin
+    WinLib_ErrorForm('수정할 데이터가 없습니다.');
+    Exit;
+  end;
+  
+  // 필수 키값 확인 (PLTNO, CODE)
+  if (Trim(SubkQuery2.FieldByName('SUBK_PLTNO').AsString) = '') or
+     (Trim(SubkQuery2.FieldByName('SUBK_CODE').AsString) = '') then
+  begin
+     WinLib_ErrorForm('선택된 행의 정보가 불충분합니다.');
+     Exit;
+  end;
+
+  Bol_Data_Ok := True;
+  Bol_Modal   := False;
+  Var_Form    := Nil;
+
+  // 2. 팝업 폼 생성 (SFrm_6130)
+  SFrm_6130 := TSFrm_6130.Create(Application);
+  Bol_Modal := True;
+
+  // 3. 폼 설정 (수정 모드)
+  SFrm_6130.Bol_Insert := False;
+  SFrm_6130.Bol_Update := True;
+  SFrm_6130.TitleLbl.Caption := '재고 상세 수정'; 
+
+  // 4. [핵심] DBGrid1(SubkQuery2)의 데이터를 팝업창(SFrm_6130)으로 전송
+  with SFrm_6130 do
+  begin
+    // 4-1. Key 값 (수정 불가능하게 막음)
+    LocaMEd.Text         := SubkQuery2.FieldByName('SUBK_LOCA').AsString;
+    LocaMEd.Enabled      := False; // 위치 수정 불가 (PK)
+
+    ItemCodeMed.Text     := SubkQuery2.FieldByName('SUBK_CODE').AsString;
+    ItemCodeMed.Enabled  := False; // 코드 수정 불가 (PK)
+
+    LotnoEd.Text         := SubkQuery2.FieldByName('SUBK_LOTNO').AsString;
+    LotnoEd.Enabled      := False; // LOTNO 수정 불가 (PK)
+
+    PltNoEd.Text     := SubkQuery2.FieldByName('SUBK_PLTNO').AsString;
+    PltNoEd.Enabled  := False; // PK이므로 수정 못하게 막음
+
+    // 4-2. 일반 데이터 (수정 가능)
+    SpecEd.Text          := SubkQuery2.FieldByName('MAST_NAME').AsString;   // 품명
+    QtyEd.Text           := FloatToStr(SubkQuery2.FieldByName('SUBK_WGT').AsFloat); // 재고중량
+    RQtyEd.Text          := FloatToStr(SubkQuery2.FieldByName('SUBK_RWGT').AsFloat); // 예약중량
+    
+    // 비고
+    if SubkQuery2.FindField('SUBK_REMARK') <> nil then
+       BigoEd.Text       := SubkQuery2.FieldByName('SUBK_REMARK').AsString;
+
+    // BOXNO
+    BoxNoEd.Text         := SubkQuery2.FieldByName('SUBK_BOXNO').AsString;
+    
+    // 입고 시간
+    InTimeEd.Text        := SubkQuery2.FieldByName('SUBK_INTIME').AsString;
+
+    // 4-3. 입고 일자 처리
+    sDate := Trim(SubkQuery2.FieldByName('SUBK_INDATE').AsString);
+    if Length(sDate) = 8 then
+    begin
+       InDateDTP.Date := EncodeDate(StrToInt(Copy(sDate, 1, 4)), 
+                                    StrToInt(Copy(sDate, 5, 2)), 
+                                    StrToInt(Copy(sDate, 7, 2)));
+    end
+    else
+       InDateDTP.Date := Now; 
+
+    // 4-4. 상태(FLAG) 콤보박스 선택 로직 [수정됨]
+    // FlagCB Items: 0:바닥재고, 1:입고완료, 2:재입고대기, 3:금지
+    sFlag := SubkQuery2.FieldByName('SUBK_FLAG').AsString;
+    
+    if      sFlag = '0' then FlagCB.ItemIndex := 0 // 바닥재고
+    else if sFlag = '1' then FlagCB.ItemIndex := 1 // 입고완료
+    else if sFlag = 'R' then FlagCB.ItemIndex := 2 // 재입고대기
+    else if sFlag = 'N' then FlagCB.ItemIndex := 3 // 금지
+    else FlagCB.ItemIndex := 1; // 그 외 이상한 값은 '입고완료'로 기본 설정
+  end;
+
+  // 5. 폼 띄우기 및 결과 확인
+  try
+    if SFrm_6130.ShowModal = mrOk then
+    begin
+      // 수정 후 저장(mrOk)되었을 때만 새로고침 실행
+      StartSpdBtnClick(Self); 
+    end;
+  finally
+    SFrm_6130.Free;
+  end;
+end;
+
+procedure TFrm_6900.DeleteBitBtnClick(Sender: TObject);
+var
+  var_Msg : String;
+  ls_check_sql : String;
+begin
+  // 선택된 데이터가 있는지 확인 (PLTNO 체크 추가)
+  if (Trim(s_pltno) = '') or (Trim(s_code) = '') then
+  begin
+     WinLib_ErrorForm('삭제할 품목(파렛트)이 선택되지 않았습니다.');
+     Exit;
+  end;
+
+  var_Msg := '선택한 품목을 정말로 삭제 확정 합니까?';
+  if Not WinLib_ConfirmForm( var_Msg ) then Exit;
+
+  // 1. T2MISUBK (상세 재고) 삭제 실행
+  // [수정] 조건: PLTNO + CODE + LOTNO
+  var_sql := ' Delete From T2MISUBK ';
+  var_sql := var_sql + ' Where SUBK_PLTNO = ''' + s_pltno + ''' '; // LOCA -> PLTNO 변경
+  var_sql := var_sql + '   And SUBK_CODE  = ''' + s_code  + ''' ';
+  var_sql := var_sql + '   And SUBK_LOTNO = ''' + s_lotno + ''' ';
+
+  Try
+    With UpdtQuery Do Begin
+      Close;
+      SQL.Clear;
+      SQL.Add( var_sql );
+      ExecSql;
+    End;
+  Except
+    WinLib_ErrorForm('재고(PLT: ' + s_pltno + ') 삭제 에러!!!! ');
+    Exit;
+  End;
+
+
+  // 2. 해당 위치(LOCA)에 남은 재고가 있는지 확인
+  // (삭제는 PLTNO로 했더라도, 마스터 정리는 해당 위치가 비었는지 확인해야 하므로 LOCA 유지)
+  ls_check_sql := ' Select count(*) From T2MISUBK (NOLOCK) Where SUBK_LOCA = ''' + s_loca + ''' ';
+
+  With UpdtQuery Do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add( ls_check_sql );
+    Open;
+    
+    // 남은 재고가 0개라면 마스터 테이블 초기화 진행
+    if Fields[0].AsInteger = 0 then
+    begin
+       Close;
+       SQL.Clear;
+       var_sql := ' Update T2MILSTK Set ';
+       var_sql := var_sql + '     LSTK_FLAG   = ''0'', ';  // 0: 빈 셀
+       var_sql := var_sql + '     LSTK_INDATE = '''',  ';
+       var_sql := var_sql + '     LSTK_INTIME = '''',  ';
+       var_sql := var_sql + '     LSTK_PLTNO  = ''''   ';
+       var_sql := var_sql + ' Where LSTK_LOCA = ''' + s_loca + ''' '; 
+
+       Try
+         SQL.Add(var_sql);
+         ExecSql;
+       Except
+         WinLib_ErrorForm('재고위치 마스터(T2MILSTK) ' + s_loca + ' 초기화 에러!!!! ');
+         Exit;
+       End;
+    end;
+  End;
+
+  // 3. 화면 갱신
+  //StartSpdBtnClick(Self);
+  SB_AllViewClick(self);
+  
+  // WinLib_ErrorForm('삭제되었습니다.');
+end;
+
+procedure TFrm_6900.PrintBitBtnClick(Sender: TObject);
+begin
+  if MessageDlg(' 정말로 인쇄 합니까.?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+  begin
+      QRLbl_DateTime.Caption := DateTimeToStr( Now );
+      QuickRep1.Preview;
+//    QuickRep1.Print;
+  end;
+end;
+
+procedure TFrm_6900.ExitBitBtnClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TFrm_6900.LocaMEdKeyPress(Sender: TObject; var Key: Char);
+begin
+  If Key = #13 Then StartSpdBtnClick(Self);
+end;
+
+
+procedure TFrm_6900.SubkQueryLSTK_FLAGGetText(Sender: TField;
+  var Text: String; DisplayText: Boolean);
+begin
+   if Sender.Value = 'Y'  then Text := '출고'
+   else if Sender.Value = 'X'  then Text := '입고'
+   else if Sender.Value = '1'  then Text := '제품유'
+   else if Sender.Value = '0'  then Text := '빈셀'
+   else if Sender.Value = 'N'  then Text := '금지'
+   else if Sender.Value = 'W'  then Text := '이중'
+   else if Sender.Value = 'E'  then Text := '공출'
+   else if Sender.Value = 'R'  then Text := '재입고 대기'
+   else Text := '';
+end;
+
+procedure TFrm_6900.SubkQuery2SUBK_GUBUNGetText(Sender: TField;
+  var Text: String; DisplayText: Boolean);
+begin
+   if Sender.Value = 'Y'  then Text := '불량'
+   else if Sender.Value = 'N'  then Text := '정상'
+   else Text := '';
+end;   
+
+procedure TFrm_6900.SubkQuery2SUBK_FLAGGetText(Sender: TField;
+  var Text: String; DisplayText: Boolean);
+begin
+  if Sender.Value = '0' then Text := '바닥재고'
+  else if Sender.Value = '1' then Text := '입고완료'
+  else if Sender.Value = 'R' then Text := '재입고대기'
+  else if Sender.Value = 'N' then Text := '금지'
+  else Text := Sender.Value; // 그 외는 코드 그대로 표시
+
+end;
+
+procedure TFrm_6900.DBGrid1DrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn;
+  State: TGridDrawState);
+var
+    ls_use, Value, ls_rsrv : String;
+    WW     : Integer;
+    xDBGrid: TDBGrid;
+ begin
+  ls_rsrv :=  subkQuery2.FieldByName('SUBK_FLAG').AsString;
+  if  (ls_rsrv = 'Y') or (ls_rsrv = 'E') then
+  begin
+   with(Sender as TDBGrid).Canvas do
+    begin
+      Brush.Color := clYellow;
+      Font.Color  := clRed;
+      Canvas.Font.Style := [fsBold];
+      FillRect(Rect);
+    end;
+    DbGrid1.DefaultDrawColumnCell(Rect, DataCol, Column, State);
+  end;
+
+  if  (ls_rsrv = 'N') then
+  begin
+   with(Sender as TDBGrid).Canvas do
+    begin
+      Brush.Color := clRed;
+      Font.Color  := clWhite;
+      Canvas.Font.Style := [fsBold];
+      FillRect(Rect);
+    end;
+    DbGrid1.DefaultDrawColumnCell(Rect, DataCol, Column, State);
+  end;
+
+end;
+
+procedure TFrm_6900.PltNoEditKeyPress(Sender: TObject; var Key: Char);
+begin
+  If Key = #13 Then StartSpdBtnClick(Self);
+end;
+
+procedure TFrm_6900.MilstkBitBtnClick(Sender: TObject);
+begin
+  MainMenu_f.MenuSelect(MainMenu_f.Mnu_6100);
+end;
+
+
+procedure TFrm_6900.AddBitBtnClick(Sender: TObject);
+var
+  i, CheckCnt: Integer;
+  FirstPlt, SecondPlt: String;
+  bState: Boolean;
+begin
+  // 1. 체크된 파렛트 2개 확인
+  CheckCnt := 0;
+  FirstPlt := '';
+  SecondPlt := '';
+
+  for i := 1 to AdvSGrid.RowCount - 1 do
+  begin
+    if AdvSGrid.GetCheckBoxState(2, i, bState) and bState then
+    begin
+      Inc(CheckCnt);
+      if FirstPlt = '' then FirstPlt := AdvSGrid.Cells[3, i]
+      else SecondPlt := AdvSGrid.Cells[3, i];
+    end;
+  end;
+
+  if CheckCnt <> 2 then
+  begin
+    WinLib_ErrorForm('작업할 파렛트 2개를 선택해주세요.');
+    Exit;
+  end;
+
+  {
+  // 2. 이동/합짐 폼 띄우기
+  SFrm_6910 := TSFrm_6910.Create(Application);
+  try
+    // 폼 실행 (두 파렛트 번호 전달)
+    SFrm_6910.Execute(FirstPlt, SecondPlt);
+
+    // 저장 후 닫혔으면 화면 갱신
+    if SFrm_6910.ModalResult = mrOk then
+    begin
+      StartSpdBtnClick(Self); // 재조회
+    end;
+  finally
+    SFrm_6910.Free;
+  end;
+  }
+
+  // [수정] 여기가 핵심입니다.
+  SFrm_6910 := TSFrm_6910.Create(Application);
+  try
+    // 1. 데이터를 먼저 세팅합니다.
+    SFrm_6910.Execute(FirstPlt, SecondPlt);
+    
+    // 2. 폼을 띄우고(ShowModal), 닫힐 때 결과를 확인합니다.
+    // 사용자가 '저장'을 눌러서 ModalResult가 mrOk가 되었을 때만 실행됩니다.
+    if SFrm_6910.ShowModal = mrOk then
+    begin
+      StartSpdBtnClick(Self); // 여기서만 새로고침!
+    end;
+    
+  finally
+    SFrm_6910.Free;
+  end;
+
+
+
+
+
+end;
+
+{
+procedure TFrm_6900.AdvSGridDrawCell(Sender: TObject; ACol, ARow: Integer;
+  Rect: TRect; State: TGridDrawState);
+var
+  bState: Boolean;
+  CheckRect: TRect;
+begin
+  // 체크박스 컬럼(2번), 데이터 행만
+  if (ACol = 2) and (ARow > 0) then
+  begin
+    // 셀 배경 먼저 그리기
+    AdvSGrid.Canvas.FillRect(Rect);
+    
+    // 체크박스가 있는지 확인
+    if AdvSGrid.HasCheckBox(ACol, ARow) then
+    begin
+      // 체크박스 위치 계산 (셀 중앙)
+      CheckRect.Left := Rect.Left + (Rect.Right - Rect.Left - 13) div 2;
+      CheckRect.Top := Rect.Top + (Rect.Bottom - Rect.Top - 13) div 2;
+      CheckRect.Right := CheckRect.Left + 13;
+      CheckRect.Bottom := CheckRect.Top + 13;
+      
+      // 체크 상태 가져오기
+      AdvSGrid.GetCheckBoxState(ACol, ARow, bState);
+      
+      // 체크박스 그리기
+      if bState then
+        DrawFrameControl(AdvSGrid.Canvas.Handle, CheckRect, DFC_BUTTON, DFCS_BUTTONCHECK or DFCS_CHECKED)
+      else
+        DrawFrameControl(AdvSGrid.Canvas.Handle, CheckRect, DFC_BUTTON, DFCS_BUTTONCHECK);
+    end;
+  end;
+end;
+}
+
+
+procedure TFrm_6900.AdvSGridDrawCell(Sender: TObject; ACol, ARow: Integer;
+  Rect: TRect; State: TGridDrawState);
+var
+  bState: Boolean;
+  CheckRect: TRect;
+  IsErrorRow: Boolean;
+  uFormat: UINT;
+begin
+  if ARow = 0 then Exit; // 헤더는 건드리지 않음
+
+  // 1. 해당 행이 'N' 상태인지 확인 (4번 컬럼 기준)
+  IsErrorRow := (AdvSGrid.Cells[4, ARow] = 'N');
+
+  // =========================================================
+  // [핵심] 'N' 상태면 무조건 빨간색 배경을 강제로 칠함 (선택색 덮어쓰기)
+  // =========================================================
+  if IsErrorRow then
+  begin
+    AdvSGrid.Canvas.Brush.Color := clRed;
+    AdvSGrid.Canvas.Font.Color  := clWhite;
+    AdvSGrid.Canvas.FillRect(Rect); // 파란색 선택바를 빨간색으로 덮어버림
+  end;
+
+  // 2. 체크박스 컬럼(2번) 처리
+  if ACol = 2 then
+  begin
+    // 'N' 상태가 아니면 배경을 기본(흰색 or 선택색)으로 칠해줘야 잔상이 안 남음
+    if not IsErrorRow then
+       AdvSGrid.Canvas.FillRect(Rect);
+
+    // 체크박스 그리기 (기존 로직 유지)
+    if AdvSGrid.HasCheckBox(ACol, ARow) then
+    begin
+      CheckRect.Left := Rect.Left + (Rect.Right - Rect.Left - 13) div 2;
+      CheckRect.Top := Rect.Top + (Rect.Bottom - Rect.Top - 13) div 2;
+      CheckRect.Right := CheckRect.Left + 13;
+      CheckRect.Bottom := CheckRect.Top + 13;
+
+      AdvSGrid.GetCheckBoxState(ACol, ARow, bState);
+      if bState then
+        DrawFrameControl(AdvSGrid.Canvas.Handle, CheckRect, DFC_BUTTON, DFCS_BUTTONCHECK or DFCS_CHECKED)
+      else
+        DrawFrameControl(AdvSGrid.Canvas.Handle, CheckRect, DFC_BUTTON, DFCS_BUTTONCHECK);
+    end;
+  end
+  // 3. 나머지 텍스트 컬럼 처리 ('N' 상태일 때만 수동으로 글자를 그림)
+  else if IsErrorRow then
+  begin
+    // 위에서 FillRect로 배경을 빨갛게 칠하면서 글자가 지워졌으므로, 글자를 다시 그려야 함
+    
+    // 텍스트 여백 및 정렬 설정 (기존 GetAlignment 로직 반영)
+    InflateRect(Rect, -2, -2); 
+    uFormat := DT_VCENTER or DT_SINGLELINE;
+
+    if ACol = 6 then uFormat := uFormat or DT_RIGHT  // 6번(수량)은 우측 정렬
+    else uFormat := uFormat or DT_CENTER;            // 나머지는 중앙 정렬
+
+    // 텍스트 출력
+    DrawText(AdvSGrid.Canvas.Handle, PChar(AdvSGrid.Cells[ACol, ARow]), -1, Rect, uFormat);
+  end;
+end;
+
+// AdvStringGrid 클릭 시 상세 조회
+procedure TFrm_6900.AdvSGridClick(Sender: TObject);
+var
+  CurrentRow: Integer;
+  sPltNo, sLocaRaw: String;
+begin
+  CurrentRow := AdvSGrid.Row;
+  if CurrentRow < 1 then Exit; // 헤더 클릭 방지
+
+  // 그리드 값 가져오기
+  sPltNo   := AdvSGrid.Cells[3, CurrentRow]; // PLT-NO
+  sLocaRaw := AdvSGrid.Cells[5, CurrentRow]; // 위치 (예: 1-11-1)
+
+  // 위치값에서 하이픈(-) 제거 (DB 조회용)
+  // '1-11-1' -> '1111'
+  sLocaRaw := StringReplace(sLocaRaw, '-', '', [rfReplaceAll]);
+  sLocaRaw := Trim(sLocaRaw);
+
+  // Edit 박스에 값 반영
+  PltNoEdit.Text := sPltNo;
+  LocaMEd.Text   := sLocaRaw; // 하이픈 뺀 값을 넣음
+
+  // 상세 조회 실행
+  T2MISUBK_Select_Proc;
+end;
+
+procedure TFrm_6900.UseConfirmBtnClick(Sender: TObject);
+var
+  i: Integer;
+  bState: Boolean;
+  TargetPlt, SourcePlt1, SourcePlt2: String;
+  CurrentPlt: String;
+  ls_sql: String;
+begin
+  // 입력값 검증
+  if TargetPlt = '' then
+  begin
+    WinLib_ErrorForm('기준이 될 파렛트 번호(PLT-NO)를 입력하세요.');
+    Exit;
+  end;
+
+  // 체크된 파렛트 번호 가져오기
+  SourcePlt1 := '';
+  SourcePlt2 := '';
+
+  for i := 1 to AdvSGrid.RowCount - 1 do
+  begin
+    if AdvSGrid.GetCheckBoxState(2, i, bState) and bState then
+    begin
+      CurrentPlt := AdvSGrid.Cells[3, i];
+      if SourcePlt1 = '' then SourcePlt1 := CurrentPlt
+      else SourcePlt2 := CurrentPlt;
+    end;
+  end;
+
+  // 체크된 게 2개가 아니면 중단
+  if (SourcePlt1 = '') or (SourcePlt2 = '') then
+  begin
+    WinLib_ErrorForm('선택된 파렛트 정보를 확인할 수 없습니다. 다시 선택해주세요.');
+    Exit;
+  end;
+
+  // 입력한 PLT가 선택한 두 개 중 하나인지 확인
+  if (TargetPlt <> SourcePlt1) and (TargetPlt <> SourcePlt2) then
+  begin
+    if MessageDlg('입력한 파렛트[' + TargetPlt + ']는 선택한 파렛트와 다릅니다.' + #13#10 +
+                  '정말로 진행하시겠습니까? (새로운 번호로 합쳐집니다)', mtConfirmation, [mbYes, mbNo], 0) = mrNo then Exit;
+  end;
+
+  // 최종 확인
+  if not WinLib_ConfirmForm('선택한 두 파렛트를 [' + TargetPlt + ']로 합치시겠습니까?') then Exit;
+
+  // 합짐 실행
+  ls_sql := ' UPDATE T2MISUBK SET ';
+  ls_sql := ls_sql + '   SUBK_PLTNO = ''' + TargetPlt + ''' ';
+  //ls_sql := ls_sql + '   SUBK_PLTNO = ''' + TargetPlt + ''', ';
+  //ls_sql := ls_sql + '   SUBK_INDATE = CONVERT(VARCHAR(8), GETDATE(), 112), '; // 작업일자 갱신
+  //ls_sql := ls_sql + '   SUBK_INTIME = REPLACE(CONVERT(VARCHAR(8), GETDATE(), 108), '':'', '''') '; // 작업시간 갱신
+  ls_sql := ls_sql + ' WHERE SUBK_PLTNO IN (''' + SourcePlt1 + ''', ''' + SourcePlt2 + ''') ';
+
+  try
+    with UpdtQuery do
+    begin
+      Close;
+      SQL.Clear;
+      SQL.Add(ls_sql);
+      ExecSQL;
+    end;
+
+    ShowMessage('합짐 처리가 완료되었습니다.');
+
+
+    LocaMED.Text := '';
+    pltnoEdit.Text := '';
+    StartSpdBtnClick(Self);
+
+  except
+    on E: Exception do
+      WinLib_ErrorForm('DB 업데이트 중 오류 발생: ' + E.Message);
+  end;
+end;
+
+procedure TFrm_6900.UseCloseBtnClick(Sender: TObject);
+begin
+  StartSpdBtnClick(Self); 
+end;
+
+{
+procedure TFrm_6900.regBitBtnClick(Sender: TObject);
+begin
+  // 1. 등록할 위치(LOCA)가 입력되어 있는지 확인
+  if Trim(LocaMEd.Text) = '' then
+  begin
+    WinLib_ErrorForm('재고를 등록할 위치(LOCA)가 선택되지 않았습니다.');
+    LocaMEd.SetFocus;
+    Exit;
+  end;
+
+  Bol_Data_Ok := True;
+  Bol_Modal   := False;
+  Var_Form    := Nil;
+
+  // 2. 팝업 폼 생성
+  SFrm_6130 := TSFrm_6130.Create(Application);
+  Bol_Modal := True;
+
+  // 3. 모드 설정 (등록 모드)
+  SFrm_6130.Bol_Insert := True;
+  SFrm_6130.Bol_Update := False;
+
+  // 4. UI 설정
+  SFrm_6130.TitleLbl.Caption  := '재고 상세 등록';
+  
+  // 메인 화면의 위치값을 팝업에 전달하고 수정 불가능하게 설정
+  SFrm_6130.LocaMed.Text      := LocaMEd.Text;
+  SFrm_6130.LocaMed.Enabled   := False;
+  
+  // 품목 검색 버튼 활성화 (등록 시에는 검색 필요)
+  SFrm_6130.SB_Search.Enabled := True;
+
+  // 입력 필드 초기화 (깔끔하게 시작)
+  SFrm_6130.ItemCodeMed.Text := '';
+  SFrm_6130.SpecEd.Text      := '';
+  SFrm_6130.QtyEd.Text       := '';
+  SFrm_6130.RQtyEd.Text      := '';
+  SFrm_6130.BigoEd.Text      := '';
+  SFrm_6130.BoxNoEd.Text     := '';
+  SFrm_6130.LotnoEd.Text     := '';
+  SFrm_6130.InDateDTP.Date   := Now;
+
+  // 5. 상태(Flag) 콤보박스 설정 (현재 조회된 위치의 상태값 기준)
+  // s_flag 변수는 DataSource1DataChange에서 갱신됨
+  if      s_flag = '0' then SFrm_6130.FlagCB.ItemIndex := 0
+  else if s_flag = '1' then SFrm_6130.FlagCB.ItemIndex := 1
+  else if s_flag = 'X' then SFrm_6130.FlagCB.ItemIndex := 2
+  else if s_flag = 'Y' then SFrm_6130.FlagCB.ItemIndex := 3
+  else if s_flag = 'W' then SFrm_6130.FlagCB.ItemIndex := 4
+  else if s_flag = 'E' then SFrm_6130.FlagCB.ItemIndex := 5
+  else if s_flag = 'N' then SFrm_6130.FlagCB.ItemIndex := 6
+  else SFrm_6130.FlagCB.ItemIndex := 1; // 기본값: 제품유(1)
+
+  // 6. 폼 띄우기
+  if SFrm_6130 <> Nil then
+  begin
+    with TForm(SFrm_6130) do
+    begin
+      if Bol_Modal then ShowModal
+      else
+      begin
+        BorderIcons := [];
+        Show;
+      end;
+    end;
+    SFrm_6130.Free;
+  end;
+
+  // 7. 팝업 종료 후 화면 갱신
+  StartSpdBtnClick(Self);
+end;
+}
+
+procedure TFrm_6900.regBitBtnClick(Sender: TObject);
+begin
+  //등록할 파렛트 번호(PLT-NO) 체크
+  if Trim(PltNoEdit.Text) = '' then
+  begin
+    WinLib_ErrorForm('등록할 파렛트 번호(PLT-NO)를 입력해주세요.');
+    PltNoEdit.SetFocus;
+    Exit;
+  end;
+
+  Bol_Data_Ok := True;
+  Bol_Modal   := False;
+  Var_Form    := Nil;
+
+  // 팝업 폼 생성
+  SFrm_6130 := TSFrm_6130.Create(Application);
+  Bol_Modal := True;
+
+  // 모드 설정 (등록 모드)
+  SFrm_6130.Bol_Insert := True;
+  SFrm_6130.Bol_Update := False;
+
+  SFrm_6130.TitleLbl.Caption  := '재고 상세 등록';
+
+  // 위치값 전달 및 잠금
+  SFrm_6130.LocaMed.Text      := LocaMEd.Text;
+  SFrm_6130.LocaMed.Enabled   := False;
+
+  // 파렛트 번호 전달 및 잠금
+  SFrm_6130.PltNoEd.Text      := PltNoEdit.Text; // 메인화면 값 전달
+  SFrm_6130.PltNoEd.Enabled   := False;          // 수정 불가
+
+  // 품목 검색 버튼 활성화
+  SFrm_6130.SB_Search.Enabled := True;
+
+  // 나머지 입력 필드 초기화
+  SFrm_6130.ItemCodeMed.Text := '';
+  SFrm_6130.SpecEd.Text      := '';
+  SFrm_6130.QtyEd.Text       := '';
+  SFrm_6130.RQtyEd.Text      := '';
+  SFrm_6130.BigoEd.Text      := '';
+  SFrm_6130.BoxNoEd.Text     := '';
+
+  // LOT-NO는 비워두면 Insert_Code에서 날짜로 자동생성됨 (원하면 여기서 초기화)
+  SFrm_6130.LotnoEd.Text     := '';
+  SFrm_6130.InDateDTP.Date   := Now;
+
+  // 상태(Flag) 콤보박스 설정
+  {
+  if      s_flag = '0' then SFrm_6130.FlagCB.ItemIndex := 0
+  else if s_flag = '1' then SFrm_6130.FlagCB.ItemIndex := 1
+  else if s_flag = 'X' then SFrm_6130.FlagCB.ItemIndex := 2
+  else if s_flag = 'Y' then SFrm_6130.FlagCB.ItemIndex := 3
+  else if s_flag = 'W' then SFrm_6130.FlagCB.ItemIndex := 4
+  else if s_flag = 'E' then SFrm_6130.FlagCB.ItemIndex := 5
+  else if s_flag = 'N' then SFrm_6130.FlagCB.ItemIndex := 6
+  else SFrm_6130.FlagCB.ItemIndex := 0; // 기본값
+  }
+
+  // 6. [수정] 상태(Flag) 콤보박스 설정 (위치 정보 유무 기준)
+  // 위치값(LocaMEd.Text)이 있으면 '제품유(1)', 없으면 '빈셀(0)'로 설정
+  if Trim(LocaMEd.Text) <> '' then
+    SFrm_6130.FlagCB.ItemIndex := 1 // 제품유
+  else
+    SFrm_6130.FlagCB.ItemIndex := 0; // 빈셀
+
+  // 7. 폼 띄우기
+  {
+  if SFrm_6130 <> Nil then
+  begin
+    with TForm(SFrm_6130) do
+    begin
+      if Bol_Modal then ShowModal
+      else
+      begin
+        BorderIcons := [];
+        Show;
+      end;
+    end;
+    SFrm_6130.Free;
+  end;
+  }
+
+  if SFrm_6130 <> Nil then
+  begin
+    try
+      // [수정] ShowModal 결과가 mrOk(저장완료)이면 조회 실행
+      if SFrm_6130.ShowModal = mrOk then
+      begin
+         StartSpdBtnClick(Self); // 화면 갱신
+      end;
+    finally
+      SFrm_6130.Free;
+    end;
+  end;
+
+  // 8. 팝업 종료 후 화면 갱신
+  //StartSpdBtnClick(Self);
+end;
+
+procedure TFrm_6900.AdvSGridGetCellColor(Sender: TObject; ARow,
+  ACol: Integer; AState: TGridDrawState; ABrush: TBrush; AFont: TFont);
+begin
+if ARow > 0 then
+  begin
+    // 4번 컬럼(SUBK_FLAG)이 'N'인지 확인
+    if AdvSGrid.Cells[4, ARow] = 'N' then
+    begin
+      // [핵심] 선택되었든(gdSelected) 아니든 상관없이 빨간색으로 강제 고정
+      ABrush.Color := clRed;
+      AFont.Color  := clWhite;
+    end;
+  end;
+end;
+
+procedure TFrm_6900.SB_AllViewClick(Sender: TObject);
+begin
+// 전체 조회 pltno, locamed 초기화 후 조회
+// 1. 검색 조건 초기화
+  PltNoEdit.Text := '';  // 파렛트 번호 초기화
+  LocaMEd.Text   := '';  // 위치 정보 초기화
+
+  // 2. 조회 함수 호출 (전체 조회)
+  // 조건값이 비어있으므로 StartSpdBtnClick 내부 로직에 따라 전체 범위가 조회됩니다.
+  StartSpdBtnClick(Sender);
+end;
+
+end.

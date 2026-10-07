@@ -1,0 +1,24 @@
+object DM1: TDM1
+  OldCreateOrder = True
+  OnCreate = DataModuleCreate
+  Left = 62
+  Top = 165
+  Height = 474
+  Width = 583
+  object Main_db: TADOConnection
+    ConnectionString = 
+      'Provider=SQLOLEDB.1;Password=stk;Persist Security Info=True;User' +
+      ' ID=sa;Initial Catalog=Tokstk_db;Data Source=127.0.0.1;Use Proce' +
+      'dure for Prepare=1;Auto Translate=True;Packet Size=4096;Workstat' +
+      'ion ID=JPLUSPC02;Use Encryption for Data=False;Tag with column c' +
+      'ollation when possible=False'
+    LoginPrompt = False
+    Provider = 'SQLOLEDB.1'
+    Left = 112
+    Top = 136
+  end
+  object SaveDialog: TSaveDialog
+    Left = 192
+    Top = 136
+  end
+end

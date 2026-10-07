@@ -1,0 +1,465 @@
+unit WinLoc;
+
+interface
+
+uses Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+     ComCtrls, StdCtrls, ExtCtrls, Db, DBTables, Winsock, Registry, Module, PDA_Type;
+
+    //--------------------------------------------------------------------------
+
+    // 창고의 위치정보를 번호로 만들어서 Return 하여 준다
+    Function WinLoc_Loc_StrToCode( var_Loc : Integer ) : String;
+    Function WinLoc_Loc_CodeToindex( var_Loc : String ) : integer;
+    Function WinLoc_Loc_Code_Struct( var_Loc : String ) : TMiLoc;
+    
+    // 창고위치정보를 만들어서 결과값 RETURN
+    Function WinLoc_Loc_Code_StructReturn( var_Loc : String ) : TMiLoc;
+
+    // 장치의 상태
+    Function WinLoc_Loc_State_CodeToIndex( var_Loc : Integer ) : Integer;
+    Function WinLoc_Loc_State_IndexToCode( var_Loc : Integer ) : String;
+
+    // 코드를 위치명으로 만들어서 Return 한다
+    Function WinLoc_Cate_CodeToName( var_Code : String ) : String;
+    
+    // 전체코드를 만들어서 Return 하여 준다
+    Function WinLoc_Code_Full_Loca( var_Name, var_Code : String ) : String;
+
+    //--------------------------------------------------------------------------
+    // 실제 DB 를 이용한 조회
+    Function WinLoc_Loc_State_Product( var_PrdCode : String ) : Boolean;
+
+    //--------------------------------------------------------------------------
+    // 저장위치에 존재하는 제품 삭제
+    Function WinLoc_LSTK_Delete( glb_Query : TQuery;
+                                 var_HBL : String;
+                                 var_Qty,
+                                 var_Weight : String;
+                                 var_MiINPUT_PDA : TMiINPUT_PDA ) : TMiINPUT_PDA;
+
+    //--------------------------------------------------------------------------
+    // 저장위치에 존재하는 제품 수정
+    Function WinLoc_LSTK_Modify( glb_Query  : TQuery;
+                                 var_HBL    : String;
+                                 var_Qty,
+                                 var_Weight : String;
+                                 var_MiINPUT_PDA : TMiINPUT_PDA ) : TMiINPUT_PDA;
+
+    //--------------------------------------------------------------------------
+    //
+    //   장치 전체정보 테이블에서 찾은 수량 만큼 빼어준다
+    //
+    //--------------------------------------------------------------------------
+    Function WinLoc_LCHK_Modify( glb_Query       : TQuery;
+                                 var_MiINPUT_PDA : TMiINPUT_PDA;
+                                 var_Qty,
+                                 var_Weight : String ) : TMiINPUT_PDA; 
+
+implementation
+
+Uses WinLib;
+
+//==============================================================================
+
+// 창고의 위치정보를 번호로 만들어서 Return 하여 준다
+Function WinLoc_Loc_StrToCode( var_Loc : Integer ) : String;
+var
+  var_Return : String;
+Begin
+
+  {*
+  case var_Loc of
+      0..6 : var_Return := Glb_Loction[var_Loc+1][1];
+  else
+      WinLib_ErrorForm('해당하는 저장 위치가 존재하지 않습니다');
+      Exit;
+  end;
+  *}
+  Result := var_Return;
+End;
+
+// 장치분류에서 코드를 분류번호로 RETURN
+Function WinLoc_Loc_CodeToindex( var_Loc : String ) : integer;
+var
+  var_Return : integer;
+Begin
+  IF ( var_Loc = '010' ) or ( var_Loc = '011' ) or ( var_Loc = '012' ) or ( var_Loc = '013' ) or
+     ( var_Loc = '014' ) or ( var_Loc = '015' ) or ( var_Loc = '016' ) or ( var_Loc = '017' ) or
+     ( var_Loc = '018' ) or ( var_Loc = '018' ) Then
+  Begin
+      var_Return := 0;
+  End
+  Else IF ( var_Loc = '020' ) Then
+  Begin
+      var_Return := 1;
+  End
+  Else IF ( var_Loc = '030' ) or ( var_Loc = '031' ) or ( var_Loc = '032' ) or ( var_Loc = '033' ) or
+     ( var_Loc = '034' ) or ( var_Loc = '035' ) or ( var_Loc = '036' ) or ( var_Loc = '037' ) or
+     ( var_Loc = '038' ) or ( var_Loc = '039' ) or ( var_Loc = '040' ) or ( var_Loc = '041' ) Then
+  Begin
+      var_Return := 2;
+  End
+  Else IF ( var_Loc = '050' ) Then
+  Begin
+      var_Return := 3;
+  End
+  Else IF ( var_Loc = '060' ) Then
+  Begin
+      var_Return := 4;
+  End
+  Else IF ( var_Loc = '070' ) Then
+  Begin
+      var_Return := 5;
+  End
+  Else IF ( var_Loc = '080' ) Then
+  Begin
+      var_Return := 6;
+  End
+  Else IF ( var_Loc = '090' ) Then
+  Begin
+      var_Return := 7;
+  End
+  Else IF ( var_Loc = '100' ) or ( var_Loc = '110' ) or ( var_Loc = '120' ) or ( var_Loc = '130' ) or
+          ( var_Loc = '140' ) or ( var_Loc = '150' ) or ( var_Loc = '160' ) or ( var_Loc = '170' ) Then
+  Begin
+      var_Return := 8;
+  End
+  Else Begin
+      WinLib_ErrorForm('해당하는 저장 위치 코드가 정의 되지 않았습니다');
+      var_Return := -1;
+  End;
+
+  {*
+  IF var_Loc = Glb_Loction[1][1] Then var_Return := 0
+  Else IF var_Loc = Glb_Loction[2][1] Then var_Return := 1
+  Else IF var_Loc = Glb_Loction[3][1] Then var_Return := 2
+  Else IF var_Loc = Glb_Loction[4][1] Then var_Return := 3
+  Else IF var_Loc = Glb_Loction[5][1] Then var_Return := 4
+  Else IF var_Loc = Glb_Loction[6][1] Then var_Return := 5
+  Else IF var_Loc = Glb_Loction[7][1] Then var_Return := 6
+  Else Begin
+      WinLib_ErrorForm('해당하는 저장 위치 코드가 정의 되지 않았습니다');
+      var_Return := -1;
+  End;
+  *}
+  
+  Result := var_Return;
+End;
+
+// 창고의 위치정보를 배열로 만들어서 Return 하여 준다
+// Procedure WinLoc_Loc_Code_Struct( var_Loc : String );
+Function WinLoc_Loc_Code_Struct( var_Loc : String ) : TMiLoc;
+Begin
+   With Glb_MiLoc Do
+   Begin
+        Code := Copy( var_Loc, 0, 3 );    // 창고종류
+        Sel  := WinLoc_Loc_CodeToindex(Code); // 콤보박스 위치
+        BK   := Copy( var_Loc, 4, 2 );    // 열
+        BY   := Copy( var_Loc, 6, 3 );    // 연
+        LV   := Copy( var_Loc, 9, 2 );    // 단
+   End;
+End;
+
+// 창고 위치 정보를 만들어서 결과값 RETURN
+Function WinLoc_Loc_Code_StructReturn( var_Loc : String ) : TMiLoc;
+var
+   var_Glb_Loc : TMiLoc;
+Begin
+   With var_Glb_Loc Do
+   Begin
+        Code := Copy( var_Loc, 0, 3 );        // 창고종류
+        Sel  := WinLoc_Loc_CodeToindex(Code); // 콤보박스 위치
+        BK   := Copy( var_Loc, 4, 3 );        // 위치 3 자리
+        
+        {*
+        Code := Copy( var_Loc, 0, 3 );        // 창고종류
+        Sel  := WinLoc_Loc_CodeToindex(Code); // 콤보박스 위치
+        BK   := Copy( var_Loc, 4, 2 );        // 열
+        BY   := Copy( var_Loc, 6, 3 );        // 연
+        LV   := Copy( var_Loc, 9, 2 );        // 단
+        *}
+   End;
+
+   Result := var_Glb_Loc;
+End;
+
+// 장치의 상태 ( Code --> Index )
+Function WinLoc_Loc_State_CodeToIndex( var_Loc : Integer ) : Integer;
+var
+  var_Return : Integer;
+Begin
+  case var_Loc of
+      1 : var_Return := 0;    // 비어있음
+      2 : var_Return := 1;    // 저장가능
+      3 : var_Return := 2;    // FULL
+      9 : var_Return := 3;    // 불량
+  else
+      WinLib_ErrorForm('해당하는 장치상태의 코드가 정의 되지 않았습니다');
+      var_Return := -1;
+  end;
+  Result := var_Return;
+End;
+
+// 장치의 상태 ( Code --> Index )
+Function WinLoc_Loc_State_IndexToCode( var_Loc : Integer ) : String;
+var
+  var_Return : String;
+Begin
+  case var_Loc of
+      0 : var_Return := '1';    // 비어있음
+      1 : var_Return := '2';    // 저장가능
+      2 : var_Return := '3';    // FULL
+      3 : var_Return := '9';    // 불량
+  else
+      WinLib_ErrorForm('해당하는 장치상태의 코드가 정의 되지 않았습니다');
+      var_Return := '-1';
+  end;
+  Result := var_Return;
+End;
+
+//------------------------------------------------------------------------------
+// 코드를 위치명으로 만들어서 Return 한다
+Function WinLoc_Cate_CodeToName( var_Code : String ) : String;
+var
+  var_Result : String;
+  Var_Count  : Integer;
+Begin
+  var_Result := '';
+
+  For Var_Count := 1 To 39 do
+  Begin
+     if ( var_Code = Glb_Box_Loc[Var_Count][1] ) Then begin
+        var_Result := Glb_Box_Loc[Var_Count][2];
+        Break;
+     End;
+  End;
+
+  IF ( var_Result = '' ) Then
+     var_Result := '알수없는위치';
+
+  Result := var_Result;
+end;
+
+//------------------------------------------------------------------------------
+// 전체코드를 만들어서 Return 하여 준다
+Function WinLoc_Code_Full_Loca( var_Name, var_Code : String ) : String;
+var
+  var_Result : String;
+  var_Data : String;
+Begin
+  if( var_Name = Glb_Loction[1][2] )      then var_Result := Glb_Loction[1][1]
+  else if( var_Name = Glb_Loction[2][2] ) then var_Result := Glb_Loction[2][1]
+  else if( var_Name = Glb_Loction[3][2] ) then var_Result := Glb_Loction[3][1]
+  else if( var_Name = Glb_Loction[4][2] ) then var_Result := Glb_Loction[4][1]
+  else if( var_Name = Glb_Loction[5][2] ) then var_Result := Glb_Loction[5][1]
+  else if( var_Name = Glb_Loction[6][2] ) then var_Result := Glb_Loction[6][1]
+  else if( var_Name = Glb_Loction[7][2] ) then var_Result := Glb_Loction[7][1]
+  else var_Result := '';
+
+  if var_Result <> '' Then Begin
+      var_Data   := Copy( var_Code, 0, 2 ) + Copy( var_Code, 3, 3 ) + Copy( var_Code, 6, 2 );
+      var_Result := var_Result + var_Data;
+  End
+  Else Begin
+      WinLib_ErrorForm('알수없는 저장장치가 존재합니다..확인하여주세요!');
+      Exit;
+  End;
+
+  Result := var_Result;
+End;
+
+//------------------------------------------------------------------------------
+// 실제 DB 를 이용한 조회
+Function WinLoc_Loc_State_Product( var_PrdCode : String ) : Boolean;
+Begin
+    //
+  Result := True;
+End;
+
+//--------------------------------------------------------------------------
+// 저장위치에 존재하는 제품 삭제
+Function WinLoc_LSTK_Delete( glb_Query : TQuery;
+                             var_HBL : String;
+                             var_Qty,
+                             var_Weight : String;                             
+                             var_MiINPUT_PDA : TMiINPUT_PDA ) : TMiINPUT_PDA;
+var
+  var_Sql : String;
+Begin
+  var_MiINPUT_PDA.CHK_BAD := GLB_SEND_STATE_OK;
+
+  var_Sql := 'Delete From MiLstk ';
+  var_Sql := var_Sql + ' Where LSTK_HBL = :LSTK_HBL ';
+
+  With glb_Query Do
+  Begin
+     Try
+        Close;
+        Sql.Clear;
+        Sql.Add( var_Sql );
+        ParamByName('LSTK_HBL').AsString := var_HBL;
+        ExecSql;
+     Except
+        On E:Exception do
+        begin
+            With var_MiINPUT_PDA Do Begin
+                CHK_BAD   := GLB_SEND_STATE_ETC_ERR;
+                CHK_STATE := '[ 반출-제품위치삭제에러 ] ' + E.Message;
+            End;
+        end;
+     End;
+  End;
+
+  //------------------------------------
+  //
+  //   장치 전체정보 테이블에서 찾은 수량 만큼 빼어준다
+  //
+  //------------------------------------  
+  IF var_MiINPUT_PDA.CHK_BAD = GLB_SEND_STATE_OK Then
+       var_MiINPUT_PDA := WinLoc_LCHK_Modify( glb_Query, var_MiINPUT_PDA, var_Qty, var_Weight );
+  
+  Result := var_MiINPUT_PDA;
+End;
+
+//--------------------------------------------------------------------------
+// 저장위치에 존재하는 제품 수정
+Function WinLoc_LSTK_Modify( glb_Query  : TQuery;
+                             var_HBL    : String;
+                             var_Qty,
+                             var_Weight : String;
+                             var_MiINPUT_PDA : TMiINPUT_PDA ) : TMiINPUT_PDA;
+var
+  var_Sql : String;
+  var_aQty, var_aWeight, var_Calc : Double;
+Begin
+  var_MiINPUT_PDA.CHK_BAD := GLB_SEND_STATE_OK;
+
+  With var_MiINPUT_PDA.INPT Do
+  Begin
+      var_aQty    := StrToFloat( var_MiINPUT_PDA.INPT.INPT_INQTY ) - StrToFloat(var_Qty);
+      var_Calc    := StrToFloat( var_MiINPUT_PDA.INPT.INPT_INWEIGHT ) - StrToFloat(var_Weight);
+      var_aWeight := StrToFloat( FormatFloat('###0.00', var_Calc ) );
+  End;
+
+  IF ( var_aQty >= 0 ) and ( var_aWeight >= 0 ) Then
+  begin
+      var_Sql := 'Update MiLstk Set ';
+      var_Sql := var_Sql + '   LSTK_INQTY    = LSTK_INQTY - ' + var_Qty;
+      var_Sql := var_Sql + ' , LSTK_INWEIGHT = LSTK_INWEIGHT - ' + var_Weight;
+      var_Sql := var_Sql + ' Where LSTK_HBL = :LSTK_HBL ';
+
+      With glb_Query Do
+      Begin
+         Try
+            Close;
+            Sql.Clear;
+            Sql.Add( var_Sql );
+            ParamByName('LSTK_HBL').AsString := var_HBL;
+            ExecSql;
+         Except
+            On E:Exception do
+            begin
+                With var_MiINPUT_PDA Do Begin
+                    CHK_BAD   := GLB_SEND_STATE_ETC_ERR;
+                    CHK_STATE := '[ 반출-제품위치수정에러 ] ' + E.Message;
+                End;
+            end;
+         End;
+      End;
+  End;
+
+  //------------------------------------
+  //
+  //   장치 전체정보 테이블에서 찾은 수량 만큼 빼어준다
+  //
+  //------------------------------------  
+  IF var_MiINPUT_PDA.CHK_BAD = GLB_SEND_STATE_OK Then
+       var_MiINPUT_PDA := WinLoc_LCHK_Modify( glb_Query, var_MiINPUT_PDA, var_Qty, var_Weight );  
+    
+  Result := var_MiINPUT_PDA;
+End;
+
+//--------------------------------------------------------------------------
+//
+//   장치 전체정보 테이블에서 찾은 수량, 중량 만큼 - 하여 준다
+//
+//--------------------------------------------------------------------------
+Function WinLoc_LCHK_Modify( glb_Query       : TQuery;
+                             var_MiINPUT_PDA : TMiINPUT_PDA;
+                             var_Qty,
+                             var_Weight : String ) : TMiINPUT_PDA;
+var
+  var_Sql : String;
+  var_LCHK_USE_QTY, var_LCHK_USE_WEIGHT, var_Calc : Double;
+  var_Result : Boolean;
+  var_LOCA : String;
+Begin
+  var_Result := True;
+  var_MiINPUT_PDA.CHK_BAD := GLB_SEND_STATE_OK;
+  var_LOCA := var_MiINPUT_PDA.INPT.INPT_LOCA;
+
+  var_LCHK_USE_QTY := 0;
+  var_LCHK_USE_WEIGHT := 0;
+
+  // 예약정보 필드의 내용을 구하여 온다
+  var_Sql := 'select LCHK_USE_QTY, LCHK_USE_WEIGHT from MILCHK ';
+  var_Sql := var_Sql + ' where LCHK_LOCA = ' + '''' + var_LOCA + '''';
+  With glb_Query Do
+  Begin
+     Try
+          Close;
+          Sql.Clear;
+          Sql.Add( var_Sql );
+          Open;
+          FetchAll;
+          IF RecordCount > 0 Then
+          Begin
+             var_LCHK_USE_QTY    := FieldByName('LCHK_USE_QTY').AsFloat;
+             var_LCHK_USE_WEIGHT := FieldByName('LCHK_USE_WEIGHT').AsFloat;
+          End
+          Else var_Result := False;
+      Except
+          On E:Exception do
+          begin
+               var_Result := False;
+          end;
+      End;
+  End;
+
+  IF var_Result Then
+  Begin
+      var_LCHK_USE_QTY    := var_LCHK_USE_QTY - StrtoFloat( var_Qty );
+      var_Calc := var_LCHK_USE_WEIGHT - StrtoFloat( var_Weight );
+      var_LCHK_USE_WEIGHT := StrToFloat( FormatFloat('###0.00', var_Calc ) );
+
+      IF ( ( var_LCHK_USE_QTY >= 0 ) and ( var_LCHK_USE_WEIGHT >= 0 ) ) Then
+      Begin
+          var_Sql := 'update milchk set ';
+          var_Sql := var_Sql + '   LCHK_USE_QTY    = LCHK_USE_QTY - ' + var_Qty;
+          var_Sql := var_Sql + '  ,LCHK_USE_WEIGHT = LCHK_USE_WEIGHT - ' + var_Weight;
+          var_Sql := var_Sql + ' where LCHK_LOCA = ' + '''' + var_LOCA + '''';
+
+          With glb_Query Do
+          Begin
+             Try
+                  Close;
+                  Sql.Clear;
+                  Sql.Add( var_Sql );
+                  ExecSql;
+              Except
+                  On E:Exception do
+                  begin
+                      With var_MiINPUT_PDA Do Begin
+                          CHK_BAD   := GLB_SEND_STATE_ETC_ERR;
+                          CHK_STATE := '[ 반출-제품종합위치수정에러 ] ' + E.Message;
+                      End;
+                  end;
+              End;
+          End;
+       End; // IF 문의 끝
+   End;
+   
+   Result := var_MiINPUT_PDA;
+End;
+
+end.

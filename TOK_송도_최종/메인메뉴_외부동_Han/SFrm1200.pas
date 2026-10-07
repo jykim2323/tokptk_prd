@@ -1,0 +1,164 @@
+unit SFrm1200;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, Mask, Buttons, ExtCtrls, DB, ADODB, ComCtrls, DBTables;
+
+type
+  TSFrm_1200 = class(TForm)
+    Panel1: TPanel;
+    Shape1: TShape;
+    TitleLbl: TLabel;
+    Panel2: TPanel;
+    Label2: TLabel;
+    Label8: TLabel;
+    MesgStsBar: TStatusBar;
+    NameEdit: TEdit;
+    CustUpdateQuery: TADOQuery;
+    ConfirmBitBtn: TBitBtn;
+    Label9: TLabel;
+    BigoEdit: TEdit;
+    ExitBitBtn: TBitBtn;
+    CodeEdit: TEdit;
+    Label1: TLabel;
+    AddrEdit: TEdit;
+
+    procedure ConfirmBitBtnClick(Sender: TObject);
+    procedure ExitBitBtnClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormDestroy(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+
+  private
+    { Private declarations }
+    procedure Insert_Code;
+    procedure Update_Code;
+
+  public
+    { Public declarations }
+    Bol_insert : Boolean;
+    Bol_Update : Boolean;
+    Bol_Delete : Boolean;
+  end;
+
+var
+  SFrm_1200: TSFrm_1200;
+  var_sql, s_user : String;
+  sys_datetime  : string[14];
+  s_date : string[8];
+  s_time : string[6];
+
+
+implementation
+
+uses DBSet,WinLib, FrmPrompt, FrmError;
+
+{$R *.dfm}
+
+
+procedure TSFrm_1200.FormCreate(Sender: TObject);
+begin
+//   Cntl_MaterSelect_proc;
+//   MaterCB.ItemIndex := -1;
+
+end;
+
+procedure TSFrm_1200.ConfirmBitBtnClick(Sender: TObject);
+var
+  var_Msg : String;
+begin
+   var_Msg := ' 정말로 확정 합니까.?';
+  if WinLib_ConfirmForm( var_Msg ) then
+  begin
+
+      IF CodeEdit.Text = '' then
+      Begin
+         WinLib_ErrorForm('출하처코드를 입력 하십시요.');
+         CodeEdit.SetFocus;
+         Exit;
+      End;
+
+      IF NameEdit.Text = '' then
+      Begin
+         WinLib_ErrorForm(' 출하처 명을 입력 하십시요.');
+         NameEdit.SetFocus;
+         Exit;
+      End;  
+
+    If Bol_insert      Then Insert_Code
+    else if Bol_Update Then Update_Code;
+    Close;
+  end;
+end;
+
+procedure TSFrm_1200.Insert_Code;
+var
+  sys_datetime  : string[14];
+  s_date : string[8];
+begin
+  sys_datetime  :=  Formatdatetime('yyyymmddhhnnss', now);
+  s_date        :=  copy(sys_datetime, 1, 8);
+
+  var_sql := ' Insert Into STK_MICUST(CUST_CODE, CUST_NAME, CUST_ADDR, CUST_REMARK,  ';
+  var_sql := var_sql + '   CUST_DATE )';
+  var_sql := var_sql + ' Values('''+CodeEdit.Text+''', '''+NameEdit.Text+''',  ';
+  var_sql := var_sql + '        '''+AddrEdit.Text+''',  '''+BigoEdit.Text+''',    ';
+  var_sql := var_sql + '        getdate() )';
+
+  With CUSTUpdateQuery Do
+    Try
+      Close;
+      SQL.Clear;
+      SQL.Add( var_sql );
+      ExecSql;
+    Except
+      Begin
+         WinLib_ErrorForm('출하처코드 ' + CodeEdit.Text + ' 등록 에러!!!! ');
+         Exit;
+      End;
+    End;
+    MesgStsBar.SimpleText := '출하처코드 ' + CodeEdit.Text + '를 등록 하였습니다...';
+end;
+
+procedure TSFrm_1200.Update_Code;
+begin
+
+  var_sql := ' Update STK_MICUST Set CUST_NAME = '''+NameEdit.Text+''', CUST_REMARK  = '''+BigoEdit.Text+''', ';
+  var_sql := var_sql + '         CUST_ADDR = '''+AddrEdit.Text+''' ';
+  var_sql := var_sql + '   Where CUST_Code = '''+CodeEdit.Text+''' ';
+
+  With CUSTUpdateQuery Do
+    Try
+      Close;
+      SQL.Clear;
+      SQL.Add( var_sql );
+      ExecSql;
+    Except
+      Begin
+         WinLib_ErrorForm('출하처코드 ' + CodeEdit.Text + ' 수정에러!!!! ');
+         Exit;
+      End;
+    End;
+    MesgStsBar.SimpleText := '출하처코드 ' + CodeEdit.Text + '를 수정 하였습니다...';
+end;
+
+procedure TSFrm_1200.ExitBitBtnClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TSFrm_1200.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action := caFree;
+end;
+
+procedure TSFrm_1200.FormDestroy(Sender: TObject);
+begin
+  SFrm_1200 := Nil;
+end;
+
+
+end.
+

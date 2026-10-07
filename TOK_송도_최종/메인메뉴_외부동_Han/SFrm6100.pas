@@ -1,0 +1,418 @@
+unit SFrm6100;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, Mask, Buttons, ExtCtrls, DB, ADODB, ComCtrls, DBTables;
+
+type
+  TSFrm_6100 = class(TForm)
+    Panel1: TPanel;
+    Shape1: TShape;
+    TitleLbl: TLabel;
+    Panel2: TPanel;
+    Label3: TLabel;
+    Label8: TLabel;
+    MesgStatusBar: TStatusBar;
+    ExitBitBtn: TBitBtn;
+    ConfirmBitBtn: TBitBtn;
+    Label1: TLabel;
+    Label2: TLabel;
+    edtBigo: TEdit;
+    edtPtid: TEdit;
+    Label11: TLabel;
+    Query2: TADOQuery;
+    GroupBox1: TGroupBox;
+    cbx_1: TCheckBox;
+    cbx_2: TCheckBox;
+    MskInDate: TMaskEdit;
+    edtItem: TEdit;
+    mskLoca: TMaskEdit;
+    edtLane: TEdit;
+    Label4: TLabel;
+    Label5: TLabel;
+    edtrsrv: TEdit;
+
+    procedure ConfirmBitBtnClick(Sender: TObject);
+    procedure ExitBitBtnClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormDestroy(Sender: TObject);
+
+  private
+    { Private declarations }
+     procedure Insert_Code;
+     procedure Update_Code;
+     procedure Delete_Code;
+  public
+    { Public declarations }
+    Bol_insert : Boolean;
+    Bol_Update : Boolean;
+    Bol_Delete : Boolean;
+  end;
+
+var
+  SFrm_6100: TSFrm_6100;
+  var_sql: String;
+  s_loca, s_item : String;
+
+implementation
+
+uses DbSet, Frm6100;
+
+{$R *.dfm}
+
+procedure TSFrm_6100.ConfirmBitBtnClick(Sender: TObject);
+begin
+   s_loca := mskloca.Text;
+   s_item := trim(edtItem.text);
+//   if s_item = '' then
+//   begin
+//      MessageDlg(' 파렛코드를 입력하세요 !', mtInformation,[mbOk], 0);
+//      exit;
+//   end;
+
+    If Bol_insert      Then Insert_Code
+    else if Bol_Update Then Update_Code
+    else if Bol_Delete Then Delete_Code;
+
+//    Close;
+end;
+
+procedure TSFrm_6100.Insert_Code;
+var
+   ls, ls_dt, ls_bigo, ls_msg, ls_date, ls_time : string;
+   ls_fr, ls_hanil, ls_ptid, ls_lane, ls_bogo, ls_cargbn : string;
+   lc, ll : integer;
+begin
+   var_sql := 'select Mast_Cargbn from mimast where mast_code = '''+s_item+''' ';
+   With Query2 Do
+   begin
+    Try
+      Close; SQL.Clear; SQL.Add( var_sql ); open;
+    Except
+      Exit;
+    End;
+   End;
+
+   if Query2.RecordCount = 0 then
+   begin
+      MessageDlg('에러: 제품마스타에 등록되지 않은 코드입니다!!', mtInformation,[mbOk], 0);
+      edtItem.SetFocus;
+      Exit;
+   end;
+
+   ls_cargbn := Query2.FieldByName('MAST_CARGBN').AsString;
+
+   ls_dt := mskIndate.text;
+
+   ls_bigo := copy(trim(edtbigo.text), 1,50);
+
+   ls_ptid := trim(edtptid.text);
+   if ls_ptid = '' then
+   begin
+       if MessageDlg('파렛트 ID가 없습니다. 그래도 그냥 등록할까요 ??', mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+       begin
+          edtptid.SetFocus;
+          exit;
+       end;
+   end
+   else
+   begin
+      var_sql := 'select count(*) from milstk where lstk_ptid = '''+ls_ptid+''' ';
+      With Query2 Do
+      begin
+        Close;
+        SQL.Clear;
+        SQL.Add(var_sql);
+        open;
+        First;
+        lc := Fields[0].AsInteger;
+      End;
+      if lc > 0 then
+      begin
+        MessageDlg('에러: 파렛트ID가 중복됩니다. 이미 존재합니다. 체크바람!!', mtInformation,[mbOk], 0);
+        edtptid.SetFocus;
+        Exit;
+      end;
+   end;
+   //  
+   var_sql := 'update milstk set lstk_item = '''+s_item+''',   lstk_inalja = '''+ls_dt+''', ';
+   var_sql := var_sql + ' lstk_rdat = '''',  lstk_rsrv = ''0'', ';
+   var_sql := var_sql + ' lstk_rend  = '''', lstk_bigo = '''+ls_bigo+''' , lstk_oupt = 0, ';
+   var_sql := var_sql + ' lstk_work  = '''', lstk_ptid = '''+ls_ptid+''',  lstk_ogubn = '''', ';
+   var_sql := var_sql + ' lstk_cargbn = '''+ls_cargbn+''' ';
+   var_sql := var_sql + ' where lstk_loca = '''+s_loca+''' ';
+   var_sql := var_sql + '   And lstk_item = '''' ';
+   var_sql := var_sql + '   And LSTK_RSRV not in (''I'',''$'',''E'',''D'') ';
+   With Query2 Do
+   begin
+    Try
+      Close;
+      SQL.Clear;
+      SQL.Add( var_sql );
+      ExecSql;
+    Except
+      MessageDlg('에러: CELL상태가 변했습니다. 조회후 다시실행  ', mtInformation,[mbOk], 0);
+      Exit;
+    End;
+   End;
+
+    if cbx_2.checked then     ls_bogo := '0'     else     ls_bogo := '1';
+   if not cbx_1.checked then
+   begin
+    if ls_bogo = '0' then
+    begin
+       MessageDlg('입고실적기록 안하고 HOST만 보고하면 불일치됩니다!!',mtInformation,[mbOk], 0);
+       exit;
+    end;
+   end;
+
+   if cbx_1.checked then
+   begin
+    if MessageDlg('정말 입고실적에도 기록할까요. ???', mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+       exit;
+    if MessageDlg('입고실적일자시간이 [' + ls_dt + '] 가 맞습니까 ?', mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+       exit;
+
+    if ls_bogo = '0' then
+    begin
+       if MessageDlg('입고실적을 HOST에도 보고 하는게 맞습니까 ??', mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+          exit;
+    end;
+    if ls_bogo = '1' then
+    begin
+       if MessageDlg('입고실적을 HOST에도 보고 안하는게 맞습니까 ??', mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+       exit;
+    end;
+   end 
+   else
+   begin
+        if MessageDlg('정말 입고실적에 기록안해도 됩니까 ???', mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+        exit;
+   end;  
+
+
+   ls_lane := trim(edtlane.text);
+   ls_date := copy(ls_dt, 1, 8);
+   ls_time := copy(ls_dt, 9, 6);
+
+   if cbx_1.checked then
+   begin
+      var_sql := 'INSERT INTO miihst(ihst_date, ihst_time, ihst_code, ihst_line ';
+      var_sql := var_sql + ',ihst_flag, ihst_ptid, ihst_cargbn)';
+      var_sql := var_sql + ' VALUES( '''+ls_date+''', '''+ls_time+''', '''+s_item+''' ';
+      var_sql := var_sql + ' , '''+ls_lane+''', '''+ls_bogo+'''  ';
+      var_sql := var_sql + ' , '''+ls_ptid+''' , '''+ls_cargbn+''' )';
+      With Query2 Do
+      begin
+       Try
+        Close;
+        SQL.Clear;
+        SQL.Add( var_sql );
+        ExecSql;
+       Except
+        MessageDlg('에러: 이력삽입에러! 입고시간바꾼후 다시실행 하세요!!', mtInformation,[mbOk], 0);
+        Exit;
+       End;
+      End;
+   end;
+
+    MesgStatusBar.SimpleText := '정상 등록 하였습니다.!!';
+end;
+
+procedure TSFrm_6100.UpDate_Code;
+var
+   ls, ls_dt, ls_bigo, ls_msg, ls_date, ls_time : string;
+   ls_fr, ls_hanil, ls_ptid, ls_lane, ls_bogo, ls_cargbn : string;
+   lc, ll : integer;
+begin
+   var_sql := 'select Mast_Cargbn from mimast where mast_code = '''+s_item+''' ';
+   With Query2 Do
+   begin
+    Try
+      Close; SQL.Clear; SQL.Add( var_sql ); open;
+    Except
+      Exit;
+    End;
+   End;
+
+   if Query2.RecordCount = 0 then
+   begin
+      MessageDlg('에러: 제품마스타에 등록되지 않은 코드입니다!!', mtInformation,[mbOk], 0);
+      edtItem.SetFocus;
+      Exit;
+   end;
+
+   ls_cargbn := Query2.FieldByName('MAST_CARGBN').AsString;
+
+   ls_dt    := mskIndate.text;
+   s_item   := trim(edtItem.text);
+   ls_bigo := copy(trim(edtbigo.text), 1,50);
+   ls_ptid := trim(edtptid.text);
+
+   if ls_ptid = '' then
+   begin
+       if MessageDlg('파렛트 ID가 없습니다. 그래도 그냥 등록할까요 ??', mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+       begin
+          edtptid.SetFocus;
+          exit;
+       end;
+   end
+   else
+   begin
+      var_sql := 'select count(*) from milstk where lstk_ptid = '''+ls_ptid+''' ';
+      With Query2 Do
+      begin
+        Close;
+        SQL.Clear;
+        SQL.Add(var_sql);
+        open;
+        First;
+        lc := Fields[0].AsInteger;
+      End;
+      if lc > 1 then
+      begin
+        MessageDlg('에러: 파렛트ID가 중복됩니다. 이미 존재합니다. 체크바람!!', mtInformation,[mbOk], 0);
+        edtptid.SetFocus;
+        Exit;
+      end;
+   end;
+
+   var_sql := 'update milstk set lstk_item = '''+s_item+''',   lstk_inalja = '''+ls_dt+''', ';
+   var_sql := var_sql + 'lstk_rdat = '''',  lstk_rsrv = ''0'', ';
+   var_sql := var_sql + 'lstk_rend  = '''', lstk_bigo = '''+ls_bigo+''' , lstk_oupt = 0, ';
+   var_sql := var_sql + 'lstk_work  = '''', lstk_ptid = '''+ls_ptid+''',  lstk_ogubn = '''', ';
+   var_sql := var_sql + 'lstk_cargbn = '''+ls_cargbn+''' ';
+   var_sql := var_sql + ' where lstk_loca = '''+s_loca+''' ';
+   var_sql := var_sql + '   And LSTK_RSRV not in (''I'',''$'',''E'',''D'') ';
+   With Query2 Do
+   begin
+    Try
+      Close;
+      SQL.Clear;
+      SQL.Add( var_sql );
+      ExecSql;
+    Except
+      MessageDlg('에러: CELL상태가 변했습니다. 조회후 다시실행  ', mtInformation,[mbOk], 0);
+      Exit;
+    End;
+   End;
+
+   if cbx_2.checked then     ls_bogo := '0'     else     ls_bogo := '1';
+   if not cbx_1.checked then
+   begin
+    if ls_bogo = '0' then
+    begin
+       MessageDlg('입고실적기록 안하고 HOST만 보고하면 불일치됩니다!!',mtInformation,[mbOk], 0);
+       exit;
+    end;
+   end;
+
+   if cbx_1.checked then
+   begin
+    if MessageDlg('정말 입고실적에도 기록할까요. ???', mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+       exit;
+    if MessageDlg('입고실적일자시간이 [' + ls_dt + '] 가 맞습니까 ?', mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+       exit;
+
+    if ls_bogo = '0' then
+    begin
+       if MessageDlg('입고실적을 HOST에도 보고 하는게 맞습니까 ??', mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+          exit;
+    end;
+    if ls_bogo = '1' then
+    begin
+       if MessageDlg('입고실적을 HOST에도 보고 안하는게 맞습니까 ??', mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+       exit;
+    end;
+   end 
+   else
+   begin
+        if MessageDlg('정말 입고실적에 기록안해도 됩니까 ???', mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+        exit;
+   end;
+
+   ls_lane := trim(edtlane.text);
+   ls_date := copy(ls_dt, 1, 8);
+   ls_time := copy(ls_dt, 9, 6);
+
+   if cbx_1.checked then
+   begin
+      var_sql := 'INSERT INTO miihst(ihst_date, ihst_time, ihst_code, ihst_line ';
+      var_sql := var_sql + ',ihst_flag, ihst_ptid, ihst_cargbn)';
+      var_sql := var_sql + ' VALUES( '''+ls_date+''', '''+ls_time+''', '''+s_item+''' ';
+      var_sql := var_sql + ' , '''+ls_lane+''', '''+ls_bogo+'''  ';
+      var_sql := var_sql + ' , '''+ls_ptid+''' , '''+ls_cargbn+''' )';
+      With Query2 Do
+      begin
+       Try
+        Close;
+        SQL.Clear;
+        SQL.Add( var_sql );
+        ExecSql;
+       Except
+        MessageDlg('에러: 이력삽입에러! 입고시간바꾼후 다시실행 하세요!!', mtInformation,[mbOk], 0);
+        Exit;
+       End;
+      End;
+   end;
+
+   MesgStatusBar.SimpleText := '정상 수정 하였습니다.!!';
+end;
+
+procedure TSFrm_6100.Delete_Code;
+var
+    ls_rsrv : string;
+begin
+   ls_rsrv := trim(edtrsrv.text);
+
+   if (ls_rsrv = '$')  then
+   begin
+     var_sql := 'update milstk set  ';
+     var_sql := var_sql + ' lstk_rend  = '''', lstk_rsrv = ''0'',lstk_ogubn = '''', lstk_oupt = 0, lstk_work  = '''',  ';
+     var_sql := var_sql + ' lstk_rdat = '''',  lstk_fact = '''' ';
+     var_sql := var_sql + ' where lstk_loca = '''+s_loca+''' ';
+   end
+   else
+   begin
+     var_sql := 'update milstk set lstk_use = ''1'', lstk_item = '''',   lstk_inalja = '''', ';
+     var_sql := var_sql + ' lstk_rdat = '''',  lstk_rsrv = ''0'', ';
+     var_sql := var_sql + ' lstk_rend  = '''',  lstk_bigo = '''', lstk_oupt = 0, ';
+     var_sql := var_sql + ' lstk_work  = '''',  lstk_ptid = '''',  lstk_ogubn = '''', ';
+     var_sql := var_sql + ' lstk_cargbn = '''', lstk_fact = '''' ';
+     var_sql := var_sql + ' where lstk_loca = '''+s_loca+''' ';
+   end;
+   With Query2 Do
+   begin
+    Try
+      Close;
+      SQL.Clear;
+      SQL.Add( var_sql );
+      ExecSql;
+    Except
+      MessageDlg('에러: CELL상태가 변했습니다. 조회후 다시실행  ', mtInformation,[mbOk], 0);
+      Exit;
+    End;
+   End;
+
+   MesgStatusBar.SimpleText := '정상 삭제 하였습니다.!!';
+end;
+
+procedure TSFrm_6100.ExitBitBtnClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TSFrm_6100.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action := caFree;
+end;
+
+procedure TSFrm_6100.FormDestroy(Sender: TObject);
+begin
+  SFrm_6100 := Nil;
+end;
+
+end.
+

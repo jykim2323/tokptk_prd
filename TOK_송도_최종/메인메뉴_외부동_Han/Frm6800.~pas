@@ -1,0 +1,682 @@
+unit Frm6800;
+
+interface      
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  StdCtrls, Buttons, ComCtrls, ExtCtrls, Grids, DBGrids, Db, DBTables,
+  DBCtrls, Mask, ScktComp, ADODB, QRCtrls, QuickRpt, Excel2000, OleServer,
+  ComObj, Variants, BaseGrid, AdvGrid;
+
+type
+  TFrm_6800 = class(TForm)
+    DataSource1: TDataSource;
+    Query2: TADOQuery;
+    Query1: TADOQuery;
+    StockSG: TAdvStringGrid;
+    Titlepl: TPanel;
+    FromDate: TDateTimePicker;
+    Label1: TLabel;
+    ToDate: TDateTimePicker;
+    Label2: TLabel;
+    Panel1: TPanel;
+    Shape1: TShape;
+    Label4: TLabel;
+    ExitBitBtn: TSpeedButton;
+    PrintBtn: TSpeedButton;
+    ExcelBitBtn: TSpeedButton;
+    StartBitBtn: TSpeedButton;
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure ExitBitBtnClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure PrintBitBtnClick(Sender: TObject);
+    procedure StartBitBtnClick(Sender: TObject);      
+    procedure FormDestroy(Sender: TObject);      
+  
+    procedure ExcelBitBtnClick(Sender: TObject);
+    procedure PrintBtnClick(Sender: TObject);
+    procedure StockSGGetCellColor(Sender: TObject; ARow, ACol: Integer;
+      AState: TGridDrawState; ABrush: TBrush; AFont: TFont);
+    procedure StockSGGetAlignment(Sender: TObject; ARow, ACol: Integer;
+      var HAlign: TAlignment; var VAlign: TVAlignment);
+    procedure StockSGGetCellBorder(Sender: TObject; ARow, ACol: Integer;
+      APen: TPen; var Borders: TCellBorders);
+    procedure StockSGGetCellBorderProp(Sender: TObject; ARow,
+      ACol: Integer; LeftPen, TopPen, RightPen, BottomPen: TPen);
+  
+  private
+    { Private declarations }
+   lcid : integer;
+
+   procedure Grid_Title;
+   procedure Stock_Grid_Clear;
+   procedure GridToExel(s_title, s_date, s_frdate, s_todate: string);
+  public
+    { Public declarations }
+  end;
+
+var
+  Frm_6800: TFrm_6800;
+  var_Sql : String;
+
+  var_SelForm : TForm;
+  var_Modal : Boolean;
+  StrDate, s_index : String;
+
+  sys_datetime  : string[14];
+  s_date : string[8];
+  s_time : string[6];
+
+  jj, ii, IntPos, Count : integer;
+  
+implementation
+
+Uses  DbSet, WinLib, FrmPrompt, FrmError;
+{$R *.DFM}
+
+procedure TFrm_6800.FormCreate(Sender: TObject);
+var
+  ls_sql, StrCode : String;
+begin
+  FromDate.Date := Now-1;   ToDate.Date := Now;
+  Grid_Title;
+//  StartBitBtnClick(Self);
+
+end;
+
+procedure TFrm_6800.Grid_Title;
+begin
+  With StockSG Do Begin
+     Clear;
+     
+     Cells[1,0] := '구분';
+     Cells[2,0] := '항목/일자';
+
+
+     Cells[1, 1] := '공정';
+     Cells[2, 1] := '상품셀';
+     Cells[2, 2] := '제품셀';
+     Cells[2, 3] := '원재료셀';
+     Cells[2, 4] := 'R&D셀';
+     Cells[2, 5] := 'PE셀';
+     Cells[2, 6] := '영업SAMPLE셀';
+     Cells[2, 7] := 'QC약품셀';
+     Cells[2, 8] := '공셀';
+     Cells[2, 9] := '공파레트';
+     Cells[2, 10] := '사용가능셀';
+     Cells[2, 11] := '사용셀';
+     Cells[2, 12] := '상품재고량';
+     Cells[2, 13] := '제품재고량';
+     Cells[2, 14] := '상품+제품';
+     Cells[2, 15] := '원재료재고량';
+     Cells[2, 16] := '사용률(342)';
+     MergeCells(1,1,1,16);
+     Colors[1,1] := $00EEF2EE;
+
+     Cells[1, 17] := '외부';
+     Cells[2, 17] := '상품셀';
+     Cells[2, 18] := '제품셀';
+     Cells[2, 19] := '원재료셀';
+     Cells[2, 20] := 'R&D셀';
+     Cells[2, 21] := 'PE셀';
+     Cells[2, 22] := '영업SAMPLE셀';
+     Cells[2, 23] := 'QC약품셀';
+     Cells[2, 24] := '공셀';
+     Cells[2, 25] := '공파레트';
+     Cells[2, 26] := '사용가능셀';
+     Cells[2, 27] := '사용셀';
+     Cells[2, 28] := '상품재고량';
+     Cells[2, 29] := '제품재고량';
+     Cells[2, 30] := '상품+제품';
+     Cells[2, 31] := '원재료재고량';
+     Cells[2, 32] := '사용률(702)';
+     MergeCells(1,17,1,16);
+     Colors[1,17] := clCream;    // $00F0F1EF //$00EEF2EE //$00F2F3ED //$00E4E4E4;
+
+     Cells[1, 33] := '수동';
+     Cells[2, 33] := '상품셀';
+     Cells[2, 34] := '제품셀';
+     Cells[2, 35] := '원재료셀';
+     Cells[2, 36] := 'R&D셀';
+     Cells[2, 37] := 'PE셀';
+     Cells[2, 38] := '영업SAMPLE셀';
+     Cells[2, 39] := 'QC약품셀';
+     Cells[2, 40] := '공셀';
+     Cells[2, 41] := '공파레트';
+     Cells[2, 42] := '사용가능셀';
+     Cells[2, 43] := '사용셀';
+     Cells[2, 44] := '상품재고량';
+     Cells[2, 45] := '제품재고량';
+     Cells[2, 46] := '상품+제품';
+     Cells[2, 47] := '원재료재고량';
+     Cells[2, 48] := '사용률(299)';   // '사용률(409)';
+     MergeCells(1,33,1,16);
+     Colors[1,33] := $00D7EAEA;     // $00F0F1EF //$00EEF2EE //$00F2F3ED //$00E4E4E4;
+
+
+     Cells[1, 49] := '합계';
+     Cells[2, 49] := '상품셀';
+     Cells[2, 50] := '제품셀';
+     Cells[2, 51] := '원재료셀';
+     Cells[2, 52] := 'R&D셀';
+     Cells[2, 53] := 'PE셀';
+     Cells[2, 54] := '영업SAMPLE셀';
+     Cells[2, 55] := 'QC약품셀';
+     Cells[2, 56] := '공셀';
+     Cells[2, 57] := '공파레트';
+     Cells[2, 58] := '사용가능셀';
+     Cells[2, 59] := '사용셀';
+     Cells[2, 60] := '상품재고량';
+     Cells[2, 61] := '제품재고량';
+     Cells[2, 62] := '상품+제품';
+     Cells[2, 63] := '원재료재고량';
+     Cells[2, 64] := '사용률(1453)';
+     MergeCells(1,49,1,16);
+     Colors[1,49] := $00E1E1FF;     // $00F0F1EF //$00EEF2EE //$00F2F3ED //$00E4E4E4;
+  End;
+
+end;
+
+procedure TFrm_6800.Stock_Grid_Clear;
+var
+  IntCnt, li_x, li_y, li_z  : Integer;
+begin
+  With StockSG Do Begin
+   for li_z := 1 to ColCount do begin
+    for li_y := 1 to RowCount do
+     begin
+      Cells[li_z, li_y] := '';
+     end;
+   end;
+  End;    
+end;
+
+
+procedure TFrm_6800.StartBitBtnClick(Sender: TObject);
+var    
+  li_qty, li_esum, li_tsum, li_total, li_oldqty : Integer;
+  ls_sql, S_percent : String;
+  Stok_Percent, li_sum : Real;
+  Stok_cnt, Stok_cnt1, Stok_cnt2,  Stok_cnt3, iRow, iCol : integer;
+  StrQty1, StrQty2, StrQty3 : String;
+  StrDate1,StrDate2, ls_date  : String;
+begin
+  StrDate1 := FormatDateTime('yyyymmdd', FromDate.Date);
+  StrDate2 := FormatDateTime('yyyymmdd', ToDate.Date);
+
+  ls_sql := '  Select Top(31) * From T2MISTOK (NOLOCK) ';
+  ls_sql := ls_sql + ' Where STOK_DATE >= '''+StrDate1+''' And STOK_DATE <= '''+StrDate2+'''  ';
+  ls_sql := ls_sql  + ' Order by STOK_DATE   ';
+
+  Query1.Close;
+  Query1.SQL.Clear;
+  Query1.SQL.Add(ls_sql);
+  Query1.Open;
+  Query1.First;
+
+  if (Query1.RecordCount = 0) then Exit;
+
+  li_sum := 0;
+  iRow := 0;
+  iCol := 2;
+
+  while True do
+  begin
+       if Query1.Eof = True then break;
+
+       inc(iRow);     inc(iCol);
+////////////////////////////////////////////////////////////////////////////////
+// 생산동 자동창고
+
+       ls_date :=  Query1.FieldByName('STOK_DATE').AsString;
+       if Length(Trim(ls_date)) = 8  then ls_date := Copy(ls_date,1,4) + '/' + Copy(ls_date,5,2) + '/' + Copy(ls_date,7,2);
+
+       StockSG.Cells[iCol,0] := Copy(ls_date,6,5);
+
+       li_sum  := Query1.FieldByName('STOK_T1QTY1').AsFloat;
+       StockSG.Cells[iCol, 1] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T1QTY2').AsFloat;
+       StockSG.Cells[iCol, 2] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T1QTY3').AsFloat;
+       StockSG.Cells[iCol, 3] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T1QTY4').AsFloat;
+       StockSG.Cells[iCol, 4] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T1QTY5').AsFloat;
+       StockSG.Cells[iCol, 5] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T1QTY6').AsFloat;
+       StockSG.Cells[iCol, 6] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T1QTY7').AsFloat;
+       StockSG.Cells[iCol, 7] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T1QTY8').AsFloat;
+       StockSG.Cells[iCol, 8] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T1QTY9').AsFloat;
+       StockSG.Cells[iCol, 9] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T1QTY10').AsFloat;
+       StockSG.Cells[iCol, 10] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T1QTY11').AsFloat;
+       StockSG.Cells[iCol, 11] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T1QTY12').AsFloat;
+       StockSG.Cells[iCol, 12] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T1QTY13').AsFloat;
+       StockSG.Cells[iCol, 13] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T1QTY14').AsFloat;
+       StockSG.Cells[iCol, 14] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T1QTY15').AsFloat;
+       StockSG.Cells[iCol, 15] := FormatFloat('###,##0', li_sum);
+
+       Stok_Percent  := Query1.FieldByName('STOK_T1QTY16').AsFloat;
+       S_Percent     := Format('%3.1f', [Stok_Percent]);
+       StockSG.Cells[iCol, 16] := S_percent + '%';
+////////////////////////////////////////////////////////////////////////////////
+// 외부동 자동창고
+
+       li_sum  := Query1.FieldByName('STOK_T2QTY1').AsFloat;
+       StockSG.Cells[iCol, 17] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T2QTY2').AsFloat;
+       StockSG.Cells[iCol, 18] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T2QTY3').AsFloat;
+       StockSG.Cells[iCol, 19] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T2QTY4').AsFloat;
+       StockSG.Cells[iCol, 20] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T2QTY5').AsFloat;
+       StockSG.Cells[iCol, 21] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T2QTY6').AsFloat;
+       StockSG.Cells[iCol, 22] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T2QTY7').AsFloat;
+       StockSG.Cells[iCol, 23] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T2QTY8').AsFloat;
+       StockSG.Cells[iCol, 24] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T2QTY9').AsFloat;
+       StockSG.Cells[iCol, 25] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T2QTY10').AsFloat;
+       StockSG.Cells[iCol, 26] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T2QTY11').AsFloat;
+       StockSG.Cells[iCol, 27] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T2QTY12').AsFloat;
+       StockSG.Cells[iCol, 28] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T2QTY13').AsFloat;
+       StockSG.Cells[iCol, 29] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T2QTY14').AsFloat;
+       StockSG.Cells[iCol, 30] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_T2QTY15').AsFloat;
+       StockSG.Cells[iCol, 31] := FormatFloat('###,##0', li_sum);
+
+       Stok_Percent  := Query1.FieldByName('STOK_T2QTY16').AsFloat;
+       S_Percent     := Format('%3.1f', [Stok_Percent]);
+       StockSG.Cells[iCol, 32] := S_percent + '%';
+////////////////////////////////////////////////////////////////////////////////
+// 수동창고
+       li_sum  := Query1.FieldByName('STOK_S1QTY1').AsFloat;
+       StockSG.Cells[iCol, 33] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_S1QTY2').AsFloat;
+       StockSG.Cells[iCol, 34] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_S1QTY3').AsFloat;
+       StockSG.Cells[iCol, 35] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_S1QTY4').AsFloat;
+       StockSG.Cells[iCol, 36] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_S1QTY5').AsFloat;
+       StockSG.Cells[iCol, 37] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_S1QTY6').AsFloat;
+       StockSG.Cells[iCol, 38] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_S1QTY7').AsFloat;
+       StockSG.Cells[iCol, 39] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_S1QTY8').AsFloat;
+       StockSG.Cells[iCol, 40] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_S1QTY9').AsFloat;
+       StockSG.Cells[iCol, 41] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_S1QTY10').AsFloat;
+       StockSG.Cells[iCol, 42] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_S1QTY11').AsFloat;
+       StockSG.Cells[iCol, 43] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_S1QTY12').AsFloat;
+       StockSG.Cells[iCol, 44] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_S1QTY13').AsFloat;
+       StockSG.Cells[iCol, 45] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_S1QTY14').AsFloat;
+       StockSG.Cells[iCol, 46] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_S1QTY15').AsFloat;
+       StockSG.Cells[iCol, 47] := FormatFloat('###,##0', li_sum);
+
+       Stok_Percent  := Query1.FieldByName('STOK_S1QTY16').AsFloat;
+       S_Percent     := Format('%3.1f', [Stok_Percent]);
+       StockSG.Cells[iCol, 48] := S_percent + '%';
+////////////////////////////////////////////////////////////////////////////////
+// 창고 합계
+
+       li_sum  := Query1.FieldByName('STOK_TTQTY1').AsFloat;
+       StockSG.Cells[iCol, 49] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_TTQTY2').AsFloat;
+       StockSG.Cells[iCol, 50] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_TTQTY3').AsFloat;
+       StockSG.Cells[iCol, 51] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_TTQTY4').AsFloat;
+       StockSG.Cells[iCol, 52] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_TTQTY5').AsFloat;
+       StockSG.Cells[iCol, 53] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_TTQTY6').AsFloat;
+       StockSG.Cells[iCol, 54] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_TTQTY7').AsFloat;
+       StockSG.Cells[iCol, 55] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_TTQTY8').AsFloat;
+       StockSG.Cells[iCol, 56] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_TTQTY9').AsFloat;
+       StockSG.Cells[iCol, 57] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_TTQTY10').AsFloat;
+       StockSG.Cells[iCol, 58] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_TTQTY11').AsFloat;
+       StockSG.Cells[iCol, 59] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_TTQTY12').AsFloat;
+       StockSG.Cells[iCol, 60] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_TTQTY13').AsFloat;
+       StockSG.Cells[iCol, 61] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_TTQTY14').AsFloat;
+       StockSG.Cells[iCol, 62] := FormatFloat('###,##0', li_sum);
+
+       li_sum  := Query1.FieldByName('STOK_TTQTY15').AsFloat;
+       StockSG.Cells[iCol, 63] := FormatFloat('###,##0', li_sum);
+
+       Stok_Percent  := Query1.FieldByName('STOK_TTQTY16').AsFloat;
+       S_Percent     := Format('%3.1f', [Stok_Percent]);
+       StockSG.Cells[iCol, 64] := S_percent + '%';
+
+
+//       StockSG.RowCount := iRow + 1;
+
+       Query1.Next;
+  end;
+end;
+
+procedure TFrm_6800.PrintBitBtnClick(Sender: TObject);
+begin
+  PrintScale := poPrintToFit;
+  Print;
+end;
+
+procedure TFrm_6800.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action := caFree;
+end;
+
+procedure TFrm_6800.ExitBitBtnClick(Sender: TObject);
+begin
+  close;
+end;
+
+procedure TFrm_6800.FormDestroy(Sender: TObject);
+begin
+   Frm_6800 := Nil;
+end;
+
+procedure TFrm_6800.ExcelBitBtnClick(Sender: TObject);
+var
+   ls_date, ls_frdate, ls_todate, ls_title : String;
+begin
+ if MessageDlg('엑셀로 저장하겠습니까 ?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+ begin
+
+   ls_date  := DateTimeToStr( Now );
+
+   
+   ls_todate := '';
+   ls_title  := '일별재고현황';
+
+   GridToExel(ls_title, ls_date, ls_frdate, ls_todate );
+ end;
+end;
+
+{*****************************************************************************}
+{*  엑셀저장처리                                                             *}
+{*****************************************************************************}
+procedure TFrm_6800.GridToExel(s_title,  s_date, s_frdate, s_todate: string);
+var
+   i,j, Row, Col, ColCnt,RowCnt, BookCount:Integer;
+   V, sheet : Variant;
+begin
+
+ ColCnt:= 13;
+ RowCnt:= StockSG.RowCount - 1;
+ i := 1;
+ J := 0;
+
+ try
+    if VarIsEmpty(V) then begin
+      BookCount := 0;
+      V := CreateOleObject('Excel.Application');
+    end;
+    V.Visible := False;
+    V.WorkBooks.Add;
+    BookCount := BookCount + 1;
+    Sheet := V.Workbooks[BookCount].Sheets[1];
+    Sheet.Name := s_title;
+ except 
+ end;    
+
+  V.Cells[1,2].Value := '[[ ' + s_title + ' ]]';
+
+  V.Cells[1,2].Font.Size := '22';
+  V.Cells[1,2].Font.Name := '굴림체';
+  V.Cells[1,2].Font.FontStyle := 'Bold';
+  V.Cells[1,2].EntireRow.Interior.Color := $02EEEEEE;
+
+
+  V.Cells[2,1].Value := '발행일시:';
+  V.Cells[2,2].Value := s_date;
+
+ for Row := 4 to RowCnt+4 do begin
+   V.Cells[Row,1].Value := StockSG.Cells[1, J];
+   V.Cells[Row,2].Value := StockSG.Cells[2, J];
+   V.Cells[Row,3].Value := StockSG.Cells[3, J];
+   V.Cells[Row,4].Value := StockSG.Cells[4, J];
+   V.Cells[Row,5].Value := StockSG.Cells[5, J];
+   V.Cells[Row,6].Value := StockSG.Cells[6, J];
+   V.Cells[Row,7].Value := StockSG.Cells[7, J];
+   V.Cells[Row,8].Value := StockSG.Cells[8, J];
+   V.Cells[Row,9].Value := StockSG.Cells[9, J];
+   V.Cells[Row,10].Value := StockSG.Cells[10, J];
+   V.Cells[Row,11].Value := StockSG.Cells[11, J];
+   V.Cells[Row,12].Value := StockSG.Cells[12, J];
+   V.Cells[Row,13].Value := StockSG.Cells[13, J];
+   V.Cells[Row,14].Value := StockSG.Cells[14, J];
+   V.Cells[Row,15].Value := StockSG.Cells[15, J];
+   V.Cells[Row,16].Value := StockSG.Cells[16, J];
+   V.Cells[Row,17].Value := StockSG.Cells[17, J];
+   V.Cells[Row,18].Value := StockSG.Cells[18, J];
+   V.Cells[Row,19].Value := StockSG.Cells[19, J];
+   V.Cells[Row,20].Value := StockSG.Cells[20, J];
+   V.Cells[Row,21].Value := StockSG.Cells[21, J];
+   V.Cells[Row,22].Value := StockSG.Cells[22, J];
+   V.Cells[Row,23].Value := StockSG.Cells[23, J];
+   V.Cells[Row,24].Value := StockSG.Cells[24, J];
+   V.Cells[Row,25].Value := StockSG.Cells[25, J];
+   V.Cells[Row,26].Value := StockSG.Cells[26, J];
+   V.Cells[Row,27].Value := StockSG.Cells[27, J];
+   V.Cells[Row,28].Value := StockSG.Cells[28, J];
+   V.Cells[Row,29].Value := StockSG.Cells[29, J];
+   V.Cells[Row,30].Value := StockSG.Cells[30, J];
+   V.Cells[Row,31].Value := StockSG.Cells[31, J];
+   J := J + 1;
+end;   
+
+ v.Quit;
+
+ {   // sample
+  Interior.Color := RGB(200, 200, 200);
+  
+  HorizontalAlignment := xlHAlignCenter;
+  Columns.AutoFit;
+  Rows.AutoFit;
+
+  NumberFormat := '@';
+  HorizontalAlignment := xlHAlignLeft;
+  Columns.AutoFit;
+  Rows.AutoFit;
+
+
+  NumberFormat := '#,##0';
+  HorizontalAlignment := xlHAlignRight;
+  Columns.AutoFit;
+  Rows.AutoFit;
+}
+end;
+
+procedure TFrm_6800.PrintBtnClick(Sender: TObject);
+begin
+  PrintScale := poPrintToFit;
+  Print;
+end;
+
+procedure TFrm_6800.StockSGGetCellColor(Sender: TObject; ARow,
+  ACol: Integer; AState: TGridDrawState; ABrush: TBrush; AFont: TFont);
+var
+   ls_wsum, ls_jsum : STring;
+   li_wsum, li_jsum : Real;
+begin
+   If ARow > 0 Then
+    begin
+//       If ARow Mod 2 = 0 Then ABrush.Color := $00E4E4E4; // $00F0F1EF //$00EEF2EE //$00F2F3ED //$00E4E4E4;
+    end;
+
+      If ARow > 0 Then Begin
+       Case ACol Of
+{
+          0 :
+          1 :
+          2 :
+          3 :
+          4 :
+          5 :
+}
+          2 : Begin
+               AFont.Color  := clBlue;    //수량   폰트색 지정
+//               ABrush.Color := clMoneyGreen;
+//               AFont.Style := [fsBold];
+               End;
+
+//        1 :  ABrush.Color := clLime;  //선택   바탕색 지정
+          //ABrush.Color := clSilver;  //선택   바탕색 지정
+
+//          2 :  if  (StockSG.Cells[ACol, ARow] <> '')  then  AFont.Color  := clRed;
+
+       End;
+    End;
+//   if (ARow > 0) and (ACol in [1]) then ABrush.Color := $00B0FFFF;
+//   if (ARow > 0) and (ACol in [11]) then ABrush.Color := $00B0FFFF;
+  if (ARow = 16) or (ARow = 32) or (ARow = 48) or (ARow = 64) then AFont.Color  := clBlue;
+  if (ARow = 64) then ABrush.Color := ClYellow;
+end;
+
+procedure TFrm_6800.StockSGGetAlignment(Sender: TObject; ARow,
+  ACol: Integer; var HAlign: TAlignment; var VAlign: TVAlignment);
+begin
+    if ARow = 0 then // Title부분은 전부 중앙정렬한다.
+        HAlign := taCenter
+    else begin
+
+    if ACol in [3..33] then // 숫자값이 들어있는 번 Field의 데이터는 오른쪽으로 정렬한다.
+        HAlign := taRightJustify
+    else if ACol in [1] then HAlign := taCenter
+    else // 나머지는 왼쪽으로 정렬한다.
+        HAlign := taLeftJustify;
+    end;
+end;
+
+procedure TFrm_6800.StockSGGetCellBorder(Sender: TObject; ARow,
+  ACol: Integer; APen: TPen; var Borders: TCellBorders);
+begin
+{
+  if not Odd(ACol) and (ARow > 0) and (ACol > 0) then
+  begin
+    Borders := [cbLeft];
+    APen.Width := 1;
+    APen.Color := clBlack;
+  end;
+
+  if not Odd(ARow) and (ARow > 0) and (ACol > 0) then
+  begin
+    Borders := Borders + [cbBottom];
+    APen.Width := 1;
+    APen.Color := clBlack;
+  end;
+}
+
+{
+ if  (StockSG.Cells[2, ARow] = '사용률(342/702/409)') then
+  begin
+    Borders := [cbLeft];
+    APen.Width := 1;
+    APen.Color := clBlack;
+  end;
+}
+  if (ARow = 16) or (ARow = 32) or (ARow = 48) then
+  begin
+    Borders := Borders + [cbBottom];
+    APen.Width := 2;
+    APen.Color := clBlack;
+  end;
+
+end;
+
+procedure TFrm_6800.StockSGGetCellBorderProp(Sender: TObject; ARow,
+  ACol: Integer; LeftPen, TopPen, RightPen, BottomPen: TPen);
+begin
+//   LeftPen.Color := clBlue;
+  
+   BottomPen.Color := clRed;
+end;
+
+end.

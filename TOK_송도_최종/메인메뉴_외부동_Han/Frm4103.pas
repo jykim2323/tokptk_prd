@@ -1,0 +1,436 @@
+unit Frm4103;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, Grids, DBGrids, Buttons, ExtCtrls, Mask, DB, DBTables,
+  ADODB, ComCtrls, QuickRpt, QRCtrls, qrBarcode;
+
+type
+  PLT_DESC = Record
+    Code : String;
+    Length : String;
+    Color  : String;
+    Qty : Integer;
+  End;
+
+  TFrm_4103 = class(TForm)
+    Panel1: TPanel;
+    Shape1: TShape;
+    Label4: TLabel;
+    ExitBitBtn: TSpeedButton;
+    Panel9: TPanel;
+    ChaSuCB: TComboBox;
+    Panel8: TPanel;
+    Panel10: TPanel;
+    OutDateDTP: TDateTimePicker;
+    DataSource1: TDataSource;
+    DispGrid: TDBGrid;
+    StartBitBtn: TSpeedButton;
+    Query1: TADOQuery;
+    Query1OUPT_DATE: TStringField;
+    Query1OUPT_JOB_FLAG: TStringField;
+    Query2: TADOQuery;
+    PrintBitBtn: TSpeedButton;
+    Query1OUPT_CNT: TIntegerField;
+    Query1OUPT_CHASU: TStringField;
+    QuickReport: TQuickRep;
+    QRBand3: TQRBand;
+    QRBand4: TQRBand;
+    QRLbl_DateTime: TQRLabel;
+    QRBand5: TQRBand;
+    QRLbl_Code: TQRLabel;
+    QRLabel11: TQRLabel;
+    QRBand2: TQRBand;
+    QRExpr1: TQRExpr;
+    QRDBText7: TQRDBText;
+    QRLabel5: TQRLabel;
+    QRLabel14: TQRLabel;
+    QRLabel3: TQRLabel;
+    QRLabel10: TQRLabel;
+    QRLabel1: TQRLabel;
+    QRLabel8: TQRLabel;
+    QRLabel4: TQRLabel;
+    QRLabel9: TQRLabel;
+    PrtQuery: TADOQuery;
+    PrtQueryOUPT_HOGI: TStringField;
+    PrtQueryOUPT_DATE: TStringField;
+    PrtQueryOUPT_INDEX: TStringField;
+    PrtQueryOUPT_LOCA: TStringField;
+    PrtQueryOUPT_CODE: TStringField;
+    PrtQueryMAST_NAME: TStringField;
+    PrtQueryOUPT_LOTNO: TStringField;
+    PrtQueryOUPT_WGT: TBCDField;
+    PrtQueryOUPT_OUT_WGT: TBCDField;
+    PrtQueryOUPT_INDATE: TStringField;
+    PrtQueryOUPT_INTIME: TStringField;
+    PrtQueryOUPT_TIME: TStringField;
+    PrtQueryOUPT_BOXNO: TStringField;
+    PrtQueryOUPT_REMARK: TStringField;
+    PrtQueryOUPT_CHASU: TStringField;
+    QRLabel6: TQRLabel;
+    PrtQueryOUPT_CUST: TStringField;
+    QRLabel12: TQRLabel;
+    QRLabel13: TQRLabel;
+    PrtQueryOUPT_BOXNO1: TStringField;
+    PrtQueryOUPT_REMARK1: TStringField;
+    QRLabel15: TQRLabel;
+    QRLabel16: TQRLabel;
+    QrlNo: TQRLabel;
+    QRDBText1: TQRDBText;
+    QRDBText14: TQRDBText;
+    QRDBText2: TQRDBText;
+    QRDBText4: TQRDBText;
+    QRDBText3: TQRDBText;
+    QRDBText11: TQRDBText;
+    QRDBText5: TQRDBText;
+    QRDBText9: TQRDBText;
+    QRDBText12: TQRDBText;
+    QRDBText6: TQRDBText;
+    QRExpr3: TQRExpr;
+    QRDBText10: TQRDBText;
+    QRDBText8: TQRDBText;
+    QRLabel7: TQRLabel;
+    QRLabel17: TQRLabel;
+    DBGrid1: TDBGrid;
+    DataSource2: TDataSource;
+    ScQuery1: TADOQuery;
+    Query1SCHE_SC: TStringField;
+    Query1SCHE_INDEX: TStringField;
+    Query1SCHE_JOBGUBUN: TStringField;
+    Query1SCHE_LOCA: TStringField;
+    Query1SCHE_WSNO: TStringField;
+    Query1SCHE_DATE: TStringField;
+    Query1SCHE_TIME: TStringField;
+    Query1SCHE_EMER: TStringField;
+    UpdtQuery: TADOQuery;
+    DeleteBitBtn: TSpeedButton;
+    Label5: TLabel;
+    ReservedSB: TSpeedButton;
+    QRLabel2: TQRLabel;
+    QRDBText13: TQRDBText;
+    PrtQueryOUPT_PLTNO: TStringField;
+    QRShape4: TQRShape;
+    QRShape33: TQRShape;
+    QRShape13: TQRShape;
+    QRShape14: TQRShape;
+    QRShape34: TQRShape;
+    QRShape35: TQRShape;
+    QRShape15: TQRShape;
+    QRLabel23: TQRLabel;
+    QRLabel24: TQRLabel;
+    QRLabel25: TQRLabel;
+    QRLabel30: TQRLabel;
+    QRLabel29: TQRLabel;
+    procedure FormCreate(Sender: TObject);      
+    procedure ExitBitBtnClick(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure OutDateDTPChange(Sender: TObject);
+    procedure StartBitBtnClick(Sender: TObject);
+    procedure DispGridCellClick(Column: TColumn);
+    procedure PrintBitBtnClick(Sender: TObject);
+    procedure ChaSuCBChange(Sender: TObject);
+    procedure QRGroup1BeforePrint(Sender: TQRCustomBand;
+      var PrintBand: Boolean);
+    procedure QRBand3BeforePrint(Sender: TQRCustomBand;
+      var PrintBand: Boolean);
+    procedure QRBand4AfterPrint(Sender: TQRCustomBand;
+      BandPrinted: Boolean);
+    procedure QRGroup2BeforePrint(Sender: TQRCustomBand;
+      var PrintBand: Boolean);
+  
+    procedure DeleteBitBtnClick(Sender: TObject);
+    procedure ReservedSBClick(Sender: TObject);
+
+  private
+    { Private declarations }   
+    procedure ChaSuComBo_Insert;        
+  public
+    { Public declarations }
+  end;
+
+var
+  Frm_4103: TFrm_4103;
+
+  Var_Form : TForm;
+  Bol_Modal : Boolean;
+  Bol_Data_Ok : Boolean;
+
+  PltInfo : Array of PLT_DESC;
+
+  NumData : Real;
+  NumPassQty : Real;
+  StrQry : String;
+  StrMsg : String;
+  StrJobNo : String;
+  StrChasu, StrDate, s_index  : String;
+  IntPos,  IntRow, I : integer;
+
+implementation
+
+uses DbSet,WinLib, FrmPrompt, FrmError;
+
+{$R *.dfm}   
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+procedure TFrm_4103.FormCreate(Sender: TObject);
+begin
+  Top  := (Screen.Height - Self.Height) div 2;
+  Left := (Screen.Width - Self.Width) div 2;
+
+  OutDateDTP.Date := Now;
+  ChaSuComBo_Insert;
+  ChaSuCB.ItemIndex := 0;
+  StartBitBtnClick(Self);
+end;
+
+procedure TFrm_4103.ChaSuComBo_Insert;
+begin
+ StrDate := DateToStr(OutDateDtp.Date);
+  While Pos('-', StrDate) > 0 Do Begin  Delete(StrDate, pos('-', StrDate), 1); End;
+
+  StrQry := ' Select  OUPT_CHASU From T2MIOUPT (NOLOCK) ';
+  StrQry := StrQry + ' Where OUPT_DATE = '''+StrDate+''' ';
+  StrQry := StrQry + ' And   OUPT_CHASU <> '''' ';
+  StrQry := StrQry + ' Group by  OUPT_CHASU   ';
+  ChaSuCB.Clear;
+  With Query2 Do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add( StrQry );
+    Open;
+
+    if RecordCount = 0 Then Exit;
+
+    While Not Eof Do Begin
+      ChaSuCB.Items.Add(FieldByName('OUPT_CHASU').AsString);
+      Next;
+    End;
+  End;
+end;
+
+procedure TFrm_4103.StartBitBtnClick(Sender: TObject);
+begin
+  StrDate := DateToStr(OutDateDtp.Date);
+  While Pos('-', StrDate) > 0 Do Begin  Delete(StrDate, pos('-', StrDate), 1); End;
+  StrChasu := ChaSuCB.Text;  
+
+  StrQry := '  SELECT  OUPT_DATE, OUPT_CHASU, ISNULL(COUNT(DISTINCT OUPT_CODE),0) AS OUPT_CNT,  ';
+  StrQry := StrQry + ' CASE WHEN (MAX(OUPT_JOB_FLAG))= ''0'' THEN ''대기'' ELSE ''완료'' END AS OUPT_JOB_FLAG  ';
+  StrQry := StrQry + ' From T2MIOUPT (NOLOCK)   ';
+  StrQry := StrQry + ' Where OUPT_DATE   = '''+StrDate+''' ';
+  StrQry := StrQry + ' And OUPT_CHASU <> '''' ';
+  if (StrChasu  <> '') then  StrQry := StrQry + ' And   OUPT_CHASU >= '''+StrChasu+'''';
+  StrQry := StrQry + ' Group by  OUPT_DATE, OUPT_CHASU   ';
+
+  With Query1 Do Begin
+    DisableControls;
+    Close;
+    SQL.Clear;
+    SQL.Add( StrQry );
+    Open;
+    EnableControls;
+    First;
+  End;
+
+  StrQry := '  SELECT sche_sc, sche_index, sche_jobgubun, sche_loca,  ';
+  StrQry := StrQry + ' sche_wsno, sche_emer, sche_date, sche_time  FROM  t2tische1  (nolock)  ';   
+  StrQry := StrQry + ' order by sche_index  ';
+
+  with ScQuery1 do
+  begin
+    DisableControls;
+    Close;
+    SQL.clear;
+    SQL.Add( StrQry );
+    Open;
+    EnableControls;
+  end;
+end;
+
+
+
+procedure TFrm_4103.DispGridCellClick(Column: TColumn);
+begin
+  ChaSuCB.Text  := Query1.FieldByName('OUPT_CHASU').AsString;
+end;     
+
+
+procedure TFrm_4103.OutDateDTPChange(Sender: TObject);
+begin
+  ChaSuComBo_Insert;
+  ChaSuCB.ItemIndex := 0;
+  StartBitBtnClick(Self);
+end;
+
+
+procedure TFrm_4103.ExitBitBtnClick(Sender: TObject);
+begin
+   Close;
+end;
+
+procedure TFrm_4103.FormDestroy(Sender: TObject);
+begin
+   Frm_4103 := Nil;
+end;
+
+procedure TFrm_4103.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+   Action := caFree;
+end;
+
+procedure TFrm_4103.ChaSuCBChange(Sender: TObject);
+begin
+  StartBitBtnClick(Self);
+end;
+
+
+procedure TFrm_4103.PrintBitBtnClick(Sender: TObject);
+var
+  var_sql : String;
+  var_chasu : String;
+begin
+  StrDate := DateToStr(OutDateDtp.Date);
+  While Pos('-', StrDate) > 0 Do Begin  Delete(StrDate, pos('-', StrDate), 1); End;
+  var_chasu := ChaSuCB.Text; 
+
+  var_Sql := ' Select  Substring(OUPT_LOCA,1,1) As OUPT_HOGI,  OUPT_DATE, OUPT_INDEX, OUPT_LOCA, OUPT_CODE, MAST_NAME, OUPT_LOTNO,  ';
+  var_Sql := var_Sql + ' OUPT_WGT, OUPT_OUT_WGT, OUPT_INDATE,  OUPT_INTIME,  OUPT_TIME,  OUPT_BOXNO,  OUPT_REMARK, OUPT_CHASU, OUPT_CUST, OUPT_PLTNO, ';
+  var_Sql := var_Sql + ' OUPT_BOXNO1,  OUPT_REMARK1 ';
+  var_Sql := var_Sql + ' From T2MIOUPT (NOLOCK) ';
+  var_Sql := var_Sql + ' LEFT OUTER JOIN MIMAST (NOLOCK) ON MAST_CODE = OUPT_CODE ';
+  var_Sql := var_Sql + ' Where OUPT_CHASU <> ''''    ';
+  var_Sql := var_Sql + '   And OUPT_DATE = '''+StrDate +''' ';
+  var_Sql := var_Sql + '   And OUPT_CHASU  = '''+var_chasu+'''      ';
+  var_Sql := var_Sql + '    And OUPT_OUT_WGT > 0 ';   // 출고지시 내려온 대상만 불러오기 위함. 
+//  var_Sql := var_Sql + ' Order By Substring(OUPT_LOCA,1,1), OUPT_INDEX, OUPT_LOCA, OUPT_CODE, OUPT_LOTNO ';
+//  var_Sql := var_Sql + ' Order By OUPT_CUST, OUPT_CODE, OUPT_LOTNO, OUPT_BOXNO1, Substring(OUPT_LOCA,1,1), OUPT_INDEX, OUPT_LOCA ';
+  var_Sql := var_Sql + ' Order By Substring(OUPT_LOCA,1,1), OUPT_LOCA, OUPT_CUST, OUPT_CODE, OUPT_LOTNO, OUPT_BOXNO1,  OUPT_INDEX ';
+  With PrtQuery Do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add( var_Sql );
+    Open;
+    First;
+  End;
+
+  QRLbl_DateTime.Caption := DateTimeToStr( Now );
+  QRLbl_Code.Caption := '지시일자: ' + StrDate   + ' 지시차수: ' + var_chasu ;
+  QuickReport.Preview;
+
+end;
+
+
+procedure TFrm_4103.QRGroup1BeforePrint(Sender: TQRCustomBand;
+  var PrintBand: Boolean);
+begin
+   I := 0;
+end;
+
+procedure TFrm_4103.QRBand3BeforePrint(Sender: TQRCustomBand;
+  var PrintBand: Boolean);
+begin
+    I  :=  I + 1;
+   QrlNo.Caption := IntToStr(i);
+ //  QRAsBarcode1.Text := PrtQuery.FieldByName('OUPT_INDEX').AsString;
+end;
+
+procedure TFrm_4103.QRBand4AfterPrint(Sender: TQRCustomBand;
+  BandPrinted: Boolean);
+begin
+    QRBand4.ForceNewPage:=True; 
+end;
+
+procedure TFrm_4103.QRGroup2BeforePrint(Sender: TQRCustomBand;
+  var PrintBand: Boolean);
+begin
+ //   QRAsBarcode1.Text := PrtQuery.FieldByName('OUPT_INDEX').AsString;
+end;
+
+
+procedure TFrm_4103.DeleteBitBtnClick(Sender: TObject);
+var
+   var_sql, var_Msg, ls_index, ls_loca : String;
+   intPos : Integer;
+begin
+  if Dbgrid1.SelectedRows.Count = 0 then Exit;
+
+  var_Msg := ' 출고 지시  데이타를 삭제 하겠습니까??';
+  If Not WinLib_ConfirmForm( var_Msg ) Then Begin  Exit;    End;
+
+
+  For intPos := 1 To DBGrid1.SelectedRows.Count Do Begin
+      With DBGrid1.DataSource.DataSet Do Begin
+        If DBGrid1.SelectedRows.Count > 0 Then Begin
+           gotobookmark(pointer(DBGrid1.SelectedRows.items[intpos -1]));
+
+           ls_index    := ScQuery1.FieldByName('SCHE_INDEX').AsString;
+           ls_loca     := ScQuery1.FieldByName('SCHE_LOCA').AsString;
+
+           UpdtQuery.Close;
+           UpdtQuery.SQL.Clear;
+           UpdtQuery.SQL.Add(' Delete From T2MIOUPT Where OUPT_INDEX    = '''+ls_index+'''  ');
+           UpdtQuery.ExecSQL;
+
+           UpdtQuery.Close;
+           UpdtQuery.SQL.Clear;
+           UpdtQuery.SQL.Add(' Update T2MISUBK Set SUBK_RWGT = ''0.00'', SUBK_FLAG = ''1''  Where SUBK_FLAG = ''Y'' And SUBK_LOCA  = '''+ls_loca+'''  ');
+           UpdtQuery.ExecSQL;
+
+           UpdtQuery.Close;
+           UpdtQuery.SQL.Clear;
+           UpdtQuery.SQL.Add(' Update T2MILSTK Set LSTK_FLAG = ''1''  Where LSTK_FLAG = ''Y'' And LSTK_LOCA  = '''+ls_loca+'''  ');
+           UpdtQuery.ExecSQL;
+
+           UpdtQuery.Close;
+           UpdtQuery.SQL.Clear;
+           UpdtQuery.SQL.Add(' Delete from t2tische1 where sche_index = '''+ls_index+'''  ');
+           UpdtQuery.ExecSQL;
+        End;
+      End;
+    End;
+    Dbgrid1.SelectedRows.Clear;
+    StartBitBtnClick(Self);
+end;   
+
+
+procedure TFrm_4103.ReservedSBClick(Sender: TObject);
+var
+   var_sql, var_Msg : String;
+   li_sche_cnt : Integer;
+begin
+  with UpdtQuery do
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add(' select count(*) from t2tische1 (nolock) ');
+    Open;
+  end;
+  li_sche_cnt := UpdtQuery.Fields[0].AsInteger;
+  if (li_sche_cnt <= 0) then  begin WinLib_ErrorForm('출고 지시할 데이터가 없습니다..!!');  exit;  end;     
+
+  
+  var_Msg := ' 출고 지시  확정 하겠습니까??';
+  If Not WinLib_ConfirmForm( var_Msg ) Then Begin  Exit;    End;
+
+  try
+     UpdtQuery.Close;
+     UpdtQuery.SQL.Clear;
+     UpdtQuery.SQL.Add(' Insert Into t2tische Select * from t2tische1   ');
+     UpdtQuery.ExecSQL;    
+     
+     UpdtQuery.Close;
+     UpdtQuery.SQL.Clear;
+     UpdtQuery.SQL.Add(' Delete from t2tische1   ');
+     UpdtQuery.ExecSQL;
+
+     StartBitBtnClick(Self);
+  except
+    WinLib_ErrorForm('동일한 출고지시가 있습니다.에러!!');
+    exit;
+  end;
+end;
+
+end.

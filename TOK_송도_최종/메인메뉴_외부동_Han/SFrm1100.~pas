@@ -1,0 +1,291 @@
+unit SFrm1100;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, Mask, Buttons, ExtCtrls, DB, ADODB, ComCtrls, DBTables;
+
+type
+  TSFrm_1100 = class(TForm)
+    Panel1: TPanel;
+    Shape1: TShape;
+    TitleLbl: TLabel;
+    Panel2: TPanel;
+    Label2: TLabel;
+    Label8: TLabel;
+    MesgStsBar: TStatusBar;
+    ExitBitBtn: TBitBtn;
+    ConfirmBitBtn: TBitBtn;
+    NameEd: TEdit;
+    codeEd: TEdit;
+    MastUpdateQuery: TADOQuery;
+    Label4: TLabel;
+    Label5: TLabel;
+    WeightEd: TEdit;
+    UnitCB: TComboBox;
+    Label1: TLabel;
+    Label3: TLabel;
+    Label6: TLabel;
+    Gubn1CB: TComboBox;
+    Gubn2CB: TComboBox;
+    Gubn3CB: TComboBox;
+    DispQuery: TADOQuery;
+    Label7: TLabel;
+    BcodeEd: TEdit;
+    Label9: TLabel;
+    Edit1: TEdit;
+
+    procedure ConfirmBitBtnClick(Sender: TObject);
+    procedure ExitBitBtnClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormDestroy(Sender: TObject);
+    function StringConvert(str: string): string;
+    procedure FormActivate(Sender: TObject);
+
+  private
+    { Private declarations }
+    procedure Insert_Code;
+    procedure Update_Code;
+    procedure Delete_code;
+
+  public
+    { Public declarations }
+    Bol_insert : Boolean;
+    Bol_Update : Boolean;
+    Bol_Delete : Boolean;
+  end;
+
+var
+  SFrm_1100: TSFrm_1100;
+  var_sql, s_user : String;
+  sys_datetime  : string[14];
+  s_date : string[8];
+  s_time : string[6];
+
+
+implementation
+
+uses DBSet,WinLib, FrmPrompt, FrmError, Frm1100;
+
+{$R *.dfm}
+
+
+procedure TSFrm_1100.FormActivate(Sender: TObject);
+var
+  ls_sql, ls_gubn, ls_code,ls_name : String;
+begin
+{
+  Gubn1CB.Items.Clear;
+  Gubn1CB.Items.Add('');
+
+  ls_sql := ' Select * From MIGUBN1 (NOLOCK) Order By GUBN1_CODE';
+
+  With DispQuery Do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(ls_sql);
+    Open;
+
+    While Not Eof Do Begin
+      ls_code :=  FieldByNAme('GUBN1_CODE').AsString;
+      ls_name :=  FieldByNAme('GUBN1_NAME').AsString;
+
+      ls_gubn := ls_code + '-' + ls_name;
+      Gubn1CB.Items.Add(ls_gubn);
+      Next;
+    End;
+  End;
+
+  Gubn1CB.ItemIndex := 0;
+////////////////////////////////////////////
+  Gubn2CB.Items.Clear;
+  Gubn2CB.Items.Add('');
+
+  ls_sql := ' Select * From MIGUBN2 (NOLOCK) Order By GUBN2_CODE';
+
+  With DispQuery Do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(ls_sql);
+    Open;
+
+    While Not Eof Do Begin
+      ls_code :=  FieldByNAme('GUBN2_CODE').AsString;
+      ls_name :=  FieldByNAme('GUBN2_NAME').AsString;
+
+      ls_gubn := ls_code + '-' + ls_name;
+      Gubn2CB.Items.Add(ls_gubn);
+      Next;
+    End;
+  End;
+
+  Gubn2CB.ItemIndex := 0;
+/////////////////////////////////////////
+  Gubn3CB.Items.Clear;
+  Gubn3CB.Items.Add('');
+
+  ls_sql := ' Select * From MIGUBN3 (NOLOCK) Order By GUBN3_CODE';
+
+  With DispQuery Do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(ls_sql);
+    Open;
+
+    While Not Eof Do Begin
+      ls_code :=  FieldByNAme('GUBN3_CODE').AsString;
+      ls_name :=  FieldByNAme('GUBN3_NAME').AsString;
+
+      ls_gubn := ls_code + '-' + ls_name;
+      Gubn3CB.Items.Add(ls_gubn);
+      Next;
+    End;
+  End;
+
+  Gubn3CB.ItemIndex := 0;
+}  
+end;
+
+
+procedure TSFrm_1100.ConfirmBitBtnClick(Sender: TObject);
+var
+  var_Msg : String;
+begin
+   var_Msg := ' 정말로 확정 합니까.?';
+  if WinLib_ConfirmForm( var_Msg ) then
+  begin
+      IF CodeEd.Text = '' then
+      Begin
+         WinLib_ErrorForm(' 품목코드를 입력 하십시요.');
+         CodeEd.SetFocus;
+         Exit;
+      End;
+
+      IF NameEd.Text = '' then
+      Begin
+         WinLib_ErrorForm(' 품목명을 입력 하십시요...');
+         CodeEd.SetFocus;
+         Exit;
+      End;
+
+    IF Length(TRim(WeightEd.Text)) = 0 then WeightEd.Text := '0';
+
+
+    If Bol_insert      Then Insert_Code
+    else if Bol_Update Then Update_Code
+    else if Bol_Delete Then Delete_Code;
+
+    Close;
+  end;
+end;
+
+procedure TSFrm_1100.Delete_code;
+begin
+ var_sql := ' Delete From MIMAST Where MAST_CODE = '''+codeEd.Text+'''  ';
+  With MastUpdateQuery Do
+  begin
+    Try
+      Close;
+      SQL.Clear;
+      SQL.Add( var_sql );
+      ExecSql;
+    Except
+      Begin
+        WinLib_ErrorForm('품목코드  ' + CodeEd.Text + ' 삭제 에러!!!! ');
+        Exit;
+      End;
+    End;
+  end;
+    MesgStsBar.SimpleText := '품목코드 ' + CodeEd.Text + '를 삭제 하였습니다.';
+end;
+
+procedure TSFrm_1100.Insert_Code;
+var
+  ls_gubn1,  ls_gubn2, ls_gubn3 : String;
+begin
+  ls_gubn1 := Trim(Copy(Gubn1cb.Text,1,1));
+  ls_gubn2 := Trim(Copy(Gubn2cb.Text,1,1));
+  ls_gubn3 := Trim(Copy(Gubn3cb.Text,1,1));
+
+  var_sql := ' Insert Into MIMAST(MAST_CODE, MAST_BCODE, MAST_NAME, MAST_UNIT, MAST_WEIGHT, MAST_DATE,  ';
+  var_sql := var_sql + '         MAST_GUBN1, MAST_GUBN2, MAST_GUBN3 ) ';
+  var_sql := var_sql + '   Values('''+CodeEd.Text+''', '''+BCodeEd.Text+''', '''+NameEd.Text+''',  '''+UnitCB.Text+''',  ';
+  var_sql := var_sql + '          '''+WeightEd.Text+''', getdate(),  '''+ls_gubn1+''', '''+ls_gubn2+''', '''+ls_gubn3+'''  ) ';
+  With MastUpdateQuery Do
+    Try
+      Close;
+      SQL.Clear;
+      SQL.Add( var_sql );
+      ExecSql;
+    Except
+      Begin
+         WinLib_ErrorForm('품목 코드 ' + CodeEd.Text + ' 등록 에러!!!! ');
+         Exit;
+      End;
+    End;
+    MesgStsBar.SimpleText := '품목 코드 ' + CodeEd.Text + '를 등록 하였습니다...';
+end;
+
+procedure TSFrm_1100.Update_Code;
+var
+  ls_gubn1,  ls_gubn2, ls_gubn3 : String;
+begin
+  ls_gubn1 := Trim(Copy(Gubn1cb.Text,1,1));
+  ls_gubn2 := Trim(Copy(Gubn2cb.Text,1,1));
+  ls_gubn3 := Trim(Copy(Gubn3cb.Text,1,1));
+  var_sql := 'Update MIMAST Set ';
+  var_sql := var_sql + ' MAST_BCODE = '''+BcodeEd.Text+''',    ';
+  var_sql := var_sql + ' MAST_NAME   = '''+NameEd.Text+''',   MAST_UNIT = '''+UnitCb.Text+''',    ';
+  var_sql := var_sql + ' MAST_WEIGHT = '''+WeightEd.Text+''',    ';
+  var_sql := var_sql + ' MAST_DATE   =   getdate(),   ';
+  var_sql := var_sql + ' MAST_GUBN1 = '''+ls_gubn1+''',    ';
+  var_sql := var_sql + ' MAST_GUBN2 = '''+ls_gubn2+''',    ';
+  var_sql := var_sql + ' MAST_GUBN3 = '''+ls_gubn3+'''    ';
+  var_sql := var_sql + ' Where  MAST_CODE = '''+CodeEd.Text+'''  ';
+
+  With MastUpdateQuery Do
+    Try
+      Close;
+      SQL.Clear;
+      SQL.Add( var_sql );
+      ExecSql;
+    Except
+      Begin
+        WinLib_ErrorForm('품목 코드 ' + CodeEd.Text + ' 수정 에러!!!! ');
+        Exit;
+      End;
+    End;
+     MesgStsBar.SimpleText := '품목 코드 ' + CodeEd.Text + '를 수정 하였습니다...';
+end;
+
+procedure TSFrm_1100.ExitBitBtnClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TSFrm_1100.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action := caFree;
+end;
+
+procedure TSFrm_1100.FormDestroy(Sender: TObject);
+begin
+  SFrm_1100 := Nil;
+end;  
+
+function TSFrm_1100.StringConvert(str: string): string;
+var
+ I: Integer;
+ stemp : string;
+begin
+ stemp := str;
+ for I := Length(stemp) downto 1 do
+ if stemp[I] = '''' then Insert('''', stemp, I);
+ Result := stemp;
+end;
+
+
+
+end.
+

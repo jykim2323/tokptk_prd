@@ -1,0 +1,406 @@
+unit Frm4101;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, Buttons, comobj, StdCtrls, Grids, DB, ADODB, ExtCtrls;
+
+type
+  TFrm_4101 = class(TForm)
+    OpenDialog1: TOpenDialog;
+    StringGrid1: TStringGrid;
+    Edit1: TEdit;
+    Query2: TADOQuery;
+    Panel1: TPanel;
+    Shape1: TShape;
+    Label4: TLabel;
+    UpdateBitBtn: TSpeedButton;
+    ExitBitBtn: TSpeedButton;
+    ExlBtn: TSpeedButton;
+    DeleteBitBtn: TSpeedButton;
+    CancelSB: TSpeedButton;
+    LineEd: TEdit;
+    Panel3: TPanel;
+    UpdtQuery: TADOQuery;
+    Memo1: TMemo;
+    Label1: TLabel;
+    procedure ExlBtnClick(Sender: TObject);
+    procedure UpdateBitBtnClick(Sender: TObject);
+    procedure ExitBitBtnClick(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure DeleteBitBtnClick(Sender: TObject);
+    procedure CancelSBClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure Grid_Title;
+    procedure StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer;
+      Rect: TRect; State: TGridDrawState);
+  private
+    { Private declarations }
+  function StringConvert(str: string): string;
+  function f_get_sysdate_time1(): String;
+
+  public
+    { Public declarations }
+  end;
+
+var
+  Frm_4101: TFrm_4101;
+
+implementation
+
+{$R *.dfm}
+uses DBSet, WinLib, FrmProgress;
+
+
+procedure TFrm_4101.FormCreate(Sender: TObject);
+begin
+  Top  := (Screen.Height - Self.Height) div 2;
+  Left := (Screen.Width - Self.Width) div 2;
+  Grid_Title;
+end;
+
+procedure TFrm_4101.Grid_Title;
+begin
+  With StringGrid1 Do Begin
+     Cells[1,0] := 'NO';
+     Cells[2,0] := '품목코드';
+     Cells[3,0] := '품  명';
+     Cells[4,0] := 'LOTNO';
+     Cells[5,0] := '출고수량';
+     Cells[6,0] := '납품처';
+     Cells[7,0] := 'BOXNO';
+     Cells[8,0] := '비고';
+  End;
+End;    
+
+
+procedure TFrm_4101.ExlBtnClick(Sender: TObject);
+var
+ v : Variant ;
+ iRow, iCol, eRow : integer ;
+ CNT : integer;
+ lf_time, lf_Min  : Real;
+ ls_time, ls_min, ls_hhmm : String;
+
+ ss_time, ls_seq : String;
+
+ li_line, li_Seqno, li_model, li_VehNum, li_Ocn, li_Nation : Integer;
+ li_Grade, li_Seat, li_Date, li_Time, li_Line2 : Integer;
+
+begin
+
+  If StringGrid1.Cells[1, 1] <> '' Then Exit;
+
+  if Length(Trim(LineEd.Text)) = 0   then  exit;
+  li_line   := StrToInt(Trim(LineEd.Text));
+
+  try
+      v:= CreateOleObject('Excel.application');
+  except
+     ShowMessage('Excel Not Install');
+     Exit;
+ end;
+
+ IF OpenDialog1.Execute then
+ begin
+ v.WorkBooks.open(OpenDialog1.FileName);
+ end
+ else Exit;
+
+ cnt := strToint(v.ActiveSheet.UsedRange.Rows.Count);
+
+// SHOWMESSAGE(intTostr(cnt));
+
+ StringGrid1.RowCount := cnt;
+
+ For iRow := 1 to cnt do
+ begin
+
+     eRow := iRow + li_line;
+
+
+     If Trim(v.cells[eRow, 3]) = '' Then
+     begin
+       Break;
+     end
+     else StringGrid1.Cells[2 , iRow] := Trim(v.cells[eRow, 3]);
+
+
+     StringGrid1.Cells[1 , iRow] := IntToStr(iRow);
+//     StringGrid1.Cells[2, iRow] := '2222';
+//     StringGrid1.Cells[2 , iRow] := Trim(v.cells[eRow, 3]);
+     StringGrid1.Cells[3 , iRow] := Trim(v.cells[eRow, 4]);
+     StringGrid1.Cells[4 , iRow] := Trim(v.cells[eRow, 8]);
+     StringGrid1.Cells[5 , iRow] := Trim(v.cells[eRow, 5]);
+     StringGrid1.Cells[6 , iRow] := Trim(v.cells[eRow, 11]);
+     StringGrid1.Cells[7 , iRow] := Trim(v.cells[eRow, 14]);
+     StringGrid1.Cells[8 , iRow] := Trim(v.cells[eRow, 15]);
+ end;
+
+// Edit1.Text:= ('Total = ' + IntTostr(Cnt - 1) + ' 엑셀 데이터.');
+  Edit1.Text:= ('Total = ' + IntToStr(iRow -1) + ' 엑셀 데이터.');
+
+ V.WorkBooks.Close;
+ V.quit ;
+ V:=unassigned;
+// ShowMessage('Load Complited To Excel.');
+end;
+
+procedure TFrm_4101.UpdateBitBtnClick(Sender: TObject);
+var
+ MRow, i_seq, i, int_cnt, Plt_Qty, j, k : integer ;
+ var_sql, sys_date, ls_Seq, StrChasu, stat_date : String;
+ ls_Qty, ls_item, ls_jdate, ls_seqno, ls_lotno, ls_date, ls_time : String;
+ ls_cust, ls_boxno, ls_remark : String;
+begin
+
+ if MessageDlg('출고 지시에 등록합니까  ?', mtConfirmation, [mbYes, mbNo], 0) = mrNo then  Exit;
+
+ if MessageDlg('기존출고지시 데이터는 전부 삭제 됩니다..  ?', mtConfirmation, [mbYes, mbNo], 0) = mrNo then  Exit;
+
+  //   Var_Sql := ' TRUNCATE TABLE T2HHOUPT ';
+   Var_Sql := ' DELETE  FROM T2HHOUPT ';
+   Try
+        UpdtQuery.Close;
+        UpdtQuery.SQL.Clear;
+        UpdtQuery.SQL.Add(Var_Sql);
+        UpdtQuery.ExecSQL;
+   Except
+       ShowMessage('출고지시데이터 삭제에러 = ' + Var_Sql );   exit;
+   End;
+
+
+ int_cnt := 0;       
+
+ sys_date := f_get_sysdate_time1();
+ ls_date := Copy(sys_date,1,8);
+ ls_time := Copy(sys_date,9,6);
+
+
+  var_sql := ' Select STAT_CDATE, STAT_CINDX  From T2TBSTAT (NOLOCK) Where STAT_PSWD = ''JPLS'' ';
+  Query2.Close;
+  Query2.SQL.Clear;
+  Query2.SQL.Add(var_sql);
+  Query2.Open;
+
+  stat_date  :=  Query2.FieldByName('STAT_CDATE').AsString;
+
+  if  (ls_date = stat_date)  then
+  begin
+     StrChasu :=  Format('%3.3d', [Query2.FieldByName('Stat_CINDX').AsInteger]);
+     if Query2.FieldByName('STAT_CINDX').AsInteger >= 998 Then Begin
+           var_sql := ' Update T2TBSTAT Set STAT_CINDX = convert(Numeric,''1'') ';
+     End Else Begin
+         var_sql := ' Update T2TBSTAT Set STAT_CINDX = STAT_CINDX + 1 ';
+     End;
+     var_sql := var_sql + ' Where STAT_PSWD = ''JPLS'' ';
+  end
+  else
+  begin
+      StrChasu :=  Format('%3.3d', [1]);
+      var_sql := ' Update T2TBSTAT Set STAT_CDATE = '''+ls_date+''', STAT_CINDX = convert(Numeric,''2'') ';
+      var_sql := var_sql + ' Where STAT_PSWD = ''JPLS'' ';
+  end;
+
+  UpdtQuery.Close;
+  UpdtQuery.SQL.Clear;
+  UpdtQuery.SQL.Add(var_sql);
+  UpdtQuery.ExecSQL;     
+
+
+ For MRow := 1 to StringGrid1.RowCount  do
+ begin
+     If StringGrid1.Cells[2, MRow] = '' Then Break;
+
+     ls_Seq     := Trim(StringGrid1.cells[1, MRow]);
+     ls_item    := Trim(StringGrid1.cells[2, MRow]);
+     ls_lotno   := Trim(StringGrid1.cells[4, MRow]);
+     ls_Qty     := Trim(StringGrid1.cells[5, MRow]);
+     While Pos(',', ls_Qty) > 0  Do Begin Delete(ls_Qty, Pos(',', ls_Qty), 1); End;
+     if Length(trim(ls_Qty)) = 0  then  ls_Qty := '0';
+
+     ls_cust     := Trim(StringGrid1.cells[6, MRow]);
+     ls_boxno    := Trim(StringGrid1.cells[7, MRow]);
+     ls_remark   := Trim(StringGrid1.cells[8, MRow]);
+
+     Try
+
+        var_sql := ' Select * from T2HHOUPT (NOLOCK) Where HO_DATE = '''+ls_date+''' And HO_CODE = '''+ls_item+''' ';
+        var_sql := var_sql + '   And HO_LOTNO     =  '''+ls_lotno+''' And HO_CUST   =  '''+ls_cust+''' ';
+
+        Query2.Close;
+        Query2.SQL.Clear;
+        Query2.SQL.Add(var_sql);
+        Query2.Open;
+        if  Query2.RecordCount = 0  then
+       begin
+           var_sql :=  'Insert Into T2HHOUPT( HO_DATE, HO_CHASU, HO_CODE, HO_LOTNO, HO_CUST,  HO_QTY,  HO_BOXNO, HO_REMARK, HO_TIME   ) ';
+           var_sql := var_sql +  ' Values(  '''+ls_date+''', '''+StrChasu+''',   '''+ls_item+''', '''+ls_lotno+''', '''+ls_cust+''', ';
+           var_sql := var_sql +  '           '''+ls_qty+''', '''+ls_boxno+''', '''+ls_remark+''', '''+ls_time+''' ) ';
+       end
+       else
+       begin
+          var_sql := ' Update T2HHOUPT Set HO_QTY  = ISNULL(HO_QTY,0) +  Convert(Numeric,'''+ls_Qty+''')  ';
+          var_sql := var_sql + ' Where HO_DATE = '''+ls_date+'''  ';
+          var_sql := var_sql + '   And HO_CODE  = '''+ls_item+''' And HO_LOTNO = '''+ls_lotno+''' And HO_CUST  =  '''+ls_cust+''' ';
+       end;
+
+       with Query2 do
+       begin
+              Close;
+              Sql.Clear;
+              Sql.Add(var_sql);
+              ExecSql;
+              INC(int_cnt);
+        end;
+     Except
+         Edit1.Text:= ('등록에러 = ' +  ls_lotno);
+         Memo1.Lines.Add(var_sql);        
+     End;
+ end; //Row For End
+ DeleteBitBtnClick(Self);
+ ShowMessage('출고지시 등록 건수 ' + '[' + StrChasu + ']' + '= ' + IntToStr(int_cnt));
+ Memo1.Lines.Add('출고지시 등록 건수 ' + '  차수  [' + StrChasu + ']' + '= ' + IntToStr(int_cnt));
+end;
+
+
+procedure TFrm_4101.ExitBitBtnClick(Sender: TObject);
+begin
+    Close;
+end;
+
+procedure TFrm_4101.FormDestroy(Sender: TObject);
+begin
+   Frm_4101 := Nil;
+end;
+
+procedure TFrm_4101.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+    Action := caFree;
+end;
+
+
+procedure TFrm_4101.DeleteBitBtnClick(Sender: TObject);
+var
+   IntCnt : Integer;
+begin
+   With  StringGrid1 Do Begin
+      For  Intcnt := 1  to    StringGrid1.RowCount do  Begin
+           Cells[1, Intcnt] := '';
+           Cells[2, Intcnt] := '';
+           Cells[3, Intcnt] := '';
+           Cells[4, Intcnt] := '';
+           Cells[5, Intcnt] := '';
+           Cells[6, Intcnt] := '';
+           Cells[7, Intcnt] := '';
+           Cells[8, Intcnt] := '';
+      end;
+      StringGrid1.RowCount := 2;
+   End;
+end;
+
+procedure TFrm_4101.CancelSBClick(Sender: TObject);
+var
+    m_Row, i, j : Integer;
+    StrMsg : string;
+begin
+  If StringGrid1.Cells[1, StringGrid1.Row] = '' Then Begin
+//    StrMsg := ' 삭제할 데이타가 없습니다....' + #13#10 + '데이타를 선택한 후 다시 하십시요!!!';
+    StrMsg := ' The data is exist....' + #13#10 + 'Please try again after selecting data!!!';
+    if MessageDlg( StrMsg, mtConfirmation, [mbYes, mbNo], 0) = mrNo then  Exit;
+  End;
+  StrMsg := ' Do you really want to delete select line?? .';
+  if MessageDlg( StrMsg, mtConfirmation, [mbYes, mbNo], 0) = mrNo then  Exit;
+
+  m_Row := StringGrid1.Row;
+
+  for j := m_Row to  StringGrid1.RowCount-2 do
+  begin
+    for i := 0 to    StringGrid1.ColCount-1  do
+    begin
+      StringGrid1.Cells[i, j] := StringGrid1.Cells[i, j+1];
+    end;
+  end;
+
+  for j := 0 to  StringGrid1.ColCount-1  do
+  begin
+    StringGrid1.Cells[j, StringGrid1.RowCount-1] := '';
+  end;
+
+  If StringGrid1.RowCount > 2 Then StringGrid1.RowCount := StringGrid1.RowCount - 1;
+  StringGrid1.Col := 0;
+end;
+      
+procedure TFrm_4101.StringGrid1DrawCell(Sender: TObject; ACol,
+  ARow: Integer; Rect: TRect; State: TGridDrawState);
+var
+  OldAlign : Word;
+  LeftPos: Integer;
+  CellStr: string;
+begin
+  with TStringGrid(Sender).Canvas do
+  begin
+    CellStr := TStringGrid(Sender).Cells[ACol, ARow];
+
+   IF ARow = 0 Then Begin
+      if ACol > 0 Then Begin
+        LeftPos := ((Rect.Right-Rect.Left-TStringGrid(Sender).Canvas.TextWidth(CellStr)) div 2) + Rect.Left;  // 가운데 정렬
+        With TStringGrid(Sender).Canvas.Font Do Begin
+          Brush.Color := clSkyBlue;
+          Font.Color  := clBlue;
+          Style := [fsBold];
+        End;
+        FillRect(Rect);
+        TextOut(LeftPos, Rect.Top+5, CellStr);
+      End;
+    End;
+
+    IF ARow > 0 Then Begin
+      if (ACol = 5) Then Begin
+        LeftPos := (Rect.Right-Rect.Left-TStringGrid(Sender).Canvas.TextWidth(CellStr)) + Rect.Left;  // 오른쪽 정렬
+        With TStringGrid(Sender).Canvas.Font Do Begin
+ //         Brush.Color := clyellow;
+          Font.Color  := clBlue;
+          Style := [fsBold];
+        End;
+         FillRect(Rect);
+        TextOut(LeftPos, Rect.Top+5, CellStr);
+      End;
+    End;
+  End;  
+end;
+
+
+function TFrm_4101.StringConvert(str: string): string;
+var
+ I: Integer;
+ stemp : string;
+begin
+ stemp := str;
+ for I := Length(stemp) downto 1 do
+ if stemp[I] = '''' then Insert('''', stemp, I);
+ Result := stemp;
+end;
+
+function TFrm_4101.f_get_sysdate_time1(): String;
+var
+  ls, ls_date, ls_sql : String;
+Begin
+    ls_sql := ' select convert(char(19), getdate(), 120)  from dumm_tbl (NOLOCK) ';
+    With UpdtQuery Do Begin
+      Close;
+      SQL.Clear;
+      SQL.Add(ls_sql);
+      Open;
+      ls_date    := Fields[0].AsString;
+    End;
+
+    ls := trim(ls_date);
+    ls_date := Copy(ls, 1, 4)  + Copy(ls, 6, 2)  + Copy(ls, 9, 2) + Copy(ls, 12, 2) + Copy(ls, 15, 2) + Copy(ls, 18, 2);
+
+    Result :=  ls_date
+end;
+
+end.

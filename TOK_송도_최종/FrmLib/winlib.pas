@@ -1,0 +1,760 @@
+unit winlib;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Dialogs, Forms,
+  Registry, WinSock, WinInet, shlobj, TypInfo, IMM, DBGrids, DB, ShellAPI;
+
+  {*
+  StdCtrls, ComCtrls, Psock, NMFtp, ExtCtrls, ColorButton, Buttons, IniFiles,
+  CheckLst, ShellAPI, IdBaseComponent, IdComponent, IdTCPConnection,
+  IdTCPClient, IdFTP;
+  *}
+
+type
+  DirectoryType = (_WINDOWS, _TEMP, _SYSTEM, _CURRENT, _EXEPATH);
+
+  function WinLib_GetDirectory(Dir: DirectoryType): string;                     // 사용자 디렉토리 정보 구하기
+  function WinLib_GetExePath : String;                                          // 현재 실행프로그램 위치 정보 구하기
+
+  procedure WinLib_ErrorForm( var_String : String );                            // ERROR 표현
+  Function WinLib_ConfirmForm( var_String : String ) : Boolean;                 // 확인 표현
+
+  function  WinLib_Get_Number( S : String ) : String;                           // 문자열에서 숫자만 Return
+  Function  WinLib_Chk_Non_Data( var_Data : String ) : Boolean;                 // 검색입력시에 빈문자열인지를 Check
+  procedure WinLib_Delay(MSecs : Integer);                                      // 시간지연함수
+  function  WinLib_DateCompare( var_Sdate, var_Edate : TDateTime) : Smallint;   // 날자 비교함수
+  function  WinLib_Year_Janu( var_Date : TDateTime ) : Boolean;                 // 1월인지를 조사하는 함수
+
+  function WinLib_NumFormatToInt(s : string) : Integer;                         // 금액에서 , 삭제 해주는 함수
+  function WinLib_FloatToNumber( s : Double ) : Double;                         // 반올림해주는 함수
+
+  procedure WinLib_Strsplit( sepq: String;                                      // 구분자 사이에 문자열 RETURN
+                             LineStr: String;
+                             var tmpList: TStringList);
+
+  function WinLib_GetExeVersion(ExePath: String): String;                       // 실행 화일의 버젼정보 얻기 
+
+  function  WinLib_InternetConnected : Boolean;                                 // 인터넷 연결되어있는지 확인하기
+
+  function WinLib_DelDir(APath: string): boolean;                               // 디렉토리 삭제 함수
+  function WinLib_RenMovDir(AOldPath, ANewPath: string): boolean;               // 디렉토리 이동
+
+//  procedure WinLib_SetDefaultIme(Sender: TForm);                              // 코드을 이용한 한영전환
+  procedure WinLib_SetHangulOnOffH(const bSetHan: Boolean; Handle : HWND);
+
+  Function WinLib_DBtoExcel( AFileName : String;                                // DB그리드를 읽어서 EXCEL이나 HTML로 만들기
+                             DBG : TDBGrid;
+                             SheetName:string ) : Boolean;
+
+  //------------------------------------------------------------------------------
+  //
+  //                              시간 관련 함수
+  //
+  //------------------------------------------------------------------------------
+
+  procedure WinLib_ChangeDateFormat(value: String);                             // 시스템의 날자 형식변경
+  procedure WinLib_ChangeDateFormat2(value: String);                            // 시스템의 날자 형식변경 - 2 번째
+  FUNCTION WinLib_DateOnlyStr( var_Data : TDate ) : String;                     // 날자를 오직 스트링만 추출하여 리턴
+  FUNCTION WinLib_TimeOnlyStr( var_Data : TDateTime ) : String;                 // 시간를 오직 스트링만 추출하여 리턴
+  FUNCTION WinLib_DateTimeToStr( var_Data : TDateTime ) : String;               // 날짜와 시간를 오직 스트링만 추출하여 리턴
+  FUNCTION WinLib_StrToDate( var_Data : String ) : String;                      // 날짜만을 뽑아서 RETURN
+  FUNCTION WinLib_StrToTime( var_Data : String ) : String;                      // 시간만을 봅아서 RETURN
+  FUNCTION WinLib_SpaceDate( var_INDATE : String ) : String;                    // 시작과 끝일자 사이의 총 일수 RETURN 
+
+
+  FUNCTION WinLib_WINRUN(COMMAND,PARAMS,WORKDIR:STRING) : BOOLEAN;              // 다른 프로그램의 실행
+  FUNCTION WinLib_WINRUN2(COMMAND,PARAMS,WORKDIR:STRING) : BOOLEAN;             // 다른 프로그램이 끝날때까지 기다리는 함수.
+
+
+  // 값이 비어 있는지를 CHECK 하여 비어 있다면 비어 있다는 메세지 출력이후 중지
+  FUNCTION WinLib_ChkSpace( var_Data : String ) : String;
+
+  // 문자열안의 모든 Space 제거 함수
+  FUNCTION WinLib_All_Space_Trim( src: string ) : string;
+
+  //------------------------------------------------------------------------------
+  //
+  //                              파일 관련 함수
+  //
+  //------------------------------------------------------------------------------
+  function WinLib_GetFileSize(const FileName: string): LongInt;
+  function WinLib_GetFileDateTime(const FileName: string): System.TDateTime;
+  function WinLib_HasAttr(const FileName: string; Attr: Word): Boolean;
+  function WinLib_FileTimeToDateTime(AFileTime: TFileTime): TDateTime;
+
+
+implementation
+
+USES FrmError, FrmPrompt;
+
+(*-------------------------------------------------------------------*)
+FUNCTION WinLib_WINRUN(COMMAND,PARAMS,WORKDIR:STRING) : BOOLEAN;
+// 다른 프로그램의 실행
+(* 명령어, 파라미터, 작업디렉토리를 인수로 받아서 실행한다.
+(*-------------------------------------------------------------------*)
+BEGIN
+ COMMAND:=COMMAND+#0;
+ PARAMS:=PARAMS+#0;
+ WORKDIR:=WORKDIR+#0;
+ RESULT := TRUE;
+ IF SHELLEXECUTE(0{HANDLE},Nil{'OPEN'{},@COMMAND[1],@PARAMS[1],
+                 @WORKDIR[1],SW_SHOWNORMAL)<32 THEN
+ BEGIN
+   RESULT := FALSE;
+   MESSAGEDLG('FAILED TO EXECUTE '+COMMAND,MTERROR,[MBOK],0);
+ END;
+END;
+
+(*-------------------------------------------------------------------*)
+FUNCTION WinLib_WINRUN2(COMMAND,PARAMS,WORKDIR:STRING) : BOOLEAN;
+// 다른 프로그램이 끝날때까지 기다리는 함수.
+(* 명령어, 파라미터, 작업디렉토리를 인수로 받아서 실행한다.
+(*-------------------------------------------------------------------*)
+var inst : THandle;
+BEGIN
+ COMMAND:=COMMAND+#0;
+ PARAMS:=PARAMS+#0;
+ WORKDIR:=WORKDIR+#0;
+ RESULT := TRUE;
+ inst := SHELLEXECUTE(0{HANDLE},'OPEN',@COMMAND[1],@PARAMS[1], @WORKDIR[1],SW_HIDE);
+ IF inst<32 THEN
+ BEGIN
+   RESULT := FALSE;
+   MESSAGEDLG('FAILED TO EXECUTE '+COMMAND,MTERROR,[MBOK],0);
+ END else begin
+
+  // while GetModuleUsage(inst) <> 0 do Application.ProcessMessages;
+ end;
+END;
+
+
+//------------------------------------------------------------------------------
+// 파일크기
+function WinLib_GetFileSize(const FileName: string): LongInt;
+var 
+  SearchRec: TSearchRec; 
+begin 
+  try 
+    if FindFirst(ExpandFileName(FileName), faAnyFile, SearchRec) = 0 then 
+      Result := SearchRec.Size 
+    else Result := -1; 
+  finally 
+    SysUtils.FindClose(SearchRec); 
+  end; 
+end; 
+
+//------------------------------------------------------------------------------
+// 파일의 생성시간과 일자
+function WinLib_GetFileDateTime(const FileName: string): System.TDateTime;
+begin
+  Result := FileDateToDateTime(FileAge(FileName)); 
+end; 
+
+//------------------------------------------------------------------------------
+// 파일의 속성
+function WinLib_HasAttr(const FileName: string; Attr: Word): Boolean;
+var
+  FileAttr: Integer;
+begin
+  FileAttr := FileGetAttr(FileName);
+  if FileAttr = -1 then FileAttr := 0;
+  Result := (FileAttr and Attr) = Attr;
+end;
+
+//------------------------------------------------------------------------------
+// 파일의 시간
+function WinLib_FileTimeToDateTime(AFileTime: TFileTime): TDateTime;
+var
+  SysTime: TSystemTime;
+begin
+  if not FileTimeToSystemTime(AFileTime, SysTime) then Begin
+    with SysTime do
+      Result := EncodeDate(wYear, wMonth, wDay) + EncodeTime(wHour, wMinute, wSecond, wMilliseconds);
+  End
+  Else Result := Now();
+end; 
+
+
+//------------------------------------------------------------------------------
+// 사용자 디렉토리 정보 구하기
+function WinLib_GetDirectory(Dir: DirectoryType): string;
+var
+  PATH: array [0..260] of Char;
+begin
+  case Dir of
+    _WINDOWS : GetWindowsDirectory(Path, Sizeof(PATH));
+    _SYSTEM  : GetSystemDirectory(Path, Sizeof(PATH));
+    _TEMP    : GetTempPath(Sizeof(Path), PATH);
+    _CURRENT : GetCurrentDirectory(Sizeof(Path), PATH);
+    _EXEPATH : Result := WinLib_GetExePath + '\';
+  end;
+
+  IF ( Dir <> _EXEPATH ) Then
+       Result := StrPas(PATH);
+end;
+
+// 현재 실행프로그램 위치 정보 구하기
+function WinLib_GetExePath : String;
+var
+   LastBackSlashPos, i : integer;
+begin
+     LastBackSlashPos := 0;
+     Result := Application.ExeName;
+     for i := 1 to Length(Result) do
+     begin
+        if Result[i] = '\' then
+           LastBackSlashPos := i;
+     end;
+     Result := Copy(Result, 1, LastBackSlashPos - 1);
+end;
+
+//------------------------------------------------------------------------------
+// 에러 내용를 띄어준다
+procedure WinLib_ErrorForm( var_String : String );
+Begin
+   Frm_Error := TFrm_Error.Create(Nil);
+   With Frm_Error Do begin
+     Lbl_Error.Caption := var_String;
+     ShowModal;
+   End;
+End;
+
+//------------------------------------------------------------------------------
+// 확인 내용를 띄어준다
+Function WinLib_ConfirmForm( var_String : String ) : Boolean;
+var
+   var_Result : Boolean;
+Begin
+   Frm_Prompt := TFrm_Prompt.Create(Nil);
+   With Frm_Prompt Do begin
+     Lbl_Text.Caption := var_String;
+     IF ShowModal = mrOK Then var_Result := True
+     Else var_Result := False;
+   End;
+
+   Result := var_Result;
+End;
+
+//------------------------------------------------------------------------------
+// 디렉토리 이동
+// 두개의 상위가 같으면 디렉토리명 바꾸기이며, 틀리면 이동이 된다. 
+function WinLib_RenMovDir(AOldPath, ANewPath: string): boolean; 
+begin 
+ Result := False; 
+
+ if MoveFile(PChar(AOldPath), PChar(ANewPath)) then 
+ begin 
+   // 원도우즈 탐색기에 알려서 디렉토리변경을 탐색기에 반영시킨다 
+   SHChangeNotify(SHCNE_RENAMEFOLDER, SHCNF_PATH, PChar(AOldPath), pChar(ANewPath)); 
+   Result := True; 
+ end; 
+end;
+
+//---------------------------------------------------------------------
+// 코드을 이용한 한영전환
+{*
+      Create 에
+         fnSetDefaultIme(Self); // Ime 전환
+
+      [ 사용법 ]
+         OnEdit1Enter Event에서
+           - fnSetHangulOnOffH(TRUE, edit1.handle); // 한글 모드로
+           - fnSetHangulOnOffH(False, edit1.handle); // 영문 모드로
+*}
+// Imename 프러퍼티를 무조건 바꿈. 프러퍼티가 없어도 에러 발생 안함.
+{*
+function GetDefaultImes : string;
+const
+ KbLayoutRegkeyFmt = 'System\CurrentControlSet\Control\Keyboard Layouts\.8x';
+ KbLayoutRegSubkey = 'layout text';
+var
+ TotalKbLayout, I, Bufsize: Integer;
+ KbList: array[0..63] of HKL;
+ qKey: HKey;
+ ImeFileName: array [Byte] of Char;
+ RegKey: array [0..63] of Char;
+
+ FDefaultIme: string;
+ FDefaultKbLayout: HKL;
+begin
+ Result := Screen.defaultIme;
+
+ FDefaultIme := '';
+ FDefaultKbLayout := GetKeyboardLayout(0);
+ TotalKbLayout := GetKeyboardLayoutList(64, KbList);
+
+ for I := 0 to TotalKbLayout - 1 do
+ begin
+   if Imm32IsIME(KbList[I]) then
+   begin
+     if RegOpenKeyEx(HKEY_LOCAL_MACHINE,
+       StrFmt(RegKey, KbLayoutRegKeyFmt, [KbList[I]]), 0, KEY_ALL_ACCESS,
+       qKey) = ERROR_SUCCESS then
+     try
+       Bufsize := sizeof(ImeFileName);
+       if RegQueryValueEx(qKey, KbLayoutRegSubKey, nil, nil,
+            @ImeFileName, @Bufsize) = ERROR_SUCCESS then
+       begin
+         if KbList[I] = FDefaultKbLayout then
+           Result := ImeFileName;
+       end;
+     finally
+       RegCloseKey(qKey);
+     end;
+   end;
+ end;
+end;
+
+procedure WinLib_SetDefaultIme(Sender: TForm);
+var
+ i : integer;
+ p : Pointer;
+ sDefaultIme : string;
+
+ function HasProperty(Obj : TObject; Prop : string) : PPropInfo;
+ begin
+   Result := GetPropInfo(Obj.ClassInfo, Prop);
+ end;
+ 
+begin
+ sDefaultIme := GetDefaultImes;
+
+ for I := 0 to Sender.ComponentCount -1 do
+ begin
+   p := HasProperty(Sender.Components[i], 'ImeName');
+   if p <> nil then
+      SetStrProp(Sender.Components[i], p, sDefaultIme);
+ end;
+end;
+*}
+
+// true : 한글 모드
+// false : 영문 모드
+procedure  WinLib_SetHangulOnOffH(const bSetHan: Boolean; Handle : HWND);
+var
+ TIMC : HIMC;
+ dwSentence, dwConversion : DWORD;
+ hWndCtrl : HWnd;
+begin
+ hWndCtrl := Handle;
+
+ TIMC := ImmGetContext(hWndCtrl);
+ ImmGetConversionStatus(TIMC, dwConversion, dwSentence);
+
+ if bSetHan then    // 한글 모드
+   ImmSetConversionStatus(TIMC, IME_CMODE_NATIVE, dwSentence)
+ else              // 영문 모드
+   ImmSetConversionStatus(TIMC, IME_CMODE_ROMAN, dwSentence);
+
+ ImmReleaseContext(hWndCtrl, TIMC);
+end;
+
+//------------------------------------------------------------------------------
+// 디렉토리 삭제 함수
+function WinLib_DelDir(APath: string): boolean;
+begin 
+ Result := False; 
+
+ if DeleteFile(PChar(APath)) then 
+ begin
+   // 원도우즈 탐색기에 알려서 디렉토리변경을 탐색기에 반영시킨다 
+   SHChangeNotify(SHCNE_DELETE, SHCNF_PATH, PChar(APath), pChar(APath)); 
+   Result := True; 
+ end; 
+end;
+
+//------------------------------------------------------------------------------
+// 구분자 사이에 문자열 RETURN
+{*
+     [ 사용법 ]
+        WinLib_Strsplit('|||', 'nalrsis|||인사|||하이', tmpList);
+        for i := 0 to tmpList.Count do
+           memo1.lines.add(tmplist.string[i]);
+*}
+procedure WinLib_Strsplit(sepq: String; LineStr: String; var tmpList: TStringList);
+var
+   tmpStr : String;
+begin
+   while true do begin
+     if Pos(sepq, LineStr) <> 0 then begin
+        tmpStr := Copy(LineStr, 0, Pos(sepq, LineStr) - 1);
+        tmpList.Add(tmpStr);
+        LineStr := Copy(LineStr, Pos(sepq, LineStr) + 3, Length(LineStr));
+        continue;
+     end
+     else begin
+       tmpList.Add(LineStr);
+       break;
+     end;
+   end;
+end;
+
+//------------------------------------------------------------------------------
+// 인터넷 연결되어있는지 확인하기
+function  WinLib_InternetConnected : Boolean;
+CONST
+  INTERNET_CONNECTION_MODEM = 1; // local system uses a modem to connect to the Internet.
+  INTERNET_CONNECTION_LAN = 2; // local system uses a local area network to connect to the Internet.
+  INTERNET_CONNECTION_PROXY = 4; // local system uses a proxy server to connect to the Internet.
+  INTERNET_CONNECTION_MODEM_BUSY = 8; // local system's modem is busy with a non-Internet connection.
+VAR
+  dwConnectionTypes : DWORD;
+BEGIN
+  dwConnectionTypes := INTERNET_CONNECTION_MODEM + INTERNET_CONNECTION_LAN + INTERNET_CONNECTION_PROXY;
+  Result := InternetGetConnectedState(@dwConnectionTypes,0);
+END;
+
+//------------------------------------------------------------------------------
+// 실행화일의 버젼정보 얻기
+{*
+var
+ SrvVersion : TStringList;
+begin
+ . . .
+ ExtractStrings(['.'],[],PChar(GetExeVersion(Application.ExeName)),SrvVersion);
+ // SrvVerion[0] := 메이져 버전
+ // SrvVerion[1] := 마이너 버전
+ // SrvVerion[2] := 릴리즈 버전
+ // SrvVerion[3] := 빌드
+*}
+function WinLib_GetExeVersion(ExePath: String): String;
+var
+ trans : Pointer;
+ transtring : String;
+ n, aLen, bLen : DWORD;
+ Buf : PChar;
+ VersionS : PChar;
+begin
+ n := GetFileVersionInfoSize(PChar(ExePath), n);
+ Buf := AllocMem(n);
+ GetFileVersionInfo(PChar(ExePath), 0, n, Buf);
+ VerQueryValue(Buf, 'VarFileInfo\Translation', trans, aLen);
+ transtring := IntToHex(MakeLong(HiWord(Longint(trans^)), LoWord(Longint(trans^))), 8);
+ VerQueryValue(Buf, PChar('StringFileInfo\' + transtring + '\FileVersion'), Pointer(VersionS), bLen);
+ FreeMem(Buf, n);
+ 
+ Result := VersionS;
+end;
+
+//------------------------------------------------------------------------------
+// 문자열에서 숫자만 Return
+function WinLib_Get_Number(S:String):String;
+var iL:Word;
+    Rs:String;
+begin
+  Rs := '';
+  for iL := 1 to Length(S) do
+    if S[iL] in ['0'..'9','.','-'] then Rs := Rs + S[iL];
+  if Trim(Rs) = '' then Rs := '0';
+  Result := Rs;
+end;
+
+//------------------------------------------------------------------------------
+// 검색입력시에 빈문자열인지를 Check
+Function WinLib_Chk_Non_Data( var_Data : String ) : Boolean;
+Begin
+   if var_Data = '' then
+   Begin
+        WinLib_ErrorForm('    ◁ 검색를 원하시는 문자열를 입력하여 주세요 ▷    ');
+        Result := False;
+   End
+   Else Result := True;
+End;
+
+//------------------------------------------------------------------------------
+// 시간지연함수
+procedure WinLib_Delay(MSecs : Integer);
+var 
+   FirstTickCount : LongInt; 
+begin 
+   FirstTickCount := GetTickCount;
+   repeat 
+      Application.ProcessMessages;
+   until ( ( GetTickCount - FirstTickCount ) >= LongInt(MSecs) );
+end;
+
+//------------------------------------------------------------------------------
+// 날자 비교함수
+function WinLib_DateCompare( var_Sdate, var_Edate : TDateTime) : Smallint;
+var
+        var_Result : integer;
+        var_S, var_E : integer;
+Begin
+        var_S := DateTimeToTimeStamp(var_Sdate).Date;
+        var_E := DateTimeToTimeStamp(var_Edate).Date;
+
+        IF var_S > var_E Then var_Result := -1
+        Else IF ( var_S = var_E ) Then var_Result := 0
+        Else var_Result := 1;
+
+        Result := var_Result;
+End;
+
+//------------------------------------------------------------------------------
+// 1월인지를 조사하는 함수
+Function WinLib_Year_Janu( var_Date : TDateTime ) : Boolean;
+var
+        var_Result : Boolean;
+        var_SDate : String;   
+Begin
+        var_SDate := Copy( DateToStr( var_Date ), 6, 2 );
+          
+        IF var_SDate = '01' Then var_Result := True
+        Else var_Result := False;
+
+        Result := var_Result;
+End;
+
+//------------------------------------------------------------------------------
+// 금액에서 , 삭제 해주는 함수
+function WinLib_NumFormatToInt(s : string) : Integer;
+begin
+   if Length(Trim(s)) <= 0 then
+   begin
+       Result := 0;
+       Exit;
+   end;
+   while Pos(',', s) > 0 do
+       Delete(s, Pos(',', s), 1);
+
+   Result := StrToIntDef(s, 0);
+end;
+
+//------------------------------------------------------------------------------
+// 반올림해주는 함수
+function WinLib_FloatToNumber( s : Double ) : Double;
+begin
+   Result := Trunc( s * 100 + 0.5) / 100;
+end;
+
+//------------------------------------------------------------------------------
+// 시스템의 날자 형식변경
+{*
+    [ 사용법 ]
+        ChangeDateFormat('yyyy-MM-dd')
+*}
+procedure WinLib_ChangeDateFormat(value: String);
+var
+ Registry: TRegistry;
+begin
+ Registry := TRegistry.Create;
+ with Registry do
+   begin
+     RootKey := HKEY_CURRENT_USER;
+     OpenKey('Control Panel\International', true);
+     WriteString('sShortDate', value);
+     CloseKey;
+     Free;
+   end;
+  SendMessage(HWND_BROADCAST, WM_SETTINGCHANGE, 0, 0);
+end;
+
+// 시스템의 날자 형식변경 - 2 번째
+procedure WinLib_ChangeDateFormat2( value : String );
+var
+ lngLocale: Cardinal;
+begin
+ lngLocale := GetSystemDefaultLCID;
+ if SetLocaleInfo(lngLocale, LOCALE_SSHORTDATE, PChar(value) ) then
+      SendMessage(HWND_BROADCAST, WM_SETTINGCHANGE, 0, 0)
+ else
+   ShowMessage('변경 실패');
+end;
+
+//------------------------------------------------------------------------------
+// DB그리드를 읽어서 EXCEL이나 HTML로 만들기
+{*
+    *AFileName : 저장할 파일명 (.htm을주면 htm로 인식, .xls로 주면 엑셀에서 바로읽음)
+    *DBG : DB가 연결되어있는 DBGRID
+    *SheetName : 엑셀에 표현될 타이틀명.
+*}
+Function WinLib_DBtoExcel(AFileName:String;DBG:TDBGrid;SheetName:string):Boolean;
+var
+  SL : TStringList;
+  DataSet : TDataSet;
+  i, j : Integer;
+  sValue:string;
+  sAligl : String;
+  iFontSize : Real;
+//  iWidth : Real;
+  SaveDlg : TSaveDialog;
+  FilePath : String;
+begin
+  Result:=False;
+
+  SaveDlg := TSaveDialog.Create(nil);
+  SaveDlg.FileName:=AFileName;
+  SaveDlg.Filter:='*.xls|*.xls'; //파일다이얼로그창에 XLS만 뜸
+  if SaveDlg.Execute=False then begin
+    SaveDlg.Free;
+    Exit;
+  end;
+
+  FilePath := SaveDlg.FileName;
+  i := pos('.',FilePath);
+  if i > 0 then FilePath:=Copy(FilePath,1,i-1);
+  FilePath:=FilePath+'.xls';
+  SaveDlg.Free;
+  DataSet:=DBG.DataSource.Dataset;
+  SL:=TStringList.Create;
+
+  SL.Add('<table border="1" cellspacing="0" cellpadding="0" align="center">');
+  SL.Add('<tr bgcolor="#999999">');
+  SL.Add(Format('<td align="Center"><font size=5>%s</font></td>',[SheetName]));
+  SL.Add('</tr>');
+  SL.Add('<tr bgcolor="#999999">');
+  //타이틀 처리
+  iFontSize:=2.5;
+  for i:=0 to DBG.Columns.Count-1 do begin
+//   iWidth := DBG.Columns[i].Width;
+   case DBG.Columns[i].Alignment of
+     taLeftJustify :sAligl:='Left';
+     taCenter      :sAligl:='Center';
+     taRightJustify:sAligl:='Right';
+   end;
+   sValue:=DBG.Columns[i].Title.Caption;
+   SL.Add(Format('<td align="%s"><font size=%f color="%s">%s</font></td>',
+    [sAligl,iFontSize,'white',sValue]));
+  end;
+
+  //그리드값
+  SL.Add('</tr>');
+  DataSet.First;
+  While Not DataSet.Eof do begin
+   SL.Add('<tr bgcolor="#FFFFFF">');
+   for i:=0 to DBG.Columns.Count-1 do begin
+     if DBG.Fields[i] is TStringField then
+        SL.Add(Format('<td align="%s">%s</td>',[sAligl,DBG.Fields[i].AsString]))
+     else if DBG.Fields[i] is TFloatField then
+        SL.Add(Format('<td align="%s">%s</td>',[sAligl,FormatFloat('#,##0',DBG.Fields[i].AsFloat)]))
+     else if DBG.Fields[i] is TIntegerField then
+        SL.Add(Format('<td align="%s">%s</td>',[sAligl,FormatFloat('#,##0',DBG.Fields[i].AsInteger)]));
+   end;
+   SL.Add('</tr>');
+   DataSet.Next;
+ end;
+ SL.Add('</table>');
+ SL.SaveToFile(FilePath);
+ Result:=True;
+end;  
+
+//------------------------------------------------------------------------------
+// 다른 실행프로그램 실행시키기
+{*
+    var_Sel : 1 ==> 탐색기 띄우기
+    var_Sel : 2 ==> 브라우져 띄우기
+    var_Sel : 기타 ==> 계산기 띄우기
+*}
+procedure WinLib_Exec( var_Sel : Integer );
+begin
+  IF var_Sel = 1 Then ShellExecute( 0, nil, 'C:\', nil, nil, SW_SHOW )
+  Else IF var_Sel = 2 Then ShellExecute( 0, nil, 'explorer.exe', 'http://www.koreaenm.com', nil, SW_SHOW )
+  Else ShellExecute( 0, nil, 'calc.exe', nil, nil, SW_SHOW );
+end;
+
+//==============================================================================
+//==============================================================================
+//
+//                              시간 관련 함수
+//
+//==============================================================================
+//==============================================================================
+// 날짜를 오직 스트링만 추출하여 리턴
+FUNCTION WinLib_DateOnlyStr( var_Data : TDate ) : String;
+Begin
+  Result := FormatDateTime('yyyymmdd', var_Data);
+End;
+
+// 시간를 오직 스트링만 추출하여 리턴
+FUNCTION WinLib_TimeOnlyStr( var_Data : TDateTime ) : String;
+Begin
+  Result := FormatDateTime('hhnnss', var_Data);
+End;
+
+// 날짜와 시간를 오직 스트링만 추출하여 리턴
+FUNCTION WinLib_DateTimeToStr( var_Data : TDateTime ) : String;
+Begin
+  Result := FormatDateTime('yyyymmddhhnnss', var_Data);
+End;
+
+// 날짜만을 뽑아서 RETURN
+FUNCTION WinLib_StrToDate( var_Data : String ) : String;
+var
+  var_Date : String;
+Begin
+  IF Length( var_Date ) > 8 Then Begin
+     var_Date := Copy( var_Data, 0, 8);
+  End
+  Else var_Date := var_Data;
+
+  var_Date := Copy(var_Date, 0, 4) + '-' + Copy(var_Date, 5, 2) + '-' + Copy(var_Date, 7, 2);
+  Result := var_Date;
+End;
+
+// 날짜에 시간만을 봅아서 RETURN
+FUNCTION WinLib_StrToTime( var_Data : String ) : String;
+var
+  var_Date : String;
+Begin
+  var_Date := Copy( var_Data, 9, 6);
+  Result := var_Date;
+End;
+
+// 시작과 끝일자 사이의 총 일수
+FUNCTION WinLib_SpaceDate( var_INDATE : String ) : String;
+var
+  var_Date  : String;
+Begin
+  // 문자로 된 시간을 문자형으로 바꾸어준다
+  var_Date  := Copy(var_INDATE, 0, 4 ) + '-' + Copy(var_INDATE, 5, 2 ) + '-' + Copy(var_INDATE, 7, 2 );
+  var_Date  := IntTOStr( Trunc( Date - StrToDate( var_Date ) ) );
+
+  Result := var_Date;
+End;  
+
+// 문자열안의 모든 Space 제거 함수
+function WinLib_All_Space_Trim( src: string ) : string;
+var
+  var_Result : String;
+//  Count, i   : Integer;
+begin
+  var_Result := StringReplace(src, ' ', '', [rfReplaceAll]);
+  {*
+  src := Trim(src);
+  SetLength( var_Result, Length(src) );
+
+  Count := 1;
+  for i:=1 to Length(src) do begin
+    if src[i] <> ' ' then
+    begin
+       var_Result[Count] := src[i];
+       inc(Count);
+    end;
+  end;
+  SetLength(var_Result, Count-1);
+  *}
+
+  Result := var_Result;
+end;
+
+
+//------------------------------------------------------------------------------
+// 값이 비어 있는지를 CHECK 하여 비어 있다면 비어 있다는 메세지 출력이후 중지
+FUNCTION WinLib_ChkSpace( var_Data : String ) : String;
+var
+  var_Result : String;
+Begin
+  var_Result := TRim( var_Data );
+  IF var_Result = '' Then Begin
+      WinLib_ErrorForm('    ◁ 필수 입력입니다. 값을 입력하여 주세요! ▷    ');
+      var_Result := '';
+  End;
+  Result := var_Result;
+End;
+
+
+
+
+end.

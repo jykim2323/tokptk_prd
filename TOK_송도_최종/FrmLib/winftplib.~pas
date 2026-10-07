@@ -1,0 +1,52 @@
+unit winftplib;
+
+interface
+
+uses Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+     ComCtrls, StdCtrls, ExtCtrls, Db, DBTables, IdBaseComponent, IdComponent,
+     IdTCPConnection, IdTCPClient, IdFTP, Module;
+
+   Function WinFtpLib_Ftp_Connect( var_ldFtp : TIdFTP ) : Boolean;
+
+implementation
+
+Uses WinLib, Main;
+
+// 관우회 서버에 접속을 시도한다
+Function WinFtpLib_Ftp_Connect( var_ldFtp : TIdFTP ) : Boolean;
+var
+   var_Result : Boolean;
+   var_Msg    : String;
+begin
+   var_Result:= True;
+
+   With var_ldFtp Do
+   Begin
+       Host     := GLB_FTP_IP;
+       Port     := GLB_FTP_PORT;
+       UserName := GLB_FTP_ID;
+       Password := GLB_FTP_PW;
+
+       Try
+          Connect;
+       Except On E:Exception do
+          begin
+             var_Msg := 'FTP 서버 ' + GLB_FTP_IP + ' 에 연결 할 수 없습니다...' + #13#10 + E.Message;
+//             MainForm.Memo_Ftp_Status.Lines.Add(var_Msg);
+//             WinLib_ErrorForm( var_Msg );
+             var_Result := False;
+          end;
+       end;
+
+       IF Not( var_Result and Connected ) Then Begin
+             var_Msg := 'FTP 서버 ' + GLB_FTP_IP + ' 에 연결 할 수 없습니다...';
+             MainForm.Memo_Ftp_Status.Lines.Add(var_Msg);
+//             WinLib_ErrorForm( var_Msg );
+             var_Result := False;
+       End;
+   End;
+
+   Result := var_Result;
+End;
+
+end.

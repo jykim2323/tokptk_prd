@@ -1,0 +1,439 @@
+unit Convision_u;
+
+interface
+
+uses WinTypes, WinProcs, SysUtils, classes, controls, Dialogs;
+
+const
+
+  STX = #02;
+  ETX = #03;
+  EOT = #04;
+  ENQ = #05;
+  ACK = #06;
+  NAK = #15;
+
+
+  CVC1_R_CMD  = '500000FF03FF000018000A04010000D*0008060002';
+  CVC1_W_CMD  = '500000FF03FF00001C000A14010000D*0009070001';
+
+  CVC2_R_CMD  = '500000FF03FF000018000A04010000D*0008060002';
+  CVC2_W_CMD  = '500000FF03FF00001C000A14010000D*0009070001';
+
+  CVC3_R_CMD  = '500000FF03FF000018000A04010000D*0008060002';
+  CVC3_W_CMD  = '500000FF03FF00001C000A14010000D*0009070001';
+
+  SRC1_R_CMD  = '500000FF03FF000018000A04010000D*0008000006';
+  SRC1_W_CMD  = '500000FF03FF000034000A14010000D*0009000007';
+
+  SRC2_R_CMD  = '500000FF03FF000018000A04010000D*0008000006';
+  SRC2_W_CMD  = '500000FF03FF000034000A14010000D*0009000007';
+
+  SRC3_R_CMD  = '500000FF03FF000018000A04010000D*0008000006';
+  SRC3_W_CMD  = '500000FF03FF000034000A14010000D*0009000007';
+
+
+// bcr no read data format
+  BCR_NO_READ = '????';
+  BCR_S_CMD = 'S';
+  BCR_E_CMD = 'E';
+
+// 사용할 함수및 프로시저 선언
+  function  GetBit(Data: Word; Bits: Integer): WORD; far;
+  function  CMP_NDATA(des: PChar; source: PChar; count: Integer): Integer; far;
+
+  function  StrToAscDigit(Buf: PChar; PSource: PChar; Count: Integer): Integer; far;
+  function  StrToDscDigit(Buf: PChar; PSource: PChar; Count: Integer): Integer; far;
+  function  DigitToAscStr(Buf: PChar; PSource: PChar; Count: Integer): Integer; far;
+  function  DigitToDscStr(Buf: PChar; PSource: PChar; Count: Integer): Integer; far;
+  function  Con_Bay(Buf: String): String;
+  function  Con_Read(Buf: String): String;
+
+  procedure MV_NDATA(PDest: PChar; PSrc: PChar; count: Integer); far;
+  procedure SerialNoToStr(SerialNo: Integer; PSerialNo: PChar); far;
+
+
+
+implementation
+// 8,4,2,1
+function StrToAscDigit(Buf: PChar; PSource: PChar; Count: Integer): Integer;
+var
+  Value: Char;
+  Str: String[4];
+  i, j: Integer;
+begin
+  if Count < 1 then
+  begin
+    StrToAscDigit := 1;
+    exit;
+  end;
+
+  for i := 1 to Count do
+  begin
+    Str := '0000';
+    Value  := PSource^;
+
+    case Value of
+      '0': Str := '0000';
+      '1': Str := '0001';
+      '2': Str := '0010';
+      '3': Str := '0011';
+      '4': Str := '1000';
+      '5': Str := '0101';
+      '6': Str := '0110';
+      '7': Str := '0111';
+      '8': Str := '1000';
+      '9': Str := '1001';
+      'A': Str := '1010';
+      'B': Str := '1011';
+      'C': Str := '1100';
+      'D': Str := '1101';
+      'E': Str := '1110';
+      'F': Str := '1111';
+    else
+      begin
+        Str := '0000';
+        StrToAscDigit := 1;
+        exit;
+      end;
+    end;
+
+    for j := 1 to 4 do
+    begin
+      Buf^ := Str[j];
+      Inc(Buf);
+    end;
+    Inc(PSource);
+  end;
+
+  StrToAscDigit := 0;
+end;  {* The End of StrToAscDigit() *}
+
+// 1,2,4,8
+function StrToDscDigit(Buf: PChar; PSource: PChar; Count: Integer): Integer;
+var
+  Value: Char;
+  Str: String[4];
+  i, j: Integer;
+begin
+  if Count < 1 then
+  begin
+    StrToDscDigit := 1;
+    exit;
+  end;
+
+  for i := 1 to Count do
+  begin
+    Str := '0000';
+    Value  := PSource^;
+
+    case Value of
+      '0': Str := '0000';
+      '1': Str := '1000';
+      '2': Str := '0100';
+      '3': Str := '1100';
+      '4': Str := '0010';
+      '5': Str := '1010';
+      '6': Str := '0110';
+      '7': Str := '1110';
+      '8': Str := '0001';
+      '9': Str := '1001';
+      'A': Str := '0101';
+      'B': Str := '1101';
+      'C': Str := '0011';
+      'D': Str := '1011';
+      'E': Str := '0111';
+      'F': Str := '1111';
+    else
+      begin
+        Str := '0000';
+        StrToDscDigit := 1;
+        exit;
+      end;
+    end;
+
+    for j := 1 to 4 do
+    begin
+      Buf^ := Str[j];
+      Inc(Buf);
+    end;
+
+    Inc(PSource);
+  end;
+
+  StrToDscDigit := 0;
+end;  {* The End of StrToDscDigit() *}
+
+// 8,4,2,1
+function DigitToAscStr(Buf: PChar; PSource: PChar; Count: Integer): Integer;
+var
+  Value: String[1];
+  Str: String[4];
+  i, j, k, LenSu: Integer;
+begin
+  k     := Count mod 4;
+  LenSu := Count div 4;
+
+  if (LenSu < 1) or (k <> 0) then
+  begin
+    DigitToAscStr := 1;
+    exit;
+  end;
+
+  for i := 1 to LenSu do
+  begin
+    Str   := '0000';
+    Value := '0';
+    for j := 1 to 4 do
+    begin
+      Str[j] := PSource^;
+      Inc(PSource);
+    end;
+
+    if      CMP_NDATA(@Str[1], '0000', 4) = 0 then Value := '0'
+    else if CMP_NDATA(@Str[1], '0001', 4) = 0 then Value := '1'
+    else if CMP_NDATA(@Str[1], '0010', 4) = 0 then Value := '2'
+    else if CMP_NDATA(@Str[1], '0011', 4) = 0 then Value := '3'
+    else if CMP_NDATA(@Str[1], '0100', 4) = 0 then Value := '4'
+    else if CMP_NDATA(@Str[1], '0101', 4) = 0 then Value := '5'
+    else if CMP_NDATA(@Str[1], '0110', 4) = 0 then Value := '6'
+    else if CMP_NDATA(@Str[1], '0111', 4) = 0 then Value := '7'
+    else if CMP_NDATA(@Str[1], '1000', 4) = 0 then Value := '8'
+    else if CMP_NDATA(@Str[1], '1001', 4) = 0 then Value := '9'
+    else if CMP_NDATA(@Str[1], '1010', 4) = 0 then Value := 'A'
+    else if CMP_NDATA(@Str[1], '1011', 4) = 0 then Value := 'B'
+    else if CMP_NDATA(@Str[1], '1100', 4) = 0 then Value := 'C'
+    else if CMP_NDATA(@Str[1], '1101', 4) = 0 then Value := 'D'
+    else if CMP_NDATA(@Str[1], '1110', 4) = 0 then Value := 'E'
+    else if CMP_NDATA(@Str[1], '1111', 4) = 0 then Value := 'F'
+    else
+      begin
+        Value := '0';
+        DigitToAscStr := 1;
+        exit;
+      end;
+
+    Buf^ := Value[1];
+    Inc(Buf);
+  end;
+
+  DigitToAscStr := 0;
+
+end;  {* The End of DigitToAscStr() *}
+
+// 1,2,4,8
+function DigitToDscStr(Buf: PChar; PSource: PChar; Count: Integer): Integer;
+var
+  Value: String[1];
+  Str: String[4];
+  i, j, k, LenSu: Integer;
+begin
+  k     := Count mod 4;
+  LenSu := Count div 4;
+
+  if (LenSu < 1) or (k <> 0) then
+  begin
+    DigitToDscStr := 1;
+    exit;
+  end;
+
+  for i := 1 to LenSu do
+  begin
+    Str   := '0000';
+    Value := '0';
+    for j := 1 to 4 do
+    begin
+      Str[j] := PSource^;
+      Inc(PSource);
+    end;
+
+    if      CMP_NDATA(@Str[1], '0000', 4) = 0 then Value := '0'
+    else if CMP_NDATA(@Str[1], '1000', 4) = 0 then Value := '1'
+    else if CMP_NDATA(@Str[1], '0100', 4) = 0 then Value := '2'
+    else if CMP_NDATA(@Str[1], '1100', 4) = 0 then Value := '3'
+    else if CMP_NDATA(@Str[1], '0010', 4) = 0 then Value := '4'
+    else if CMP_NDATA(@Str[1], '1010', 4) = 0 then Value := '5'
+    else if CMP_NDATA(@Str[1], '0110', 4) = 0 then Value := '6'
+    else if CMP_NDATA(@Str[1], '1110', 4) = 0 then Value := '7'
+    else if CMP_NDATA(@Str[1], '0001', 4) = 0 then Value := '8'
+    else if CMP_NDATA(@Str[1], '1001', 4) = 0 then Value := '9'
+    else if CMP_NDATA(@Str[1], '0101', 4) = 0 then Value := 'A'
+    else if CMP_NDATA(@Str[1], '1101', 4) = 0 then Value := 'B'
+    else if CMP_NDATA(@Str[1], '0011', 4) = 0 then Value := 'C'
+    else if CMP_NDATA(@Str[1], '1011', 4) = 0 then Value := 'D'
+    else if CMP_NDATA(@Str[1], '0111', 4) = 0 then Value := 'E'
+    else if CMP_NDATA(@Str[1], '1111', 4) = 0 then Value := 'F'
+    else
+      begin
+        Value := '0';
+        DigitToDscStr := 1;
+        exit;
+      end;
+
+    Buf^ := Value[1];
+    Inc(Buf);
+  end;
+
+  DigitToDscStr := 0;
+
+end;  {* The End of DigitToDscStr() *}
+///////////////////////////////////////////////////////////
+//    2004,05,3 현위치, 에러번호 Convert
+///////////////////////////////////////////////////////////
+function Con_Read(Buf: String): String;
+var
+  li_data, li_data1, li_data2 : Integer;
+  ls_data1, ls_data2 : String[1];
+begin
+
+ if  buf = '0000'   then  begin Con_Read := '0000';  exit;  end; 
+
+ ls_data1 := Copy(buf, 3, 1);
+ ls_data2 := Copy(buf, 4, 1);  
+
+ if         ls_data1 = '0' then   li_data1 := 0
+ else if    ls_data1 = '1' then   li_data1 := 1
+ else if    ls_data1 = '2' then   li_data1 := 2
+ else if    ls_data1 = '3' then   li_data1 := 3
+ else if    ls_data1 = '4' then   li_data1 := 4
+ else if    ls_data1 = '5' then   li_data1 := 5
+ else if    ls_data1 = '6' then   li_data1 := 6
+ else if    ls_data1 = '7' then   li_data1 := 7
+ else if    ls_data1 = '8' then   li_data1 := 8
+ else if    ls_data1 = '9' then   li_data1 := 9
+ else if    ls_data1 = 'A' then   li_data1 := 10
+ else if    ls_data1 = 'B' then   li_data1 := 11
+ else if    ls_data1 = 'C' then   li_data1 := 12
+ else if    ls_data1 = 'D' then   li_data1 := 13
+ else if    ls_data1 = 'E' then   li_data1 := 14
+ else if    ls_data1 = 'F' then   li_data1 := 15
+ else li_data1 := 0;
+
+ li_data1 := li_data1 * 16;
+
+ if         ls_data2 = '0' then   li_data2 := 0
+ else if    ls_data2 = '1' then   li_data2 := 1
+ else if    ls_data2 = '2' then   li_data2 := 2
+ else if    ls_data2 = '3' then   li_data2 := 3
+ else if    ls_data2 = '4' then   li_data2 := 4
+ else if    ls_data2 = '5' then   li_data2 := 5
+ else if    ls_data2 = '6' then   li_data2 := 6
+ else if    ls_data2 = '7' then   li_data2 := 7
+ else if    ls_data2 = '8' then   li_data2 := 8
+ else if    ls_data2 = '9' then   li_data2 := 9
+ else if    ls_data2 = 'A' then   li_data2 := 10
+ else if    ls_data2 = 'B' then   li_data2 := 11
+ else if    ls_data2 = 'C' then   li_data2 := 12
+ else if    ls_data2 = 'D' then   li_data2 := 13
+ else if    ls_data2 = 'E' then   li_data2 := 14
+ else if    ls_data2 = 'F' then   li_data2 := 15
+ else li_data2 := 0;
+
+ li_data := li_data1 + li_data2;
+
+ Con_Read := Format('%4.4d', [li_data]);
+
+end;  {* The End of  *}
+///////////////////////////////////////////////////////////
+//    2004,05,3 PLC송신시 연  Convert
+///////////////////////////////////////////////////////////
+function Con_Bay(Buf: String): String;
+var
+  li_bay, li_div, li_mod : Integer;
+  ls_bay1, ls_bay2 : String[1];
+
+begin
+
+ if  Buf = '0000'   then  begin  Con_Bay := '0000';  exit;  end;
+
+ li_bay  :=  StrToInt(Buf);
+ ls_bay1 := '0';  ls_bay2 := '0';
+
+ if  (li_bay  >=  16)  then
+ begin
+    li_div  := li_bay  div 16;
+    li_mod  := li_bay  mod 16;
+    ls_bay1 := IntToStr(li_div);
+    li_bay  := li_mod;
+ end;
+
+ if   (li_bay  < 10)  then
+ begin
+    ls_bay2 :=  IntToStr(li_bay);
+ end
+ else
+ begin
+   if         li_bay = 10  then   ls_bay2 := 'A'
+   else if    li_bay = 11  then   ls_bay2 := 'B'
+   else if    li_bay = 12  then   ls_bay2 := 'C'
+   else if    li_bay = 13  then   ls_bay2 := 'D'
+   else if    li_bay = 14  then   ls_bay2 := 'E'
+   else if    li_bay = 15  then   ls_bay2 := 'F'
+ end;
+
+ Con_Bay := '00' + ls_bay1 + ls_bay2;
+
+end;  {* The End of  *}
+
+procedure MV_NDATA(PDest: PChar; PSrc: PChar; Count: Integer);
+begin
+   while count > 0 do
+   begin
+     PDest^ := PSrc^;
+     Inc(PDest);
+     Inc(PSrc);
+     Dec(count);
+   end;
+
+end;  {* The End of MV_NDATA() *}
+
+
+procedure SerialNoToStr(SerialNo: Integer; PSerialNo: PChar);
+var
+  SeqNo: String;
+begin
+
+  SeqNo := IntToStr(SerialNo);
+
+  PSerialNo^ := '0';
+
+  if SerialNo < 10 then
+    StrMove(PSerialNo + 1, @SeqNo[1], 1)
+  else
+    StrMove(PSerialNo, @SeqNo[1], 2);
+
+end; {* The End of SerialNoToStr() *}
+
+
+function GetBit(Data: WORD; Bits: Integer): WORD;
+begin
+  GetBit := (Data shr Bits) and 1;
+end; {* The End of GetBit() *}
+
+function CMP_NDATA(des: PChar; source: PChar; count: Integer): Integer;
+begin
+  while (count > 0) do
+  begin
+
+    if(des^ > source^) then
+    begin
+      CMP_NDATA := 1;
+      exit;
+    end;
+
+    if(des^ < source^) then
+    begin
+      CMP_NDATA := -1;
+      exit;
+    end;
+
+    Inc(des);
+    Inc(Source);
+    dec(count);
+  end;
+
+  CMP_NDATA := 0;
+
+end; {* End of CMP_NDATA() *}
+
+end.

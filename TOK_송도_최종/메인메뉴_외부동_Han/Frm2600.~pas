@@ -1,0 +1,150 @@
+unit Frm2600;
+
+interface
+
+uses
+  Windows, Messages, SysUtils,  Classes, Graphics, Controls, Forms,
+  Dialogs, DB, DBTables, StdCtrls, Grids, DBGrids, ExtCtrls, Buttons, Mask,
+  ADODB;
+
+type
+  TFrm_2600 = class(TForm)
+    Panel2: TPanel;
+    Shape1: TShape;
+    Label13: TLabel;
+    ExitBitBtn1: TSpeedButton;
+    Panel1: TPanel;
+    DBGrid1: TDBGrid;
+    DataSource1: TDataSource;
+    DeleteBitBtn: TSpeedButton;
+    startBitBtn: TSpeedButton;
+    Query1: TADOQuery;
+    UpdtQuery: TADOQuery;
+    Query1UPDT_INDEX: TStringField;
+    Query1UPDT_PLTID: TStringField;
+    Query1UPDT_LOCA: TStringField;
+    Query1UPDT_JOB: TStringField;
+    Query1UPDT_DATE: TStringField;
+    Query1UPDT_TIME: TStringField;
+    Query1UPDT_BACK: TStringField;
+    procedure ExitBitBtn1Click(Sender: TObject); 
+
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+
+    procedure StartBitBtnClick(Sender: TObject); 
+    procedure DeleteBitBtnClick(Sender: TObject);
+
+    procedure DeleteExecUpdate; 
+    procedure DataSource1DataChange(Sender: TObject; Field: TField);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Frm_2600: TFrm_2600;
+  p_step: String[02];
+  p_u_cnt: Integer;
+  ls_index : string[5];
+
+
+implementation
+
+uses Dbset, WinLib, FrmPrompt, FrmError;
+
+{$R *.DFM}
+
+procedure TFrm_2600.FormCreate(Sender: TObject);
+begin
+  StartBitBtnClick(Self);
+end;
+
+procedure TFrm_2600.StartBitBtnClick(Sender: TObject);
+begin
+  with Query1 do
+  begin
+    DisableControls;
+    Close;
+    SQL.clear;
+    SQL.Add(' SELECT   updt_index, updt_job, updt_pltid, updt_loca,  ');
+    SQL.Add('          updt_date, updt_time, updt_back  FROM  stk1_tbupdt (NOLOCK) ');
+    SQL.Add(' order by updt_index ');
+    Open;
+    EnableControls;
+  end;  
+end;
+
+procedure TFrm_2600.DataSource1DataChange(Sender: TObject; Field: TField);
+begin
+  ls_index := Query1.FieldByName('updt_index').AsString;
+end;
+
+procedure TFrm_2600.DeleteBitBtnClick(Sender: TObject);
+var
+  var_Msg : String;
+begin
+  var_Msg := '정말로 해당데이터 예약을 삭제합니까.??';
+  if WinLib_ConfirmForm( var_Msg ) then
+  begin
+    DeleteExecUpdate;
+  end;
+end;
+
+procedure TFrm_2600.DeleteExecUpdate;
+var
+  li_updt_cnt: Integer; 
+begin
+try
+  p_step := '01';
+  with UpdtQuery do
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add(' select count(*) from stk1_tbupdt (NOLOCK) ');
+    SQL.Add(' where  updt_index = '''+ls_index+''' ');
+    Open;
+  end;
+  li_updt_cnt := UpdtQuery.Fields[0].AsInteger;
+  if (li_updt_cnt <= 0) then begin WinLib_ErrorForm('이미 삭제 되었습니다..!!');  exit;  end;
+
+  //begin ShowMessage('이미 삭제 되었습니다..!!');  exit;  end;
+
+    p_step := '02';
+    with UpdtQuery do
+    begin
+      SQL.Clear;
+      SQL.Add(' delete from stk1_tbupdt where updt_index = '''+ls_index+''' ');
+      ExecSQL;
+    end;
+
+    p_step := '88';
+  except
+    On E:Exception do
+    begin
+      WinLib_ErrorForm(E.Message+'로 인하여 에러가 발생 하였습니다');
+    end;
+  end;
+  StartBitBtnClick( Self );
+end;
+
+
+procedure TFrm_2600.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action := caFree;
+end;
+
+procedure TFrm_2600.FormDestroy(Sender: TObject);
+begin
+  Frm_2600 := Nil;
+end;
+
+procedure TFrm_2600.ExitBitBtn1Click(Sender: TObject);
+begin
+  close;
+end; 
+
+
+end.

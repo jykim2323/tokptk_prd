@@ -1,0 +1,316 @@
+unit ScrcDisp_u;
+
+interface
+
+uses
+  Windows, Messages, SysUtils,  Classes, Graphics, Controls, Forms,
+  Dialogs, ExtCtrls, DB, DBTables, StdCtrls, Mask, Buttons, ADODB;
+
+type
+  TScrcDisp_f = class(TForm)
+    RecmdBitBtn: TSpeedButton;
+    ResetBitBtn: TSpeedButton;
+    EndBitBtn: TSpeedButton;
+    Panel2: TPanel;
+    Shape1: TShape;
+    Label4: TLabel;
+    ExitBitBtn1: TSpeedButton;
+    StartBitBtn: TSpeedButton;
+    Timer1: TTimer;
+    Query1: TADOQuery;
+    Query2: TADOQuery;
+    Panel3: TPanel;
+    ScEdit: TEdit;
+    Panel4: TPanel;
+    CycleEdit: TEdit;
+    Panel31: TPanel;
+    OnLineEdit: TEdit;
+    Panel10: TPanel;
+    ReadyEdit: TEdit;
+    Panel5: TPanel;
+    AckEdit: TEdit;
+    Panel6: TPanel;
+    LoadEdit: TEdit;
+    Panel30: TPanel;
+    UnloadEdit: TEdit;
+    Panel11: TPanel;
+    ScPltEdit: TEdit;
+    Panel8: TPanel;
+    LocaEdit: TMaskEdit;
+    Panel36: TPanel;
+    Panel12: TPanel;
+    ScPosbyME: TMaskEdit;
+    ScposlvME: TMaskEdit;
+    Panel13: TPanel;
+    ErrEdit: TEdit;
+    Panel15: TPanel;
+    EcodeEdit: TEdit;
+    InitBitBtn: TSpeedButton;
+    Panel1: TPanel;
+    HomeEdit: TEdit;
+    Panel7: TPanel;
+    CenterEdit: TEdit;
+    WIndxEdit: TMaskEdit;
+    Panel16: TPanel;
+    HighEdit: TEdit;
+    Panel18: TPanel;
+    WsnoEdit: TEdit;
+    updtQuery: TADOQuery;
+    Panel9: TPanel;
+    PltNoEdit: TEdit;
+    procedure ExitBitBtn1Click(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormDestroy(Sender: TObject); 
+    procedure StartBitBtnClick(Sender: TObject);
+    procedure PrintBitBtnClick(Sender: TObject);
+    procedure RecmdBitBtnClick(Sender: TObject);
+    procedure ResetBitBtnClick(Sender: TObject);
+    procedure EndBitBtnClick(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+    procedure InitBitBtnClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  ScrcDisp_f: TScrcDisp_f;
+  ls_cycle  : String[01];
+  ls_cycle1 : String[01];
+  ls_loc    : String;
+  ls_sc : String[01];
+  ls_sc_cycle : String[02];
+  ls_ack, ls_load, ls_unload : String[01];
+  var_Msg : String;
+
+
+implementation
+
+uses WinLib, FrmPrompt, FrmError, DBset;
+{$R *.dfm}
+
+
+procedure TScrcDisp_f.FormActivate(Sender: TObject);
+begin
+  StartBitBtnClick(self);
+end;
+
+procedure TScrcDisp_f.StartBitBtnClick(Sender: TObject);
+begin
+  Query1.Close;
+  Query1.SQL.clear;
+  Query1.SQL.Add (' select * from T2TBSCRC (NOLOCK) Where scrc_no = '''+scEdit.Text+''' ');
+  Query1.open;
+  Query1.First;
+
+  ScEdit.Text     := Query1.FieldByName('SCRC_NO').AsString;
+  CycleEdit.Text  := Query1.FieldByName('SCRC_CYCLE').AsString;
+  OnLineEdit.Text := Query1.FieldByName('SCRC_ONLINE').AsString;
+  ReadyEdit.Text  := Query1.FieldByName('SCRC_READY').AsString;
+  HomeEdit.Text   := Query1.FieldByName('SCRC_HOME').AsString;
+  LocaEdit.Text   := Query1.FieldByName('SCRC_LOCA').AsString;
+  CenterEdit.Text := Query1.FieldByName('SCRC_CENTER').AsString;
+  AckEdit.Text    := Query1.FieldByName('SCRC_ACK').AsString;
+  LoadEdit.Text   := Query1.FieldByName('SCRC_LOAD').AsString;
+  UnLoadEdit.Text := Query1.FieldByName('SCRC_UNLOAD').AsString;
+  ScpltEdit.Text  := Query1.FieldByName('SCRC_SCPLT').AsString;
+  ScPosbyME.Text  := Query1.FieldByName('SCRC_POSBY').AsString;
+  ScPoslvME.Text  := Query1.FieldByName('SCRC_POSLV').AsString;
+  ErrEdit.Text    := Query1.FieldByName('SCRC_ERROR').AsString;
+  WIndxEdit.Text  := Query1.FieldByName('SCRC_INDEX').AsString;
+  HighEdit.Text   := Query1.FieldByName('SCRC_HIGH').AsString;
+  WsnoEdit.Text   := Query1.FieldByName('SCRC_WSNO').AsString;
+  EcodeEdit.Text  := Query1.FieldByName('SCRC_DESC').AsString;
+  PltNoEdit.Text  := Query1.FieldByName('SCRC_PLTNO').AsString;
+
+  ls_sc := ScEdit.Text;
+end;
+
+procedure TScrcDisp_f.PrintBitBtnClick(Sender: TObject);
+begin
+  PrintScale := poPrintToFit;
+  Print;
+end;
+
+procedure TScrcDisp_f.RecmdBitBtnClick(Sender: TObject);
+var
+  rc: TModalResult;
+begin
+  StartBitBtnClick( Self );
+
+  ls_cycle  := Copy(CycleEdit.Text, 1, 1);
+  ls_cycle1 := Copy(CycleEdit.Text, 2, 1);
+  ls_loc    := LocaEdit.Text;    
+
+  if (ls_cycle1 = '3') or (ls_loc < '0000') then
+  begin
+    WinLib_ErrorForm('재명령 조건이 아닙니다. 확인바람!!');
+    exit;
+  end;
+
+//  if  ( ls_cycle1 <= '3') then  ls_sc_cycle := ls_cycle + '0' else   ls_sc_cycle := ls_cycle + '4';
+  ls_sc_cycle := ls_cycle + '0';
+
+  rc := MessageDlg(' S/C Fork 에 제품이 있습니까?', mtConfirmation, [mbYes, mbNo, mbCancel], 0);
+
+   if      (rc = idYes) then
+   begin
+    try
+      Query2.Close;
+      Query2.SQL.Clear;
+      Query2.SQL.Add(' update T2TBSCRC set  ');
+      Query2.SQL.Add(' scrc_cycle   = '''+ls_sc_cycle+''',  scrc_ack   = ''0'', scrc_load  = ''1'', ');
+      Query2.SQL.Add(' scrc_unload  = ''0'',  scrc_error = ''0'', scrc_desc = '''' ');
+      Query2.SQL.Add(' where scrc_no = '''+ls_sc+''' ');
+      Query2.ExecSQL;
+      StartBitBtnClick(self);
+    except
+    end
+   end
+  else if (rc = idNo)  then
+  begin
+    try
+      Query2.Close;
+      Query2.SQL.Clear;
+      Query2.SQL.Add(' update T2TBSCRC set  ');
+      Query2.SQL.Add(' scrc_cycle   = '''+ls_sc_cycle+''', scrc_ack   = ''0'', scrc_load  = ''0'', ');
+      Query2.SQL.Add(' scrc_unload  = ''0'',  scrc_error = ''0'', scrc_desc = ''''  ');
+      Query2.SQL.Add(' where scrc_no = '''+ls_sc+''' ');
+      Query2.ExecSQL;
+      StartBitBtnClick(self);
+    except
+    end;
+  end;
+end;
+
+procedure TScrcDisp_f.ResetBitBtnClick(Sender: TObject);
+var
+  ls_indx, ls_err, ls_sql  : String;
+begin
+  var_Msg := ' 정말로 취소 합니까?';
+  if WinLib_ConfirmForm( var_Msg ) then
+  begin
+    try
+
+      Query2.Close;
+      Query2.SQL.Clear;
+      Query2.SQL.Add(' update T2TBSCRC set  ');
+      Query2.SQL.Add(' scrc_cycle = ''O3'', scrc_ready = ''0'', scrc_loca  = '''', ');
+      Query2.SQL.Add(' scrc_ack   = ''0'',  scrc_load  = ''0'', scrc_unload = ''0'',  ');
+      Query2.SQL.Add(' scrc_scplt = ''0'',  scrc_error = ''0'', scrc_index  = '''',   ');
+      Query2.SQL.Add(' scrc_high  = '''',   scrc_wsno  = '''',  scrc_desc  = '''', scrc_pltno = '''' ');
+      Query2.SQL.Add(' where scrc_no = '''+ls_sc+''' ');
+      Query2.ExecSQL;
+
+
+
+      if (ls_sc = '1') then ls_sql := ' update T2tbscc1 set  SCC1_CH01 = ''0000000000000000''  where scc1_sr = ''S'' '
+      else if (ls_sc = '2') then ls_sql := ' update T2tbscc2 set  SCC2_CH01 = ''0000000000000000''  where scc2_sr = ''S'' '
+      else if (ls_sc = '3') then ls_sql := ' update T2tbscc3 set  SCC3_CH01 = ''0000000000000000''  where scc3_sr = ''S'' ';
+
+      Query2.Close;
+      Query2.SQL.Clear;
+      Query2.SQL.Add(ls_sql);
+      Query2.ExecSQL;
+
+      StartBitBtnClick(self);
+    except
+        WinLib_ErrorForm('기존에 취소 되었습니다!!')
+    end;
+  end;
+end;
+
+
+procedure TScrcDisp_f.EndBitBtnClick(Sender: TObject);
+var
+  ls_sql, ls_pltno : String;
+begin
+  StartBitBtnClick( Self );
+  ls_cycle  := Copy(CycleEdit.Text, 1, 1);
+  ls_cycle1 := Copy(CycleEdit.Text, 2, 1);
+  ls_loc    := LocaEdit.Text;
+  ls_pltno  := PltNoEdit.Text;
+  var_Msg := ' 정말로 완료 처리 합니까?';
+  if WinLib_ConfirmForm( var_Msg ) then
+  begin
+    if (ls_cycle1 = '3') or (ls_loc < '000') then
+    begin
+      WinLib_ErrorForm('완료처리 조건이 아님니다.확인바람!!');
+      exit;
+    end;
+
+    if (ls_cycle1 = '0') then
+    begin
+      ls_ack := '1';    ls_load := '1';    ls_unload := '1';
+    end
+    else if (ls_cycle1 = '1') then
+    begin
+      ls_ack := '0';    ls_load := '1';    ls_unload := '1';
+    end
+    else if (ls_cycle1 = '2') then
+    begin
+      ls_ack := '0';    ls_load := '0';    ls_unload := '1';
+    end;
+
+    begin
+      try
+        Query2.Close;
+        Query2.SQL.Clear;
+        Query2.SQL.Add(' UPDATE T2TBSCRC set  ');
+        Query2.SQL.Add(' scrc_ack     = '''+ls_ack+''',     scrc_load  = '''+ls_load+''', ');
+        Query2.SQL.Add(' scrc_unload  = '''+ls_unload+''',  scrc_error = ''0'',   ');
+        Query2.SQL.Add(' scrc_ready = ''0'',  scrc_desc = '''', scrc_pltno = '''+ls_pltno+''' ');
+        Query2.SQL.Add(' where scrc_no = '''+ls_sc+''' ');
+        Query2.ExecSQL;
+        StartBitBtnClick(self);
+      except
+        Showmessage('S/C 상태가 변했슴! 새로 창을 열어 실행하세요');
+      end;
+    end;
+  end;
+end;
+
+procedure TScrcDisp_f.ExitBitBtn1Click(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TScrcDisp_f.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action := caFree;
+end;
+
+procedure TScrcDisp_f.FormDestroy(Sender: TObject);
+begin
+  ScrcDisp_f := Nil;
+end;
+
+procedure TScrcDisp_f.InitBitBtnClick(Sender: TObject);
+var
+  ls_cycle, ls_cycle1: String[01];
+  ls_loc: String[06];
+begin
+  ls_cycle  := Copy(CycleEdit.Text, 1, 1);
+  ls_cycle1 := Copy(CycleEdit.Text, 2, 1);
+  ls_loc    := LocaEdit.Text;
+
+  var_Msg := ' 에러해제를 하시겠습니까?';
+  if WinLib_ConfirmForm( var_Msg ) then
+  begin
+    try
+      Query2.Close;
+      Query2.SQL.Clear;
+      Query2.SQL.Add(' update T2TBSCRC set  ');
+      Query2.SQL.Add(' scrc_error = ''0'', scrc_desc = '''' ');
+      Query2.SQL.Add(' where scrc_no = '''+ls_sc+''' ');
+      Query2.ExecSQL;    
+
+      StartBitBtnClick(self);
+    except
+      Showmessage('S/C 상태가 변했습니다. 창을 닫고 새로 열어 실행하세요!');
+    end;
+  end;  
+end;
+
+end.

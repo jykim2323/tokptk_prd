@@ -1,0 +1,410 @@
+unit ahupdt_u;
+
+interface
+
+uses
+Windows, Classes, Messages, SysUtils, Dialogs, dbtables;
+
+type
+  ahupdt_T = class(TThread)
+  private
+    s_index, s_lotno , s_gubun, s_usrid, s_code : string;
+    s_qty, s_loca, s_job,   s_oindex : string;
+    s_job_flag : String;
+    i_qty,  sum_qty : Real;    
+
+    s_indate, s_intime, s_stime, s_etime,  s_eplt, s_fact, s_from, s_to, s_high, s_rflag, s_boxno : String;
+    s_rdate, s_rtime, s_remark : String;
+    s_pltno : String; // 김준영 추가
+
+    s_date : String[08];
+    s_time : String[06];
+
+    sys_datetime  : string[14];
+
+  protected
+    procedure Execute; override;
+    procedure main_cntl_proc;
+    procedure Normal_inpt_proc;
+   
+    procedure Full_Pick_proc;
+    procedure LocaUpdate_Cntl_proc;
+    procedure Inpt_subk_proc;
+  
+    procedure Oupt_LocaUpdate_proc;
+    procedure Oupt_Delete_subk_proc; 
+    procedure Oupt_miouptproc;  
+    procedure Oupt_misubkproc;        // 김준영 추가
+    procedure Oupt_misubkUpdate_Proc; // 김준영 추가
+    function f_get_sysdate_time1(): String;
+  end;
+///// program initial definition area     /////
+const
+  pgm_id  : string  = 'updt';
+  min_sc  : integer = 2;
+  max_sc  : integer = 2;
+  gap_sc  : integer = 1;
+  hax_bin : integer = 8421;
+///////////////////////////////////////////////
+var
+  updt_pgm  : char;
+  updt_step : integer;
+  updt_ok : integer;
+
+implementation
+
+uses ahcomm_u;
+
+/////////////////////////////////////////////////////////////////////////////////
+procedure ahupdt_T.Execute;
+begin
+  updt_pgm := 'T';
+  updt_step := 0;
+
+  ahcomm_f.updtEdit.Text := '입출고 업데이트가 시작 되었습니다.!!';
+  sleep(1000); // 1
+
+  While (not (updt_T.Terminated)) and (updt_pgm = 'T') do
+  begin
+      if ahcomm_f.UpdtImg.Visible = True Then ahcomm_f.UpdtImg.Visible := False else ahcomm_f.UpdtImg.Visible := True;
+      main_cntl_proc;
+      sleep(1500);
+  end;
+  ahcomm_f.updtEdit.Text := '입출고 업데이트가 종료 되었습니다.!!';
+  updt_pgm := 'F';
+end;
+/////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+procedure ahupdt_T.main_cntl_proc;
+begin
+   with ahcomm_f.SelQuery do
+   begin
+      Close;
+      SQL.Clear;
+      SQL.Add(' select * from T2TIUPDT (NOLOCK) order by updt_date, updt_time ');
+      Open;
+      First;
+      ahcomm_f.updtEdit.Text := '[*]입출고 데이타 유/무 조회 .!!';
+      sleep(600);   ///////5
+      
+      if  Recordcount = 0  then
+      begin
+         ahcomm_f.updtEdit.Text := '[*]입출고 데이타 없슴!!';
+         exit;
+      end;
+
+      s_index := FieldByName('UPDT_INDEX').AsString;
+      s_loca  := FieldByName('UPDT_LOCA').AsString;
+      s_job   := FieldByName('UPDT_JOB').AsString;
+      s_pltno := FieldByName('UPDT_PLTNO').AsString;
+    end;
+
+    sys_datetime :=  f_get_sysdate_time1();
+    s_date       :=  copy(sys_datetime, 1, 8);
+    s_time       :=  copy(sys_datetime, 9, 6);
+
+    ahcomm_f.Memo1.Lines.Add('[*]Updt ' + s_time + ' ' + s_index + s_loca + ' ' + s_job);
+
+
+   s_job := Copy(s_index,9,1);
+
+   if  (s_job = 'I')  then  Normal_inpt_proc
+   else if  (s_job = 'O')  then  Full_Pick_proc;
+
+    updt_step := 41;
+    with ahcomm_f.UpdtQuery do
+    begin
+      try
+        Close;
+        SQL.Clear;
+        SQL.Add(' Delete from T2TIUPDT where UPDT_INDEX = '''+s_index+''' ');
+        ExecSQL; // 김준영 임시주석
+      except
+        ahcomm_f.Memo1.Lines.Add('[*]Updt Cntl STEP=' + IntToStr(Updt_step) + s_index + s_loca);
+      end;
+    end;
+
+end;
+////////////////////////////////////////////////////////
+//  정상 입고 처리
+///////////////////////////////////////////////////////
+procedure ahupdt_T.Normal_inpt_proc;
+begin
+    with ahcomm_f.SelQuery do
+    begin
+      Close;
+      SQL.Clear;
+      SQL.Add(' select * from t2miinpt (NOLOCK)  where inpt_index = '''+s_index+''' AND inpt_pltno = '''+s_pltno+'''  ');
+      open;
+      First;
+      if Recordcount = 0  then  exit;
+
+      While True do
+      begin
+        if Eof = True Then
+        begin
+           LocaUpdate_Cntl_proc;
+           Break;
+        end;
+
+      s_code       := FieldByName('INPT_CODE').AsString;
+      s_lotno      := FieldByName('INPT_LOTNO').AsString;
+      s_qty        := FieldByName('INPT_WEIGHT').AsString;
+      s_indate     := FieldByName('INPT_INDATE').AsString;
+      s_stime      := FieldByName('INPT_STIME').AsString;
+      s_etime      := FieldByName('INPT_ETIME').AsString;
+      s_boxno      := FieldByName('INPT_BOXNO').AsString;
+      s_pltno      := FieldByName('INPT_PLTNO').AsString; // 김준영 추가
+      s_rdate      := Trim(FieldByName('inpt_rdate').AsString);
+      s_rtime      := Trim(FieldByName('inpt_rtime').AsString);
+
+      s_remark     := Trim(FieldByName('inpt_remark').AsString);
+
+      if Length(s_rdate) = 0  then  s_rdate := s_date;
+      if Length(s_rtime) = 0  then  s_rtime := s_time;
+
+
+      Inpt_subk_proc;  
+      Next;
+    end;
+  end;
+end;
+
+procedure ahupdt_T.Inpt_subk_proc;
+var
+  ls_sql : String;
+begin
+  with ahcomm_f.UpdtQuery  do
+  begin
+    try
+      updt_step := 76;
+      Close;
+      SQL.Clear;
+
+      // 김준영 수정
+      {
+      SQL.Add(' INSERT  INTO  T2MISUBK ');
+      SQL.Add(' (SUBK_LOCA,   SUBK_CODE,   SUBK_LOTNO,  SUBK_WGT,  SUBK_RWGT,  ');
+      SQL.Add('  SUBK_FLAG,   SUBK_REMARK, SUBK_INDATE, SUBK_INTIME, SUBK_BOXNO ) ');
+      SQL.Add(' values( '''+s_loca+''',   '''+s_code+''',  '''+s_lotno+''', '''+s_qty+''',  ''0'', ');
+      SQL.Add('         ''1'', '''+s_remark+''', '''+s_rdate+''', '''+s_rtime+''', '''+s_boxno+''' )');
+      }
+
+      SQL.Add(' UPDATE T2MISUBK SET SUBK_LOCA = '''+s_loca+''', SUBK_FLAG = ''1'' WHERE SUBK_PLTNO = '''+s_pltno+''' ');  // 김준영 추가
+      ExecSQL;
+
+      updt_step := 77;
+
+      //ahcomm_f.Memo1.Lines.Add('Subk Insert ' + s_index  + s_code + s_lotno);
+      ahcomm_f.Memo1.Lines.Add('SUBK UPDATE ' + s_index + ' ' + s_code +  ' ' + s_lotno +  ' ' + s_pltno);
+{
+      Close;
+      SQL.Clear;
+      SQL.Add(' update t2miinpt set inpt_loca = '''+s_loca+''',   ');
+      SQL.Add('                   inpt_etime = '''+s_time+''', inpt_job_flag = ''C''             ');
+      SQL.Add(' where  inpt_index  = '''+s_index+'''   And  inpt_code  = '''+s_code+'''  ');
+      SQL.Add('        And inpt_lotno  = '''+s_lotno+'''  ');
+      SQL.Add('        And inpt_pltno  = '''+s_pltno+'''  ');   // 김준영 추가.
+
+      ExecSQL
+}
+
+      ls_sql := ' update t2miinpt set inpt_loca = '''+s_loca+''', ';
+      ls_sql := ls_sql +  ' inpt_etime = '''+s_time+''', inpt_job_flag = ''C'' ';
+      ls_sql := ls_sql +  ' where  inpt_index  = '''+s_index+'''   And  inpt_code  = '''+s_code+''' ';
+      ls_sql := ls_sql +  '         And inpt_lotno  = '''+s_lotno+'''   ';
+      ls_sql := ls_sql +  '         And inpt_lotno  = '''+s_lotno+'''  ';
+      ls_sql := ls_sql +  '         And inpt_pltno  = '''+s_pltno+''' ';
+
+      Close;
+      SQL.Clear;
+      SQL.Add(ls_sql);
+      ExecSQL;
+
+      //ahcomm_f.Memo1.Lines.Add(ls_sql);
+
+      updt_step := 77;
+
+      ahcomm_f.updtEdit.Text := '입고 업데이트 완료.!!';
+    except
+      ahcomm_f.Memo1.Lines.Add('Subk Insert Error =' + IntToStr(updt_step) + s_code + s_loca);
+    end;
+  end;
+end;
+
+procedure ahupdt_T.LocaUpdate_Cntl_proc;
+var
+  ls_sql  : string;
+begin   
+  ls_sql := '  update t2milstk set  lstk_flag = ''1'', ';
+  ls_sql := ls_sql + '   lstk_indate   = '''+s_date+''',   lstk_intime   = '''+s_time+''',  lstk_pltno   = '''+s_pltno+''' ';
+  ls_sql := ls_sql + '   where  lstk_loca = '''+s_loca+''' ';
+  with ahcomm_f.UpdtQuery  do
+  begin
+    try
+      updt_step := 78;
+      Close;
+      SQL.Clear;
+      SQL.Add(ls_sql);
+      ExecSQL;
+    except
+      ahcomm_f.Memo1.Lines.Add('Lstk Update Error =' + ls_sql );
+    end;
+  end;
+end;
+//////////////////////////////////////////////
+////  Full/picking   출고
+//////////////////////////////////////////////
+procedure ahupdt_T.Full_Pick_proc;
+begin
+  with ahcomm_f.SelQuery do begin
+      Close;
+      SQL.Clear;
+      //SQL.Add(' select * from t2mioupt (NOLOCK) where oupt_index = '''+s_index+'''    ');
+      SQL.Add(' select * from t2mioupt (NOLOCK) where oupt_index = '''+s_index+''' AND oupt_pltno = '''+s_pltno+''' ');
+
+      open;
+      First;
+      if Recordcount = 0  then  exit;   
+
+      // 잔량 계산                Oupt_misubkproc; // 김준영 추가
+      // 잔량 없는 SUBK 삭제      Oupt_Delete_subk_proc;
+      // LOCA UPdate              Oupt_LocaUpdate_proc;
+      // OUPT JOB_FLAG 변경       Oupt_miouptproc;
+      
+      Oupt_misubkproc; // 김준영 추가( 잔량 계산 )
+      Oupt_Delete_subk_proc;
+      Oupt_misubkUpdate_Proc; // 재입고 상태 변환
+      Oupt_LocaUpdate_proc;
+      Oupt_miouptproc;
+
+  end;
+end;
+
+procedure ahupdt_T.Oupt_misubkproc;  // 김준영 추가
+begin
+  with ahcomm_f.UpdtQuery do
+  begin
+    try updt_step := 93;
+      close;
+      SQL.Clear;
+      // 재고 남아있으니 SUBK_FLAG = 'R' 재입고 상태
+      //SQL.Add(' UPDATE T2MISUBK SET SUBK_LOCA = '''', SUBK_FLAG = ''R'', ');
+      //SQL.Add( '                    SUBK_WGT = SUBK_WGT - SUBK_RWGT, SUBK_RWGT = ''0''  ' );  // 잔량 계산
+      //SQL.Add(' WHERE SUBK_PLTNO = '''+s_pltno+''' ');
+
+      SQL.Add(' UPDATE T2MISUBK SET SUBK_WGT = ISNULL(SUBK_WGT,0) - ISNULL(SUBK_RWGT,0), SUBK_RWGT = Convert(Numeric, ''0'' ) ' );  // 잔량 계산
+      SQL.Add(' WHERE SUBK_LOCA = '''+s_loca+''' AND SUBK_PLTNO = '''+s_pltno+''' ');
+      ExecSql;
+
+
+      ahcomm_f.UpdtEdit.Text := '재고 업데이트 완료.!!';
+    except
+      ahcomm_f.Memo1.Lines.Add('t2misubk Update Error =' + IntToStr(updt_step));
+    end;
+  end;
+end;
+
+procedure ahupdt_T.Oupt_misubkUpdate_Proc;  // 김준영 추가
+begin
+  with ahcomm_f.UpdtQuery do
+  begin
+    try updt_step := 94;
+      close;
+      SQL.Clear;
+
+      SQL.Add(' UPDATE T2MISUBK SET SUBK_LOCA = '''', SUBK_FLAG = ''R'' ' );  // 잔량 계산
+      SQL.Add(' WHERE SUBK_LOCA = '''+s_loca+''' ');
+      ExecSql;
+
+
+      ahcomm_f.UpdtEdit.Text := '재고 업데이트 완료.!!';
+    except
+      ahcomm_f.Memo1.Lines.Add('t2misubk Update Error =' + IntToStr(updt_step));
+    end;
+  end;
+end;
+
+
+
+procedure ahupdt_T.Oupt_Delete_subk_proc;
+begin
+    with ahcomm_f.UpdtQuery do
+    begin
+      try
+        Close;
+        SQL.Clear;
+        SQL.Add(' Delete from T2MISUBK where subk_loca = '''+s_loca+''' AND SUBK_WGT = Convert(Numeric, ''0'' ) ');    // (재고(잔량) 없을때 삭제)
+
+        {
+        // (재고(잔량) 없을때 , 기재고(PLTNO 'T'로 시작 삭제)
+        SQL.Add(' DELETE FROM T2MISUBK ');
+        SQL.Add(' WHERE subk_loca = ''' + s_loca + ''' ');
+        SQL.Add('   AND (SUBK_WGT = Convert(Numeric, ''0'') '); // 재고가 0인 경우
+        SQL.Add('        OR SUBSTRING(SUBK_PLTNO, 1, 1) = ''T'') '); // PLTNO가 'T'로 시작하는 경우
+        }
+        ExecSQL;
+      except
+        ahcomm_f.Memo1.Lines.Add('[*]Updt Cntl STEP=' + IntToStr(Updt_step) + s_code + s_loca);
+      end;
+    end;
+end;
+
+procedure ahupdt_T.Oupt_LocaUpdate_proc;
+var
+  ls_sql  : string;
+begin
+  ls_sql := '  update t2milstk  set lstk_flag = ''0'',  ';
+  ls_sql := ls_sql + '   lstk_indate   = '''',   lstk_intime   = '''', lstk_pltno = '''' ';   // 김준영 추가
+  ls_sql := ls_sql + '   where  lstk_loca = '''+s_loca+''' ';
+  with ahcomm_f.UpdtQuery  do
+  begin
+    try
+      updt_step := 91;
+      Close;
+      SQL.Clear;
+      SQL.Add(ls_sql);
+      ExecSQL;
+    except
+      ahcomm_f.Memo1.Lines.Add('Lstk Update Error =' + ls_sql);
+    end;
+  end;   
+end;
+
+procedure ahupdt_T.Oupt_miouptproc;
+begin
+  with ahcomm_f.UpdtQuery  do
+  begin
+    try  updt_step := 92;
+      Close;
+      SQL.Clear;
+      SQL.Add(' update t2mioupt set oupt_time   = '''+s_time+''', oupt_job_flag = ''C'' ');
+      SQL.Add(' where  oupt_index = '''+s_index+'''    ');
+      ExecSQL;
+      ahcomm_f.updtEdit.Text := '출고 업데이트 완료.!!';
+     except
+      ahcomm_f.Memo1.Lines.Add('oupt Update Error =' + IntToStr(updt_step));
+     end;
+  end;
+end;
+
+function ahupdt_T.f_get_sysdate_time1(): String;
+var
+  ls, ls_date, ls_sql : String;
+Begin
+    ls_sql := ' select convert(char(19), getdate(), 120)  from dumm_tbl (NOLOCK) ';
+    With ahcomm_f.SelQuery Do Begin
+      Close;
+      SQL.Clear;
+      SQL.Add(ls_sql);
+      Open;
+      ls_date    := Fields[0].AsString;
+    End;
+
+    ls := trim(ls_date);
+    ls_date := Copy(ls, 1, 4)  + Copy(ls, 6, 2)  + Copy(ls, 9, 2) + Copy(ls, 12, 2) + Copy(ls, 15, 2) + Copy(ls, 18, 2);
+
+    Result :=  ls_date;
+end;
+
+end.

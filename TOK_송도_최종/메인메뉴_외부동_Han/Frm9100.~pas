@@ -1,0 +1,208 @@
+unit Frm9100;
+
+interface
+
+uses
+  Windows, Messages, SysUtils,  Classes, Graphics, Controls, Forms,
+  Dialogs, DB, DBTables, StdCtrls, Grids, DBGrids, ExtCtrls, Buttons, Mask,
+  ADODB;
+
+type
+  TFrm_9100 = class(TForm)
+    Panel2: TPanel;
+    Shape1: TShape;
+    Panel1: TPanel;
+    DBGrid1: TDBGrid;
+    RecNoEdit: TEdit;
+    DataSource1: TDataSource;
+    Query1: TADOQuery;
+    Query1SCHE_INDEX: TStringField;
+    Query1SCHE_LOCA: TStringField;
+    Query1SCHE_JOB: TStringField;
+    Query1SCHE_EMER: TStringField;
+    Query1SCHE_DATE: TStringField;
+    Query1SCHE_TIME: TStringField;
+    UpdtQuery: TADOQuery;
+    startBitBtn: TSpeedButton;
+    DeleteBitBtn: TSpeedButton;
+    ExitBitBtn1: TSpeedButton;
+    Label13: TLabel;
+    Label1: TLabel;
+    Query1SCHE_TRAINNO: TStringField;
+    Query1SCHE_WSNO: TStringField;
+    procedure ExitBitBtn1Click(Sender: TObject);  
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure StartBitBtnClick(Sender: TObject); 
+    procedure DeleteBitBtnClick(Sender: TObject);
+    procedure DeleteExecUpdate;
+    procedure DataSource1DataChange(Sender: TObject; Field: TField);
+    procedure DBGrid1DrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);   
+    
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Frm_9100: TFrm_9100;
+  p_step: String[02];
+  p_u_cnt: Integer;  
+  ls_index, ls_emer, ls_serial  : string;
+
+
+implementation
+
+uses DBSet, WinLib, FrmPrompt, FrmError;
+
+{$R *.DFM}
+
+procedure TFrm_9100.FormCreate(Sender: TObject);
+begin
+  StartBitBtnClick(Self);
+  
+end;
+
+procedure TFrm_9100.StartBitBtnClick(Sender: TObject);
+begin
+  with Query1 do
+  begin
+    DisableControls;
+    Close;
+    SQL.clear;
+    SQL.Add(' SELECT SCHE_INDEX, SCHE_LOCA, SCHE_TRAINNO, SCHE_JOB,  ');
+    SQL.Add('        SCHE_WSNO,  SCHE_DATE, SCHE_TIME, SCHE_EMER   ');
+    SQL.Add('  FROM  STK1_TBSCHE (NOLOCK)');
+    SQL.Add('  Order By SCHE_INDEX ');
+    Open;
+
+    RecNoEdit.Text := Format('%d',[RecordCount]);
+    EnableControls;
+  end;   
+end;
+
+procedure TFrm_9100.DataSource1DataChange(Sender: TObject; Field: TField);
+begin
+    ls_index := Query1.FieldByName('SCHE_INDEX').AsString;
+    ls_emer  := Query1.FieldByName('SCHE_EMER').AsString;  
+end;
+
+procedure TFrm_9100.DeleteBitBtnClick(Sender: TObject);
+var
+  var_Msg : String;
+begin
+  var_Msg := '정말로 해당데이터 예약을 삭제합니까?';
+  if WinLib_ConfirmForm( var_Msg ) then
+  begin
+    DeleteExecUpdate;
+  end;
+end;
+
+procedure TFrm_9100.DeleteExecUpdate;
+var
+  li_sche_cnt: Integer;   
+  ls_loca, ls_trno, ls_rsrv : String;
+begin
+try
+
+  ls_index := Query1.FieldByName('SCHE_INDEX').AsString;
+  ls_loca  := Query1.FieldByName('SCHE_LOCA').AsString;
+
+  p_step := '01';
+  with UpdtQuery do
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add(' select count(*) from STK1_tbsche (NOLOCK) ');
+    SQL.Add(' where  sche_index = '''+ls_index+''' ');
+    Open;
+    li_sche_cnt := Fields[0].AsInteger;
+  end;
+
+  if (li_sche_cnt <= 0) then  begin WinLib_ErrorForm('이미 삭제 되었습니다..!!');  exit;  end;
+
+    p_step := '02';
+    with UpdtQuery do
+    begin
+      Close;
+      SQL.Clear;
+      SQL.Add(' select  lstk_trainno from STK1_Milstk (NOLOCK) where  lstk_loca = '''+ls_loca+''' ');
+      Open;
+    end;
+
+    ls_trno  := UpdtQuery.FieldByName('lstk_trainno').AsString;
+
+    if Trim(ls_trno) <> '' then ls_rsrv := '1'  else  ls_rsrv := '0';
+
+    p_step := '03';
+    with UpdtQuery do
+    begin
+      SQL.Clear;
+      SQL.Add(' update STK1_milstk set lstk_Resv = '''+ls_rsrv+''' where lstk_loca = '''+ls_loca+''' ');
+      ExecSQL;
+    end;      
+
+    p_step := '04';
+    with UpdtQuery do
+    begin
+      SQL.Clear;
+      SQL.Add(' delete from STK1_tbsche where sche_index = '''+ls_index+''' ');
+      ExecSQL;
+    end;
+{
+    p_step := '05';
+    with UpdtQuery do
+    begin
+      SQL.Clear;
+      SQL.Add(' Delete From STK1_MIOUPT Where OUPT_INDEX = '''+ls_index+''' ');
+      ExecSQL;
+    end;
+}
+    p_step := '88';
+    except
+    On E:Exception do
+    begin
+      WinLib_ErrorForm(E.Message+'로 인하여 에러가 발생 하였습니다');
+    end;
+  end;     
+  StartBitBtnClick( Self );
+end;
+
+
+procedure TFrm_9100.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action := caFree;
+end;
+
+procedure TFrm_9100.FormDestroy(Sender: TObject);
+begin
+  Frm_9100 := Nil;
+end;
+
+procedure TFrm_9100.ExitBitBtn1Click(Sender: TObject);
+begin
+  close;
+end;
+
+procedure TFrm_9100.DBGrid1DrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn;
+  State: TGridDrawState);
+var
+   Value : String;
+   WW    : Integer;
+begin
+  If DataCol = 0 Then
+  begin
+   with(Sender as TDBGrid).Canvas do
+   begin
+    Value := IntToStr(Query1.RecNo);
+    WW    := Canvas.TextWidth(value);
+    TextOut(Rect.Left+(Rect.Right - Rect.Left - WW) div 2, Rect.Top+2,Value);
+   end;
+  end;
+end;    
+
+end.

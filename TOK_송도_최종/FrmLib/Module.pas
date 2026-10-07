@@ -1,0 +1,370 @@
+unit Module;
+
+interface
+
+uses Windows, Messages, SysUtils, Classes, Graphics, Controls, Dialogs;
+
+type
+  TBG_Msg = Array of string;  // PDA 서버에서 사용
+
+  //---------------------------------------------
+
+  // 사용자 정보
+  TUSERINFO = Record
+       USER_ID   : String;   // 아이디
+       USER_PW   : String;   // 비밀번호
+       USER_IP   : String;   // 접속자 IP
+       USER_NAME : String;   // 접속자 성명
+       PDA_NO    : String;   // PDA 번호 ( 단말기 번호 )
+       USER_STATE : STRING;  // 회원상태
+  End;
+
+  //---------------------------------------------
+  // PDA 접속자 정보 ( Query 부여 )
+  TUSER_CONN_INFO = Record
+       USER_INFO : TUSERINFO;   // 아이디
+       USE_Query : SmallInt;    // Query 사용번호
+       USE_STAT  : Boolean;     // 사용여부  
+  End;
+
+  //---------------------------------------------
+
+  // 매입정보
+  TMiINPUT = Record
+       INPT_SCODE         : String[5];
+       INPT_YEAR          : String[4];
+       INPT_INDEX         : String[6];
+       INPT_MRN           : String[11];
+       INPT_MSN           : String[4];
+       INPT_HSN           : String[3];
+       INPT_GROUP         : String[2];
+       INPT_INDATE        : String[14];
+       INPT_HOUSE         : String[3];
+       INPT_CUSTCODE      : String[4];
+       INPT_CUSTNAME      : String[20];
+       INPT_PRDCODE       : String[2];
+       INPT_PRDNAME       : String[20];
+       INPT_MBL           : String[20];
+       INPT_HBL           : String[20];
+       INPT_AIRNO         : String[10];
+       INPT_IOCODE        : String[2];
+       INPT_HFROM         : String[8];
+       INPT_HTO           : String[8];
+       INPT_HLIC          : String[20];
+       INPT_HCOMPANY      : String[20];
+       INPT_PAKCODE       : String[3];
+       INPT_TROCODE       : String[3];
+       INPT_INQTY         : String[6];
+       INPT_OUTQTY        : String[6];
+       INPT_STOCKQTY      : String[6];
+       INPT_INWEIGHT      : String[7];
+       INPT_OUTWEIGHT     : String[7];
+       INPT_STOCKWEIGHT   : String[7];
+       INPT_INCAP         : String[6];
+       INPT_OUTCAP        : String[6];
+       INPT_STOCKCAP      : String[6];
+       INPT_LOCA          : String[10];         // 장치위치
+       INPT_CHKDATE       : String[8];
+       INPT_CHKUSER       : String[10];
+       INPT_STO           : String[1];
+       INPT_STONO         : String[10];
+       INPT_STODATE       : String[8];
+       INPT_CREMODE       : String[1];
+       INPT_USERID        : String[10];        // 수정 또는 등록자 아이디
+       INPT_USERPW        : String[10];        // 수정 또는 등록자의 비밀번호
+       INPT_JOBDATE       : String[8];         // 수정 또는 등록일자 
+       INPT_PDANO         : String[5];         // PDA 번호
+       INPT_TRADE         : String[1];
+       INPT_FREIGHT       : String[1];
+       INPT_FLAG          : String[1];
+       INPT_ENTER         : String[2];          // 끝에 SPACE 문자 포함  ( PDA 에서 값의 존재 유무 체크)
+  end;
+
+  // 반입정보 저장 STRUCTURE
+  TMiINPUT_ETC = record
+       INPT  : TMiINPUT;
+       ETC   : STRING;
+  end;
+
+  //---------------------------------------------
+
+  // 반출정보
+  TMiOUPUT = Record
+        OUPT_SCODE         : String[5];
+        OUPT_YEAR          : String[4];
+        OUPT_INDEX         : String[6];
+        OUPT_INYEAR        : String[4];
+        OUPT_ININDEX       : String[6];
+        OUPT_GROUP         : String[2];
+        OUPT_OUTDATE       : String[14];
+        OUPT_JDATE         : String[4];
+        OUPT_CUSTCODE      : String[4];
+        OUPT_CUSTNAME      : String[20];
+        OUPT_CUSTJUMIN     : String[13];
+        OUPT_MBL           : String[20];
+        OUPT_HBL           : String[20];
+        OUPT_APNO          : String[20];
+        OUPT_APDATE        : String[8];
+        OUPT_DECLAUSER     : String[10];
+        OUPT_IOCODE        : String[2];
+        OUPT_TROCODE       : String[3];
+        OUPT_QTY           : String[6];
+        OUPT_WEIGHT        : String[7];
+        OUPT_PRDCODE       : String[3];
+        OUPT_CHKINSUR      : String[1];
+        OUPT_SANGCHA       : String[1];
+        OUPT_RMONEY        : String[11];
+        OUPT_GMONEY        : String[11];
+        OUPT_DMONEY        : String[9];
+        OUPT_JMONEY        : String[9];
+        OUPT_IMONEY        : String[9];
+        OUPT_AMONEY        : String[9];
+        OUPT_TMONEY        : String[9];
+        OUPT_CREMODE       : String[1];
+        OUPT_USERID        : String[10];
+        OUPT_USERPW        : String[10];
+        OUPT_JOBDATE       : String[8];
+        OUPT_PDANO         : String[5];
+        OUPT_FLAG          : String[1];
+        OUPT_SENDDATE      : String[8];
+        OUPT_SENDTIME      : String[6];
+        OUPT_ENTER         : String[2];          // 프로그램에서 체크하기 위한 변수
+  end;
+  
+  // 반출정보 저장 STRUCTURE
+  TMiOUPUT_ETC = record
+       INPT  : TMiOUPUT;
+       ETC   : STRING;
+  end;
+
+  //---------------------------------------------
+  
+  // 창고위치 구조체 ( 열연단 정보 사용 )
+  TMiLoc = packed record
+        Code   : String[3];    // 창고종류
+        Sel    : integer;      // 콤보박스 위치
+        BK     : String[3];    // 자치위치
+        BY     : String[3];    // 연  <-- 사용안함
+        LV     : String[2];    // 단  <-- 사용안함
+  end;
+
+  // 저장장치 요약 테이블
+  TMilChk = packed record
+        LOCA   : String[10];   // 장치 위치 정보
+        STATE  : String[1];    // 장치의 현상태 ( 
+                                  {*
+                                      1 : 비어있음 ( 기본값 )
+                                      2 : 저장가능
+                                      3 : FULL
+                                      9 : 불량
+                                      X : 장치가 존재하지 않음
+                                      N : 장치위치 제한 사용하지 않음
+                                      E : 장치위치 조회중 Query Error
+                                  *}
+        MAX_WEIGHT : Double;  // Max 중량
+        MAX_QTY    : Integer; // MAX 수량
+        USE_WEIGHT : Double;  // 사용 중량
+        USE_QTY    : Integer; // 사용 수량
+  end;
+
+  //---------------------------------------------
+  
+  // 장치위치별 제품정보
+  TMiLSTK = packed Record
+       INPT       : TMiINPUT;
+       LSTK_STATE : String[1];
+       ETC        : STRING;
+  End; 
+
+  //---------------------------------------------  
+
+  // PDA 와의 통신에서 사용할 구조체 정의 ( 반입/반출/장치위치 )
+  TMiINPUT_PDA = record
+       INPT    : TMiINPUT;
+       OUPT    : TMiOUPUT;
+       MILOC   : TMiLoc;
+       CHK_BAD : STRING[2];    // 체크비트 ( 값이 존재하지 않거나, 잘못된 자료일 경우에 사용하기 위한 비트 )
+       CHK_STATE : STRING[50]; // 장치위치 사용가능여부 또는 메세지로 날리고 싶은 값
+  end;
+
+  //---------------------------------------------
+  // 허용중량과 수량이 허용하는지을 체크하여 저장되는 Class
+  TMilChk_State = record
+       Rec_Check  : Boolean;     // DB 에서 검색 하였를때에 Record 가 존재한다면 TRUE, 없다면 False
+       Rec_Err    : String;      // 에러발생시에 에러 내용 저장되는 변수
+       Loc1       : String[10];
+       Loc1_State : Boolean;     // 사용가능여부
+       Loc1_Why   : Smallint;    // 사용못하게 걸린부분 ( 0 : 용량 제한에 걸림, -1 : 중량 제한에 걸림, 1 : 예정 등록 가능  )
+       Loc1_Apply : Boolean;     // 제한적용여부
+       Loc2       : String[10];
+       Loc2_State : Boolean;     // 사용가능여부
+       Loc2_Why   : Smallint;    // 사용못하게 걸린부분 ( 0 : 용량 제한에 걸림, -1 : 중량 제한에 걸림, 1 : 예정 등록 가능  )
+       Loc2_Apply : Boolean;     // 제한적용여부
+  end;
+
+  //---------------------------------------------
+  // 전역변수로 저장위치 코드 정의
+  var Glb_Loction : array[1..7,1..2] of String = ( ('A00','바닥'),
+                                                   ('B00','귀금속'),
+                                                   ('C00','보온'),
+                                                   ('D00','냉동'),
+                                                   ('E00','경량'),
+                                                   ('F00','장기간보관'),
+                                                   ('Z00','자동창고') );
+
+  //---------------------------------------------
+  // 반입에 대한 상태 ( 예약, 반입확정 )
+  var Glb_INPT_STATE : array[1..6,1..2] of String = ( ('0','예약등록'),
+                                                      ('1','입고완료'),
+                                                      ('2','수기예약등록'),
+                                                      ('*','관우회 발송됨'),
+                                                      ('R','재발송 요구'),
+                                                      ('X','반입자료삭제됨') );
+
+  //---------------------------------------------
+  // 장치 위치 정보 배열로 정의
+  var Glb_Box_Name : array[1..9] of String = ( '경량',
+                                               '자동',
+                                               '바닥',
+                                               '보온',
+                                               '냉장',
+                                               '냉동',
+                                               '무기',
+                                               '귀금속',
+                                               '채화' );
+                                                     
+
+  //---------------------------------------------
+  // 전역변수로 저장위치 코드 다시 정의...ㅜㅜ
+  // 각 전부 바탁번호 000 이 기본적으로 존재함
+  var Glb_Box_Loc : array[1..39, 1..3 ] of String = (
+                                                       ('010','경량보관', '7'),
+                                                       ('011','경량보관', '8'),
+                                                       ('012','경량보관', '8'),
+                                                       ('013','경량보관', '7'),
+                                                       ('014','경량보관', '8'),
+                                                       ('015','경량보관', '7'),
+                                                       ('016','경량보관', '8'),
+                                                       ('017','경량보관', '8'),
+                                                       ('018','경량보관', '8'),
+                                                       ('019','경량보관', '8'),     // 10   (10)
+
+                                                       ('020','자동창고', '0'),     // 1    (11)
+
+                                                       ('030','바닥보관', '0'),     //      (12)
+                                                       ('031','바닥보관', '0'),
+                                                       ('032','바닥보관', '0'),
+                                                       ('033','바닥보관', '0'),
+                                                       ('034','바닥보관', '0'),
+                                                       ('035','바닥보관', '0'),
+                                                       ('036','바닥보관', '0'),
+                                                       ('037','바닥보관', '0'),
+                                                       ('038','바닥보관', '0'),
+                                                       ('039','바닥보관', '0'),
+                                                       ('040','바닥보관', '0'),
+                                                       ('041','바닥보관', '0'),
+                                                       ('042','바닥보관', '0'),
+                                                       ('043','바닥보관', '0'),
+                                                       ('044','바닥보관', '0'),     // 15    (27)
+
+                                                       ('050','보온창고', '11'),    //       (28)
+                                                       ('060','냉장창고', '13'),    //       (29)
+                                                       ('070','냉동창고', '13'),    // 3     (30)
+
+                                                       ('080','무 기 고', '6'),     //       (31)
+                                                       ('090','귀 금 속', '6'),     // 2     (32)
+
+                                                       ('100','체화창고', '5'),     //       (33)
+                                                       ('110','체화창고', '8'),
+                                                       ('120','체화창고', '9'),
+                                                       ('130','체화창고', '9'),
+                                                       ('140','체화창고', '6'),
+                                                       ('150','체화창고', '8'),
+                                                       ('160','체화창고', '6'),
+                                                       ('170','체화창고', '5')    );   // 8  (40)
+
+var
+    //--------------------------------------------------------------------------
+    //
+    //   환경정보
+    //
+    //--------------------------------------------------------------------------
+    Glb_Path  : String;                          // 실행프로그램 전체 디렉토리명
+    Glb_BDE   : String = 'AutoPDA';              // 알리아스명
+    Glb_DB_UserNm : String = 'pda';              // BDE 접속 아이디
+    Glb_DB_UserPw : String = 'pda';              // BDE 접속 비밀번호
+
+    //--------------------------------------------------------------------------
+    //
+    //   기본 데이타 정의
+    //
+    //--------------------------------------------------------------------------
+    GLB_SCODE          : String = '10610';      // 사무소 코드
+    GLB_INPT_HOUSE     : String = '040';        // 입항세관
+    GLB_INPT_CUSTCODE  : String = '9999';       // 화주코드가 없를 경에 사용하는 값
+    GLB_INPT_CUSTNAME  : String = 'anonym';     // 화주코드가 없를 경에 사용하는 화주명
+    GLB_CLINET_PDANO   : String = '00000';      // 반입등록시에 클라이언트에서 등록한것임을 인지
+    GLB_OUPT_CHKINSUR  : String = '1';          // 반출에서 보험가입 유무의 기본값 ( 1 로 고정함 )
+    GLB_INPT_PRDCODE   : String = '99';         // 품명이 없을때에 사용
+    GLB_INPT_PRDNAME   : String = '기타';       // 품명이 없을때에 사용
+
+    //--------------------------------------------------------------------------
+    //
+    //   로그인 사용자 정보 ( 원도우용 관리자 로그인 정보 )
+    //
+    //--------------------------------------------------------------------------
+    Glb_UserID, Glb_UserPW : String;            // 접속 사용자 아이디 와 비밀번호
+    Glb_UserName   : String;                    // 접속 사용자 성명
+    Glb_User_Kind  : Integer;                   // 접속 사용자 권한
+
+    //--------------------------------------------------------------------------
+    //
+    //   관우회에서 파일를 다운로드 받기 위한 접속정보
+    //
+    //   관우회 디렉토리명과 똑같은 디렉토리를 사용한다
+    //
+    //--------------------------------------------------------------------------
+    GLB_FTP_IP   : String;                        // 관우회 서버 IP
+    GLB_FTP_PORT : Integer;                       // 관우회 서버 PORT
+    GLB_FTP_ID   : String;                        // 관우회 서버 접속 아이디
+    GLB_FTP_PW   : String;                        // 관우회 서버 접속 비밀번호
+    GLB_FTP_DIR  : String;                        // 관우회 서버에서 계정의 전체 디렉토리명
+    GLB_FTP_DOWNDIR : String;                     // 관우회 서버에서 다운받을 디렉토리명
+    GLB_FTP_UPDIR   : String;                     // 관우회 서버에서 업로드할 디렉토리명
+    GLB_FTP_TIME    : Smallint;                   // 관우회 서버에 FTP 로 접속하는 시간
+
+    //--------------------------------------------------------------------------
+    //
+    //   다운로드 받은 파일에 대하여 파일의 제일끝에 완전한 파일인지 체크하는
+    //   완료 문자 정의
+    //
+    //--------------------------------------------------------------------------
+    GLB_FILE_END_CHECK : String = 'END';
+
+    //--------------------------------------------------------------------------
+    //
+    //     매입 정보 정의
+    //
+    //--------------------------------------------------------------------------
+    // 창고위치를 구분하여 저장되는 전역변수
+    Glb_MiLoc : TMiLoc;
+
+    //--------------------------------------------------------------------------
+    //
+    //     접속자 정보
+    //
+    //--------------------------------------------------------------------------
+    Glb_Userinfo : TUSERINFO;
+
+
+    //--------------------------------------------------------------------------
+    //
+    //     접속자 정보
+    //
+    //--------------------------------------------------------------------------
+    Glb_Conn_Max : Smallint = 50;
+    Glb_Conn_Query : Array[ 1..50 ] of TUSER_CONN_INFO;    
+
+implementation
+
+end.

@@ -1,0 +1,1337 @@
+unit Frm3900;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, Grids, DBGrids, Buttons, ExtCtrls, DB, ADODB, DBTables,
+  ComCtrls, Mask, Winsock;
+
+type
+  TFrm_3900 = class(TForm)
+    Panel1: TPanel;
+    Shape1: TShape;
+    Label4: TLabel;
+    ExitBitBtn: TSpeedButton;
+    InResGrid: TStringGrid;
+    ConfirmPnl: TPanel;
+    Panel2: TPanel;
+    Panel7: TPanel;
+    ReservedSB: TSpeedButton;
+    WeightEdit: TEdit;
+    Panel10: TPanel;
+    NameEdit: TEdit;
+    Panel4: TPanel;
+    Query2: TADOQuery;
+    UpdtQuery: TADOQuery;
+    ItnbrEdit: TEdit;
+    Panel6: TPanel;
+    GroupBox1: TGroupBox;
+    StartBitBtn: TSpeedButton;
+    Label1: TLabel;
+    Label2: TLabel;
+    Titlepl: TPanel;
+    FromDate: TDateTimePicker;
+    ToDate: TDateTimePicker;
+    DBGrid1: TDBGrid;
+    ConfirmBtn: TSpeedButton;
+    CancelSB: TSpeedButton;
+    Panel5: TPanel;
+    LotnoEdit: TEdit;
+    Query1: TADOQuery;
+    DataSource1: TDataSource;
+    RecNoEdit: TEdit;
+    SeltCB: TComboBox;
+    ItemCB: TEdit;
+    Panel9: TPanel;
+    Panel11: TPanel;
+    DateEdit: TMaskEdit;
+    TimeEdit: TMaskEdit;
+    Panel13: TPanel;
+    OindexEdit: TEdit;
+    StatQuery: TADOQuery;
+    DispQuery: TADOQuery;
+    HogiCB: TComboBox;
+    Panel3: TPanel;
+    Query1OUPT_DATE: TStringField;
+    Query1OUPT_INDEX: TStringField;
+    Query1OUPT_CODE: TStringField;
+    Query1MAST_NAME: TStringField;
+    Query1OUPT_LOTNO: TStringField;
+    Query1OUPT_SEQNO: TIntegerField;
+    Query1OUPT_WGT: TBCDField;
+    Query1OUPT_OUT_WGT: TBCDField;
+    Query1OUPT_RLOCA: TStringField;
+    Query1OUPT_LOCA: TStringField;
+    Query1OUPT_TIME: TStringField;
+    Query1OUPT_RFLAG: TStringField;
+    Query1OUPT_JOB_FLAG: TStringField;
+    Query1OUPT_INDATE: TStringField;
+    Query1OUPT_INTIME: TStringField;
+    Panel17: TPanel;
+    BigoEdit: TEdit;
+    Query1OUPT_REMARK: TStringField;
+    Panel12: TPanel;
+    Panel14: TPanel;
+    Panel15: TPanel;
+    Em3lv1Pnl: TPanel;
+    Em2lv1Pnl: TPanel;
+    Em1lv1Pnl: TPanel;
+    Panel45: TPanel;
+    Panel47: TPanel;
+    Em1lv2Pnl: TPanel;
+    Em2lv2Pnl: TPanel;
+    Em3lv2Pnl: TPanel;
+    Em3lv3Pnl: TPanel;
+    Em2lv3Pnl: TPanel;
+    Em1lv3Pnl: TPanel;
+    Panel49: TPanel;
+    Panel21: TPanel;
+    Em1lv4Pnl: TPanel;
+    Em2lv4Pnl: TPanel;
+    Em3lv4Pnl: TPanel;
+    Em3lv5Pnl: TPanel;
+    Em2lv5Pnl: TPanel;
+    Em1lv5Pnl: TPanel;
+    Panel16: TPanel;
+    Panel18: TPanel;
+    Em1lv6Pnl: TPanel;
+    Em2lv6Pnl: TPanel;
+    Em3lv6Pnl: TPanel;
+    Em3lv7Pnl: TPanel;
+    Em2lv7Pnl: TPanel;
+    Em1lv7Pnl: TPanel;
+    Panel33: TPanel;
+    Panel29: TPanel;
+    Em1lv8Pnl: TPanel;
+    Em2lv8Pnl: TPanel;
+    Em3lv8Pnl: TPanel;
+    Panel25: TPanel;
+    Em1lv9Pnl: TPanel;
+    Em2lv9Pnl: TPanel;
+    Em3lv9Pnl: TPanel;
+    Query1OUPT_BOXNO: TStringField;
+    Panel8: TPanel;
+    BoxNoEdit: TEdit;
+    Query1OUPT_PLTNO: TStringField;
+    Panel19: TPanel;
+    pltnoEdit: TEdit;
+    Query1STATUS_CODE: TStringField;
+    Query1CURR_WGT: TBCDField;
+    procedure ExitBitBtnClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);  
+    procedure ConfirmBtnClick(Sender: TObject);
+    procedure ReservedSBClick(Sender: TObject);
+    procedure DataGridDrawCell(Sender: TObject; ACol, ARow: Integer;
+      Rect: TRect; State: TGridDrawState);
+    procedure CancelSBClick(Sender: TObject);   
+    procedure Cntl_Item_Check;
+    procedure StartBitBtnClick(Sender: TObject); 
+    procedure WeightEditChange(Sender: TObject);     
+    procedure DBGrid1CellClick(Column: TColumn);
+    procedure DBGrid1DrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure SeltCBChange(Sender: TObject);
+    procedure ItemCBKeyPress(Sender: TObject; var Key: Char);
+
+    procedure DBGrid1TitleClick(Column: TColumn);
+    procedure MouseWheelHandler(var Message: TMessage); override;
+     
+  private
+    { Private declarations }
+    function IsNumCheck(var StrData : String): Boolean; 
+    procedure InResGrid_Clear_Proc;
+    function f_get_sysdate_time1(): String;
+
+
+  public
+    { Public declarations }
+  end;
+
+var
+  Frm_3900: TFrm_3900;
+
+  Var_Form : TForm;
+  Bol_Data_Ok : Boolean;
+
+  StrQry : String;
+  StrMsg : String;
+  StrDate1, StrDate2: String;    
+  s_date, s_time : String;
+  sys_datetime : String;
+
+  StrItnbr,  StrLotno, StrCode, s_high, s_wsno, s_floor, s_gubun, s_station : String;
+  CheckPltNo : String;
+  DeleteList: TStringList;
+implementation
+
+uses DBSet, WinLib, FrmPrompt, FrmError, FrmProgress;
+
+{$R *.dfm}
+
+function TFrm_3900.IsNumCheck(var StrData: String): Boolean;
+var
+  IntPos : Integer;
+begin
+  Result := True;
+  for IntPos := 1 to Length(StrData) Do Begin
+    If not (StrData[intPos] in [',', '.', '0'..'9']) Then Begin
+       Result := False;
+       Exit;
+    End;
+  End;
+end;
+
+procedure TFrm_3900.FormCreate(Sender: TObject);
+begin
+  if (jj_kind <> '50') then
+  begin
+    ReservedSB.Visible := False;
+  end;
+
+  DeleteList := TStringList.Create; // 리스트 생성
+
+  // 1. 전체 컬럼 수 설정 (중요: 0~11번까지 총 12개)
+  InResGrid.ColCount := 12;
+
+  // 2. 헤더 명칭 설정 (ConfirmBtnClick 저장 순서와 일치시킴)
+  InResGrid.Cells[1,0]  := 'PLT-NO';     // [추가됨]
+  InResGrid.Cells[2,0]  := '품목코드';
+  InResGrid.Cells[3,0]  := '품 목 명';
+  InResGrid.Cells[4,0]  := 'LOT-NO';
+  InResGrid.Cells[5,0]  := '적재중량';
+  InResGrid.Cells[6,0]  := 'BOX-NO';
+  InResGrid.Cells[7,0]  := '비  고';
+  InResGrid.Cells[8,0]  := '입고일자';   // [위치 변경]
+  InResGrid.Cells[9,0]  := '입고시간';   // [위치 변경]
+  InResGrid.Cells[10,0] := '출고순번';   // [위치 변경]
+  InResGrid.Cells[11,0] := '상태';    // 내부 사용용 (화면에 안 보여도 됨)
+
+  // 3. 컬럼 너비 설정
+  InResGrid.ColWidths[0] := 4;
+  InResGrid.ColWidths[1] := 110; // PLT-NO
+  InResGrid.ColWidths[2] := 110; // 품목코드
+  InResGrid.ColWidths[3] := 180; // 품명
+  InResGrid.ColWidths[4] := 110; // LOT-NO
+  InResGrid.ColWidths[5] := 70;  // 중량
+  InResGrid.ColWidths[6] := 100; // BOX-NO
+  InResGrid.ColWidths[7] := 120; // 비고
+  InResGrid.ColWidths[8] := 80;  // 입고일자
+  InResGrid.ColWidths[9] := 70;  // 입고시간
+  InResGrid.ColWidths[10]:= 70;  // 출고순번
+  InResGrid.ColWidths[11]:= 80;  // 상태코드 (숨김 처리)
+
+  InResGrid.RowCount := 2;
+
+  FromDate.Date := Now;   
+  ToDate.Date := Now;
+  SeltCB.ItemIndex := 0;
+  HogiCB.ItemIndex := 0;   
+
+  StartBitBtnClick(Self);
+end;
+
+{
+procedure TFrm_3900.InResGrid_Clear_Proc;
+var
+  IntCnt : Integer;
+begin
+  With InResGrid Do Begin
+    For IntCnt := 1 to RowCount - 1 do Begin
+     Cells[1,IntCnt]  := '';
+     Cells[2,IntCnt]  := '';
+     Cells[3,IntCnt]  := '';
+     Cells[4,IntCnt]  := '';
+     Cells[5,IntCnt]  := '';
+     Cells[6,IntCnt]  := '';
+     Cells[7,IntCnt]  := '';
+     Cells[8,IntCnt]  := '';
+     Cells[9,IntCnt]  := '';
+    End;
+  End;
+  InResGrid.RowCount := 2;
+end;
+}
+
+procedure TFrm_3900.InResGrid_Clear_Proc;
+var
+  IntCnt, i : Integer;
+begin
+  With InResGrid Do Begin
+    // 1행부터 마지막 행까지
+    For IntCnt := 1 to RowCount - 1 do Begin
+      // 모든 컬럼(0~ColCount-1) 데이터 삭제
+      For i := 0 to ColCount - 1 do
+      begin
+        Cells[i, IntCnt] := '';
+      end;
+    End;
+  End;
+  InResGrid.RowCount := 2;
+end;
+
+procedure TFrm_3900.StartBitBtnClick(Sender: TObject);
+var
+  ls_sql : String;
+  ls_SearchVal : String;
+  
+  // 랙 현황판용 변수
+  li_stok1  : Array[1..9] of Integer;
+  li_stok2  : Array[1..9] of Integer;
+  li_stok3  : Array[1..9] of Integer;
+  ls_lv, ls_bk : string;
+  li_i, li_cnt : Integer;
+begin
+  // 1. 조회 기간 및 검색어 설정
+  StrDate1 := FormatDateTime('yyyymmdd', FromDate.Date);
+  StrDate2 := FormatDateTime('yyyymmdd', ToDate.Date);
+  
+  ls_SearchVal := Trim(ItemCB.Text); 
+
+  // 2. 메인 그리드(DBGrid1) 조회 쿼리 작성
+  ls_sql := ' SELECT ';
+  ls_sql := ls_sql + '   A.OUPT_DATE, A.OUPT_INDEX, A.OUPT_SEQNO, ';
+  ls_sql := ls_sql + '   A.OUPT_PLTNO, A.OUPT_CODE, B.MAST_NAME, A.OUPT_LOTNO, ';
+  ls_sql := ls_sql + '   A.OUPT_WGT, A.OUPT_OUT_WGT, ';
+  ls_sql := ls_sql + '   A.OUPT_BOXNO, A.OUPT_REMARK, ';
+  ls_sql := ls_sql + '   A.OUPT_LOCA, A.OUPT_RLOCA, A.OUPT_TIME, ';
+  ls_sql := ls_sql + '   A.OUPT_RFLAG, A.OUPT_JOB_FLAG, A.OUPT_INDATE, A.OUPT_INTIME, ';
+
+  // [상태 판단 로직 - PLTNO 기준]
+  // C.SUBK_PLTNO가 존재하면(매칭되면), 품목/LOT 상관없이 재고가 있는 것으로 간주
+  ls_sql := ls_sql + '   CASE ';
+  ls_sql := ls_sql + '      WHEN C.SUBK_PLTNO IS NULL THEN ''0'' ';          // 재고 없음 (신규)
+  ls_sql := ls_sql + '      WHEN ISNULL(C.SUBK_LOCA, '''') = '''' THEN ''1'' '; // LOCA 없음 (바닥재고)
+  ls_sql := ls_sql + '      ELSE ''2'' ';                                  // LOCA 있음 (랙재고)
+  ls_sql := ls_sql + '   END AS STATUS_CODE, ';
+
+  // 현재 시스템상 재고 수량
+  ls_sql := ls_sql + '   ISNULL(C.SUBK_WGT, 0) AS CURR_WGT ';
+
+  ls_sql := ls_sql + ' FROM T2MIOUPT A (NOLOCK) ';
+  ls_sql := ls_sql + ' LEFT OUTER JOIN MIMAST   B (NOLOCK) ON A.OUPT_CODE = B.MAST_CODE ';
+
+  {
+  ls_sql := ls_sql + ' LEFT OUTER JOIN T2MISUBK C (NOLOCK) ';
+  ls_sql := ls_sql + '    ON A.OUPT_PLTNO = C.SUBK_PLTNO ';
+  }
+
+  ls_sql := ls_sql + ' LEFT OUTER JOIN ( ';
+  ls_sql := ls_sql + '    SELECT ';
+  ls_sql := ls_sql + '       SUBK_PLTNO, ';
+  ls_sql := ls_sql + '       MAX(SUBK_LOCA) AS SUBK_LOCA, '; // 해당 파렛트의 위치 (바닥이면 공란일 것임)
+  ls_sql := ls_sql + '       SUM(SUBK_WGT)  AS SUBK_WGT ';   // 해당 파렛트의 총 남은 재고량 합계
+  ls_sql := ls_sql + '    FROM T2MISUBK (NOLOCK) ';
+  ls_sql := ls_sql + '    GROUP BY SUBK_PLTNO ';             // PLTNO별로 1줄만 나오게 만듦
+  ls_sql := ls_sql + ' ) C ON A.OUPT_PLTNO = C.SUBK_PLTNO ';
+
+
+
+  ls_sql := ls_sql + ' WHERE 1=1 ';
+  ls_sql := ls_sql + '    AND A.OUPT_DATE >= ''' + StrDate1 + ''' ';
+  ls_sql := ls_sql + '    AND A.OUPT_DATE <= ''' + StrDate2 + ''' ';
+  
+  // 호기 필터
+  if HogiCB.ItemIndex = 1 then      
+     ls_sql := ls_sql + ' AND Substring(A.OUPT_LOCA,1,1) In (''1'',''2'') '
+  else if HogiCB.ItemIndex = 2 then 
+     ls_sql := ls_sql + ' AND Substring(A.OUPT_LOCA,1,1) In (''3'',''4'') '
+  else if HogiCB.ItemIndex = 3 then 
+     ls_sql := ls_sql + ' AND Substring(A.OUPT_LOCA,1,1) In (''5'',''6'') ';
+
+  // 검색 조건 필터
+  if (SeltCB.ItemIndex > 0) and (ls_SearchVal <> '') then
+  begin
+     if SeltCB.ItemIndex = 1 then      
+        ls_sql := ls_sql + ' AND A.OUPT_PLTNO LIKE ''%' + ls_SearchVal + '%'' '
+        //ls_sql := ls_sql + ' AND A.OUPT_PLTNO = ''' + ls_SearchVal + ''' '
+     else if SeltCB.ItemIndex = 2 then
+        //ls_sql := ls_sql + ' AND A.OUPT_CODE LIKE ''%' + ls_SearchVal + '%'' '
+        ls_sql := ls_sql + ' AND A.OUPT_CODE = ''' + ls_SearchVal + ''' '  // 고객사 요청
+     else if SeltCB.ItemIndex = 3 then
+        ls_sql := ls_sql + ' AND B.MAST_NAME LIKE ''%' + ls_SearchVal + '%'' '
+        //_sql := ls_sql + ' AND B.MAST_NAME = ''' + ls_SearchVal + ''' '
+     else if SeltCB.ItemIndex = 4 then
+        ls_sql := ls_sql + ' AND A.OUPT_LOTNO LIKE ''%' + ls_SearchVal + '%'' ';
+        //_sql := ls_sql + ' AND A.OUPT_LOTNO = ''' + ls_SearchVal + ''' ';
+  end;
+
+  ls_sql := ls_sql + ' ORDER BY A.OUPT_DATE DESC, A.OUPT_TIME DESC, A.OUPT_PLTNO, A.OUPT_SEQNO ';
+
+  // 쿼리 실행
+  With Query1 Do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(ls_sql);
+    Open;
+    RecNoEdit.Text := FormatFloat('#,##0', RecordCount);
+  End;
+
+
+  // ===========================================================================
+  // 3. 하단 재고 현황판(랙맵) 조회 로직
+  // ===========================================================================
+  For li_i := 1 to 9 do Begin 
+    li_stok1[li_i] := 0; li_stok2[li_i] := 0; li_stok3[li_i] := 0; 
+  end;
+
+  ls_sql := ' Select LSTK_LV, LSTK_BK, Count(*) As Cnt From T2MILSTK (NOLOCK) ';
+  ls_sql := ls_sql + '  Where  LSTK_FLAG = ''0'' '; // 빈 빈(Empty Bin) 개수
+  ls_sql := ls_sql + '  GROUP BY LSTK_LV, LSTK_BK  ';
+  ls_sql := ls_sql + '  ORDER BY LSTK_LV, LSTK_BK ';
+  
+  With Query2 Do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(ls_sql);
+    Open;
+    First;
+    While Not Eof Do Begin
+      ls_lv  := FieldByName('LSTK_LV').AsString;
+      ls_bk  := FieldByName('LSTK_BK').AsString;
+      li_cnt := FieldByName('Cnt').AsInteger;
+
+      // [1호기] 1,2 Bank
+      if (ls_lv = '1') And ((ls_bk = '1') or (ls_bk = '2')) then  li_stok1[1] :=  li_stok1[1] + li_cnt;
+      if (ls_lv = '2') And ((ls_bk = '1') or (ls_bk = '2')) then  li_stok1[2] :=  li_stok1[2] + li_cnt;
+      if (ls_lv = '3') And ((ls_bk = '1') or (ls_bk = '2')) then  li_stok1[3] :=  li_stok1[3] + li_cnt;
+      if (ls_lv = '4') And ((ls_bk = '1') or (ls_bk = '2')) then  li_stok1[4] :=  li_stok1[4] + li_cnt;
+      if (ls_lv = '5') And ((ls_bk = '1') or (ls_bk = '2')) then  li_stok1[5] :=  li_stok1[5] + li_cnt;
+      if (ls_lv = '6') And ((ls_bk = '1') or (ls_bk = '2')) then  li_stok1[6] :=  li_stok1[6] + li_cnt;
+      if (ls_lv = '7') And ((ls_bk = '1') or (ls_bk = '2')) then  li_stok1[7] :=  li_stok1[7] + li_cnt;
+      if (ls_lv = '8') And ((ls_bk = '1') or (ls_bk = '2')) then  li_stok1[8] :=  li_stok1[8] + li_cnt;
+      if (ls_lv = '9') And ((ls_bk = '1') or (ls_bk = '2')) then  li_stok1[9] :=  li_stok1[9] + li_cnt;
+
+      // [2호기] 3,4 Bank
+      if (ls_lv = '1') And ((ls_bk = '3') or (ls_bk = '4')) then  li_stok2[1] :=  li_stok2[1] + li_cnt;
+      if (ls_lv = '2') And ((ls_bk = '3') or (ls_bk = '4')) then  li_stok2[2] :=  li_stok2[2] + li_cnt;
+      if (ls_lv = '3') And ((ls_bk = '3') or (ls_bk = '4')) then  li_stok2[3] :=  li_stok2[3] + li_cnt;
+      if (ls_lv = '4') And ((ls_bk = '3') or (ls_bk = '4')) then  li_stok2[4] :=  li_stok2[4] + li_cnt;
+      if (ls_lv = '5') And ((ls_bk = '3') or (ls_bk = '4')) then  li_stok2[5] :=  li_stok2[5] + li_cnt;
+      if (ls_lv = '6') And ((ls_bk = '3') or (ls_bk = '4')) then  li_stok2[6] :=  li_stok2[6] + li_cnt;
+      if (ls_lv = '7') And ((ls_bk = '3') or (ls_bk = '4')) then  li_stok2[7] :=  li_stok2[7] + li_cnt;
+      if (ls_lv = '8') And ((ls_bk = '3') or (ls_bk = '4')) then  li_stok2[8] :=  li_stok2[8] + li_cnt;
+      if (ls_lv = '9') And ((ls_bk = '3') or (ls_bk = '4')) then  li_stok2[9] :=  li_stok2[9] + li_cnt;
+
+      // [3호기] 5,6 Bank
+      if (ls_lv = '1') And ((ls_bk = '5') or (ls_bk = '6')) then  li_stok3[1] :=  li_stok3[1] + li_cnt;
+      if (ls_lv = '2') And ((ls_bk = '5') or (ls_bk = '6')) then  li_stok3[2] :=  li_stok3[2] + li_cnt;
+      if (ls_lv = '3') And ((ls_bk = '5') or (ls_bk = '6')) then  li_stok3[3] :=  li_stok3[3] + li_cnt;
+      if (ls_lv = '4') And ((ls_bk = '5') or (ls_bk = '6')) then  li_stok3[4] :=  li_stok3[4] + li_cnt;
+      if (ls_lv = '5') And ((ls_bk = '5') or (ls_bk = '6')) then  li_stok3[5] :=  li_stok3[5] + li_cnt;
+      if (ls_lv = '6') And ((ls_bk = '5') or (ls_bk = '6')) then  li_stok3[6] :=  li_stok3[6] + li_cnt;
+      if (ls_lv = '7') And ((ls_bk = '5') or (ls_bk = '6')) then  li_stok3[7] :=  li_stok3[7] + li_cnt;
+      if (ls_lv = '8') And ((ls_bk = '5') or (ls_bk = '6')) then  li_stok3[8] :=  li_stok3[8] + li_cnt;
+      if (ls_lv = '9') And ((ls_bk = '5') or (ls_bk = '6')) then  li_stok3[9] :=  li_stok3[9] + li_cnt;
+
+      Next;
+    End;
+  End;
+
+  // 패널 캡션 업데이트
+  Em1lv1Pnl.Caption := IntToStr(li_stok1[1]);   Em1lv2Pnl.Caption := IntToStr(li_stok1[2]); Em1lv3Pnl.Caption := IntToStr(li_stok1[3]);
+  Em1lv4Pnl.Caption := IntToStr(li_stok1[4]);   Em1lv5Pnl.Caption := IntToStr(li_stok1[5]); Em1lv6Pnl.Caption := IntToStr(li_stok1[6]);
+  Em1lv7Pnl.Caption := IntToStr(li_stok1[7]);   Em1lv8Pnl.Caption := IntToStr(li_stok1[8]); Em1lv9Pnl.Caption := IntToStr(li_stok1[9]);
+
+  Em2lv1Pnl.Caption := IntToStr(li_stok2[1]);   Em2lv2Pnl.Caption := IntToStr(li_stok2[2]); Em2lv3Pnl.Caption := IntToStr(li_stok2[3]);
+  Em2lv4Pnl.Caption := IntToStr(li_stok2[4]);   Em2lv5Pnl.Caption := IntToStr(li_stok2[5]); Em2lv6Pnl.Caption := IntToStr(li_stok2[6]);
+  Em2lv7Pnl.Caption := IntToStr(li_stok2[7]);   Em2lv8Pnl.Caption := IntToStr(li_stok2[8]); Em2lv9Pnl.Caption := IntToStr(li_stok2[9]);
+
+  Em3lv1Pnl.Caption := IntToStr(li_stok3[1]);   Em3lv2Pnl.Caption := IntToStr(li_stok2[2]); Em3lv3Pnl.Caption := IntToStr(li_stok3[3]);
+  Em3lv4Pnl.Caption := IntToStr(li_stok3[4]);   Em3lv5Pnl.Caption := IntToStr(li_stok2[5]); Em3lv6Pnl.Caption := IntToStr(li_stok3[6]);
+  Em3lv7Pnl.Caption := IntToStr(li_stok3[7]);   Em3lv8Pnl.Caption := IntToStr(li_stok2[8]); Em3lv9Pnl.Caption := IntToStr(li_stok3[9]);
+end;
+
+procedure TFrm_3900.DBGrid1CellClick(Column: TColumn);
+var
+  sPltNo, sStatus, ls_sql : String;
+  IntPos : Integer;
+  IsGridEmpty : Boolean; // 그리드가 비었는지 확인용
+begin
+   // 1. 에디트 박스 채우기 (기존 동일)
+   pltNoEdit.Text   := Query1.FieldByName('OUPT_PLTNO').AsString;
+   ItnbrEdit.Text   := Query1.FieldByName('OUPT_CODE').AsString;
+   NameEdit.Text    := Query1.FieldByName('MAST_NAME').AsString;
+   LotnoEdit.Text   := Query1.FieldByName('OUPT_LOTNO').AsString;
+   WeightEdit.Text  := FloatToStr(Query1.FieldByName('OUPT_WGT').AsFloat - Query1.FieldByName('OUPT_OUT_WGT').AsFloat);
+   DateEdit.Text    := Query1.FieldByName('OUPT_INDATE').AsString;
+   TimeEdit.Text    := Query1.FieldByName('OUPT_INTIME').AsString;
+   OindexEdit.Text  := Query1.FieldByName('OUPT_INDEX').AsString;
+   BigoEdit.Text    := Query1.FieldByName('OUPT_REMARK').AsString;
+   BoxnoEdit.Text   := Query1.FieldByName('OUPT_BOXNO').AsString;
+
+   // 2. 바닥재고(Status=1) 불러오기 로직
+   sStatus := Query1.FieldByName('STATUS_CODE').AsString;
+   sPltNo  := Trim(Query1.FieldByName('OUPT_PLTNO').AsString);
+
+   if (sStatus = '1') and (sPltNo <> '') then
+   begin
+     // [수정] 그리드가 비어있지 않으면 다른 PLTNO 불러오기 차단
+     // (단, 이미 불러온 놈을 또 클릭했을 때는 조용히 무시)
+     
+     if (InResGrid.RowCount > 1) and (Trim(InResGrid.Cells[1, 1]) <> '') then
+     begin
+       // 이미 불러온 PLTNO와 같은지 확인
+       if Trim(InResGrid.Cells[1, 1]) = sPltNo then 
+         Exit; // 같으면 이미 불러왔으니 무시
+
+       // 다르면 에러 메시지 (혼적 불가 원칙)
+       //WinLib_ErrorForm('작업 목록에는 하나의 PLTNO만 불러올 수 있습니다.' + #13#10 +
+       //                 '기존 목록을 초기화하거나 저장 후 진행하세요.');
+       Exit;
+     end;
+
+     // 불러오기 확인
+     if WinLib_ConfirmForm('해당 PLTNO[' + sPltNo + ']로 등록된 바닥 재고 데이터가 있습니다.' + #13#10 +
+                           '작업 목록(그리드)으로 불러오시겠습니까?') then
+     begin
+       // ... (T2MISUBK 조회 및 그리드 추가 로직 - 기존과 동일) ...
+       ls_sql := ' SELECT A.SUBK_PLTNO, A.SUBK_CODE, B.MAST_NAME, A.SUBK_LOTNO, ';
+       ls_sql := ls_sql + '        A.SUBK_WGT, A.SUBK_BOXNO, A.SUBK_REMARK, ';
+       ls_sql := ls_sql + '        A.SUBK_INDATE, A.SUBK_INTIME ';
+       ls_sql := ls_sql + ' FROM T2MISUBK A (NOLOCK) ';
+       ls_sql := ls_sql + ' LEFT OUTER JOIN MIMAST B (NOLOCK) ON A.SUBK_CODE = B.MAST_CODE ';
+       ls_sql := ls_sql + ' WHERE A.SUBK_PLTNO = ''' + sPltNo + ''' ';
+
+       with Query2 do
+       begin
+         Close; SQL.Clear; SQL.Add(ls_sql); Open;
+         if RecordCount = 0 then begin
+           WinLib_ErrorForm('등록된 재고 정보를 찾을 수 없습니다.'); Exit;
+         end;
+         First;
+         while not Eof do begin
+           IntPos := InResGrid.RowCount;
+           if InResGrid.Cells[1, IntPos - 1] <> '' then begin
+             InResGrid.RowCount := IntPos + 1;
+             IntPos := IntPos + 1;
+           end;
+           InResGrid.Cells[1, IntPos - 1] := FieldByName('SUBK_PLTNO').AsString;
+           InResGrid.Cells[2, IntPos - 1] := FieldByName('SUBK_CODE').AsString;
+           InResGrid.Cells[3, IntPos - 1] := FieldByName('MAST_NAME').AsString;
+           InResGrid.Cells[4, IntPos - 1] := FieldByName('SUBK_LOTNO').AsString;
+           InResGrid.Cells[5, IntPos - 1] := FormatFloat('#,##0.00', FieldByName('SUBK_WGT').AsFloat);
+           InResGrid.Cells[6, IntPos - 1] := FieldByName('SUBK_BOXNO').AsString;
+           InResGrid.Cells[7, IntPos - 1] := FieldByName('SUBK_REMARK').AsString;
+           InResGrid.Cells[8, IntPos - 1] := FieldByName('SUBK_INDATE').AsString;
+           InResGrid.Cells[9, IntPos - 1] := FieldByName('SUBK_INTIME').AsString;
+           InResGrid.Cells[10,IntPos - 1] := ''; 
+           InResGrid.Cells[11,IntPos - 1] := '1'; // 기존재고
+           Next;
+         end;
+       end; 
+     end;
+   end;
+end;
+
+procedure TFrm_3900.SeltCBChange(Sender: TObject);
+begin
+   ItemCb.Text := '';
+end;
+
+procedure TFrm_3900.ItemCBKeyPress(Sender: TObject; var Key: Char);
+begin
+  if key <> #13 then Exit;
+  StartBitBtnClick(self);
+end;
+
+
+procedure TFrm_3900.Cntl_Item_Check;
+var
+  IntRow, li_i : Integer;
+  StrSql, ls_yy, ls_mm, ls_dd : String;
+  NumQty, ls_qty : Real;
+begin
+  Bol_Data_Ok := True;
+
+  StrQry := 'SELECT  * From  MIMAST (NOLOCK) WHERE MAST_CODE = '''+itnbrEdit.Text+''' ';
+  With Query2 Do
+  Begin
+      Close;
+      SQL.Clear;
+      SQL.Add(StrQry);
+      Open;
+      First;
+
+      if RecordCount = 0  then
+      begin
+        Bol_Data_Ok := False;
+        StrMsg := ' 제품 마스터에 코드가 없읍니다..' + #13#10 + ' 확인한 후 다시 하십시요!!!';
+        WinLib_ErrorForm( StrMsg );
+        ItnbrEdit.Text := '';
+//        ItnbrEdit.SetFocus;
+        Exit;
+      end;
+      ItnbrEdit.Text   := FieldByName('MAST_CODE').AsString;
+      NameEdit.Text    := FieldByName('MAST_NAME').AsString;
+      WeightEdit.Text  := FieldByName('MAST_WEIGHT').AsString;
+  end;
+  ConfirmBtnClick(Self);
+//  ItnbrEdit.SetFocus;
+end;
+
+procedure TFrm_3900.WeightEditChange(Sender: TObject);
+var
+  StrBQty, StrQry : String;
+  NumQty, NumWgt : Real;
+begin
+  StrBQty := WeightEdit.Text;
+
+  if (Length(StrBQty) = 0) or  (StrBQty = '0') then  Exit;
+
+  if IsNumCheck(StrBQty) = False then
+  Begin
+    StrMsg := '숫자를 Key-in 하세요....';
+    WinLib_ErrorForm( StrMsg );
+    Exit;
+  End;
+
+  While Pos(',', StrBQty) > 0 Do Begin Delete(StrBQty, Pos(',', StrBQty), 1); End;
+
+
+  NumQty := StrToFloat(StrBQty);
+
+  if NumQty = 0 Then
+  Begin
+    StrMsg := '입고 작업할  중량이 없습니다....';
+    WinLib_ErrorForm( StrMsg );
+    Exit;
+  End;    
+end;
+
+procedure TFrm_3900.ConfirmBtnClick(Sender: TObject);
+var
+  IntPos, i : Integer;
+  StrBQty, StrQry : String;
+  NumQty : Double;
+  li_cnt : Integer;
+  sPltNo, sFirstPltNo : String;
+  sDbLoca, sStatus : String;
+  GridHasPlt : Boolean;
+begin
+  // ===========================================================================
+  // 1. 기본 유효성 검사
+  // ===========================================================================
+  sPltNo := Trim(pltnoEdit.Text);
+
+  if Length(sPltNo) = 0 Then Begin
+    StrMsg := 'PLT-NO가 입력되지 않았습니다.';
+    WinLib_ErrorForm( StrMsg );
+    pltnoEdit.SetFocus;
+    Exit;
+  End;
+
+  if Length(Trim(ItnbrEdit.Text)) = 0 Then Begin
+    StrMsg := '품목코드가 없습니다.';
+    WinLib_ErrorForm( StrMsg );
+    ItnbrEdit.SetFocus;
+    Exit;
+  End;
+
+  // 품목 마스터 확인 및 품명 가져오기
+  StrQry := 'SELECT MAST_NAME FROM MIMAST (NOLOCK) WHERE MAST_CODE = ''' + Trim(ItnbrEdit.Text) + ''' ';
+  With Query2 Do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(StrQry);
+    Open;
+    if RecordCount = 0 then begin
+      StrMsg := '품목 마스터에 존재하지 않는 코드입니다.';
+      WinLib_ErrorForm( StrMsg );
+      ItnbrEdit.SetFocus;
+      Exit;
+    end;
+    NameEdit.Text := FieldByName('MAST_NAME').AsString;
+  End;
+
+  if Length(Trim(WeightEdit.Text)) = 0 Then begin
+    StrMsg := '수량(중량)을 입력하세요.';
+    WinLib_ErrorForm( StrMsg );
+    WeightEdit.SetFocus;
+    Exit;
+  end;
+
+  StrBQty := WeightEdit.Text;
+  While Pos(',', StrBQty) > 0 Do Delete(StrBQty, Pos(',', StrBQty), 1);
+  NumQty := StrToFloatDef(StrBQty, 0);
+
+  if NumQty <= 0 Then Begin
+    StrMsg := '입고할 수량이 0보다 커야 합니다.';
+    WinLib_ErrorForm( StrMsg );
+    WeightEdit.SetFocus;
+    Exit;
+  End;
+
+
+  // ===========================================================================
+  // 2. 리스트 내 혼적 체크 (다른 PLTNO 등록 방지) - 가장 먼저 체크
+  // ===========================================================================
+  if (InResGrid.RowCount > 1) and (Trim(InResGrid.Cells[1, 1]) <> '') then
+  begin
+      sFirstPltNo := Trim(InResGrid.Cells[1, 1]); 
+
+      if sFirstPltNo <> sPltNo then
+      begin
+          StrMsg := '작업 목록에는 동일한 PLTNO만 등록할 수 있습니다.' + #13#10 +
+                    '--------------------------------------------------' + #13#10 +
+                    '기존 목록: [' + sFirstPltNo + ']' + #13#10 +
+                    '현재 입력: [' + sPltNo + ']';
+          WinLib_ErrorForm(StrMsg);
+          pltnoEdit.SetFocus;
+          Exit;
+      end;
+  end;
+
+
+  // ===========================================================================
+  // 3. DB 중복 및 모드 검증 (핵심 방어 로직)
+  // ===========================================================================
+  sStatus := '0'; // 기본값: 신규
+
+  StrQry := ' SELECT COUNT(*) AS CNT, MAX(ISNULL(SUBK_LOCA, '''')) AS LOCA ';
+  StrQry := StrQry + ' FROM T2MISUBK (NOLOCK) ';
+  StrQry := StrQry + ' WHERE SUBK_PLTNO = ''' + sPltNo + ''' ';
+  
+  With Query2 Do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(StrQry);
+    Open;
+    li_cnt  := FieldByName('CNT').AsInteger;
+    sDbLoca := Trim(FieldByName('LOCA').AsString);
+  End;
+
+  // [Case A] DB에 데이터가 존재하는 경우
+  if li_cnt > 0 then 
+  begin
+    // A-1. 이미 랙에 적재된 경우 -> 무조건 차단
+    if sDbLoca <> '' then 
+    Begin
+      StrMsg := '[' + sPltNo + '] 는 이미 적재 완료된(위치: ' + sDbLoca + ') 상태입니다.';
+      WinLib_ErrorForm(StrMsg);
+      pltnoEdit.SetFocus; 
+      Exit;
+    End;
+
+    // A-2. 바닥 재고인 경우 -> 그리드에 있거나, 클릭했던 놈인지 확인
+    GridHasPlt := False;
+    // 그리드에 데이터가 있고, 그게 지금 입력한 PLTNO와 같은지 확인
+    if (InResGrid.RowCount > 1) and (Trim(InResGrid.Cells[1, 1]) = sPltNo) then
+    begin
+       GridHasPlt := True;
+    end;
+
+    // ★★★ [수정된 부분] ★★★ 
+    // 그리드에 있거나(GridHasPlt) OR 아까 클릭했던 놈(CheckPltNo)이면 통과
+    if (GridHasPlt) or (sPltNo = CheckPltNo) then
+    begin
+       // [허용] 
+       sStatus := '0'; 
+    end
+    else
+    begin
+       // [차단] 
+       StrMsg := '[' + sPltNo + '] 는 이미 등록된 바닥 재고입니다.' + #13#10 + 
+                 '먼저 목록에서 해당 데이터를 불러온 후 추가하세요.';
+       WinLib_ErrorForm(StrMsg);
+       pltnoEdit.SetFocus; 
+       Exit;
+    end;
+  end;
+  // [Case B] DB에 데이터가 없는 경우 (li_cnt = 0) -> 신규('0') -> 정상 통과
+
+
+  // ===========================================================================
+  // 4. 그리드 내 완전 동일 데이터(품목+LOT) 중복 체크
+  // ===========================================================================
+  for i := 1 to InResGrid.RowCount - 1 do
+  begin
+    if (Trim(InResGrid.Cells[1, i]) = sPltNo) and
+       (Trim(InResGrid.Cells[2, i]) = Trim(ItnbrEdit.Text)) and
+       (Trim(InResGrid.Cells[4, i]) = Trim(LotnoEdit.Text)) then
+    begin
+       StrMsg := '이미 목록에 추가된 항목입니다.';
+       WinLib_ErrorForm( StrMsg );
+       Exit;
+    end;
+  end;
+
+
+  // ===========================================================================
+  // 5. 그리드에 데이터 추가
+  // ===========================================================================
+  IntPos := InResGrid.RowCount;
+  if InResGrid.Cells[1, IntPos - 1] <> '' then
+  begin
+    InResGrid.RowCount := IntPos + 1;
+    IntPos := IntPos + 1;
+  end;
+
+  InResGrid.Cells[1, IntPos - 1] := sPltNo;                 // PLT-NO
+  InResGrid.Cells[2, IntPos - 1] := ItnbrEdit.Text;         // 품목코드
+  InResGrid.Cells[3, IntPos - 1] := NameEdit.Text;          // 품명
+  InResGrid.Cells[4, IntPos - 1] := LotnoEdit.Text;         // LOT-NO
+  InResGrid.Cells[5, IntPos - 1] := FormatFloat('#,##0.00', NumQty); // 수량
+  InResGrid.Cells[6, IntPos - 1] := BoxnoEdit.Text;         // BOX-NO
+  InResGrid.Cells[7, IntPos - 1] := BigoEdit.Text;          // 비고
+  InResGrid.Cells[8, IntPos - 1] := DateEdit.Text;          // 입고일자
+  InResGrid.Cells[9, IntPos - 1] := TimeEdit.Text;          // 입고시간
+  InResGrid.Cells[10, IntPos - 1] := OindexEdit.Text;       // 출고순번
+  
+  // 상태코드 적용 (0:신규/추가/수정)
+  InResGrid.Cells[11, IntPos - 1] := sStatus;
+
+  // ===========================================================================
+  // 6. 입력창 초기화
+  // ===========================================================================
+  ItnbrEdit.Text  := '';
+  NameEdit.Text   := '';
+  LotnoEdit.Text  := '';
+  WeightEdit.Text := '';
+  BoxnoEdit.Text  := '';
+  BigoEdit.Text   := '';
+  
+  DateEdit.Text   := '';
+  TimeEdit.Text   := '';
+  OindexEdit.Text := '';
+  
+  // pltnoEdit.Text := ''; 
+End;
+
+procedure TFrm_3900.ReservedSBClick(Sender: TObject);
+var
+  IntPos, k : Integer;
+  StrQry, ls_sql : String;
+
+  // 그리드 데이터 변수
+  StrPltNo, StrItnbr, StrLotno, StrQty, StrBoxNo, StrBigo : String;
+  StrDate, StrTime, sStatus : String;
+  
+  // 삭제 처리용 변수
+  DelItem, dPlt, dCode, dLot : String;
+  p : Integer;
+
+  IsGridEmpty : Boolean;
+  li_cnt : Integer;
+begin
+  // ===========================================================================
+  // 1. 유효성 검사 (데이터 존재 여부)
+  // ===========================================================================
+  IsGridEmpty := True;
+  
+  // 삭제할 목록이 있거나, 그리드에 데이터가 있으면 진행
+  if (DeleteList.Count > 0) then 
+    IsGridEmpty := False
+  else if InResGrid.RowCount > 1 then
+  begin
+    for IntPos := 1 to InResGrid.RowCount - 1 do
+    begin
+      if Trim(InResGrid.Cells[1, IntPos]) <> '' then
+      begin
+        IsGridEmpty := False;
+        Break;
+      end;
+    end;
+  end;
+
+  if IsGridEmpty then
+  begin
+    WinLib_ErrorForm('저장할 데이터가 없습니다.');
+    Exit;
+  end;
+
+  // 2. 저장 확인 메시지
+  if Not WinLib_ConfirmForm('작업 목록을재입고 확정 하시겠습니까?') then Exit;
+
+  // 3. 시간 설정
+  StrDate := FormatDateTime('yyyymmdd', Now);
+  StrTime := FormatDateTime('hhmmss', Now);
+
+  // 트랜잭션 시작 (권장사항 - 컴포넌트 지원 시 주석 해제)
+  // UpdtQuery.Connection.BeginTrans; 
+
+  try
+    // =========================================================================
+    // [STEP 1] 삭제 목록(DeleteList) 처리 - DB에서 영구 삭제
+    // =========================================================================
+    if DeleteList.Count > 0 then
+    begin
+      for k := 0 to DeleteList.Count - 1 do
+      begin
+        DelItem := DeleteList[k]; // 예: "PLT001^CODE01^LOT01"
+        
+        // 파싱 로직 (구분자 ^ 로 분리)
+        // 1. PLTNO
+        p := Pos('^', DelItem);
+        dPlt := Copy(DelItem, 1, p - 1);
+        Delete(DelItem, 1, p);
+        
+        // 2. CODE
+        p := Pos('^', DelItem);
+        dCode := Copy(DelItem, 1, p - 1);
+        Delete(DelItem, 1, p);
+        
+        // 3. LOTNO (나머지 전체)
+        dLot := DelItem;
+
+        // DB 삭제 실행
+        ls_sql := ' DELETE FROM T2MISUBK ';
+        ls_sql := ls_sql + ' WHERE SUBK_PLTNO = ''' + dPlt + ''' ';
+        ls_sql := ls_sql + '   AND SUBK_CODE  = ''' + dCode + ''' ';
+        ls_sql := ls_sql + '   AND SUBK_LOTNO = ''' + dLot + ''' ';
+
+        With UpdtQuery Do Begin
+          Close;
+          SQL.Clear;
+          SQL.Add(ls_sql);
+          ExecSql;
+        End;
+      end;
+    end;
+
+    // =========================================================================
+    // [STEP 2] 그리드 데이터 처리 (INSERT / UPDATE)
+    // =========================================================================
+    for IntPos := 1 to InResGrid.RowCount - 1 do
+    begin
+      // 빈 행 건너뜀
+      if Trim(InResGrid.Cells[1, IntPos]) = '' then Continue;
+
+      // 값 파싱
+      StrPltNo  := Trim(InResGrid.Cells[1, IntPos]); // PLT-NO
+      StrItnbr  := Trim(InResGrid.Cells[2, IntPos]); // 품목코드
+      StrLotno  := Trim(InResGrid.Cells[4, IntPos]); // LOT-NO
+      StrQty    := Trim(InResGrid.Cells[5, IntPos]); // 수량
+      StrBoxNo  := Trim(InResGrid.Cells[6, IntPos]); // BOX-NO
+      StrBigo   := Trim(InResGrid.Cells[7, IntPos]); // 비고
+      sStatus   := Trim(InResGrid.Cells[11, IntPos]); // 상태코드 (0:신규, 1:기존)
+
+      // 수량 콤마 제거
+      While Pos(',', StrQty) > 0 Do Delete(StrQty, Pos(',', StrQty), 1);
+      if StrQty = '' then StrQty := '0';
+
+      // -----------------------------------------------------------------------
+      // Case A: 기존 바닥 재고 (UPDATE)
+      // -----------------------------------------------------------------------
+      if sStatus = '1' then
+      begin
+         ls_sql := ' UPDATE T2MISUBK SET ';
+         ls_sql := ls_sql + '   SUBK_WGT    = ' + StrQty + ', ';
+         ls_sql := ls_sql + '   SUBK_RWGT   = 0, ';
+         ls_sql := ls_sql + '   SUBK_BOXNO  = ''' + StrBoxNo + ''', ';
+         ls_sql := ls_sql + '   SUBK_REMARK = ''' + StrBigo + ''', ';
+         ls_sql := ls_sql + '   SUBK_FLAG   = ''R'', ';                // 재입고 대기
+         ls_sql := ls_sql + '   SUBK_GUBUN  = '''' ';
+         ls_sql := ls_sql + ' WHERE SUBK_PLTNO = ''' + StrPltNo + ''' ';
+         ls_sql := ls_sql + '   AND SUBK_CODE  = ''' + StrItnbr + ''' ';
+         ls_sql := ls_sql + '   AND SUBK_LOTNO = ''' + StrLotno + ''' ';
+
+         With UpdtQuery Do Begin
+           Close; SQL.Clear; SQL.Add(ls_sql); ExecSql;
+         End;
+      end
+      // -----------------------------------------------------------------------
+      // Case B: 신규 재고 (INSERT) - 단, 혹시 모를 중복 방지 체크 포함
+      // -----------------------------------------------------------------------
+      else 
+      begin
+         // 안전장치: 실제 DB에 있는지 확인
+         ls_sql := ' SELECT COUNT(*) FROM T2MISUBK (NOLOCK) ';
+         ls_sql := ls_sql + ' WHERE SUBK_PLTNO = ''' + StrPltNo + ''' ';
+         ls_sql := ls_sql + '   AND SUBK_CODE  = ''' + StrItnbr + ''' ';
+         ls_sql := ls_sql + '   AND SUBK_LOTNO = ''' + StrLotno + ''' ';
+         
+         With Query2 Do Begin
+           Close; SQL.Clear; SQL.Add(ls_sql); Open;
+           li_cnt := Fields[0].AsInteger;
+         End;
+
+         if li_cnt > 0 then
+         begin
+           // 이미 존재하면 UPDATE로 전환
+           ls_sql := ' UPDATE T2MISUBK SET ';
+           ls_sql := ls_sql + '   SUBK_WGT    = ' + StrQty + ', ';
+           ls_sql := ls_sql + '   SUBK_RWGT   = 0, ';
+           ls_sql := ls_sql + '   SUBK_BOXNO  = ''' + StrBoxNo + ''', ';
+           ls_sql := ls_sql + '   SUBK_REMARK = ''' + StrBigo + ''', ';
+           ls_sql := ls_sql + '   SUBK_FLAG   = ''R'', '; 
+           ls_sql := ls_sql + '   SUBK_GUBUN  = '''' ';
+           ls_sql := ls_sql + ' WHERE SUBK_PLTNO = ''' + StrPltNo + ''' ';
+           ls_sql := ls_sql + '   AND SUBK_CODE  = ''' + StrItnbr + ''' ';
+           ls_sql := ls_sql + '   AND SUBK_LOTNO = ''' + StrLotno + ''' ';
+
+           With UpdtQuery Do Begin
+             Close; SQL.Clear; SQL.Add(ls_sql); ExecSql;
+           End;
+         end
+         else
+         begin
+           // 신규 INSERT
+           ls_sql := ' INSERT INTO T2MISUBK ( ';
+           ls_sql := ls_sql + '   SUBK_PLTNO, SUBK_CODE, SUBK_LOTNO, ';
+           ls_sql := ls_sql + '   SUBK_WGT, SUBK_RWGT, SUBK_BOXNO, SUBK_REMARK, ';
+           ls_sql := ls_sql + '   SUBK_FLAG, SUBK_GUBUN, ';
+           ls_sql := ls_sql + '   SUBK_INDATE, SUBK_INTIME, SUBK_USERID ';
+           ls_sql := ls_sql + ' ) VALUES ( ';
+           ls_sql := ls_sql + '   ''' + StrPltNo + ''', ''' + StrItnbr + ''', ''' + StrLotno + ''', ';
+           ls_sql := ls_sql + '   ' + StrQty + ', 0, ''' + StrBoxNo + ''', ''' + StrBigo + ''', ';
+           ls_sql := ls_sql + '   ''R'', '''', ';  
+           ls_sql := ls_sql + '   ''' + StrDate + ''', ''' + StrTime + ''', ''' + jj_id + ''' ';
+           ls_sql := ls_sql + ' ) ';
+
+           With UpdtQuery Do Begin
+             Close; SQL.Clear; SQL.Add(ls_sql); ExecSql;
+           End;
+         end;
+      end;
+    end; // End For Loop
+
+    DeleteList.Clear; // 삭제 목록 초기화 (중요)
+    
+    ShowMessage('저장이 완료되었습니다.');
+    
+    InResGrid_Clear_Proc;
+    StartBitBtnClick(Self); // 재조회
+    
+    // 입력창 초기화
+    ItnbrEdit.Text  := ''; 
+    NameEdit.Text   := ''; 
+    LotnoEdit.Text  := ''; 
+    WeightEdit.Text := ''; 
+    BoxNoEdit.Text  := ''; 
+    BigoEdit.Text   := '';
+    DateEdit.Text   := '';
+    TimeEdit.Text   := '';
+    OindexEdit.Text := '';
+    // pltnoEdit.Text  := ''; 
+
+  except
+    WinLib_ErrorForm('저장 중 오류가 발생했습니다.');
+  end;
+end;
+
+procedure TFrm_3900.CancelSBClick(Sender: TObject);
+var
+  m_Row, i, j : Integer;
+  StrMsg : string;
+  sPltNo, sCode, sLot, sStatus : String;
+  DelKey : String;
+begin
+  // 1. 선택 확인
+  If InResGrid.row = 0 Then  Exit;
+  If InResGrid.Cells[1, InResGrid.Row] = '' Then Begin
+    StrMsg := '취소(수정)할 데이터가 선택되지 않았습니다.';
+    WinLib_ErrorForm( StrMsg );
+    Exit;
+  End;
+
+  m_Row := InResGrid.Row;
+
+  // 데이터 파싱
+  sPltNo  := Trim(InResGrid.Cells[1, m_Row]); 
+  sCode   := Trim(InResGrid.Cells[2, m_Row]); 
+  sLot    := Trim(InResGrid.Cells[4, m_Row]);
+  sStatus := Trim(InResGrid.Cells[11, m_Row]); 
+
+  // 확인 메시지
+  StrMsg := '선택한 데이터를 목록에서 제외하고 수정하시겠습니까?' + #13#10 +
+            '(이미 등록된 재고는 [저장] 시 삭제됩니다.)';
+  if Not WinLib_ConfirmForm(StrMsg) then Exit;
+
+  // ===========================================================================
+  // [수정] 취소한 항목을 '내가 작업 중인 PLTNO'로 인식시켜 재등록 허용
+  // ===========================================================================
+  if sStatus = '1' then 
+  begin
+     CheckPltNo := sPltNo; // ★ 핵심 수정 사항
+  end;
+
+  // DB 삭제 목록에 추가
+  if sStatus = '1' then 
+  begin
+    DelKey := sPltNo + '^' + sCode + '^' + sLot;
+    DeleteList.Add(DelKey); 
+  end;
+
+  // 2. 그리드 데이터를 입력창(Edit)으로 복구
+  pltnoEdit.Text  := InResGrid.Cells[1, m_Row]; 
+  ItnbrEdit.Text  := InResGrid.Cells[2, m_Row]; 
+  NameEdit.Text   := InResGrid.Cells[3, m_Row]; 
+  LotnoEdit.Text  := InResGrid.Cells[4, m_Row]; 
+  WeightEdit.Text := InResGrid.Cells[5, m_Row]; 
+  BoxNoEdit.Text  := InResGrid.Cells[6, m_Row]; 
+  BigoEdit.Text   := InResGrid.Cells[7, m_Row]; 
+  DateEdit.Text   := InResGrid.Cells[8, m_Row]; 
+  TimeEdit.Text   := InResGrid.Cells[9, m_Row]; 
+  OindexEdit.Text := InResGrid.Cells[10, m_Row]; 
+
+  // 3. 그리드에서 행 삭제
+  for j := m_Row to  InResGrid.RowCount-2 do
+  begin
+      for i := 0 to InResGrid.ColCount-1  do
+      begin
+          InResGrid.Cells[i, j] := InResGrid.Cells[i, j+1];
+      end;
+  end;
+
+  for j := 0 to  InResGrid.ColCount-1  do
+  begin
+      InResGrid.Cells[j, InResGrid.RowCount-1] := '';
+  end;
+
+  If InResGrid.RowCount > 2 Then InResGrid.RowCount := InResGrid.RowCount - 1;
+  InResGrid.Col := 0;
+
+  WeightEdit.SetFocus;
+  WeightEdit.SelectAll; 
+end;
+
+procedure TFrm_3900.DataGridDrawCell(Sender: TObject; ACol, ARow: Integer;
+  Rect: TRect; State: TGridDrawState);
+var
+  OldAlign : Word;
+  LeftPos: Integer;
+  CellStr: string;
+begin
+  with TStringGrid(Sender).Canvas do
+  begin
+    CellStr := TStringGrid(Sender).Cells[ACol, ARow];
+
+    IF ARow = 0 Then Begin
+      if ACol > 0 Then Begin
+        LeftPos := ((Rect.Right-Rect.Left-TStringGrid(Sender).Canvas.TextWidth(CellStr)) div 2) + Rect.Left;  // 가운데 정렬
+        With TStringGrid(Sender).Canvas.Font Do Begin
+          Brush.Color := clTeal;
+          Font.Color  := clWhite;
+          Style := [fsBold];
+        End;
+        FillRect(Rect);
+        TextOut(LeftPos, Rect.Top+5, CellStr);
+      End;
+    End;
+    IF ARow > 0 Then Begin
+      if (ACol = 4)   Then Begin
+        OldAlign := SetTextAlign (TStringGrid(Sender).Canvas.Handle, ta_right);
+        TStringGrid(Sender).Canvas.TextRect(Rect, Rect.right-2, Rect.top+2, TStringGrid(Sender).Cells[ACol,ARow]);
+        SetTextAlign(TStringGrid(Sender).Canvas.Handle, OldAlign);
+      End;
+    End;
+  End;
+end;
+
+
+
+procedure TFrm_3900.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action := caFree;
+end;
+
+procedure TFrm_3900.FormDestroy(Sender: TObject);
+begin
+  if Assigned(DeleteList) then DeleteList.Free; // 메모리 해제
+  Frm_3900 := Nil;
+end;
+
+procedure TFrm_3900.ExitBitBtnClick(Sender: TObject);
+begin
+  close;
+end;
+
+{
+procedure TFrm_3900.DBGrid1DrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn;
+  State: TGridDrawState);
+var
+   Value, ls_hogi, ls_status : String;
+   WW    : Integer;
+begin
+  // 1. 상태코드 가져오기
+  ls_status := Query1.FieldByName('STATUS_CODE').AsString;
+
+  // 2. 선택된 행이 아닐 경우에만 배경색 변경 (선택된 행은 파란색 반전 유지)
+  if not (gdSelected in State) then
+  begin
+    if ls_status = '1' then      // [바닥재고] - 노란색 (주목)
+      (Sender as TDBGrid).Canvas.Brush.Color := $00C6FFC6 // 연한 초록 or clInfoBk
+    else if ls_status = '2' then // [랙 재고] - 붉은색 (주의/불가)
+      //(Sender as TDBGrid).Canvas.Brush.Color := $00C1C1FF // 연한 빨강
+      (Sender as TDBGrid).Canvas.Brush.Color := clRed // 연한 빨강
+    else                         // [신규/없음] - 흰색
+      //(Sender as TDBGrid).Canvas.Brush.Color := clWhite;
+  end;
+
+  // 3. 배경색 적용을 위해 기본 그리기 호출
+  (Sender as TDBGrid).DefaultDrawColumnCell(Rect, DataCol, Column, State);
+
+
+  // ===========================================================================
+  // 기존 커스텀 그리기 로직 (순번 및 호기 표시)
+  // ===========================================================================
+  
+  // [순번 그리기]
+  If DataCol = 0 Then
+  begin
+    with (Sender as TDBGrid).Canvas do
+    begin
+      Value := IntToStr(Query1.RecNo);
+      WW    := TextWidth(value);
+      // 배경색 위에 글자를 다시 써줌
+      TextOut(Rect.Left + (Rect.Right - Rect.Left - WW) div 2, Rect.Top + 2, Value);
+    end;
+  end;
+
+  // [호기 구분 그리기]
+  If DataCol = 3 Then // 쿼리상 순서나 컬럼 인덱스 확인 필요 (기존 로직 유지)
+  begin
+    ls_hogi := Query1.FieldByName('OUPT_RLOCA').AsString;
+    ls_hogi := Copy(ls_hogi, 1, 1);
+
+    if (ls_hogi = '1') or (ls_hogi = '2') then       ls_hogi := '1'
+    else if (ls_hogi = '3') or (ls_hogi = '4') then  ls_hogi := '2'
+    else if (ls_hogi = '5') or (ls_hogi = '6') then  ls_hogi := '3'
+    else if (ls_hogi = '') then                      ls_hogi := '';
+
+    with (Sender as TDBGrid).Canvas do
+    begin
+       Value := ls_hogi;
+       WW    := TextWidth(value);
+       // 배경색 위에 글자를 다시 써줌
+       TextOut(Rect.Left + (Rect.Right - Rect.Left - WW) div 2, Rect.Top + 2, Value);
+    end;
+  end;
+end;
+}
+
+procedure TFrm_3900.DBGrid1DrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn;
+  State: TGridDrawState);
+var
+   Value, ls_hogi, ls_status : String;
+   WW     : Integer;
+   Grid   : TDBGrid;
+begin
+  Grid := Sender as TDBGrid;
+  
+  // 1. 상태코드 가져오기
+  ls_status := Query1.FieldByName('STATUS_CODE').AsString;
+
+  if ls_status = '1' then       // [바닥재고]
+  begin
+     //Grid.Canvas.Brush.Color := $00C6FFC6; // 연한 초록
+     Grid.Canvas.Brush.Color := clYellow; // 연한 초록
+     Grid.Canvas.Font.Color  := clBlack;
+  end
+  //else if ls_status = '2' then  // [랙 재고]  -> 고객사 요청에 의한 주석 처리
+  //begin
+  //   Grid.Canvas.Brush.Color := clRed;     // 빨강 (또는 $00C1C1FF 연한 빨강)
+  //   Grid.Canvas.Font.Color  := clWhite;   // 빨강 배경엔 흰 글씨가 잘 보임
+  //end
+  else                          // [신규]
+  begin
+     Grid.Canvas.Brush.Color := clWhite;
+     Grid.Canvas.Font.Color  := clBlack;
+  end;
+
+  // 3. 선택된 행(gdSelected)일 경우의 처리
+  //    선택되었다는 것을 표시하기 위해 색상을 반전시키거나 테두리를 그립니다.
+  if (gdSelected in State) then
+  begin
+     // 방법 A: 선택되면 무조건 파란색 (기존 방식 - 색이 풀려 보일 수 있음)
+     Grid.Canvas.Brush.Color := clHighlight;
+     Grid.Canvas.Font.Color  := clHighlightText;
+
+     Grid.Canvas.Font.Style := [fsBold];
+     Grid.Canvas.Font.Color := clBlue; // 선택된 행은 글자를 파란색으로
+  end;
+
+  // 4. 실제 그리기 (DefaultDrawColumnCell 호출)
+  Grid.DefaultDrawColumnCell(Rect, DataCol, Column, State);
+
+
+  // ===========================================================================
+  // 5. 커스텀 텍스트 그리기 (순번, 호기 등)
+  //    ※ DefaultDrawColumnCell이 배경을 칠했으므로, 그 위에 글자를 다시 써줘야 함
+  // ===========================================================================
+  
+  // [순번 그리기]
+  If DataCol = 0 Then
+  begin
+     Value := IntToStr(Query1.RecNo);
+     WW    := Grid.Canvas.TextWidth(value);
+     // 아까 설정한 Font 색상/스타일로 그려짐
+     Grid.Canvas.TextOut(Rect.Left + (Rect.Right - Rect.Left - WW) div 2, Rect.Top + 2, Value);
+  end;
+
+  // [호기 구분 그리기]
+  If DataCol = 3 Then 
+  begin
+     ls_hogi := Query1.FieldByName('OUPT_RLOCA').AsString;
+     ls_hogi := Copy(ls_hogi, 1, 1);
+
+     if (ls_hogi = '1') or (ls_hogi = '2') then       ls_hogi := '1'
+     else if (ls_hogi = '3') or (ls_hogi = '4') then  ls_hogi := '2'
+     else if (ls_hogi = '5') or (ls_hogi = '6') then  ls_hogi := '3'
+     else if (ls_hogi = '') then                      ls_hogi := '';
+
+     Value := ls_hogi;
+     WW    := Grid.Canvas.TextWidth(value);
+     Grid.Canvas.TextOut(Rect.Left + (Rect.Right - Rect.Left - WW) div 2, Rect.Top + 2, Value);
+  end;
+end;
+
+procedure TFrm_3900.DBGrid1TitleClick(Column: TColumn);
+begin
+   if Column.Field.DataSet is TADOQuery then
+   with TADOQuery(Column.Field.DataSet) do begin
+     if (Pos(Column.FieldName + ' DESC', Sort) > 0) or ( Sort = '' ) then
+       Sort := Column.FieldName + ' ASC'
+     else
+       Sort := Column.FieldName + ' DESC';
+   end;
+
+end;
+
+procedure TFrm_3900.MouseWheelHandler(var Message: TMessage);
+var
+ i: SmallInt;
+begin
+ // inherited;
+ if Message.Msg = WM_MOUSEWHEEL then
+ begin
+   if ActiveControl is TDBGrid then
+   begin
+     Message.Msg := WM_KEYDOWN;
+     Message.lParam := 0;
+     i := HiWord(Message.wParam);
+     if i > 0 then
+       Message.wParam := VK_UP
+     else
+       Message.wParam := VK_DOWN;
+     SendMessage(ActiveControl.Handle, Message.Msg, Message.wParam, Message.LParam);
+     (ActiveControl as TDBGrid).Refresh;
+   end;
+ end;
+end;
+
+function TFrm_3900.f_get_sysdate_time1(): String;
+var
+  ls, ls_date, ls_sql : String;
+Begin
+    ls_sql := ' select convert(char(19), getdate(), 120)  from dumm_tbl (NOLOCK) ';
+    With Query2 Do Begin
+      Close;
+      SQL.Clear;
+      SQL.Add(ls_sql);
+      Open;
+      ls_date    := Fields[0].AsString;
+    End;
+
+    ls := trim(ls_date);
+    ls_date := Copy(ls, 1, 4)  + Copy(ls, 6, 2)  + Copy(ls, 9, 2) + Copy(ls, 12, 2) + Copy(ls, 15, 2) + Copy(ls, 18, 2);
+    Result :=  ls_date;
+end;
+
+
+end.

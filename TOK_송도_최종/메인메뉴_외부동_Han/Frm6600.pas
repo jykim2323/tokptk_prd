@@ -1,0 +1,2656 @@
+unit Frm6600;
+
+interface      
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  StdCtrls, Buttons, ComCtrls, ExtCtrls, Grids, DBGrids, Db, DBTables,
+  DBCtrls, Mask, ScktComp, ADODB, QRCtrls, QuickRpt, Excel2000, OleServer,
+  ComObj, Variants, BaseGrid, AdvGrid;
+
+type
+  TFrm_6600 = class(TForm)
+    Panel1: TPanel;
+    Shape1: TShape;
+    Label4: TLabel;
+    ExitBitBtn: TSpeedButton;
+    DataSource1: TDataSource;
+    Query2: TADOQuery;
+    Query1: TADOQuery;
+    StartBitBtn: TSpeedButton;
+    PrintBtn: TSpeedButton;
+    ExcelBitBtn: TSpeedButton;
+    StockSG: TAdvStringGrid;
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure ExitBitBtnClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure PrintBitBtnClick(Sender: TObject);
+    procedure StartBitBtnClick(Sender: TObject);      
+    procedure FormDestroy(Sender: TObject);      
+  
+    procedure ExcelBitBtnClick(Sender: TObject);
+    procedure PrintBtnClick(Sender: TObject);
+    procedure StockSGGetCellColor(Sender: TObject; ARow, ACol: Integer;
+      AState: TGridDrawState; ABrush: TBrush; AFont: TFont);
+    procedure StockSGGetAlignment(Sender: TObject; ARow, ACol: Integer;
+      var HAlign: TAlignment; var VAlign: TVAlignment);
+  
+  private
+    { Private declarations }
+   lcid : integer;
+
+   procedure Grid_Title;
+   procedure Stock_Grid_Clear;
+   procedure GridToExel(s_title, s_date, s_frdate, s_todate: string);
+  public
+    { Public declarations }
+  end;
+
+var
+  Frm_6600: TFrm_6600;
+  var_Sql : String;
+
+  var_SelForm : TForm;
+  var_Modal : Boolean;
+  StrDate, s_index : String;
+
+  sys_datetime  : string[14];
+  s_date : string[8];
+  s_time : string[6];
+
+  jj, ii, IntPos, Count : integer;
+  
+implementation
+
+Uses  DbSet, WinLib, FrmPrompt, FrmError;
+{$R *.DFM}
+
+procedure TFrm_6600.FormCreate(Sender: TObject);
+var
+  ls_sql, StrCode : String;
+begin
+  
+  Grid_Title;
+  StartBitBtnClick(Self);
+
+end;
+
+procedure TFrm_6600.Grid_Title;
+begin
+  With StockSG Do Begin
+     Cells[1,0] := '항목';
+     Cells[2,0] := '생산동';
+     Cells[3,0] := '외부동';
+     Cells[4,0] := '수동창고';
+     Cells[5,0] := '합계';
+     Cells[6,0] := '창고A';
+     Cells[7,0] := '창고B';
+     Cells[8,0] := '창고C';
+     Cells[9,0] := '창고D';
+     Cells[10,0] := '창고E';
+
+     Cells[1, 1] := '상품셀';
+     Cells[1, 2] := '제품셀';
+     Cells[1, 3] := '원재료셀';
+     Cells[1, 4] := 'R&D셀';
+     Cells[1, 5] := 'PE셀';
+     Cells[1, 6] := '영업SAMPLE셀';
+     Cells[1, 7] := 'QC약품셀';
+     Cells[1, 8] := '공셀';
+     Cells[1, 9] := '공파레트';
+     Cells[1, 10] := '사용가능셀';
+     Cells[1, 11] := '사용셀';
+     Cells[1, 12] := '상품재고량';
+     Cells[1, 13] := '제품재고량';
+     Cells[1, 14] := '상품+제품';
+     Cells[1, 15] := '원재료재고량';
+     Cells[1, 16] := '사용률(342/702/299)';
+  End;
+
+end;
+
+procedure TFrm_6600.Stock_Grid_Clear;
+var
+  IntCnt, li_x, li_y, li_z  : Integer;
+begin
+  With StockSG Do Begin
+   for li_z := 1 to ColCount do begin
+    for li_y := 1 to RowCount do
+     begin
+      Cells[li_z, li_y] := '';
+     end;
+   end;
+  End;    
+end;
+
+
+procedure TFrm_6600.StartBitBtnClick(Sender: TObject);
+var    
+  li_qty, li_sum, li_esum, li_tsum, li_total, li_oldqty : Integer;
+  Empt_Cnt, S_percent : String;
+  Stok_Percent : Real;
+  Stok_cnt, Stok_cnt1, Stok_cnt2,  Stok_cnt3 : integer;
+  StrQty1, StrQty2, StrQty3,  StrQty4, StrQty5, StrQty6, StrQty7 : String;
+
+begin
+
+///  생산동자동창고  ///////////////////////////////////////////////////////////
+
+  IntPos := 1;   li_sum := 0;  li_total := 0;   li_oldqty := 0;  li_esum := 0;  li_tsum:= 0;
+/////////////  Auto /////////////////////////////////////////////
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''CG'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[2, 1] := FormatFloat('###,##0', li_sum);
+  end;
+
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''PG'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[2, 2] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''RM'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[2, 3] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''RD'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[2, 4] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''MF'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[2, 5] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''SA'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[2, 6] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''QC'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[2, 7] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     Count(*) As Cnt   ';
+  var_Sql := var_Sql + ' FROM   MILSTK ';
+  var_Sql := var_Sql + ' WHERE  LSTK_FLAG = ''0'' ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+    li_esum := li_sum;
+
+    StockSG.Cells[2, 8] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''EM'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+    li_esum := li_esum + li_sum;
+    StockSG.Cells[2, 9] := FormatFloat('###,##0', li_sum);
+  end;
+
+
+  stockSG.Cells[2, 10] := FormatFloat('###,##0', li_esum);
+
+
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK  ';
+  var_Sql := var_Sql + ' WHERE  (SUBK_CODE <> '''') ';
+//  var_Sql := var_Sql + '    And (SUBSTRING(SUBK_CODE, 1, 2) <> ''EM'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[2, 11] := FormatFloat('###,##0', li_sum);
+  end;
+/////////////////////////////////////////////////////////////////////////////////
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''CG'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[2, 12] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''PG'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[2, 13] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK  ';
+  var_Sql := var_Sql + ' WHERE     SUBSTRING(SUBK_CODE, 1, 2) IN (''CG'', ''PG'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[2, 14] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''RM'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[2, 15] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''EM'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+
+    Stok_cnt          := 342 - RecordCount;
+  end;
+
+{
+  var_Sql := ' SELECT     Count(*) As Cnt   ';
+  var_Sql := var_Sql + ' FROM   MILSTK ';
+  var_Sql := var_Sql + ' WHERE  LSTK_FLAG = ''0'' ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    Stok_cnt := Stok_cnt - Fields[0].AsInteger;
+  end;
+
+  Stok_Percent     :=  (Stok_cnt / 342)  * 100;
+  S_Percent        := Format('%3.1f', [Stok_Percent]);
+  StockSG.Cells[2, 16] := S_percent + '%';
+}
+  var_Sql := ' SELECT    SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM   MISUBK  ';
+  var_Sql := var_Sql + ' WHERE (SUBSTRING(SUBK_CODE, 1, 2) IN ';
+  var_Sql := var_Sql + ' (''CG'', ''PG'', ''RM'', ''RD'', ''MF'', ''SA'', ''QC'')) ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    Stok_cnt := RecordCount;
+  end;
+  Stok_Percent     :=  (Stok_cnt / 342)  * 100;
+  S_Percent        := Format('%3.1f', [Stok_Percent]);
+  StockSG.Cells[2, 16] := S_percent + '%';
+
+///  외부동 자동창고; //////////////////////////////////////////////////////////
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         T2MISUBK  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''CG'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[3, 1] := FormatFloat('###,##0', li_sum);
+  end;
+
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         T2MISUBK  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''PG'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[3, 2] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         T2MISUBK  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''RM'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[3, 3] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         T2MISUBK  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''RD'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[3, 4] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         T2MISUBK  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''MF'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[3, 5] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         T2MISUBK  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''SA'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[3, 6] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         T2MISUBK  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''QC'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[3, 7] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     Count(*) As Cnt   ';
+  var_Sql := var_Sql + ' FROM   T2MILSTK ';
+  var_Sql := var_Sql + ' WHERE  LSTK_FLAG = ''0'' ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+
+    li_sum := Fields[0].AsInteger;
+    li_esum := li_sum;
+
+    StockSG.Cells[3, 8] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT    SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         T2MISUBK  ';
+  var_Sql := var_Sql + ' WHERE  (ISNULL(SUBK_CODE, '''')  <> '''') ';
+  var_Sql := var_Sql + '    And (SUBSTRING(SUBK_CODE, 1, 2) = ''EM'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    li_esum := li_esum + li_sum;
+
+    StockSG.Cells[3, 9] := FormatFloat('###,##0', li_sum);
+  end;
+
+  StockSG.Cells[3, 10] := FormatFloat('###,##0', li_esum);
+
+
+
+  var_Sql := ' SELECT     Count(*) As Cnt   ';
+  var_Sql := var_Sql + ' FROM   T2MILSTK ';
+  var_Sql := var_Sql + ' WHERE  LSTK_FLAG <> ''0'' ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[3, 11] := FormatFloat('###,##0', li_sum);
+  end;     
+/////////////////////////////////////////////////////////////////////////////////
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       T2MISUBK  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''CG'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[3, 12] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       T2MISUBK  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''PG'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[3, 13] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       T2MISUBK  ';
+  var_Sql := var_Sql + ' WHERE     SUBSTRING(SUBK_CODE, 1, 2) IN (''CG'', ''PG'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[3, 14] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       T2MISUBK  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''RM'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[3, 15] := FormatFloat('###,##0', li_sum);
+  end;
+{
+  var_Sql := ' SELECT     Count(*) As Cnt   ';
+  var_Sql := var_Sql + ' FROM   T2MILSTK ';
+  var_Sql := var_Sql + ' WHERE  LSTK_FLAG = ''0'' ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+
+    li_sum := Fields[0].AsInteger;
+
+    Stok_cnt         := 702 - li_sum;
+    Stok_Percent     :=  (Stok_cnt / 702)  * 100;
+    S_Percent        := Format('%3.1f', [Stok_Percent]);
+
+    StockSG.Cells[3, 16] := S_percent + '%';
+  end;
+}
+  var_Sql := ' SELECT    SUBK_LOCA  FROM   T2MISUBK';
+  var_Sql := var_Sql + ' WHERE (SUBSTRING(SUBK_CODE, 1, 2) IN ';
+  var_Sql := var_Sql + ' (''CG'', ''PG'', ''RM'', ''RD'', ''MF'', ''SA'', ''QC'')) ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+
+    Stok_cnt := RecordCount;
+
+    Stok_Percent     :=  (Stok_cnt / 702)  * 100;
+    S_Percent        := Format('%3.1f', [Stok_Percent]);
+
+    StockSG.Cells[3, 16] := S_percent + '%';
+  end;
+
+/////////////  수동창고  ///////////////////////////////////////////////////////
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''CG'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[4, 1] := FormatFloat('###,##0', li_sum);
+  end;
+
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''PG'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[4, 2] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''RM'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[4, 3] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''RD'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[4, 4] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''MF'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[4, 5] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''SA'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[4, 6] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''QC'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[4, 7] := FormatFloat('###,##0', li_sum);
+  end;
+
+
+  var_Sql := ' SELECT     Count(*) As Cnt   ';
+  var_Sql := var_Sql + ' FROM      MILSTK1  ';
+  var_Sql := var_Sql + ' WHERE     LSTK_FLAG = ''0'' ';
+  var_Sql := var_Sql + ' And LSTK_LOCA Not In (''A1171'', ''A1172'', ''A1173'', ';
+  var_Sql := var_Sql + '                       ''A1181'', ''A1182'', ''A1183'', ';
+  var_Sql := var_Sql + '                       ''B1321'', ''B1322'', ''B1323'', ';
+  var_Sql := var_Sql + '                       ''C1321'', ''C1322'', ''C1323'', ';
+  var_Sql := var_Sql + '                       ''D1321'', ''D1322'', ''D1323'', ';
+  var_Sql := var_Sql + '                       ''E1321'', ''E1322'', ''E1323'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+    li_esum := li_sum;
+
+
+    StockSG.Cells[4, 8] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT    SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE  (ISNULL(SUBK_CODE, '''')  <> '''') ';
+  var_Sql := var_Sql + '  And (SUBSTRING(SUBK_CODE, 1, 2) = ''EM'') ';
+  var_Sql := var_Sql + '  And SUBK_LOCA Not In (''A1171'', ''A1172'', ''A1173'', ';
+  var_Sql := var_Sql + '                        ''A1181'', ''A1182'', ''A1183'', ';
+  var_Sql := var_Sql + '                        ''B1321'', ''B1322'', ''B1323'', ';
+  var_Sql := var_Sql + '                        ''C1321'', ''C1322'', ''C1323'', ';
+  var_Sql := var_Sql + '                        ''D1321'', ''D1322'', ''D1323'', ';
+  var_Sql := var_Sql + '                        ''E1321'', ''E1322'', ''E1323'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+    li_esum := li_esum  +  li_sum;
+
+    StockSG.Cells[4, 9] := FormatFloat('###,##0', li_sum);
+  end;
+
+  StockSG.Cells[4, 10] := FormatFloat('###,##0', li_esum);
+
+
+
+  var_Sql := ' SELECT     Count(*) As Cnt   ';
+  var_Sql := var_Sql + ' FROM      MILSTK1  ';
+  var_Sql := var_Sql + ' WHERE     LSTK_FLAG <> ''0'' ';
+  var_Sql := var_Sql + ' And LSTK_LOCA Not In (''A1171'', ''A1172'', ''A1173'', ';
+  var_Sql := var_Sql + '                       ''A1181'', ''A1182'', ''A1183'', ';
+  var_Sql := var_Sql + '                       ''B1321'', ''B1322'', ''B1323'', ';
+  var_Sql := var_Sql + '                       ''C1321'', ''C1322'', ''C1323'', ';
+  var_Sql := var_Sql + '                       ''D1321'', ''D1322'', ''D1323'', ';
+  var_Sql := var_Sql + '                       ''E1321'', ''E1322'', ''E1323'') ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+
+    StockSG.Cells[4, 11] := FormatFloat('###,##0', li_sum);
+  end;
+/////////////////////////////////////////////////////////////////////////////////
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''CG'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[4, 12] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''PG'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[4, 13] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     SUBSTRING(SUBK_CODE, 1, 2) IN (''CG'', ''PG'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[4, 14] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_CODE, 1, 2) = ''RM'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[4, 15] := FormatFloat('###,##0', li_sum);
+  end;
+{
+  var_Sql := ' SELECT     Count(*) As Cnt   ';
+  var_Sql := var_Sql + ' FROM      MILSTK1  ';
+  var_Sql := var_Sql + ' WHERE     LSTK_FLAG = ''0'' ';
+  var_Sql := var_Sql + ' And LSTK_LOCA Not In (''A1171'', ''A1172'', ''A1173'', ';
+  var_Sql := var_Sql + '                       ''A1181'', ''A1182'', ''A1183'', ';
+  var_Sql := var_Sql + '                       ''B1321'', ''B1322'', ''B1323'', ';
+  var_Sql := var_Sql + '                       ''C1321'', ''C1322'', ''C1323'', ';
+  var_Sql := var_Sql + '                       ''D1321'', ''D1322'', ''D1323'', ';
+  var_Sql := var_Sql + '                       ''E1321'', ''E1322'', ''E1323'') ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    Stok_cnt          := 299 - li_sum;
+    Stok_Percent     :=  (Stok_cnt / 299)  * 100;
+    S_Percent        := Format('%3.1f', [Stok_Percent]);  
+
+    StockSG.Cells[4, 16] := S_percent + '%';
+  end;
+}
+  var_Sql := ' SELECT    SUBK_LOCA  FROM   MISUBK1';
+  var_Sql := var_Sql + ' WHERE (SUBSTRING(SUBK_CODE, 1, 2) IN ';
+  var_Sql := var_Sql + ' (''CG'', ''PG'', ''RM'', ''RD'', ''MF'', ''SA'', ''QC'')) ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+
+    Stok_cnt := RecordCount;
+
+    Stok_Percent     :=  (Stok_cnt / 299)  * 100;
+    S_Percent        := Format('%3.1f', [Stok_Percent]);
+
+    StockSG.Cells[4, 16] := S_percent + '%';
+  end;
+
+
+
+  StrQty1  :=  Trim(StockSG.Cells[2, 1]);
+  StrQty2  :=  Trim(StockSG.Cells[3, 1]);
+  StrQty3  :=  Trim(StockSG.Cells[4, 1]);
+  While pos(',', StrQty1) > 0 Do Begin Delete(StrQty1, pos(',', StrQty1), 1); End;
+  While pos(',', StrQty2) > 0 Do Begin Delete(StrQty2, pos(',', StrQty2), 1); End;
+  While pos(',', StrQty3) > 0 Do Begin Delete(StrQty3, pos(',', StrQty3), 1); End;
+
+  li_sum := StrToInt(StrQty1) +  StrToInt(StrQty2) +  StrToInt(StrQty3);
+  StockSG.Cells[5, 1] := FormatFloat('###,##0', li_sum);
+
+  StrQty1  :=  Trim(StockSG.Cells[2, 2]);
+  StrQty2  :=  Trim(StockSG.Cells[3, 2]);
+  StrQty3  :=  Trim(StockSG.Cells[4, 2]);
+  While pos(',', StrQty1) > 0 Do Begin Delete(StrQty1, pos(',', StrQty1), 1); End;
+  While pos(',', StrQty2) > 0 Do Begin Delete(StrQty2, pos(',', StrQty2), 1); End;
+  While pos(',', StrQty3) > 0 Do Begin Delete(StrQty3, pos(',', StrQty3), 1); End;
+
+  li_sum := StrToInt(StrQty1) +  StrToInt(StrQty2) + StrToInt(StrQty3);
+  StockSG.Cells[5, 2] := FormatFloat('###,##0', li_sum);
+
+  StrQty1  :=  Trim(StockSG.Cells[2, 3]);
+  StrQty2  :=  Trim(StockSG.Cells[3, 3]);
+  StrQty3  :=  Trim(StockSG.Cells[4, 3]);
+  While pos(',', StrQty1) > 0 Do Begin Delete(StrQty1, pos(',', StrQty1), 1); End;
+  While pos(',', StrQty2) > 0 Do Begin Delete(StrQty2, pos(',', StrQty2), 1); End;
+  While pos(',', StrQty3) > 0 Do Begin Delete(StrQty3, pos(',', StrQty3), 1); End;
+
+  li_sum := StrToInt(StrQty1) +  StrToInt(StrQty2) + StrToInt(StrQty3);
+  StockSG.Cells[5, 3] := FormatFloat('###,##0', li_sum);
+
+  StrQty1  :=  Trim(StockSG.Cells[2, 4]);
+  StrQty2  :=  Trim(StockSG.Cells[3, 4]);
+  StrQty3  :=  Trim(StockSG.Cells[4, 4]);
+  While pos(',', StrQty1) > 0 Do Begin Delete(StrQty1, pos(',', StrQty1), 1); End;
+  While pos(',', StrQty2) > 0 Do Begin Delete(StrQty2, pos(',', StrQty2), 1); End;
+  While pos(',', StrQty3) > 0 Do Begin Delete(StrQty3, pos(',', StrQty3), 1); End;
+
+  li_sum := StrToInt(StrQty1) +  StrToInt(StrQty2) + StrToInt(StrQty3);
+  StockSG.Cells[5, 4] := FormatFloat('###,##0', li_sum);
+
+  StrQty1  :=  Trim(StockSG.Cells[2, 5]);
+  StrQty2  :=  Trim(StockSG.Cells[3, 5]);
+  StrQty3  :=  Trim(StockSG.Cells[4, 5]);
+  While pos(',', StrQty1) > 0 Do Begin Delete(StrQty1, pos(',', StrQty1), 1); End;
+  While pos(',', StrQty2) > 0 Do Begin Delete(StrQty2, pos(',', StrQty2), 1); End;
+  While pos(',', StrQty3) > 0 Do Begin Delete(StrQty3, pos(',', StrQty3), 1); End;
+
+  li_sum := StrToInt(StrQty1) +  StrToInt(StrQty2) + StrToInt(StrQty3);
+  StockSG.Cells[5, 5] := FormatFloat('###,##0', li_sum);
+
+  StrQty1  :=  Trim(StockSG.Cells[2, 6]);
+  StrQty2  :=  Trim(StockSG.Cells[3, 6]);
+  StrQty3  :=  Trim(StockSG.Cells[4, 6]);
+  While pos(',', StrQty1) > 0 Do Begin Delete(StrQty1, pos(',', StrQty1), 1); End;
+  While pos(',', StrQty2) > 0 Do Begin Delete(StrQty2, pos(',', StrQty2), 1); End;
+  While pos(',', StrQty3) > 0 Do Begin Delete(StrQty3, pos(',', StrQty3), 1); End;
+
+  li_sum := StrToInt(StrQty1) +  StrToInt(StrQty2) + StrToInt(StrQty3);
+  StockSG.Cells[5, 6] := FormatFloat('###,##0', li_sum);
+
+  StrQty1  :=  Trim(StockSG.Cells[2, 7]);
+  StrQty2  :=  Trim(StockSG.Cells[3, 7]);
+  StrQty3  :=  Trim(StockSG.Cells[4, 7]);
+  While pos(',', StrQty1) > 0 Do Begin Delete(StrQty1, pos(',', StrQty1), 1); End;
+  While pos(',', StrQty2) > 0 Do Begin Delete(StrQty2, pos(',', StrQty2), 1); End;
+  While pos(',', StrQty3) > 0 Do Begin Delete(StrQty3, pos(',', StrQty3), 1); End;
+
+  li_sum := StrToInt(StrQty1) +  StrToInt(StrQty2) + StrToInt(StrQty3);
+  StockSG.Cells[5, 7] := FormatFloat('###,##0', li_sum);
+
+  StrQty1  :=  Trim(StockSG.Cells[2, 8]);
+  StrQty2  :=  Trim(StockSG.Cells[3, 8]);
+  StrQty3  :=  Trim(StockSG.Cells[4, 8]);
+  While pos(',', StrQty1) > 0 Do Begin Delete(StrQty1, pos(',', StrQty1), 1); End;
+  While pos(',', StrQty2) > 0 Do Begin Delete(StrQty2, pos(',', StrQty2), 1); End;
+  While pos(',', StrQty3) > 0 Do Begin Delete(StrQty3, pos(',', StrQty3), 1); End;
+
+  li_sum := StrToInt(StrQty1) +  StrToInt(StrQty2) + StrToInt(StrQty3);
+  StockSG.Cells[5, 8] := FormatFloat('###,##0', li_sum);
+
+  StrQty1  :=  Trim(StockSG.Cells[2, 9]);
+  StrQty2  :=  Trim(StockSG.Cells[3, 9]);
+  StrQty3  :=  Trim(StockSG.Cells[4, 9]);
+  While pos(',', StrQty1) > 0 Do Begin Delete(StrQty1, pos(',', StrQty1), 1); End;
+  While pos(',', StrQty2) > 0 Do Begin Delete(StrQty2, pos(',', StrQty2), 1); End;
+  While pos(',', StrQty3) > 0 Do Begin Delete(StrQty3, pos(',', StrQty3), 1); End;
+
+  li_sum := StrToInt(StrQty1) +  StrToInt(StrQty2) + StrToInt(StrQty3);
+  StockSG.Cells[5, 9] := FormatFloat('###,##0', li_sum);
+
+  StrQty1  :=  Trim(StockSG.Cells[2, 10]);
+  StrQty2  :=  Trim(StockSG.Cells[3, 10]);
+  StrQty3  :=  Trim(StockSG.Cells[4, 10]);
+  While pos(',', StrQty1) > 0 Do Begin Delete(StrQty1, pos(',', StrQty1), 1); End;
+  While pos(',', StrQty2) > 0 Do Begin Delete(StrQty2, pos(',', StrQty2), 1); End;
+  While pos(',', StrQty3) > 0 Do Begin Delete(StrQty3, pos(',', StrQty3), 1); End;
+
+  li_sum := StrToInt(StrQty1) +  StrToInt(StrQty2) + StrToInt(StrQty3);
+  StockSG.Cells[5, 10] := FormatFloat('###,##0', li_sum);
+
+
+  StrQty1  :=  Trim(StockSG.Cells[2, 11]);
+  StrQty2  :=  Trim(StockSG.Cells[3, 11]);
+  StrQty3  :=  Trim(StockSG.Cells[4, 11]);
+  While pos(',', StrQty1) > 0 Do Begin Delete(StrQty1, pos(',', StrQty1), 1); End;
+  While pos(',', StrQty2) > 0 Do Begin Delete(StrQty2, pos(',', StrQty2), 1); End;
+  While pos(',', StrQty3) > 0 Do Begin Delete(StrQty3, pos(',', StrQty3), 1); End;
+
+  li_sum := StrToInt(StrQty1) +  StrToInt(StrQty2) + StrToInt(StrQty3);
+  StockSG.Cells[5, 11] := FormatFloat('###,##0', li_sum);
+
+  StrQty1  :=  Trim(StockSG.Cells[2, 12]);
+  StrQty2  :=  Trim(StockSG.Cells[3, 12]);
+  StrQty3  :=  Trim(StockSG.Cells[4, 12]);
+  While pos(',', StrQty1) > 0 Do Begin Delete(StrQty1, pos(',', StrQty1), 1); End;
+  While pos(',', StrQty2) > 0 Do Begin Delete(StrQty2, pos(',', StrQty2), 1); End;
+  While pos(',', StrQty3) > 0 Do Begin Delete(StrQty3, pos(',', StrQty3), 1); End;
+
+  li_sum := StrToInt(StrQty1) +  StrToInt(StrQty2) + StrToInt(StrQty3);
+  StockSG.Cells[5, 12] := FormatFloat('###,##0', li_sum);
+
+  StrQty1  :=  Trim(StockSG.Cells[2, 13]);
+  StrQty2  :=  Trim(StockSG.Cells[3, 13]);
+  StrQty3  :=  Trim(StockSG.Cells[4, 13]);
+  While pos(',', StrQty1) > 0 Do Begin Delete(StrQty1, pos(',', StrQty1), 1); End;
+  While pos(',', StrQty2) > 0 Do Begin Delete(StrQty2, pos(',', StrQty2), 1); End;
+  While pos(',', StrQty3) > 0 Do Begin Delete(StrQty3, pos(',', StrQty3), 1); End;
+
+  li_sum := StrToInt(StrQty1) +  StrToInt(StrQty2) + StrToInt(StrQty3);
+  StockSG.Cells[5, 13] := FormatFloat('###,##0', li_sum);
+
+  StrQty1  :=  Trim(StockSG.Cells[2, 14]);
+  StrQty2  :=  Trim(StockSG.Cells[3, 14]);
+  StrQty3  :=  Trim(StockSG.Cells[4, 14]);
+  While pos(',', StrQty1) > 0 Do Begin Delete(StrQty1, pos(',', StrQty1), 1); End;
+  While pos(',', StrQty2) > 0 Do Begin Delete(StrQty2, pos(',', StrQty2), 1); End;
+  While pos(',', StrQty3) > 0 Do Begin Delete(StrQty3, pos(',', StrQty3), 1); End;
+
+  li_sum := StrToInt(StrQty1) +  StrToInt(StrQty2) + StrToInt(StrQty3);
+  StockSG.Cells[5, 14] := FormatFloat('###,##0', li_sum);
+
+
+  StrQty1  :=  Trim(StockSG.Cells[2, 15]);
+  StrQty2  :=  Trim(StockSG.Cells[3, 15]);
+  StrQty3  :=  Trim(StockSG.Cells[4, 15]);
+  While pos(',', StrQty1) > 0 Do Begin Delete(StrQty1, pos(',', StrQty1), 1); End;
+  While pos(',', StrQty2) > 0 Do Begin Delete(StrQty2, pos(',', StrQty2), 1); End;
+  While pos(',', StrQty3) > 0 Do Begin Delete(StrQty3, pos(',', StrQty3), 1); End;
+
+  li_sum := StrToInt(StrQty1) +  StrToInt(StrQty2) + StrToInt(StrQty3);
+  StockSG.Cells[5, 15] := FormatFloat('###,##0', li_sum);
+
+////////////////////////////////////////////////////////////////
+{
+ StrQty1  :=  Trim(StockSG.Cells[5, 11]);
+ While pos(',', StrQty1) > 0 Do Begin Delete(StrQty1, pos(',', StrQty1), 1); End;
+
+ Stok_cnt         :=  StrToInt(StrQty1);
+ Stok_Percent     :=  (Stok_cnt / 1343)  * 100;
+ S_Percent        := Format('%3.1f', [Stok_Percent]);
+ StockSG.Cells[5, 16] := S_percent + '%';
+}
+  StrQty1  :=  Trim(StockSG.Cells[5, 1]);
+  StrQty2  :=  Trim(StockSG.Cells[5, 2]);
+  StrQty3  :=  Trim(StockSG.Cells[5, 3]);
+  StrQty4  :=  Trim(StockSG.Cells[5, 4]);
+  StrQty5  :=  Trim(StockSG.Cells[5, 5]);
+  StrQty6  :=  Trim(StockSG.Cells[5, 6]);
+  StrQty7  :=  Trim(StockSG.Cells[5, 7]);
+  While pos(',', StrQty1) > 0 Do Begin Delete(StrQty1, pos(',', StrQty1), 1); End;
+  While pos(',', StrQty2) > 0 Do Begin Delete(StrQty2, pos(',', StrQty2), 1); End;
+  While pos(',', StrQty3) > 0 Do Begin Delete(StrQty3, pos(',', StrQty3), 1); End;
+  While pos(',', StrQty4) > 0 Do Begin Delete(StrQty4, pos(',', StrQty4), 1); End;
+  While pos(',', StrQty5) > 0 Do Begin Delete(StrQty5, pos(',', StrQty5), 1); End;
+  While pos(',', StrQty6) > 0 Do Begin Delete(StrQty6, pos(',', StrQty6), 1); End;
+  While pos(',', StrQty7) > 0 Do Begin Delete(StrQty7, pos(',', StrQty7), 1); End;
+
+  li_sum :=   StrToInt(StrQty1) + StrToInt(StrQty2) + StrToInt(StrQty3) + StrToInt(StrQty4)
+            + StrToInt(StrQty5) + StrToInt(StrQty6) + StrToInt(StrQty7);
+
+//  Stok_cnt         :=  StrToInt(li_sum);
+  Stok_Percent     :=  (li_sum / 1343)  * 100;
+  S_Percent        := Format('%3.1f', [Stok_Percent]);
+  StockSG.Cells[5, 16] := S_percent + '%';
+
+ ///////////// 창고 A ///////////////////////////////////////////
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE  (SUBSTRING(SUBK_LOCA, 1, 1) = ''A'')  ';
+  var_Sql := var_Sql + '    AND (SUBSTRING(SUBK_CODE, 1, 2) = ''CG'')  ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[6, 1] := FormatFloat('###,##0', li_sum);
+  end;
+
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''A'')  ';
+  var_Sql := var_Sql + ' AND     (SUBSTRING(SUBK_CODE, 1, 2) = ''PG'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[6, 2] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT    SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''A'')  ';
+  var_Sql := var_Sql + ' AND     (SUBSTRING(SUBK_CODE, 1, 2) = ''RM'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[6, 3] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''A'')  ';
+  var_Sql := var_Sql + ' AND     (SUBSTRING(SUBK_CODE, 1, 2) = ''RD'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[6, 4] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''A'')  ';
+  var_Sql := var_Sql + ' AND     (SUBSTRING(SUBK_CODE, 1, 2) = ''MF'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[6, 5] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''A'')  ';
+  var_Sql := var_Sql + ' AND    (SUBSTRING(SUBK_CODE, 1, 2) = ''SA'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[6, 6] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''A'')  ';
+  var_Sql := var_Sql + ' AND     (SUBSTRING(SUBK_CODE, 1, 2) = ''QC'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[6, 7] := FormatFloat('###,##0', li_sum);
+  end;
+
+
+  var_Sql := ' SELECT     Count(*) As Cnt   ';
+  var_Sql := var_Sql + ' FROM      MILSTK1  ';
+  var_Sql := var_Sql + ' WHERE     LSTK_FLAG = ''0'' ';
+  var_Sql := var_Sql + ' AND SUBSTRING(LSTK_LOCA,1,1)  = ''A'' ';
+  var_Sql := var_Sql + ' AND LSTK_LOCA Not In (''A1171'', ''A1172'', ''A1173'', ';
+  var_Sql := var_Sql + '                       ''A1181'', ''A1182'', ''A1183'') ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+    li_esum := li_sum;
+
+
+    StockSG.Cells[6, 8] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT    SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE  (ISNULL(SUBK_CODE, '''')  <> '''') ';
+  var_Sql := var_Sql + '    And (SUBSTRING(SUBK_CODE, 1, 2) = ''EM'') ';
+  var_Sql := var_Sql + '    AND SUBSTRING(SUBK_LOCA,1,1)  = ''A'' ';
+  var_Sql := var_Sql + '  AND SUBK_LOCA Not In (''A1171'', ''A1172'', ''A1173'', ';
+  var_Sql := var_Sql + '                        ''A1181'', ''A1182'', ''A1183'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+    li_esum := li_esum  +  li_sum;
+
+    StockSG.Cells[6, 9] := FormatFloat('###,##0', li_sum);
+  end;
+
+  StockSG.Cells[6, 10] := FormatFloat('###,##0', li_esum);
+
+
+
+  var_Sql := ' SELECT     Count(*) As Cnt   ';
+  var_Sql := var_Sql + ' FROM      MILSTK1  ';
+  var_Sql := var_Sql + ' WHERE     LSTK_FLAG <> ''0'' ';
+  var_Sql := var_Sql + ' AND SUBSTRING(LSTK_LOCA,1,1)  = ''A'' ';
+  var_Sql := var_Sql + ' And LSTK_LOCA Not In (''A1171'', ''A1172'', ''A1173'', ';
+  var_Sql := var_Sql + '                       ''A1181'', ''A1182'', ''A1183'') ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+
+    StockSG.Cells[6, 11] := FormatFloat('###,##0', li_sum);
+  end;
+/////////////////////////////////////////////////////////////////////////////////
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_LOCA, 1, 1) = ''A'')  ';
+  var_Sql := var_Sql + ' AND       (SUBSTRING(SUBK_CODE, 1, 2) = ''CG'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[6, 12] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_LOCA, 1, 1) = ''A'')  ';
+  var_Sql := var_Sql + ' AND       (SUBSTRING(SUBK_CODE, 1, 2) = ''PG'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[6, 13] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_LOCA, 1, 1) = ''A'')  ';
+  var_Sql := var_Sql + ' AND       SUBSTRING(SUBK_CODE, 1, 2) IN (''CG'', ''PG'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[6, 14] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_LOCA, 1, 1) = ''A'')  ';
+  var_Sql := var_Sql + ' AND       (SUBSTRING(SUBK_CODE, 1, 2) = ''RM'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[6, 15] := FormatFloat('###,##0', li_sum);
+  end;
+{
+  var_Sql := ' SELECT     Count(*) As Cnt   ';
+  var_Sql := var_Sql + ' FROM         MILSTK1  ';
+  var_Sql := var_Sql + ' WHERE     LSTK_FLAG = ''0'' ';
+  var_Sql := var_Sql + ' AND SUBSTRING(LSTK_LOCA,1,1)  = ''A'' ';
+  var_Sql := var_Sql + ' And LSTK_LOCA Not In (''A1171'', ''A1172'', ''A1173'', ';
+  var_Sql := var_Sql + '                       ''A1181'', ''A1182'', ''A1183'') ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    Stok_cnt          := 37 - li_sum;
+    Stok_Percent     :=  (Stok_cnt / 37)  * 100;
+    S_Percent        := Format('%3.1f', [Stok_Percent]);
+
+
+     StockSG.Cells[6, 16] := S_percent + '%';
+  end;
+}
+  var_Sql := ' SELECT   SUBK_LOCA FROM MISUBK1 ';
+  var_Sql := var_Sql + ' WHERE (SUBSTRING(SUBK_LOCA, 1, 1) = ''A'')  ';
+  var_Sql := var_Sql + '   AND (SUBSTRING(SUBK_CODE, 1, 2) IN ';
+  var_Sql := var_Sql + '       (''CG'', ''PG'', ''RM'', ''RD'', ''MF'', ''SA'', ''QC''))';
+  var_Sql := var_Sql + ' And SUBK_LOCA Not In (''A1171'', ''A1172'', ''A1173'', ';
+  var_Sql := var_Sql + '                       ''A1181'', ''A1182'', ''A1183'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    Stok_cnt := RecordCount;
+
+    Stok_Percent     :=  (Stok_cnt / 37)  * 100;
+    S_Percent        := Format('%3.1f', [Stok_Percent]);
+
+
+     StockSG.Cells[6, 16] := S_percent + '%';
+  end;
+
+///////////// 창고 B ///////////////////////////////////////////////////////////
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE  (SUBSTRING(SUBK_LOCA, 1, 1) = ''B'')  ';
+  var_Sql := var_Sql + '    AND (SUBSTRING(SUBK_CODE, 1, 2) = ''CG'')  ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[7, 1] := FormatFloat('###,##0', li_sum);
+  end;
+
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''B'')  ';
+  var_Sql := var_Sql + ' AND     (SUBSTRING(SUBK_CODE, 1, 2) = ''PG'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[7, 2] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT    SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''B'')  ';
+  var_Sql := var_Sql + ' AND     (SUBSTRING(SUBK_CODE, 1, 2) = ''RM'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[7, 3] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''B'')  ';
+  var_Sql := var_Sql + ' AND     (SUBSTRING(SUBK_CODE, 1, 2) = ''RD'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[7, 4] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''B'')  ';
+  var_Sql := var_Sql + ' AND     (SUBSTRING(SUBK_CODE, 1, 2) = ''MF'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[7, 5] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''B'')  ';
+  var_Sql := var_Sql + ' AND    (SUBSTRING(SUBK_CODE, 1, 2) = ''SA'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[7, 6] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''B'')  ';
+  var_Sql := var_Sql + ' AND     (SUBSTRING(SUBK_CODE, 1, 2) = ''QC'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[7, 7] := FormatFloat('###,##0', li_sum);
+  end;
+
+
+  var_Sql := ' SELECT     Count(*) As Cnt   ';
+  var_Sql := var_Sql + ' FROM      MILSTK1  ';
+  var_Sql := var_Sql + ' WHERE     LSTK_FLAG = ''0'' ';
+  var_Sql := var_Sql + ' AND SUBSTRING(LSTK_LOCA,1,1)  = ''B'' ';
+  var_Sql := var_Sql + ' AND LSTK_LOCA Not In (''B1321'', ''B1322'', ''B1323'') ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+    li_esum := li_sum;
+
+
+    StockSG.Cells[7, 8] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT    SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE  (ISNULL(SUBK_CODE, '''')  <> '''') ';
+  var_Sql := var_Sql + '    And (SUBSTRING(SUBK_CODE, 1, 2) = ''EM'') ';
+  var_Sql := var_Sql + '    AND SUBSTRING(SUBK_LOCA,1,1)  = ''B'' ';
+  var_Sql := var_Sql + ' AND SUBK_LOCA Not In (''B1321'', ''B1322'', ''B1323'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+    li_esum := li_esum  +  li_sum;
+
+    StockSG.Cells[7, 9] := FormatFloat('###,##0', li_sum);
+  end;
+
+  StockSG.Cells[7, 10] := FormatFloat('###,##0', li_esum);
+
+
+
+  var_Sql := ' SELECT     Count(*) As Cnt   ';
+  var_Sql := var_Sql + ' FROM      MILSTK1  ';
+  var_Sql := var_Sql + ' WHERE     LSTK_FLAG <> ''0'' ';
+  var_Sql := var_Sql + ' AND SUBSTRING(LSTK_LOCA,1,1)  = ''B'' ';
+  var_Sql := var_Sql + ' AND LSTK_LOCA Not In (''B1321'', ''B1322'', ''B1323'') ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+
+    StockSG.Cells[7, 11] := FormatFloat('###,##0', li_sum);
+  end;
+/////////////////////////////////////////////////////////////////////////////////
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_LOCA, 1, 1) = ''B'')  ';
+  var_Sql := var_Sql + ' AND       (SUBSTRING(SUBK_CODE, 1, 2) = ''CG'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[7, 12] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_LOCA, 1, 1) = ''B'')  ';
+  var_Sql := var_Sql + ' AND       (SUBSTRING(SUBK_CODE, 1, 2) = ''PG'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[7, 13] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_LOCA, 1, 1) = ''B'')  ';
+  var_Sql := var_Sql + ' AND       SUBSTRING(SUBK_CODE, 1, 2) IN (''CG'', ''PG'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[7, 14] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_LOCA, 1, 1) = ''B'')  ';
+  var_Sql := var_Sql + ' AND       (SUBSTRING(SUBK_CODE, 1, 2) = ''RM'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[7, 15] := FormatFloat('###,##0', li_sum);
+  end;
+{
+  var_Sql := ' SELECT     Count(*) As Cnt   ';
+  var_Sql := var_Sql + ' FROM         MILSTK1  ';
+  var_Sql := var_Sql + ' WHERE     LSTK_FLAG = ''0'' ';
+  var_Sql := var_Sql + ' AND SUBSTRING(LSTK_LOCA,1,1)  = ''B'' ';
+  var_Sql := var_Sql + ' AND LSTK_LOCA Not In (''B1321'', ''B1322'', ''B1323'') ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    Stok_cnt          := 44 - li_sum;
+    Stok_Percent     :=  (Stok_cnt / 44)  * 100;
+    S_Percent        := Format('%3.1f', [Stok_Percent]);
+
+
+     StockSG.Cells[7, 16] := S_percent + '%';
+  end;
+}
+
+  var_Sql := ' SELECT   SUBK_LOCA FROM MISUBK1 ';
+  var_Sql := var_Sql + ' WHERE (SUBSTRING(SUBK_LOCA, 1, 1) = ''B'')  ';
+  var_Sql := var_Sql + '   AND (SUBSTRING(SUBK_CODE, 1, 2) IN ';
+  var_Sql := var_Sql + '       (''CG'', ''PG'', ''RM'', ''RD'', ''MF'', ''SA'', ''QC''))';
+  var_Sql := var_Sql + ' And SUBK_LOCA Not In (''B1321'', ''B1322'', ''B1323'')';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    Stok_cnt := RecordCount;
+
+    Stok_Percent     :=  (Stok_cnt / 44)  * 100;
+    S_Percent        := Format('%3.1f', [Stok_Percent]);
+
+
+     StockSG.Cells[7, 16] := S_percent + '%';
+  end;
+//////////////// 창고 C ////////////////////////////////////////////////////////
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE  (SUBSTRING(SUBK_LOCA, 1, 1) = ''C'')  ';
+  var_Sql := var_Sql + '    AND (SUBSTRING(SUBK_CODE, 1, 2) = ''CG'')  ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[8, 1] := FormatFloat('###,##0', li_sum);
+  end;
+
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''C'')  ';
+  var_Sql := var_Sql + ' AND     (SUBSTRING(SUBK_CODE, 1, 2) = ''PG'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[8, 2] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT    SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''C'')  ';
+  var_Sql := var_Sql + ' AND     (SUBSTRING(SUBK_CODE, 1, 2) = ''RM'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[8, 3] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''C'')  ';
+  var_Sql := var_Sql + ' AND     (SUBSTRING(SUBK_CODE, 1, 2) = ''RD'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[8, 4] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''C'')  ';
+  var_Sql := var_Sql + ' AND     (SUBSTRING(SUBK_CODE, 1, 2) = ''MF'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[8, 5] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''C'')  ';
+  var_Sql := var_Sql + ' AND    (SUBSTRING(SUBK_CODE, 1, 2) = ''SA'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[8, 6] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''C'')  ';
+  var_Sql := var_Sql + ' AND     (SUBSTRING(SUBK_CODE, 1, 2) = ''QC'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[8, 7] := FormatFloat('###,##0', li_sum);
+  end;
+
+
+  var_Sql := ' SELECT     Count(*) As Cnt   ';
+  var_Sql := var_Sql + ' FROM      MILSTK1  ';
+  var_Sql := var_Sql + ' WHERE     LSTK_FLAG = ''0'' ';
+  var_Sql := var_Sql + ' AND SUBSTRING(LSTK_LOCA,1,1)  = ''C'' ';
+  var_Sql := var_Sql + ' AND LSTK_LOCA Not In (''C1321'', ''C1322'', ''C1323'') ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+    li_esum := li_sum;
+
+
+    StockSG.Cells[8, 8] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT    SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE  (ISNULL(SUBK_CODE, '''')  <> '''') ';
+  var_Sql := var_Sql + '    And (SUBSTRING(SUBK_CODE, 1, 2) = ''EM'') ';
+  var_Sql := var_Sql + '    AND SUBSTRING(SUBK_LOCA,1,1)  = ''C'' ';
+  var_Sql := var_Sql + ' AND SUBK_LOCA Not In (''C1321'', ''C1322'', ''C1323'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+    li_esum := li_esum  +  li_sum;
+
+    StockSG.Cells[8, 9] := FormatFloat('###,##0', li_sum);
+  end;
+
+  StockSG.Cells[8, 10] := FormatFloat('###,##0', li_esum);
+
+
+
+  var_Sql := ' SELECT     Count(*) As Cnt   ';
+  var_Sql := var_Sql + ' FROM      MILSTK1  ';
+  var_Sql := var_Sql + ' WHERE     LSTK_FLAG <> ''0'' ';
+  var_Sql := var_Sql + ' AND SUBSTRING(LSTK_LOCA,1,1)  = ''C'' ';
+  var_Sql := var_Sql + ' AND LSTK_LOCA Not In (''C1321'', ''C1322'', ''C1323'') ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+
+    StockSG.Cells[8, 11] := FormatFloat('###,##0', li_sum);
+  end;
+/////////////////////////////////////////////////////////////////////////////////
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_LOCA, 1, 1) = ''C'')  ';
+  var_Sql := var_Sql + ' AND       (SUBSTRING(SUBK_CODE, 1, 2) = ''CG'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[8, 12] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_LOCA, 1, 1) = ''C'')  ';
+  var_Sql := var_Sql + ' AND       (SUBSTRING(SUBK_CODE, 1, 2) = ''PG'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[8, 13] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_LOCA, 1, 1) = ''C'')  ';
+  var_Sql := var_Sql + ' AND       SUBSTRING(SUBK_CODE, 1, 2) IN (''CG'', ''PG'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[8, 14] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_LOCA, 1, 1) = ''C'')  ';
+  var_Sql := var_Sql + ' AND       (SUBSTRING(SUBK_CODE, 1, 2) = ''RM'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[8, 15] := FormatFloat('###,##0', li_sum);
+  end;
+{
+  var_Sql := ' SELECT     Count(*) As Cnt   ';
+  var_Sql := var_Sql + ' FROM         MILSTK1  ';
+  var_Sql := var_Sql + ' WHERE     LSTK_FLAG = ''0'' ';
+  var_Sql := var_Sql + ' AND SUBSTRING(LSTK_LOCA,1,1)  = ''C'' ';
+  var_Sql := var_Sql + ' AND LSTK_LOCA Not In (''C1321'', ''C1322'', ''C1323'') ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    Stok_cnt          := 32 - li_sum;
+    Stok_Percent     :=  (Stok_cnt / 32)  * 100;
+    S_Percent        := Format('%3.1f', [Stok_Percent]);
+
+
+     StockSG.Cells[8, 16] := S_percent + '%';
+  end;
+}
+  var_Sql := ' SELECT   SUBK_LOCA FROM MISUBK1 ';
+  var_Sql := var_Sql + ' WHERE (SUBSTRING(SUBK_LOCA, 1, 1) = ''C'')  ';
+  var_Sql := var_Sql + '   AND (SUBSTRING(SUBK_CODE, 1, 2) IN ';
+  var_Sql := var_Sql + '       (''CG'', ''PG'', ''RM'', ''RD'', ''MF'', ''SA'', ''QC''))';
+  var_Sql := var_Sql + ' And SUBK_LOCA Not In (''C1321'', ''C1322'', ''C1323'')';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    Stok_cnt := RecordCount;
+
+    Stok_Percent     :=  (Stok_cnt / 32)  * 100;
+    S_Percent        := Format('%3.1f', [Stok_Percent]);
+
+
+     StockSG.Cells[8, 16] := S_percent + '%';
+  end;
+
+///////////////////////////// 창고 D ///////////////////////////////////////////
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE  (SUBSTRING(SUBK_LOCA, 1, 1) = ''D'')  ';
+  var_Sql := var_Sql + '    AND (SUBSTRING(SUBK_CODE, 1, 2) = ''CG'')  ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[9, 1] := FormatFloat('###,##0', li_sum);
+  end;
+
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''D'')  ';
+  var_Sql := var_Sql + ' AND     (SUBSTRING(SUBK_CODE, 1, 2) = ''PG'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[9, 2] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT    SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''D'')  ';
+  var_Sql := var_Sql + ' AND     (SUBSTRING(SUBK_CODE, 1, 2) = ''RM'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[9, 3] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''D'')  ';
+  var_Sql := var_Sql + ' AND     (SUBSTRING(SUBK_CODE, 1, 2) = ''RD'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[9, 4] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''D'')  ';
+  var_Sql := var_Sql + ' AND     (SUBSTRING(SUBK_CODE, 1, 2) = ''MF'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[9, 5] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''D'')  ';
+  var_Sql := var_Sql + ' AND    (SUBSTRING(SUBK_CODE, 1, 2) = ''SA'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[9, 6] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''D'')  ';
+  var_Sql := var_Sql + ' AND     (SUBSTRING(SUBK_CODE, 1, 2) = ''QC'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[9, 7] := FormatFloat('###,##0', li_sum);
+  end;
+
+
+  var_Sql := ' SELECT     Count(*) As Cnt   ';
+  var_Sql := var_Sql + ' FROM      MILSTK1  ';
+  var_Sql := var_Sql + ' WHERE     LSTK_FLAG = ''0'' ';
+  var_Sql := var_Sql + ' AND SUBSTRING(LSTK_LOCA,1,1)  = ''D'' ';
+  var_Sql := var_Sql + ' AND LSTK_LOCA Not In (''D1321'', ''D1322'', ''D1323'') ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+    li_esum := li_sum;
+
+
+    StockSG.Cells[9, 8] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT    SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE  (ISNULL(SUBK_CODE, '''')  <> '''') ';
+  var_Sql := var_Sql + '    And (SUBSTRING(SUBK_CODE, 1, 2) = ''EM'') ';
+  var_Sql := var_Sql + '    AND SUBSTRING(SUBK_LOCA,1,1)  = ''D'' ';
+  var_Sql := var_Sql + ' AND SUBK_LOCA Not In (''D1321'', ''D1322'', ''D1323'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+    li_esum := li_esum  +  li_sum;
+
+    StockSG.Cells[9, 9] := FormatFloat('###,##0', li_sum);
+  end;
+
+  StockSG.Cells[9, 10] := FormatFloat('###,##0', li_esum);
+
+
+
+  var_Sql := ' SELECT     Count(*) As Cnt   ';
+  var_Sql := var_Sql + ' FROM      MILSTK1  ';
+  var_Sql := var_Sql + ' WHERE     LSTK_FLAG <> ''0'' ';
+  var_Sql := var_Sql + ' AND SUBSTRING(LSTK_LOCA,1,1)  = ''D'' ';
+  var_Sql := var_Sql + ' AND LSTK_LOCA Not In (''D1321'', ''D1322'', ''D1323'') ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+
+    StockSG.Cells[9, 11] := FormatFloat('###,##0', li_sum);
+  end;
+/////////////////////////////////////////////////////////////////////////////////
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_LOCA, 1, 1) = ''D'')  ';
+  var_Sql := var_Sql + ' AND       (SUBSTRING(SUBK_CODE, 1, 2) = ''CG'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[9, 12] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_LOCA, 1, 1) = ''D'')  ';
+  var_Sql := var_Sql + ' AND       (SUBSTRING(SUBK_CODE, 1, 2) = ''PG'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[9, 13] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_LOCA, 1, 1) = ''D'')  ';
+  var_Sql := var_Sql + ' AND       SUBSTRING(SUBK_CODE, 1, 2) IN (''CG'', ''PG'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[9, 14] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_LOCA, 1, 1) = ''D'')  ';
+  var_Sql := var_Sql + ' AND       (SUBSTRING(SUBK_CODE, 1, 2) = ''RM'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[9, 15] := FormatFloat('###,##0', li_sum);
+  end;
+{
+  var_Sql := ' SELECT     Count(*) As Cnt   ';
+  var_Sql := var_Sql + ' FROM         MILSTK1  ';
+  var_Sql := var_Sql + ' WHERE     LSTK_FLAG = ''0'' ';
+  var_Sql := var_Sql + ' AND SUBSTRING(LSTK_LOCA,1,1)  = ''D'' ';
+  var_Sql := var_Sql + ' AND LSTK_LOCA Not In (''D1321'', ''D1322'', ''D1323'') ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    Stok_cnt          := 93 - li_sum;
+    Stok_Percent     :=  (Stok_cnt / 93)  * 100;
+    S_Percent        := Format('%3.1f', [Stok_Percent]);
+
+
+     StockSG.Cells[9, 16] := S_percent + '%';
+  end;
+}
+  var_Sql := ' SELECT   SUBK_LOCA FROM MISUBK1 ';
+  var_Sql := var_Sql + ' WHERE (SUBSTRING(SUBK_LOCA, 1, 1) = ''D'')  ';
+  var_Sql := var_Sql + '   AND (SUBSTRING(SUBK_CODE, 1, 2) IN ';
+  var_Sql := var_Sql + '       (''CG'', ''PG'', ''RM'', ''RD'', ''MF'', ''SA'', ''QC''))';
+  var_Sql := var_Sql + ' And SUBK_LOCA Not In (''D1321'', ''D1322'', ''D1323'')';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    Stok_cnt := RecordCount;
+
+    Stok_Percent     :=  (Stok_cnt / 93)  * 100;
+    S_Percent        := Format('%3.1f', [Stok_Percent]);
+
+
+    StockSG.Cells[9, 16] := S_percent + '%';
+  end;
+
+///////////////////////////// 창고 E ///////////////////////////////////////////
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE  (SUBSTRING(SUBK_LOCA, 1, 1) = ''E'')  ';
+  var_Sql := var_Sql + '    AND (SUBSTRING(SUBK_CODE, 1, 2) = ''CG'')  ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[10, 1] := FormatFloat('###,##0', li_sum);
+  end;
+
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''E'')  ';
+  var_Sql := var_Sql + ' AND     (SUBSTRING(SUBK_CODE, 1, 2) = ''PG'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[10, 2] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT    SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''E'')  ';
+  var_Sql := var_Sql + ' AND     (SUBSTRING(SUBK_CODE, 1, 2) = ''RM'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[10, 3] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''E'')  ';
+  var_Sql := var_Sql + ' AND     (SUBSTRING(SUBK_CODE, 1, 2) = ''RD'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[10, 4] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''E'')  ';
+  var_Sql := var_Sql + ' AND     (SUBSTRING(SUBK_CODE, 1, 2) = ''MF'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[10, 5] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''E'')  ';
+  var_Sql := var_Sql + ' AND    (SUBSTRING(SUBK_CODE, 1, 2) = ''SA'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[10, 6] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE   (SUBSTRING(SUBK_LOCA, 1, 1) = ''E'')  ';
+  var_Sql := var_Sql + ' AND     (SUBSTRING(SUBK_CODE, 1, 2) = ''QC'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+
+    StockSG.Cells[10, 7] := FormatFloat('###,##0', li_sum);
+  end;
+
+
+  var_Sql := ' SELECT     Count(*) As Cnt   ';
+  var_Sql := var_Sql + ' FROM      MILSTK1  ';
+  var_Sql := var_Sql + ' WHERE     LSTK_FLAG = ''0'' ';
+  var_Sql := var_Sql + ' AND SUBSTRING(LSTK_LOCA,1,1)  = ''E'' ';
+  var_Sql := var_Sql + ' AND LSTK_LOCA Not In (''E1321'', ''E1322'', ''E1323'') ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+    li_esum := li_sum;
+
+
+    StockSG.Cells[10, 8] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT    SUBK_LOCA   ';
+  var_Sql := var_Sql + ' FROM         MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE  (ISNULL(SUBK_CODE, '''')  <> '''') ';
+  var_Sql := var_Sql + '    And (SUBSTRING(SUBK_CODE, 1, 2) = ''EM'') ';
+  var_Sql := var_Sql + '    AND SUBSTRING(SUBK_LOCA,1,1)  = ''E'' ';
+  var_Sql := var_Sql + ' AND SUBK_LOCA Not In (''E1321'', ''E1322'', ''E1323'') ';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := RecordCount;
+    li_esum := li_esum  +  li_sum;
+
+    StockSG.Cells[10, 9] := FormatFloat('###,##0', li_sum);
+  end;
+
+  StockSG.Cells[10, 10] := FormatFloat('###,##0', li_esum);
+
+
+
+  var_Sql := ' SELECT     Count(*) As Cnt   ';
+  var_Sql := var_Sql + ' FROM      MILSTK1  ';
+  var_Sql := var_Sql + ' WHERE     LSTK_FLAG <> ''0'' ';
+  var_Sql := var_Sql + ' AND SUBSTRING(LSTK_LOCA,1,1)  = ''E'' ';
+  var_Sql := var_Sql + ' AND LSTK_LOCA Not In (''E1321'', ''E1322'', ''E1323'') ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+
+    StockSG.Cells[10, 11] := FormatFloat('###,##0', li_sum);
+  end;
+/////////////////////////////////////////////////////////////////////////////////
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_LOCA, 1, 1) = ''E'')  ';
+  var_Sql := var_Sql + ' AND       (SUBSTRING(SUBK_CODE, 1, 2) = ''CG'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[10, 12] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_LOCA, 1, 1) = ''E'')  ';
+  var_Sql := var_Sql + ' AND       (SUBSTRING(SUBK_CODE, 1, 2) = ''PG'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[10, 13] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_LOCA, 1, 1) = ''E'')  ';
+  var_Sql := var_Sql + ' AND       SUBSTRING(SUBK_CODE, 1, 2) IN (''CG'', ''PG'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[10, 14] := FormatFloat('###,##0', li_sum);
+  end;
+
+  var_Sql := ' SELECT     SUM(SUBK_WGT) As  SUBK_WGT  ';
+  var_Sql := var_Sql + ' FROM       MISUBK1  ';
+  var_Sql := var_Sql + ' WHERE     (SUBSTRING(SUBK_LOCA, 1, 1) = ''E'')  ';
+  var_Sql := var_Sql + ' AND       (SUBSTRING(SUBK_CODE, 1, 2) = ''RM'') ';
+
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    StockSG.Cells[10, 15] := FormatFloat('###,##0', li_sum);
+  end;
+{
+  var_Sql := ' SELECT     Count(*) As Cnt   ';
+  var_Sql := var_Sql + ' FROM         MILSTK1  ';
+  var_Sql := var_Sql + ' WHERE     LSTK_FLAG = ''0'' ';
+  var_Sql := var_Sql + ' AND SUBSTRING(LSTK_LOCA,1,1)  = ''E'' ';
+  var_Sql := var_Sql + ' AND LSTK_LOCA Not In (''E1321'', ''E1322'', ''E1323'') ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    li_sum := Fields[0].AsInteger;
+
+    Stok_cnt          := 93 - li_sum;
+    Stok_Percent     :=  (Stok_cnt / 93)  * 100;
+    S_Percent        := Format('%3.1f', [Stok_Percent]);
+
+
+     StockSG.Cells[10, 16] := S_percent + '%';
+  end;
+}
+  var_Sql := ' SELECT   SUBK_LOCA FROM MISUBK1 ';
+  var_Sql := var_Sql + ' WHERE (SUBSTRING(SUBK_LOCA, 1, 1) = ''E'')  ';
+  var_Sql := var_Sql + '   AND (SUBSTRING(SUBK_CODE, 1, 2) IN ';
+  var_Sql := var_Sql + '       (''CG'', ''PG'', ''RM'', ''RD'', ''MF'', ''SA'', ''QC''))';
+  var_Sql := var_Sql + ' And SUBK_LOCA Not In (''E1321'', ''E1322'', ''E1323'')';
+  var_Sql := var_Sql + ' GROUP BY SUBK_LOCA  ';
+  with Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(var_Sql);
+    Open;
+    Stok_cnt := RecordCount;
+
+    Stok_Percent     :=  (Stok_cnt / 93)  * 100;
+    S_Percent        := Format('%3.1f', [Stok_Percent]);
+
+
+    StockSG.Cells[10, 16] := S_percent + '%';
+  end;
+end;
+
+procedure TFrm_6600.PrintBitBtnClick(Sender: TObject);
+begin
+  PrintScale := poPrintToFit;
+  Print;
+end;
+
+procedure TFrm_6600.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action := caFree;
+end;
+
+procedure TFrm_6600.ExitBitBtnClick(Sender: TObject);
+begin
+  close;
+end;
+
+procedure TFrm_6600.FormDestroy(Sender: TObject);
+begin
+   Frm_6600 := Nil;
+end;
+
+procedure TFrm_6600.ExcelBitBtnClick(Sender: TObject);
+var
+   ls_date, ls_frdate, ls_todate, ls_title : String;
+begin
+ if MessageDlg('엑셀로 저장하겠습니까 ?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+ begin
+
+   ls_date  := DateTimeToStr( Now );
+
+   
+   ls_todate := '';
+   ls_title  := '창고 현황 집계';
+
+   GridToExel(ls_title, ls_date, ls_frdate, ls_todate );
+ end;
+end;
+
+{*****************************************************************************}
+{*  엑셀저장처리                                                             *}
+{*****************************************************************************}
+procedure TFrm_6600.GridToExel(s_title,  s_date, s_frdate, s_todate: string);
+var
+   i,j, Row, Col, ColCnt,RowCnt, BookCount:Integer;
+   V, sheet : Variant;
+begin
+
+ ColCnt:= 13;
+ RowCnt:= StockSG.RowCount - 1;
+ i := 1;
+ J := 0;
+
+ try
+    if VarIsEmpty(V) then begin
+      BookCount := 0;
+      V := CreateOleObject('Excel.Application');
+    end;
+    V.Visible := False;
+    V.WorkBooks.Add;
+    BookCount := BookCount + 1;
+    Sheet := V.Workbooks[BookCount].Sheets[1];
+    Sheet.Name := s_title;
+ except 
+ end;    
+
+  V.Cells[1,2].Value := '[[ ' + s_title + ' ]]';
+
+  V.Cells[1,2].Font.Size := '22';
+  V.Cells[1,2].Font.Name := '굴림체';
+  V.Cells[1,2].Font.FontStyle := 'Bold';
+  V.Cells[1,2].EntireRow.Interior.Color := $02EEEEEE;
+
+
+  V.Cells[2,1].Value := '발행일시:';
+  V.Cells[2,2].Value := s_date;
+
+ for Row := 4 to RowCnt+4 do begin
+   V.Cells[Row,1].Value := StockSG.Cells[1, J];
+   V.Cells[Row,2].Value := StockSG.Cells[2, J];
+   V.Cells[Row,3].Value := StockSG.Cells[3, J];
+   V.Cells[Row,4].Value := StockSG.Cells[4, J];
+   V.Cells[Row,5].Value := StockSG.Cells[5, J];
+   V.Cells[Row,6].Value := StockSG.Cells[6, J];
+   V.Cells[Row,7].Value := StockSG.Cells[7, J];
+   V.Cells[Row,8].Value := StockSG.Cells[8, J];
+   V.Cells[Row,9].Value := StockSG.Cells[9, J];
+   V.Cells[Row,10].Value := StockSG.Cells[10, J];
+   J := J + 1;
+end;   
+
+ v.Quit;
+
+ {   // sample
+  Interior.Color := RGB(200, 200, 200);
+  
+  HorizontalAlignment := xlHAlignCenter;
+  Columns.AutoFit;
+  Rows.AutoFit;
+
+  NumberFormat := '@';
+  HorizontalAlignment := xlHAlignLeft;
+  Columns.AutoFit;
+  Rows.AutoFit;
+
+
+  NumberFormat := '#,##0';
+  HorizontalAlignment := xlHAlignRight;
+  Columns.AutoFit;
+  Rows.AutoFit;
+}
+end;
+
+procedure TFrm_6600.PrintBtnClick(Sender: TObject);
+begin
+  PrintScale := poPrintToFit;
+  Print;
+end;
+
+procedure TFrm_6600.StockSGGetCellColor(Sender: TObject; ARow,
+  ACol: Integer; AState: TGridDrawState; ABrush: TBrush; AFont: TFont);
+var
+   ls_wsum, ls_jsum : STring;
+   li_wsum, li_jsum : Real;
+begin
+   If ARow > 0 Then
+    begin
+       If ARow Mod 2 = 0 Then ABrush.Color := $00E4E4E4; // $00F0F1EF //$00EEF2EE //$00F2F3ED //$00E4E4E4;
+    end;
+
+      If ARow > 0 Then Begin
+       Case ACol Of
+{
+          0 :
+          1 :
+          2 :
+          3 :
+          4 :
+          5 :
+}
+          2..4, 6..10 : Begin
+               AFont.Color  := clBlue;    //수량   폰트색 지정
+//               ABrush.Color := clMoneyGreen;
+               AFont.Style := [fsBold];
+               End;
+          5 : Begin
+               AFont.Color  := clPurple;    //수량   폰트색 지정
+//               ABrush.Color := clMoneyGreen;
+               AFont.Style := [fsBold];
+               End;
+
+//        1 :  ABrush.Color := clLime;  //선택   바탕색 지정
+          //ABrush.Color := clSilver;  //선택   바탕색 지정
+
+//          2 :  if  (AdvSGrid.Cells[ACol, ARow] <> '')  then  AFont.Color  := clRed;
+
+       End;
+    End;
+
+   if (ARow > 0) and (ACol in [5]) then ABrush.Color := $00B0FFD8;
+//   if (ARow > 0) and (ACol in [11]) then ABrush.Color := $00B0FFFF;
+end;
+
+procedure TFrm_6600.StockSGGetAlignment(Sender: TObject; ARow,
+  ACol: Integer; var HAlign: TAlignment; var VAlign: TVAlignment);
+begin
+    if ARow = 0 then // Title부분은 전부 중앙정렬한다.
+        HAlign := taCenter
+    else begin
+
+    if ACol in [2,3,4,5,6,7,8,9,10] then // 숫자값이 들어있는 번 Field의 데이터는 오른쪽으로 정렬한다.
+        HAlign := taRightJustify
+//    else if ACol in [1,2,3,4,5,6,10,15] then HAlign := taCenter
+    else // 나머지는 왼쪽으로 정렬한다.
+        HAlign := taLeftJustify;
+    end;
+end;
+
+end.

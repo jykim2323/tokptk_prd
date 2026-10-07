@@ -1,0 +1,556 @@
+unit Frm6450;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
+  Dialogs, Grids, DBGrids, StdCtrls, Buttons, ExtCtrls, DB, ADODB, DBTables,
+  Mask, ComCtrls, QRCtrls, QuickRpt;
+
+type
+  TFrm_6450 = class(TForm)
+    Panel1: TPanel;
+    Shape1: TShape;
+    Label4: TLabel;
+    GroupBox1: TGroupBox;
+    DataSource1: TDataSource;
+    Panel2: TPanel;
+    UpdtQuery: TADOQuery;
+    DBGrid1: TDBGrid;
+    Query1: TADOQuery;
+    RecNoEdit: TEdit;
+    ExlBtn: TSpeedButton;
+    PrintBitBtn: TSpeedButton;
+    QuickRep1: TQuickRep;
+    QRBand2: TQRBand;
+    QRExpr1: TQRExpr;
+    QRBand3: TQRBand;
+    QRDBText2: TQRDBText;
+    QRDBText5: TQRDBText;
+    QRDBText8: TQRDBText;
+    QRDBText10: TQRDBText;
+    QRDBText11: TQRDBText;
+    QRDBText12: TQRDBText;
+    QRDBText7: TQRDBText;
+    QRDBText1: TQRDBText;
+    QRDBText3: TQRDBText;
+    QRDBText6: TQRDBText;
+    QRBand4: TQRBand;
+    QRLbl_DateTime: TQRLabel;
+    QRBand1: TQRBand;
+    QRLabel11: TQRLabel;
+    QRBand5: TQRBand;
+    QRLabel6: TQRLabel;
+    QRLabel12: TQRLabel;
+    QRLabel2: TQRLabel;
+    QRLabel5: TQRLabel;
+    QRLabel9: TQRLabel;
+    QRLabel1: TQRLabel;
+    QRLabel3: TQRLabel;
+    QRLabel8: TQRLabel;
+    QRLabel4: TQRLabel;
+    QRLabel10: TQRLabel;
+    Panel3: TPanel;
+    ItemCB: TEdit;
+    SB_Search: TSpeedButton;
+    Query1STOK_WH: TStringField;
+    Query1STOK_LOTNO: TStringField;
+    Query1STOK_LOCA: TStringField;
+    Query1STOK_INDATE: TStringField;
+    Query1STOK_INTIME: TStringField;
+    Query1STOK_QTY: TBCDField;
+    Query1STOK_ITEM: TStringField;
+    Query1MAST_NAME: TStringField;
+    Query1STOK_REMARK: TStringField;
+    Query1STOK_BOXNO: TStringField;
+    Query1STOK_FLAG: TStringField;
+    GroupBox2: TGroupBox;
+    Rb2: TRadioButton;
+    Rb1: TRadioButton;
+    Rb3: TRadioButton;
+    ExitBitBtn: TSpeedButton;
+    StartBitBtn: TSpeedButton;
+    RbA: TRadioButton;
+    Gubn1Cb: TComboBox;
+    Label14: TLabel;
+    Label5: TLabel;
+    Gubn2Cb: TComboBox;
+    Label6: TLabel;
+    Gubn3Cb: TComboBox;
+    Query2: TADOQuery;
+    Query1gubn1_name: TStringField;
+    Query1gubn2_name: TStringField;
+    Query1gubn3_name: TStringField;
+    QRLabel7: TQRLabel;
+    QRLabel13: TQRLabel;
+    QRLabel14: TQRLabel;
+    QRDBText4: TQRDBText;
+    QRDBText9: TQRDBText;
+    QRDBText13: TQRDBText;
+    Panel4: TPanel;
+    Stock1Ed: TPanel;
+    StockEd: TPanel;
+    Panel5: TPanel;
+    DateTimePicker1: TDateTimePicker;
+    Panel6: TPanel;
+    ItemNmEdit: TEdit;
+    procedure ExitBitBtnClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);  
+    procedure StartBitBtnClick(Sender: TObject);  
+    procedure RackRGClick(Sender: TObject);
+    procedure ExlBtnClick(Sender: TObject);
+    procedure DBGrid1MouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure DBGrid1TitleClick(Column: TColumn);     
+    procedure DBGrid1DrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure PrintBitBtnClick(Sender: TObject);
+    procedure SB_SearchClick(Sender: TObject);
+    procedure ItemCBKeyPress(Sender: TObject; var Key: Char);
+    procedure Query1STOK_WHGetText(Sender: TField; var Text: String;
+      DisplayText: Boolean);
+    procedure Query1STOK_FLAGGetText(Sender: TField; var Text: String;
+      DisplayText: Boolean);
+    procedure Rb1Click(Sender: TObject);       
+    procedure Gubn1CbChange(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Frm_6450: TFrm_6450;
+
+  Var_Form : TForm;
+  Bol_Modal : Boolean;
+  Bol_Data_Ok : Boolean;
+
+  var_SelForm : TForm;
+  var_Modal : Boolean;
+
+  
+  Var_ItemDiv : String;
+
+implementation
+
+uses Dbset, WinLib, FrmPrompt, FrmError, MastDisp;
+
+{$R *.dfm}
+
+procedure TFrm_6450.FormCreate(Sender: TObject);
+var
+  ls_sql, StrCode, ls_gubn, ls_name : String;
+begin
+  Top  := (Screen.Height - Self.Height) div 2;
+  Left := (Screen.Width - Self.Width) div 2;
+
+  // DateTimePicker1을 오늘 날짜로 초기화
+  DateTimePicker1.Date := Date;
+
+  rbA.checked := True;
+
+  // ---------------------------------------------------------------------------
+  // 콤보박스(Gubn1, Gubn2, Gubn3) 초기화 로직
+  // ---------------------------------------------------------------------------
+  Gubn1CB.Clear;
+  Gubn1CB.Items.Add('');
+  ls_sql := ' Select GUBN1_CODE, GUBN1_NAME  From MIGUBN1 (NOLOCK) ';
+  ls_sql := ls_sql + ' Order by  GUBN1_CODE ';
+  With Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(ls_sql);
+    Open;
+    While Not Eof do   begin
+       ls_gubn := FieldByName('GUBN1_CODE').AsString;
+       ls_name := FieldByName('GUBN1_NAME').AsString;
+       Gubn1CB.Items.Add(ls_gubn + '-' +  ls_name);
+       Next;
+    end;
+  End;
+  Gubn1CB.ItemIndex := -1;
+
+  Gubn2CB.Clear;
+  Gubn2CB.Items.Add('');
+  ls_sql := ' Select GUBN2_CODE, GUBN2_NAME  From MIGUBN2 (NOLOCK) ';
+  ls_sql := ls_sql + ' Order by  GUBN2_CODE ';
+  With Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(ls_sql);
+    Open;
+    First;
+    While Not Eof do   begin
+       ls_gubn := FieldByName('GUBN2_CODE').AsString;
+       ls_name := FieldByName('GUBN2_NAME').AsString;
+       Gubn2CB.Items.Add(ls_gubn + '-' +  ls_name);
+       Next;
+    end;
+  End;
+  Gubn2CB.ItemIndex := -1;
+
+  Gubn3CB.Clear;
+  Gubn3CB.Items.Add('');
+  ls_sql := ' Select GUBN3_CODE, GUBN3_NAME  From MIGUBN3 (NOLOCK) ';
+  ls_sql := ls_sql + ' Order by  GUBN3_CODE ';
+  With Query2 do Begin
+    Close;
+    SQL.Clear;
+    SQL.Add(ls_sql);
+    Open;
+    First;
+    While Not Eof do   begin
+       ls_gubn := FieldByName('GUBN3_CODE').AsString;
+       ls_name := FieldByName('GUBN3_NAME').AsString;
+       Gubn3CB.Items.Add(ls_gubn + '-' +  ls_name);
+       Next;
+    end;
+  End;
+  Gubn3CB.ItemIndex := -1;
+
+
+  // 초기 조회 실행
+  StartBitBtnClick(self);
+end;
+
+procedure TFrm_6450.StartBitBtnClick(Sender: TObject);
+var
+  StrQry, StrDate : String;
+  PltQty, li_qty : Real;
+  ls_gubn1,  ls_gubn2,  ls_gubn3 : String;
+  ls_SearchDate, ls_Today : String;
+begin
+  ls_gubn1 :=  Trim(Copy(Gubn1Cb.Text,1,1));
+  ls_gubn2 :=  Trim(Copy(Gubn2Cb.Text,1,1));
+  ls_gubn3 :=  Trim(Copy(Gubn3Cb.Text,1,1));
+  li_qty   := 0;
+
+  // ---------------------------------------------------------------------------
+  // 날짜 처리 로직 (DateTimePicker -> String 변환)
+  // ---------------------------------------------------------------------------
+  ls_Today      := FormatDateTime('yyyymmdd', Date);               // 오늘 날짜
+  ls_SearchDate := FormatDateTime('yyyymmdd', DateTimePicker1.Date); // 조회 날짜
+
+  // ---------------------------------------------------------------------------
+  // 1. 메인 그리드 조회 (Query1)
+  // ---------------------------------------------------------------------------
+  with Query1 do Begin
+    DisableControls;
+    Close;
+    SQL.Clear;
+
+    // [분기] 조회일 >= 오늘 : 기존 로직 (실시간 뷰 MISTOK)
+    if ls_SearchDate >= ls_Today then
+    begin
+        SQL.Add(' SELECT STOK_WH,  STOK_ITEM, MAST_NAME, STOK_LOTNO,  STOK_LOCA,  STOK_QTY,  ');
+        SQL.Add('         STOK_BOXNO, STOK_REMARK,   STOK_INDATE,  STOK_INTIME, STOK_FLAG, ');
+        SQL.Add('         gubn1_name, gubn2_name, gubn3_name ');
+        SQL.Add('  from   MISTOK (NOLOCK)              ');
+        SQL.Add(' LEFT OUTER JOIN MIMAST (NOLOCK) ON MAST_CODE = STOK_ITEM    ');
+        SQL.Add('  LEFT OUTER JOIN MIGUBN1 (NOLOCK) ON GUBN1_CODE = MAST_GUBN1    ');
+        SQL.Add('  LEFT OUTER JOIN MIGUBN2 (NOLOCK) ON GUBN2_CODE = MAST_GUBN2   ');
+        SQL.Add('  LEFT OUTER JOIN MIGUBN3 (NOLOCK) ON GUBN3_CODE = MAST_GUBN3  ');
+        SQL.Add('  Where  ISNULL(STOK_ITEM, '''') <> ''''             ');
+
+        //if Length(Trim(ItemCb.Text)) > 0 then SQL.Add(' And  STOK_ITEM  LIKE ''%'+itemCB.Text+'%''    ');
+        if Length(Trim(ItemCb.Text)) > 0 then SQL.Add(' And  STOK_ITEM = '''+Trim(itemCB.Text)+'''    '); // 고객사 요청
+        if Length(Trim(ItemNmEdit.Text)) > 0 then SQL.Add(' And  MAST_NAME LIKE ''%'+Trim(ItemNmEdit.Text)+'%''    ');
+
+
+        If rb1.Checked = True then  SQL.Add(' AND  STOK_WH Not IN (''S'',''W'') ');
+        If rb2.Checked = True then  SQL.Add(' AND  STOK_WH  = ''S'' ');
+        If rb3.Checked = True then  SQL.Add(' AND  STOK_WH  = ''W'' ');
+
+        if (ls_gubn1 <> '') then  SQL.Add(' And  MAST_GUBN1 = '''+ls_gubn1+'''    ');
+        if (ls_gubn2 <> '') then  SQL.Add(' And  MAST_GUBN2 = '''+ls_gubn2+'''    ');
+        if (ls_gubn3 <> '') then  SQL.Add(' And  MAST_GUBN3 = '''+ls_gubn3+'''    ');
+    end
+    else
+    // [분기] 조회일 < 오늘 : 과거 로직 (이력 테이블 MISTOK_HIST)
+    begin
+        SQL.Add(' SELECT A.STOK_WH,  A.STOK_ITEM, A.MAST_NAME, A.STOK_LOTNO,  A.STOK_LOCA,  A.STOK_QTY,  ');
+        SQL.Add('        A.STOK_BOXNO, A.STOK_REMARK, A.STOK_INDATE, A.STOK_INTIME, A.STOK_FLAG, ');
+        SQL.Add('        G1.GUBN1_NAME, G2.GUBN2_NAME, G3.GUBN3_NAME ');
+        SQL.Add(' FROM MISTOK_HIST A (NOLOCK) ');
+        SQL.Add(' LEFT OUTER JOIN MIGUBN1 G1 (NOLOCK) ON G1.GUBN1_CODE = A.GUBN1_CODE ');
+        SQL.Add(' LEFT OUTER JOIN MIGUBN2 G2 (NOLOCK) ON G2.GUBN2_CODE = A.GUBN2_CODE ');
+        SQL.Add(' LEFT OUTER JOIN MIGUBN3 G3 (NOLOCK) ON G3.GUBN3_CODE = A.GUBN3_CODE ');
+        SQL.Add(' WHERE A.CLOSE_DATE = ''' + ls_SearchDate + ''' ');
+
+        if Length(Trim(ItemCb.Text)) > 0 then SQL.Add(' And  A.STOK_ITEM  LIKE ''%'+itemCB.Text+'%''    ');
+        if Length(Trim(ItemNmEdit.Text)) > 0 then SQL.Add(' And  MAST_NAME LIKE ''%'+Trim(ItemNmEdit.Text)+'%''    ');
+
+        If rb1.Checked = True then  SQL.Add(' AND  A.STOK_WH Not IN (''S'',''W'') ');
+        If rb2.Checked = True then  SQL.Add(' AND  A.STOK_WH  = ''S'' ');
+        If rb3.Checked = True then  SQL.Add(' AND  A.STOK_WH  = ''W'' ');
+
+        if (ls_gubn1 <> '') then  SQL.Add(' And  A.GUBN1_CODE = '''+ls_gubn1+'''    ');
+        if (ls_gubn2 <> '') then  SQL.Add(' And  A.GUBN2_CODE = '''+ls_gubn2+'''    ');
+        if (ls_gubn3 <> '') then  SQL.Add(' And  A.GUBN3_CODE = '''+ls_gubn3+'''    ');
+    end;
+
+    SQL.Add('  Order By STOK_ITEM, STOK_LOCA                          ');
+    Open;
+    RecNoEdit.Text := Format('%d',[Query1.RecordCount]);
+    First;
+    EnableControls;
+  End;
+
+  // ---------------------------------------------------------------------------
+  // 2. 파렛트 수량 (UpdtQuery) - GROUP BY
+  // ---------------------------------------------------------------------------
+  With UpdtQuery do Begin
+    Close;
+    SQL.Clear;
+    
+    if ls_SearchDate >= ls_Today then
+    begin
+       StrQry := ' Select STOK_LOCA  From MISTOK (NOLOCK) Group By STOK_LOCA     ';
+       SQL.Add(StrQry);
+    end
+    else
+    begin
+       StrQry := ' Select STOK_LOCA From MISTOK_HIST (NOLOCK) ';
+       StrQry := StrQry + ' WHERE CLOSE_DATE = ''' + ls_SearchDate + ''' ';
+       StrQry := StrQry + ' Group By STOK_LOCA ';
+       SQL.Add(StrQry);
+    end;
+
+    Open;
+    PltQty := RecordCount;
+    Stock1Ed.Caption := FormatFloat('#,###,##0',PltQty);
+  End;
+
+  // ---------------------------------------------------------------------------
+  // 3. 총 재고 수량 합계 (Query2)
+  // ---------------------------------------------------------------------------
+  with Query2 do Begin
+    DisableControls;
+    Close;
+    SQL.Clear;
+    
+    // [분기] 조회일 >= 오늘 : 기존 로직
+    if ls_SearchDate >= ls_Today then
+    begin
+        SQL.Add(' SELECT Sum(STOK_QTY) As STOK_QTY  ');
+        SQL.Add('   From MISTOK (NOLOCK)              ');
+        SQL.Add(' LEFT OUTER JOIN MIMAST (NOLOCK) ON MAST_CODE = STOK_ITEM    ');
+        SQL.Add('  LEFT OUTER JOIN MIGUBN1 (NOLOCK) ON GUBN1_CODE = MAST_GUBN1    ');
+        SQL.Add('  LEFT OUTER JOIN MIGUBN2 (NOLOCK) ON GUBN2_CODE = MAST_GUBN2   ');
+        SQL.Add('  LEFT OUTER JOIN MIGUBN3 (NOLOCK) ON GUBN3_CODE = MAST_GUBN3  ');
+        SQL.Add('  Where  ISNULL(STOK_ITEM, '''') <> ''''             ');
+
+        if Length(Trim(ItemCb.Text)) > 0 then SQL.Add(' And  STOK_ITEM  LIKE '''+itemCB.Text+'%''    ');
+        if Length(Trim(ItemNmEdit.Text)) > 0 then SQL.Add(' And  MAST_NAME LIKE ''%'+Trim(ItemNmEdit.Text)+'%''    ');
+        If rb1.Checked = True then  SQL.Add(' AND  STOK_WH Not IN (''S'',''W'') ');
+        If rb2.Checked = True then  SQL.Add(' AND  STOK_WH  = ''S'' ');
+        If rb3.Checked = True then  SQL.Add(' AND  STOK_WH  = ''W'' ');
+        if (ls_gubn1 <> '') then  SQL.Add(' And  MAST_GUBN1 = '''+ls_gubn1+'''    ');
+        if (ls_gubn2 <> '') then  SQL.Add(' And  MAST_GUBN2 = '''+ls_gubn2+'''    ');
+        if (ls_gubn3 <> '') then  SQL.Add(' And  MAST_GUBN3 = '''+ls_gubn3+'''    ');
+    end
+    else
+    // [분기] 조회일 < 오늘 : 과거 로직
+    begin
+        SQL.Add(' SELECT Sum(STOK_QTY) As STOK_QTY  ');
+        SQL.Add(' FROM MISTOK_HIST A (NOLOCK) ');
+        SQL.Add(' WHERE A.CLOSE_DATE = ''' + ls_SearchDate + ''' ');
+
+        if Length(Trim(ItemCb.Text)) > 0 then SQL.Add(' And  A.STOK_ITEM  LIKE '''+itemCB.Text+'%''    ');
+        if Length(Trim(ItemNmEdit.Text)) > 0 then SQL.Add(' And  MAST_NAME LIKE ''%'+Trim(ItemNmEdit.Text)+'%''    ');
+        
+        If rb1.Checked = True then  SQL.Add(' AND  A.STOK_WH Not IN (''S'',''W'') ');
+        If rb2.Checked = True then  SQL.Add(' AND  A.STOK_WH  = ''S'' ');
+        If rb3.Checked = True then  SQL.Add(' AND  A.STOK_WH  = ''W'' ');
+        if (ls_gubn1 <> '') then  SQL.Add(' And  A.GUBN1_CODE = '''+ls_gubn1+'''    ');
+        if (ls_gubn2 <> '') then  SQL.Add(' And  A.GUBN2_CODE = '''+ls_gubn2+'''    ');
+        if (ls_gubn3 <> '') then  SQL.Add(' And  A.GUBN3_CODE = '''+ls_gubn3+'''    ');
+    end;
+
+    Open;
+    li_qty := FieldByName('STOK_QTY').AsFloat;
+    EnableControls;
+  End;
+  
+  StockEd.caption := FormatFloat('###,##0.00', li_qty);
+end;
+
+
+
+procedure TFrm_6450.ExlBtnClick(Sender: TObject);
+begin
+ if Query1.Active = False then Exit;
+
+ if Query1.RecordCount <= 0 then
+ begin
+    MessageDlg('액셀로 저장할 데이타가 없습니다.!!! ', mtInformation,[mbOk], 0);
+    Exit;
+ end;
+
+ if MessageDlg('해당 조회건을 액셀로 저장할까요 ?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+ begin
+   DM1.GridToExel(query1, '장기 재고 현황');
+ end;
+end;
+
+procedure TFrm_6450.DBGrid1MouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+//
+end;
+
+procedure TFrm_6450.DBGrid1TitleClick(Column: TColumn);
+begin
+   if Column.Field.DataSet is TADOQuery then
+   with TADOQuery(Column.Field.DataSet) do begin
+     if (Pos(Column.FieldName + ' DESC', Sort) > 0) or ( Sort = '' ) then
+       Sort := Column.FieldName + ' ASC'
+     else
+       Sort := Column.FieldName + ' DESC';
+   end;
+end;
+
+
+procedure TFrm_6450.ExitBitBtnClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TFrm_6450.FormDestroy(Sender: TObject);
+begin
+  Frm_6450 := Nil;
+end;
+
+procedure TFrm_6450.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action := caFree;
+end;
+
+procedure TFrm_6450.RackRGClick(Sender: TObject);
+begin
+   StartBitBtnClick(self);
+end;
+      
+
+procedure TFrm_6450.DBGrid1DrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn;
+  State: TGridDrawState);
+var  
+  ls_use, Value, ls_rsrv : String;
+    WW     : Integer;
+    xDBGrid: TDBGrid;
+ begin
+  ls_rsrv :=  Query1.FieldByName('STOK_FLAG').AsString;
+  if  (ls_rsrv = 'Y') then
+  begin
+   with(Sender as TDBGrid).Canvas do
+    begin
+      Brush.Color := clYellow;
+      Font.Color  := clRed;
+      Canvas.Font.Style := [fsBold];
+      FillRect(Rect);
+    end;
+    DbGrid1.DefaultDrawColumnCell(Rect, DataCol, Column, State);
+  end;
+
+  if  (ls_rsrv = 'N') then
+  begin
+   with(Sender as TDBGrid).Canvas do
+    begin
+      Brush.Color := clRed;
+      Font.Color  := clWhite;
+      Canvas.Font.Style := [fsBold];
+      FillRect(Rect);
+    end;
+    DbGrid1.DefaultDrawColumnCell(Rect, DataCol, Column, State);
+  end;
+    
+  If DataCol = 0 Then
+  begin
+   with(Sender as TDBGrid).Canvas do
+   begin
+    Value := IntToStr(Query1.RecNo);
+    WW    := Canvas.TextWidth(value);
+    TextOut(Rect.Left+(Rect.Right - Rect.Left - WW) div 2, Rect.Top+2,Value);
+   end;
+  end; 
+end;
+
+
+procedure TFrm_6450.PrintBitBtnClick(Sender: TObject);
+begin
+  if MessageDlg(' 정말로 인쇄 합니까.?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+  begin
+      QRLbl_DateTime.Caption := DateTimeToStr( Now );
+//      QRLbl_FDate.Caption := FormatDateTime('yyyy-mm-dd', DateTimePicker1.Date);
+      QuickRep1.Preview;
+//    QuickRep1.Print;
+  end;
+end;
+
+procedure TFrm_6450.SB_SearchClick(Sender: TObject);
+begin
+  Bol_Data_Ok := True;
+  Bol_Modal   := False;
+  Var_Form    := Nil;
+
+  Mast_Disp  := TMast_Disp.Create(Application);
+  Bol_Modal := True;
+
+  Mast_Disp.Edt_Search.Text := ItemCB.Text;
+  If Mast_Disp <> Nil Then
+    With TForm(Mast_Disp) Do Begin
+      if Bol_Modal Then ShowModal
+      Else Begin
+        BorderIcons := [];
+        Show;
+      End;
+      Mast_Disp.Free;
+    End;
+
+    ItemCB.Text :=  jj_code;
+end;
+
+procedure TFrm_6450.ItemCBKeyPress(Sender: TObject; var Key: Char);
+begin
+   if key <> #13 then Exit;
+   StartBitBtnClick(self);
+end;
+
+procedure TFrm_6450.Query1STOK_WHGetText(Sender: TField; var Text: String;
+  DisplayText: Boolean);
+begin
+  if Sender.Value = 'S'  then Text := '생산동'
+   else if Sender.Value = 'A' then Text := '창고A'
+   else if Sender.Value = 'B' then Text := '창고B'
+   else if Sender.Value = 'C' then Text := '창고C'
+   else if Sender.Value = 'D' then Text := '창고D'
+   else if Sender.Value = 'E' then Text := '창고E'
+   else if Sender.Value = 'W' then Text := '외부동'
+   else Text := '';
+end;
+
+procedure TFrm_6450.Query1STOK_FLAGGetText(Sender: TField;
+  var Text: String; DisplayText: Boolean);
+begin
+   if Sender.Value = '1'  then Text := '대기' 
+   else if Sender.Value = 'Y' then Text := '예약'
+   else if Sender.Value = 'N' then Text := '금지'
+   else Text := '';
+end;
+
+procedure TFrm_6450.Rb1Click(Sender: TObject);
+begin
+  StartBitBtnClick(self);
+end;
+
+
+procedure TFrm_6450.Gubn1CbChange(Sender: TObject);
+begin
+    StartBitBtnClick(self)
+end;
+
+end.
