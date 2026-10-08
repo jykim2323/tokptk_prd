@@ -82,7 +82,7 @@ public  partial class Frm3100ViewModel : DocumentViewModelBase
         {
 
             StatusMessage = ex.Message;
-            _dialog.ShowMessage($"조회 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"조회 실패: {ex.Message}", "오류");
         }
     }
 
@@ -124,7 +124,7 @@ public  partial class Frm3100ViewModel : DocumentViewModelBase
         catch (Exception ex)
         {
             StatusMessage = ex.Message;
-            _dialog.ShowMessage($"추가 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"추가 실패: {ex.Message}", "오류");
         }
     }
 
@@ -165,7 +165,7 @@ public  partial class Frm3100ViewModel : DocumentViewModelBase
         catch (Exception ex)
         {
             StatusMessage = ex.Message;
-            _dialog.ShowMessage($"취소 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"취소 실패: {ex.Message}", "오류");
         }
     }
 
@@ -208,7 +208,7 @@ public  partial class Frm3100ViewModel : DocumentViewModelBase
                     throw new InvalidOperationException($"Delete Error");
                 }
 
-                _dialog.ShowMessage($"작업 완료:{Environment.NewLine}해당 {PltnoEdit} 파레트의 삭제가 완료되었습니다.", "성공");
+                _dialog.ShowInfo($"작업 완료:{Environment.NewLine}해당 {PltnoEdit} 파레트의 삭제가 완료되었습니다.", "성공");
 
             }
             else
@@ -228,7 +228,7 @@ public  partial class Frm3100ViewModel : DocumentViewModelBase
                     var cnt = await _frm3100Api.Subk_InsertAsync(item);
                 }
 
-                _dialog.ShowMessage($"저장 완료:{Environment.NewLine}해당 {PltnoEdit} 파레트의 수동 입고가 완료되었습니다.", "성공");
+                _dialog.ShowInfo($"저장 완료:{Environment.NewLine}해당 {PltnoEdit} 파레트의 수동 입고가 완료되었습니다.", "성공");
             }
 
 
@@ -236,7 +236,7 @@ public  partial class Frm3100ViewModel : DocumentViewModelBase
         catch (Exception ex)
         {
             StatusMessage = ex.Message;
-            _dialog.ShowMessage($"입고확정 실패:{Environment.NewLine}{ex.Message}", "오류");
+            _dialog.ShowWarning($"입고확정 실패:{Environment.NewLine}{ex.Message}", "오류");
         }
     }
 
@@ -296,14 +296,14 @@ public  partial class Frm3100ViewModel : DocumentViewModelBase
         catch (Exception ex)
         {
             StatusMessage = ex.Message;
-            _dialog.ShowMessage($"취소 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"취소 실패: {ex.Message}", "오류");
         }
     }
 
     [RelayCommand]
     private void Warning()
     {
-        _dialog.ShowMessage($"키 입력 실패:{Environment.NewLine} 숫자만 입력 할 수 있습니다.", "오류");
+        _dialog.ShowWarning($"키 입력 실패:{Environment.NewLine} 숫자만 입력 할 수 있습니다.", "오류");
     }
 
 }

@@ -1,9 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using System.Windows.Controls;
+using TOK.WMS.UI.Models.MainMenus;
 using TOK.WMS.Core.DTOs.Inbounds;
 using TOK.WMS.UI.Services;
 using TOK.WMS.UI.Services.Api.Inbounds;
+using TOK.WMS.UI.Services.ETC;
 using TOK.WMS.UI.ViewModels.Base;
 
 namespace TOK.WMS.UI.ViewModels.MainMenus.Inbounds;
@@ -12,14 +15,19 @@ public partial class Frm3700ViewModel : DocumentViewModelBase
 {
     private readonly IFrm3700Api _frm3700Api;
     private readonly IDialogService _dialog;
+    private readonly IExcelService _excel;
 
 
     public Frm3700ViewModel(
         IFrm3700Api frm3700Api,
-        IDialogService dialog)
+        IDialogService dialog,
+        IExcelService excel)
     {
         _frm3700Api = frm3700Api;
         _dialog = dialog;
+        _excel = excel;
+        Title = "입고 실적 현황";
+        ContentId = DocumentKeys.Frm3700;
     }
 
 
@@ -83,6 +91,26 @@ public partial class Frm3700ViewModel : DocumentViewModelBase
     [ObservableProperty]
     private string _statusMessage = string.Empty;
 
+    [RelayCommand]
+    private void ExportExcel(DataGrid? grid)
+    {
+        if (Items.Count == 0)
+        {
+            _dialog.ShowInfo("저장할 데이터가 없습니다.", "안내");
+            return;
+        }
+
+        try
+        {
+            if (_excel.Export(Items, "입고실적현황", "입고실적현황", grid))
+                _dialog.ShowInfo("엑셀로 저장되었습니다.", "완료");
+        }
+        catch (Exception ex)
+        {
+            _dialog.ShowWarning($"엑셀 저장 중 오류가 발생했습니다.\n{ex.Message}", "오류");
+        }
+    }
+
 
     // =========================================================
     // 조회
@@ -140,7 +168,7 @@ public partial class Frm3700ViewModel : DocumentViewModelBase
         {
             StatusMessage = "조회 오류";
 
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"조회 중 오류가 발생했습니다.\n{ex.Message}",
                 "오류");
         }
@@ -195,7 +223,7 @@ public partial class Frm3700ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"LOT 조회 중 오류가 발생했습니다.\n{ex.Message}",
                 "오류");
         }

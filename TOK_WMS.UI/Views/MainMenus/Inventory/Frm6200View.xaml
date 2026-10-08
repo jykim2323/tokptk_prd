@@ -1,325 +1,195 @@
-﻿<UserControl x:Class="TOK.WMS.UI.Views.MainMenus.Inventory.Frm6200View"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:conv="clr-namespace:TOK.WMS.UI.Converters"
-             xmlns:behaviors="clr-namespace:TOK.WMS.UI.Behaviors"
-             Background="{DynamicResource AppBackgroundBrush}"
-             Foreground="{DynamicResource AppTextBrush}"
-             FontFamily="{StaticResource AppFont}"
-             FontWeight="Medium"
-             Loaded="UserControl_Loaded">
-
+<UserControl xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:behaviors="clr-namespace:TOK.WMS.UI.Behaviors" xmlns:conv="clr-namespace:TOK.WMS.UI.Converters" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="TOK.WMS.UI.Views.MainMenus.Inventory.Frm6200View" Background="{DynamicResource AppBackgroundBrush}" Foreground="{DynamicResource AppTextBrush}" FontFamily="{StaticResource AppFont}" FontWeight="Medium" Loaded="UserControl_Loaded" FontSize="14">
     <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
-
-        <conv:LocaFormatConverter x:Key="LocaFormatConverter"/>
-        <conv:LstkFlagConverter x:Key="LstkFlagConverter"/>
-        <conv:SubkFlagConverter x:Key="SubkFlagConverter"/>
-        <conv:DateTimeFormatConverter x:Key="DateTimeFormatConverter"/>
-        <conv:RadioButtonConverter x:Key="RadioButtonConverter"/>
-        <Style x:Key="FilterLabel" TargetType="TextBlock">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Margin" Value="0,0,6,0"/>
-            <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}"/>
-        </Style>
-        <Style x:Key="FilterBox" TargetType="TextBox">
-            <Setter Property="Width" Value="120"/>
-            <Setter Property="Padding" Value="5,4"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Background" Value="{DynamicResource InputBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
-            <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}"/>
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="BorderThickness" Value="1"/>
-        </Style>
-        <Style x:Key="DetailLabelCell" TargetType="Border">
-            <Setter Property="Background" Value="#F2F6FA"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
-            <Setter Property="BorderThickness" Value="0,0,1,1"/>
-            <Setter Property="Padding" Value="12,0"/>
-        </Style>
-
-        <Style x:Key="Header" TargetType="Border">
-            <Setter Property="Background" Value="{DynamicResource HeaderBrush}"/>
-            <Setter Property="TextElement.Foreground" Value="{DynamicResource AppTextOnPrimBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
-            <Setter Property="BorderThickness" Value="2,2,2,2"/>
-        </Style>
-
-        <Style x:Key="DetailInputBox" TargetType="TextBox">
-            <Setter Property="Height" Value="34"/>
-            <Setter Property="Margin" Value="8,3,0,5"/>
-            <Setter Property="Padding" Value="10,4"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Background" Value="{DynamicResource InputBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontSize" Value="14"/>
-
-            <Style.Triggers>
-                <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                    <Setter Property="BorderBrush"
-                    Value="{DynamicResource BtnPrimaryBrush}"/>
-                    <Setter Property="BorderThickness" Value="2"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/TOK.WMS.UI;component/Styles/ManagementScreenStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+            <conv:LocaFormatConverter x:Key="LocaFormatConverter" />
+            <conv:LstkFlagConverter x:Key="LstkFlagConverter" />
+            <conv:SubkFlagConverter x:Key="SubkFlagConverter" />
+            <conv:DateTimeFormatConverter x:Key="DateTimeFormatConverter" />
+            <conv:RadioButtonConverter x:Key="RadioButtonConverter" />
+            <Style x:Key="FilterLabel" TargetType="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="Margin" Value="0,0,8,0" />
+                <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}" />
+            </Style>
+            <Style x:Key="DetailInputBox" TargetType="TextBox" BasedOn="{StaticResource ScreenFilterInputStyle}">
+                <Style.Triggers>
+                    <Trigger Property="IsReadOnly" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource AppSurface2Brush}" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="FilterBox" TargetType="TextBox" BasedOn="{StaticResource ScreenFilterInputStyle}">
+                <Style.Triggers>
+                    <Trigger Property="IsReadOnly" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource AppSurface2Brush}" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="Header" TargetType="Border" BasedOn="{StaticResource ScreenSectionTitleStyle}" />
+            <Style x:Key="DetailLabelCell" TargetType="Border">
+                <Setter Property="Background" Value="{DynamicResource AppSurface2Brush}" />
+                <Setter Property="Padding" Value="12,0" />
+                <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}" />
+                <Setter Property="BorderThickness" Value="0,0,0,1" />
+            </Style>
+        </ResourceDictionary>
     </UserControl.Resources>
-
-
-    <DockPanel Margin="12">
-        <!-- 헤더 -->
-        <Grid DockPanel.Dock="Top" Margin="0,0,10,0" >
-
-            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Top" Height="60">
-                <TextBlock Text="📦" FontSize="20" Margin="0,5,5,10" VerticalAlignment="Center"/>
-                <TextBlock Text="재고 자료 조회" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource AppTextBrush}" VerticalAlignment="Center"/>
-
-                <TextBlock Text="- Frm6200" FontSize="12" FontWeight="Bold" Margin="10,0,0,0"
-                    Foreground="{DynamicResource AppTextBrush}" VerticalAlignment="Center"/>
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid Margin="0,0,0,16" behaviors:ResponsiveHeader.Toolbar="{Binding ElementName=ToolbarPanel}" behaviors:ResponsiveHeader.StackBelowWidth="800" Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Border Style="{StaticResource ScreenTitleIconSurfaceStyle}">
+                    <Path Data="{StaticResource ScreenPackageIconGeometry}" Style="{StaticResource ScreenToolbarIconStyle}" Stroke="{DynamicResource AppTextBrush}" />
+                </Border>
+                <TextBlock Text="재고 자료 조회" Style="{StaticResource ScreenTitleTextStyle}" />
+                <TextBlock Text="Frm6200" Style="{StaticResource ScreenSubtitleTextStyle}" Margin="12,0,0,0" />
             </StackPanel>
-
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Width="90" HorizontalAlignment="Right" Content="❌ 금지" Command="{Binding ProhibitionCommand}"  
-                        Padding="16,6" FontWeight="Bold" Cursor="Hand" BorderThickness="0" Margin="5,0,10,5"
-                        Background="{DynamicResource BtnStadardBrush}" 
-                        Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
-
-                <Button Width="90" HorizontalAlignment="Right" Content="📊 엑셀" Command="{Binding ExportExcelCommand}"  
-                        Padding="16,6" FontWeight="Bold" Cursor="Hand" BorderThickness="0" Margin="5,0,10,5"
-                        Background="ForestGreen" 
-                        Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
-
-                <Button Width="90" HorizontalAlignment="Right" Content="🖨️ 인쇄" Command="{Binding PrintCommand}"  
-                        Padding="16,6" FontWeight="Bold" Cursor="Hand" BorderThickness="0" Margin="5,0,10,5"
-                        Background="{DynamicResource BtnStadardBrush}" 
-                        Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
-
-                <Button Width="90" HorizontalAlignment="Right" Content="⏻ 종료" Command="{Binding ExitCommand}"  
-                        Padding="16,6" FontWeight="Bold" Cursor="Hand" BorderThickness="0" Margin="5,0,10,5"
-                        Background="{DynamicResource BtnStadardBrush}" 
-                        Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
-            </StackPanel>
-            <!--<TextBlock Text="{Binding StatusMessage}" HorizontalAlignment="Right" VerticalAlignment="Center"
-                FontSize="18" FontWeight="Bold" Foreground="{DynamicResource AppTextSubBrush}"/>-->
-        </Grid>
-
-        <!-- 검색 조건 -->
-        <Border DockPanel.Dock="Top"
-            Background="{DynamicResource AppSurfaceBrush}"
-            BorderBrush="{DynamicResource AppBorderBrush}"
-            BorderThickness="1" CornerRadius="5" Padding="12,10" Margin="0,0,0,10">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-
-                <!-- Row 0: 조회기간 + 호기 -->
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
-                </StackPanel>
-
-                <!-- Row 1: 나머지 필터(좌) + 버튼(우) -->
-                <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <WrapPanel Grid.Column="0" VerticalAlignment="Center">
-                        <StackPanel Orientation="Horizontal" Margin="0,0,5,6">
-                            <TextBlock Text="입고일자:" Style="{StaticResource FilterLabel}"/>
-                            <TextBox Width="120" Text="{Binding SubkIndateFrom, Converter={StaticResource DateTimeFormatConverter}}" Style="{StaticResource DetailInputBox}" CharacterCasing="Upper"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                            <TextBlock Text="에서" Style="{StaticResource FilterLabel}"/>
-                            <TextBox Width="120" Text="{Binding SubkIndateTo, Converter={StaticResource DateTimeFormatConverter}}" Style="{StaticResource DetailInputBox}" CharacterCasing="Upper"/>
-                        </StackPanel>
-                        <StackPanel behaviors:EnterKey.Command="{Binding SearchCommand}" Orientation="Horizontal" Margin="5,0,18,6">
-                            <TextBlock Text="까지" Style="{StaticResource FilterLabel}" Width="40" />
-                            <ComboBox Width="100"
-                                      Height="33"
-                                      ItemsSource="{Binding SearchTypes}"
-                                      SelectedItem="{Binding SelectedSearchType, Mode=TwoWay}"
-                                      DisplayMemberPath="Name"
-                                      VerticalContentAlignment="Center"
-                                      Padding="6,0"/>
-                            <TextBox Text="{Binding SearchText}" Style="{StaticResource DetailInputBox}" Width="300" MaxLength="300" CharacterCasing="Upper"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,18,6">
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,18,6">
-                        </StackPanel>
-                    </WrapPanel>
-
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
-                        <Button Content="🔍 조회" Width="90" Command="{Binding SearchCommand}" Margin="0,0,10,10"
-                            Padding="16,12" FontWeight="Bold" Cursor="Hand" BorderThickness="0"
-                            Background="{DynamicResource BtnPrimaryBrush}" Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
+            <WrapPanel VerticalAlignment="Center" x:Name="ToolbarPanel" Grid.Column="1" HorizontalAlignment="Right" ItemHeight="50">
+                <Button Command="{Binding ProhibitionCommand}" Margin="8,0,0,0" Style="{StaticResource ScreenSecondaryButtonStyle}">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Path Data="{StaticResource ScreenDeleteIconGeometry}" Style="{StaticResource ScreenToolbarIconStyle}" />
+                        <TextBlock Text="금지" Margin="8,0,0,0" VerticalAlignment="Center" />
                     </StackPanel>
-                </Grid>
-                <Grid Grid.Row="2">
-                    <WrapPanel Grid.Column="0" VerticalAlignment="Center">
-                        <StackPanel Orientation="Horizontal" Margin="0,0,18,6">
-                            <TextBlock Text="⚠️ 위험물:" Style="{StaticResource FilterLabel}"/>
-                            <ComboBox Width="250"
-                                        Height="32"
-                                        ItemsSource="{Binding DangerousTypes}"
-                                        SelectedItem="{Binding SelectedDangerousType, Mode=TwoWay}"
-                                        DisplayMemberPath="Name"
-                                        VerticalContentAlignment="Center"
-                                        Padding="6,0"/>
+                </Button>
+                <Button Command="{Binding ExportExcelCommand}" CommandParameter="{Binding ElementName=MimastDB_Table}" Margin="8,0,0,0" Style="{StaticResource ScreenExcelButtonStyle}">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Path Data="{StaticResource ScreenExcelIconGeometry}" Style="{StaticResource ScreenToolbarIconStyle}" Stroke="{StaticResource Frm3300ExcelAccentBrush}" />
+                        <TextBlock Text="엑셀" Margin="8,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Button Command="{Binding PrintCommand}" Margin="8,0,0,0" Style="{StaticResource ScreenSecondaryButtonStyle}">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Path Data="{StaticResource ScreenPrinterIconGeometry}" Style="{StaticResource ScreenToolbarIconStyle}" />
+                        <TextBlock Text="인쇄" Margin="8,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Button Command="{Binding CloseCommand}" Margin="8,0,0,0" Style="{StaticResource ScreenSecondaryButtonStyle}">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Path Data="{StaticResource ScreenPowerIconGeometry}" Style="{StaticResource ScreenToolbarIconStyle}" />
+                        <TextBlock Text="종료" Margin="8,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+            </WrapPanel>
+        </Grid>
+        <Border Style="{StaticResource ScreenCardStyle}" Margin="0,0,0,16" behaviors:EnterKey.Command="{Binding SearchCommand}" Grid.Row="1">
+            <StackPanel>
+                <WrapPanel VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,16,8" VerticalAlignment="Center">
+                        <TextBlock Text="입고일자:" Style="{StaticResource FilterLabel}" />
+                        <TextBox Width="140" Text="{Binding SubkIndateFrom, Converter={StaticResource DateTimeFormatConverter}}" Style="{StaticResource DetailInputBox}" CharacterCasing="Upper" Margin="0" FontSize="14" Height="36" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,16,8" VerticalAlignment="Center">
+                        <TextBlock Text="~" Style="{StaticResource FilterLabel}" />
+                        <TextBox Width="140" Text="{Binding SubkIndateTo, Converter={StaticResource DateTimeFormatConverter}}" Style="{StaticResource DetailInputBox}" CharacterCasing="Upper" Margin="0" FontSize="14" Height="36" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,16,8" VerticalAlignment="Center">
+                        <TextBlock Text="검색 조건:" Style="{StaticResource FilterLabel}" />
+                        <ComboBox Width="120" Height="36" ItemsSource="{Binding SearchTypes}" SelectedItem="{Binding SelectedSearchType, Mode=TwoWay}" DisplayMemberPath="Name" Style="{StaticResource ScreenFilterComboBoxStyle}" Margin="0" FontSize="14" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,16,8" VerticalAlignment="Center">
+                        <TextBlock Text="검색어:" Style="{StaticResource FilterLabel}" />
+                        <TextBox Text="{Binding SearchText}" Style="{StaticResource DetailInputBox}" Width="200" MaxLength="300" CharacterCasing="Upper" Margin="0" FontSize="14" Height="36" />
+                    </StackPanel>
+                    <Button Command="{Binding SearchCommand}" Margin="8,0,0,0" Style="{StaticResource ScreenPrimaryButtonStyle}">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Path Data="{StaticResource ScreenSearchIconGeometry}" Style="{StaticResource ScreenToolbarIconStyle}" />
+                            <TextBlock Text="조회" Margin="8,0,0,0" VerticalAlignment="Center" />
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="10,0,18,6">
-                            <TextBlock Text="💧 수용성:" Style="{StaticResource FilterLabel}"/>
-                            <ComboBox Width="250"
-                                      Height="32"
-                                      ItemsSource="{Binding SolubilityTypes}"
-                                      SelectedItem="{Binding SelectedSolubilityType, Mode=TwoWay}"
-                                      DisplayMemberPath="Name"
-                                      VerticalContentAlignment="Center"
-                                      Padding="6,0"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="10,0,18,6">
-                            <TextBlock Text="🛢️ 석유류:" Style="{StaticResource FilterLabel}"/>
-                            <ComboBox Width="250"
-                                      Height="32"
-                                      ItemsSource="{Binding PetroleumTypes}"
-                                      SelectedItem="{Binding SelectedPetroleumType, Mode=TwoWay}"
-                                      DisplayMemberPath="Name"
-                                      VerticalContentAlignment="Center"
-                                      Padding="6,0"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="20,5,1,6">
-                            <TextBlock Text="재고 수량:" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>
-                            <TextBox  Width="120" IsReadOnly="True" Text="{Binding SubkWgtTotal, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,18,6">
-                        </StackPanel>
-                    </WrapPanel>
-                </Grid>
-            </Grid>
+                    </Button>
+                </WrapPanel>
+                <WrapPanel VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,16,8" VerticalAlignment="Center">
+                        <TextBlock Text="위험물:" Style="{StaticResource FilterLabel}" />
+                        <ComboBox Width="170" Height="36" ItemsSource="{Binding DangerousTypes}" SelectedItem="{Binding SelectedDangerousType, Mode=TwoWay}" DisplayMemberPath="Name" Style="{StaticResource ScreenFilterComboBoxStyle}" Margin="0" FontSize="14" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,16,8" VerticalAlignment="Center">
+                        <TextBlock Text="석유류:" Style="{StaticResource FilterLabel}" />
+                        <ComboBox Width="170" Height="36" ItemsSource="{Binding PetroleumTypes}" SelectedItem="{Binding SelectedPetroleumType, Mode=TwoWay}" DisplayMemberPath="Name" Style="{StaticResource ScreenFilterComboBoxStyle}" Margin="0" FontSize="14" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,16,8" VerticalAlignment="Center">
+                        <TextBlock Text="수용성:" Style="{StaticResource FilterLabel}" />
+                        <ComboBox Width="170" Height="36" ItemsSource="{Binding SolubilityTypes}" SelectedItem="{Binding SelectedSolubilityType, Mode=TwoWay}" DisplayMemberPath="Name" Style="{StaticResource ScreenFilterComboBoxStyle}" Margin="0" FontSize="14" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,16,8" VerticalAlignment="Center">
+                        <TextBlock Text="중량 합계:" Style="{StaticResource FilterLabel}" />
+                        <TextBox Width="130" IsReadOnly="True" Text="{Binding SubkWgtTotal, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}" Margin="0" FontSize="14" Height="36" />
+                    </StackPanel>
+                </WrapPanel>
+            </StackPanel>
         </Border>
-
-        <Grid>
-            <Border Grid.Row="0" 
-                Background="{DynamicResource AppSurfaceBrush}"
-                BorderBrush="{DynamicResource AppBorderBrush}"
-                BorderThickness="1" CornerRadius="5" Padding="12,10" Margin="0,10,0,8">
-                <DockPanel LastChildFill="True">
-                    <Border DockPanel.Dock="Top" Height="40" Style="{StaticResource Header}"
-                        BorderThickness="1" CornerRadius="5" Padding="12,10" Margin="0,0,0,8">
-                        <TextBlock Text="품목 조회" 
-                            FontSize="18" FontWeight="Bold" 
-                            Foreground="{DynamicResource AppTextOnPrimBrush}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    </Border>
-                              <!-- 결과 그리드: 컬럼이 데이터 길이에 맞춰 자동 너비 -->
-                    <DataGrid x:Name="MimastDB_Table" ItemsSource="{Binding SubkItems}"
-                         Style="{StaticResource ListDataGridStyle}"
-                         SelectionMode="Extended"
-                         ColumnWidth="Auto"
-                         SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
-                         ScrollViewer.VerticalScrollBarVisibility="Auto"
-                         ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                         LoadingRow="DataGrid_LoadingRow">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="순번"
-                            Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow},Path=Header}" Width="50"/>
-                            <DataGridTextColumn Header="상태" Binding="{Binding SubkFlag , Converter={StaticResource SubkFlagConverter}}" Width="150" />
-                            <DataGridTextColumn Header="재고위치" Binding="{Binding SubkLoca}" Width="160" />
-                            <DataGridTextColumn Header="PLT-NO" Binding="{Binding SubkPltno}" Width="160" />
-                            <DataGridTextColumn Header="품목코드" Binding="{Binding SubkCode}" Width="250" />
-                            <DataGridTextColumn Header="품 목 명" Binding="{Binding MastName}" Width="160" />
-                            <DataGridTextColumn Header="LOT-NO" Binding="{Binding SubkLotno}" Width="160" />
-                            <DataGridTextColumn Header="재고중량" Binding="{Binding SubkWgt}" Width="100" />
-                            <DataGridTextColumn Header="예약중량" Binding="{Binding SubkRwgt}" Width="100" />
-                            <DataGridTextColumn Header="BOX-NO" Binding="{Binding SubkBoxno}" Width="150" />
-                            <DataGridTextColumn Header="비고" Binding="{Binding SubkRemark}" Width="AUTO" />
-                            <DataGridTextColumn Header="입고일자" Binding="{Binding SubkIndate}" Width="100" />
-                            <DataGridTextColumn Header="입고시간" Binding="{Binding SubkIntime}" Width="100" />
-                            <DataGridTextColumn Header="위험물" Binding="{Binding Gubn1Name}" Width="AUTO" />
-                            <DataGridTextColumn Header="석유류" Binding="{Binding Gubn2Name}" Width="AUTO" />
-                            <DataGridTextColumn Header="수용성" Binding="{Binding Gubn3Name}" Width="*" />
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </DockPanel>
-            </Border>
-            <!-- 금지 설정 패널 -->
-            <Border Width="500"
-                    Height="230"
-                    Background="White"
-                    BorderBrush="#888"
-                    BorderThickness="2"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Visibility="{Binding IsBanPanelVisible,
-                                 Converter={StaticResource BoolToVisibilityConverter}}">
-
-                <Grid Margin="20">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Top" Height="60" Background="{DynamicResource HeaderBrush}" TextElement.Foreground="{DynamicResource AppTextOnPrimBrush}">
-                        <TextBlock Text="📦" FontSize="20" Margin="0,5,5,10" VerticalAlignment="Center"/>
-                        <TextBlock Text="금지 설정" FontSize="20" FontWeight="Bold"
-                                    Foreground="{DynamicResource AppTextOnPrimBrush}" VerticalAlignment="Center"/>
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="1"
-                        Orientation="Horizontal"
-                        Margin="0,25,0,0">
-                        <StackPanel Orientation="Horizontal">
-                            <RadioButton Content="금지" 
-                                         VerticalAlignment="Center"
-                                         Margin="0,0,30,0"
-                                         GroupName="BanGroup"
-                                         IsChecked="{Binding BanType,
-                                 Converter={StaticResource RadioButtonConverter},
-                                 ConverterParameter='N'}"
-                                         />
-
-                            <RadioButton Content="해제" 
-                                         VerticalAlignment="Center"
-                                         GroupName="BanGroup"
-                                         IsChecked="{Binding BanType,
-                                 Converter={StaticResource RadioButtonConverter},
-                                 ConverterParameter='1'}"/>
+        <Border Style="{StaticResource ScreenCardStyle}" Grid.Row="2">
+            <DockPanel LastChildFill="True">
+                <Border Style="{StaticResource ScreenSectionTitleStyle}" DockPanel.Dock="Top" Margin="0,0,0,8">
+                    <TextBlock Text="재고 자료" Style="{StaticResource SectionTitleTextStyle}" />
+                </Border>
+                <DataGrid x:Name="MimastDB_Table" ItemsSource="{Binding SubkItems}" Style="{StaticResource ScreenDataGridStyle}" SelectionMode="Extended" ColumnWidth="SizeToHeader" SelectedItem="{Binding SelectedItem, Mode=TwoWay}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" LoadingRow="DataGrid_LoadingRow" HeadersVisibility="Column" RowHeaderWidth="0" BorderThickness="0" MinHeight="100">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="순번" Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow},Path=Header}" Width="60" MinWidth="60" ElementStyle="{StaticResource ScreenCellTextStyle}" />
+                        <DataGridTextColumn Header="상태" Binding="{Binding SubkFlag , Converter={StaticResource SubkFlagConverter}}" Width="80" MinWidth="80" ElementStyle="{StaticResource ScreenCellTextStyle}" />
+                        <DataGridTextColumn Header="재고위치" Binding="{Binding SubkLoca}" Width="140" MinWidth="140" ElementStyle="{StaticResource ScreenCellTextStyle}" />
+                        <DataGridTextColumn Header="PLT-NO" Binding="{Binding SubkPltno}" Width="160" MinWidth="160" ElementStyle="{StaticResource ScreenCellTextStyle}" />
+                        <DataGridTextColumn Header="품목코드" Binding="{Binding SubkCode}" Width="160" MinWidth="160" ElementStyle="{StaticResource ScreenCellTextStyle}" />
+                        <DataGridTextColumn Header="품 목 명" Binding="{Binding MastName}" Width="220" MinWidth="220" ElementStyle="{StaticResource ScreenLeftCellTextStyle}" />
+                        <DataGridTextColumn Header="LOT-NO" Binding="{Binding SubkLotno}" Width="160" MinWidth="160" ElementStyle="{StaticResource ScreenCellTextStyle}" />
+                        <DataGridTextColumn Header="재고중량" Binding="{Binding SubkWgt}" Width="110" MinWidth="110" ElementStyle="{StaticResource ScreenRightCellTextStyle}" />
+                        <DataGridTextColumn Header="예약중량" Binding="{Binding SubkRwgt}" Width="110" MinWidth="110" ElementStyle="{StaticResource ScreenRightCellTextStyle}" />
+                        <DataGridTextColumn Header="BOX-NO" Binding="{Binding SubkBoxno}" Width="160" MinWidth="160" ElementStyle="{StaticResource ScreenCellTextStyle}" />
+                        <DataGridTextColumn Header="비고" Binding="{Binding SubkRemark}" Width="180" MinWidth="180" ElementStyle="{StaticResource ScreenLeftCellTextStyle}" />
+                        <DataGridTextColumn Header="입고일자" Binding="{Binding SubkIndate}" Width="110" MinWidth="110" ElementStyle="{StaticResource ScreenCellTextStyle}" />
+                        <DataGridTextColumn Header="입고시간" Binding="{Binding SubkIntime}" Width="110" MinWidth="110" ElementStyle="{StaticResource ScreenCellTextStyle}" />
+                        <DataGridTextColumn Header="위험물" Binding="{Binding Gubn1Name}" Width="140" MinWidth="140" ElementStyle="{StaticResource ScreenCellTextStyle}" />
+                        <DataGridTextColumn Header="석유류" Binding="{Binding Gubn2Name}" Width="140" MinWidth="140" ElementStyle="{StaticResource ScreenCellTextStyle}" />
+                        <DataGridTextColumn Header="수용성" Binding="{Binding Gubn3Name}" Width="*" MinWidth="140" ElementStyle="{StaticResource ScreenCellTextStyle}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+        </Border>
+        <Border Style="{StaticResource ScreenCardStyle}" Width="500" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding IsBanPanelVisible, Converter={StaticResource BoolToVisibilityConverter}}" Grid.Row="2">
+            <StackPanel>
+                <Border Style="{StaticResource ScreenSectionTitleStyle}" Margin="0,0,0,16">
+                    <TextBlock Text="금지 설정" Style="{StaticResource SectionTitleTextStyle}" />
+                </Border>
+                <WrapPanel VerticalAlignment="Center">
+                    <RadioButton Content="금지" VerticalAlignment="Center" Margin="0,0,20,12" GroupName="BanGroup" IsChecked="{Binding BanType,                                  Converter={StaticResource RadioButtonConverter},                                  ConverterParameter='N'}" FontSize="14" Foreground="{DynamicResource AppTextBrush}" />
+                    <RadioButton Content="해제" VerticalAlignment="Center" GroupName="BanGroup" IsChecked="{Binding BanType,                                  Converter={StaticResource RadioButtonConverter},                                  ConverterParameter='1'}" FontSize="14" Foreground="{DynamicResource AppTextBrush}" Margin="0,0,20,12" />
+                </WrapPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,16,8" VerticalAlignment="Center">
+                    <TextBlock Text="비고:" Style="{StaticResource FilterLabel}" />
+                    <TextBox Width="390" Text="{Binding SubkIndateFrom, Converter={StaticResource DateTimeFormatConverter}}" Style="{StaticResource DetailInputBox}" CharacterCasing="Upper" Margin="0" FontSize="14" Height="36" />
+                </StackPanel>
+                <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Right">
+                    <Button Command="{Binding ConfirmBanCommand}" Style="{StaticResource ScreenPrimaryButtonStyle}" Margin="8,0,0,0">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Path Data="{StaticResource ScreenConfirmIconGeometry}" Style="{StaticResource ScreenToolbarIconStyle}" />
+                            <TextBlock Text="확정" Margin="8,0,0,0" VerticalAlignment="Center" />
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="120,0,0,0">
-                            <Button Content="🔥 확정"                     
-                                Padding="16,6" FontWeight="Bold" Cursor="Hand" 
-                                Background="{DynamicResource BtnStadardBrush}" 
-                                Foreground="{DynamicResource BtnPrimaryTextBrush}"
-                                Command="{Binding ConfirmBanCommand}"/>
-
-                            <Button Content="⏻ 종료"  Margin="20,0,0,0"                    
-                                Padding="16,6" FontWeight="Bold" Cursor="Hand" 
-                                Background="{DynamicResource BtnStadardBrush}" 
-                                Foreground="{DynamicResource BtnPrimaryTextBrush}"
-                                Command="{Binding PopupCloseCommand}"/>
+                    </Button>
+                    <Button Margin="8,0,0,0" Command="{Binding PopupCloseCommand}" Style="{StaticResource ScreenSecondaryButtonStyle}">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Path Data="{StaticResource ScreenPowerIconGeometry}" Style="{StaticResource ScreenToolbarIconStyle}" />
+                            <TextBlock Text="종료" Margin="8,0,0,0" VerticalAlignment="Center" />
                         </StackPanel>
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="2"
-                        Orientation="Horizontal"
-                        Margin="0,25,0,0">
-
-                        <TextBlock Text="비고:" Style="{StaticResource FilterLabel}"/>
-
-                        <TextBox Width="400" Text="{Binding SubkIndateFrom, Converter={StaticResource DateTimeFormatConverter}}" Style="{StaticResource DetailInputBox}" CharacterCasing="Upper"/>
-
-
-                    </StackPanel>
-
-                </Grid>
-
-            </Border>
-        </Grid>
-    </DockPanel>
-
+                    </Button>
+                </WrapPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
 </UserControl>

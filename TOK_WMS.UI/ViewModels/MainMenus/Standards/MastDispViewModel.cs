@@ -142,7 +142,7 @@ public partial class MastDispViewModel
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"품목 조회 실패: {ex.Message}",
                 "오류");
         }
@@ -168,7 +168,7 @@ public partial class MastDispViewModel
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"품목 전체 조회 실패: {ex.Message}",
                 "오류");
         }

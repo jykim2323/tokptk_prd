@@ -132,7 +132,7 @@ public partial class Frm4103ViewModel
                 false;
 
 
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"초기 조회 실패: {ex.Message}",
                 "오류");
         }
@@ -178,7 +178,7 @@ public partial class Frm4103ViewModel
                 false;
 
 
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"날짜 변경 조회 실패: {ex.Message}",
                 "오류");
         }
@@ -339,7 +339,7 @@ public partial class Frm4103ViewModel
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"조회 실패: {ex.Message}",
                 "오류");
         }
@@ -357,7 +357,7 @@ public partial class Frm4103ViewModel
         {
             if (SelectedSchedule == null)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "삭제할 출고지시를 선택해주세요.",
                     "확인");
 
@@ -387,13 +387,13 @@ public partial class Frm4103ViewModel
 
             if (count <= 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowInfo(
                     "삭제된 출고 데이터가 없습니다.",
                     "확인");
             }
             else
             {
-                _dialog.ShowMessage(
+                _dialog.ShowInfo(
                     "출고지시 삭제 및 재고 원복이 완료되었습니다.",
                     "완료");
             }
@@ -407,7 +407,7 @@ public partial class Frm4103ViewModel
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"출고지시 삭제 실패: {ex.Message}",
                 "오류");
         }
@@ -425,7 +425,7 @@ public partial class Frm4103ViewModel
         {
             if (ScheduleItems.Count == 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "출고 지시할 데이터가 없습니다.",
                     "확인");
 
@@ -460,7 +460,7 @@ public partial class Frm4103ViewModel
 
             if (result == null)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "출고지시 결과를 확인할 수 없습니다.",
                     "오류");
 
@@ -470,7 +470,7 @@ public partial class Frm4103ViewModel
 
             if (!result.Success)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     result.Message
                     ?? "출고지시 실패",
                     "오류");
@@ -479,7 +479,7 @@ public partial class Frm4103ViewModel
             }
 
 
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 result.Message
                 ?? "출고지시가 완료되었습니다.",
                 "완료");
@@ -489,7 +489,7 @@ public partial class Frm4103ViewModel
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"출고지시 실패: {ex.Message}",
                 "오류");
         }

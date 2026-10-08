@@ -1,9 +1,8 @@
-﻿using ClosedXML.Excel;
+using ClosedXML.Excel;
 using Microsoft.Win32;
 using System.Globalization;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using TOK.WMS.Core.Attributes;
+using System.Windows.Controls;
 using TOK.WMS.Core.DTOs.Outbounds;
 
 namespace TOK.WMS.UI.Services.ETC;
@@ -11,10 +10,12 @@ namespace TOK.WMS.UI.Services.ETC;
 
 public interface IExcelService
 {
+    /// <summary>화면에서 내보낼 때 grid를 전달하면 표시 열 이름·순서·정렬·변환을 그대로 사용합니다.</summary>
     bool Export<T>(
         IEnumerable<T> rows,
         string baseFileName,
-        string sheetName = "데이터");
+        string sheetName = "데이터",
+        DataGrid? grid = null);
 
 
     List<Frm4101Dto.ExcelRowDto>? ImportFrm4101(
@@ -24,118 +25,43 @@ public interface IExcelService
 
 public class ExcelService : IExcelService
 {
-    private sealed record Col(
-        PropertyInfo Prop,
-        string Header,
-        bool IsDateTime14);
-
-
-    // =========================================================
-    // EXPORT
-    // 기존 기능 그대로
-    // =========================================================
-
     public bool Export<T>(
         IEnumerable<T> rows,
         string baseFileName,
-        string sheetName = "데이터")
+        string sheetName = "데이터",
+        DataGrid? grid = null)
     {
-        var list =
-            rows?.ToList() ?? [];
-
-
+        var list = rows?.ToList() ?? [];
         if (list.Count == 0)
             return false;
 
-
-        var cols =
-            BuildColumns(typeof(T));
-
-
-        if (cols.Count == 0)
+        var snapshot = ExcelGridSnapshot.Capture(list, grid);
+        if (snapshot.Columns.Count == 0 || snapshot.Rows.Count == 0)
             return false;
 
-
-        var dlg =
-            new SaveFileDialog
-            {
-                Filter =
-                    "Excel 통합 문서 (*.xlsx)|*.xlsx",
-
-                FileName =
-                    $"{baseFileName}_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx"
-            };
-
-
-        if (dlg.ShowDialog() != true)
+        var safeFileName = string.Concat(baseFileName.Select(character =>
+            System.IO.Path.GetInvalidFileNameChars().Contains(character) ? '_' : character));
+        var dialog = new SaveFileDialog
+        {
+            Filter = "Excel 통합 문서 (*.xlsx)|*.xlsx",
+            FileName = $"{safeFileName}_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx",
+            DefaultExt = ".xlsx",
+            AddExtension = true
+        };
+        if (dialog.ShowDialog() != true)
             return false;
 
-
-        using var wb =
-            new XLWorkbook();
-
-
-        var ws =
-            wb.Worksheets.Add(
-                sheetName);
-
-
-        // =====================================================
-        // Header
-        // =====================================================
-
-        for (var c = 0;
-             c < cols.Count;
-             c++)
-        {
-            ws.Cell(
-                    1,
-                    c + 1)
-                .Value =
-                cols[c].Header;
-        }
-
-
-        ws.Row(1)
-            .Style
-            .Font
-            .Bold =
-            true;
-
-
-        // =====================================================
-        // Data
-        // =====================================================
-
-        for (var r = 0;
-             r < list.Count;
-             r++)
-        {
-            for (var c = 0;
-                 c < cols.Count;
-                 c++)
-            {
-                ws.Cell(
-                        r + 2,
-                        c + 1)
-                    .Value =
-                    CellText(
-                        cols[c],
-                        list[r]);
-            }
-        }
-
-
-        ws.Columns()
-            .AdjustToContents();
-
-
-        wb.SaveAs(
-            dlg.FileName);
-
-
+        using var workbook = ExcelWorkbookFormatter.Create(snapshot, sheetName);
+        workbook.SaveAs(dialog.FileName);
         return true;
     }
+
+    /// <summary>파일 선택창 없이 출력 내용을 생성합니다. 반환한 통합 문서는 호출자가 Dispose합니다.</summary>
+    public XLWorkbook CreateWorkbook<T>(
+        IEnumerable<T> rows,
+        string sheetName = "데이터",
+        DataGrid? grid = null)
+        => ExcelWorkbookFormatter.Create(ExcelGridSnapshot.Capture(rows, grid), sheetName);
 
 
     // =========================================================
@@ -655,96 +581,4 @@ public class ExcelService : IExcelService
     }
 
 
-    // =========================================================
-    // EXPORT Helper
-    // =========================================================
-
-    private static List<Col> BuildColumns(
-        Type t)
-    {
-        var props =
-            t.GetProperties(
-                BindingFlags.Public |
-                BindingFlags.Instance);
-
-
-        var cols =
-            props
-                .Select(
-                    p =>
-                    (
-                        p,
-
-                        a:
-                        p.GetCustomAttribute<
-                            ExcelColumnAttribute>()
-                    ))
-                .Where(
-                    x =>
-                        x.a != null)
-                .OrderBy(
-                    x =>
-                        x.a!.Order)
-                .Select(
-                    x =>
-                        new Col(
-                            x.p,
-                            x.a!.Header,
-                            x.a!.IsDateTime14))
-                .ToList();
-
-
-        if (cols.Count == 0)
-        {
-            cols =
-                props
-                    .Select(
-                        p =>
-                            new Col(
-                                p,
-                                p.Name,
-                                false))
-                    .ToList();
-        }
-
-
-        return cols;
-    }
-
-
-    // =========================================================
-    // EXPORT Cell 변환
-    // =========================================================
-
-    private static string CellText(
-        Col col,
-        object? row)
-    {
-        var value =
-            col.Prop.GetValue(
-                row);
-
-
-        if (value == null)
-            return string.Empty;
-
-
-        if (col.IsDateTime14 &&
-            value is string s &&
-            s.Length == 14 &&
-            DateTime.TryParseExact(
-                s,
-                "yyyyMMddHHmmss",
-                CultureInfo.InvariantCulture,
-                DateTimeStyles.None,
-                out var dt))
-        {
-            return dt.ToString(
-                "yyyy-MM-dd HH:mm:ss");
-        }
-
-
-        return value.ToString()
-               ?? string.Empty;
-    }
 }

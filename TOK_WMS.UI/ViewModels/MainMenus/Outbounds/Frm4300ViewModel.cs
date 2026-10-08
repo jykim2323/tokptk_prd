@@ -10,6 +10,8 @@ using TOK.WMS.UI.Services.ETC;
 using TOK.WMS.UI.Services.Interfaces;
 using TOK.WMS.UI.ViewModels.Base;
 
+using System.Windows.Controls;
+
 namespace TOK.WMS.UI.ViewModels.MainMenus.Outbounds;
 
 public partial class Frm4300ViewModel : DocumentViewModelBase
@@ -191,7 +193,7 @@ public partial class Frm4300ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"조회 실패: {ex.Message}",
                 "오류");
         }
@@ -209,7 +211,7 @@ public partial class Frm4300ViewModel : DocumentViewModelBase
         {
             if (!IsAdmin)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "관리자만 삭제할 수 있습니다.",
                     "확인");
 
@@ -219,7 +221,7 @@ public partial class Frm4300ViewModel : DocumentViewModelBase
 
             if (SelectedItem == null)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "삭제할 데이터를 선택해주세요.",
                     "확인");
 
@@ -267,7 +269,7 @@ public partial class Frm4300ViewModel : DocumentViewModelBase
                         reqDto);
 
 
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 $"삭제 완료: {result:N0}건",
                 "완료");
 
@@ -276,7 +278,7 @@ public partial class Frm4300ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"삭제 실패: {ex.Message}",
                 "오류");
         }
@@ -294,7 +296,7 @@ public partial class Frm4300ViewModel : DocumentViewModelBase
         {
             if (SelectedItem == null)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "출고 완료할 데이터를 선택해주세요.",
                     "확인");
 
@@ -311,7 +313,7 @@ public partial class Frm4300ViewModel : DocumentViewModelBase
             if (string.IsNullOrWhiteSpace(
                 pltNo))
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "PLT-NO가 없습니다.",
                     "오류");
 
@@ -380,7 +382,7 @@ public partial class Frm4300ViewModel : DocumentViewModelBase
 
             if (result == null)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "수동출고 처리 결과가 없습니다.",
                     "오류");
 
@@ -390,7 +392,7 @@ public partial class Frm4300ViewModel : DocumentViewModelBase
 
             if (!result.Success)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     result.Message
                     ?? "수동출고 처리에 실패했습니다.",
                     "오류");
@@ -399,7 +401,7 @@ public partial class Frm4300ViewModel : DocumentViewModelBase
             }
 
 
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 $"{result.Message}\n\n" +
                 $"처리건수 : {result.CompleteCount:N0}건",
                 "완료");
@@ -409,7 +411,7 @@ public partial class Frm4300ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"수동출고 완료 실패: {ex.Message}",
                 "오류");
         }
@@ -421,11 +423,11 @@ public partial class Frm4300ViewModel : DocumentViewModelBase
     // =========================================================
 
     [RelayCommand]
-    private void Excel()
+    private void Excel(DataGrid? grid)
     {
         if (Items.Count == 0)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 "엑셀로 저장할 데이터가 없습니다.",
                 "확인");
 
@@ -445,12 +447,12 @@ public partial class Frm4300ViewModel : DocumentViewModelBase
             _excelService.Export(
                 Items,
                 "미출고현황",
-                "미출고현황");
+                "미출고현황", grid: grid);
 
 
         if (result)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 "엑셀 저장이 완료되었습니다.",
                 "완료");
         }

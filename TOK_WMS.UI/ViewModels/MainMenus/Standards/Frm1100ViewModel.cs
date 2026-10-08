@@ -10,6 +10,8 @@ using TOK.WMS.UI.Services.Interfaces;
 using TOK.WMS.UI.Services.Interfaces.Popup;
 using TOK.WMS.UI.ViewModels.Base;
 
+using System.Windows.Controls;
+
 namespace TOK.WMS.UI.ViewModels.MainMenus.Standards;
 
 public partial class Frm1100ViewModel : DocumentViewModelBase
@@ -150,7 +152,7 @@ public partial class Frm1100ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"조회 실패: {ex.Message}",
                 "오류");
         }
@@ -168,7 +170,7 @@ public partial class Frm1100ViewModel : DocumentViewModelBase
         {
             if (!IsAdmin)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "관리자만 품목을 등록할 수 있습니다.",
                     "확인");
 
@@ -197,7 +199,7 @@ public partial class Frm1100ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"등록 화면 실행 실패: {ex.Message}",
                 "오류");
         }
@@ -215,7 +217,7 @@ public partial class Frm1100ViewModel : DocumentViewModelBase
         {
             if (!IsAdmin)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "관리자만 품목을 수정할 수 있습니다.",
                     "확인");
 
@@ -225,7 +227,7 @@ public partial class Frm1100ViewModel : DocumentViewModelBase
 
             if (SelectedItem == null)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "수정할 품목을 선택해주세요.",
                     "확인");
 
@@ -278,7 +280,7 @@ public partial class Frm1100ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"수정 화면 실행 실패: {ex.Message}",
                 "오류");
         }
@@ -296,7 +298,7 @@ public partial class Frm1100ViewModel : DocumentViewModelBase
         {
             if (!IsAdmin)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "관리자만 품목을 삭제할 수 있습니다.",
                     "확인");
 
@@ -306,7 +308,7 @@ public partial class Frm1100ViewModel : DocumentViewModelBase
 
             if (SelectedItem == null)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "삭제할 품목을 선택해주세요.",
                     "확인");
 
@@ -359,7 +361,7 @@ public partial class Frm1100ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"삭제 화면 실행 실패: {ex.Message}",
                 "오류");
         }
@@ -371,13 +373,13 @@ public partial class Frm1100ViewModel : DocumentViewModelBase
     // =========================================================
 
     [RelayCommand]
-    private void Excel()
+    private void Excel(DataGrid? grid)
     {
         try
         {
             if (Items.Count == 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowInfo(
                     "엑셀로 저장할 데이터가 없습니다.",
                     "확인");
 
@@ -397,19 +399,19 @@ public partial class Frm1100ViewModel : DocumentViewModelBase
                 _excelService.Export(
                     Items,
                     "품목코드관리",
-                    "품목코드관리");
+                    "품목코드관리", grid: grid);
 
 
             if (result)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowInfo(
                     "엑셀 저장이 완료되었습니다.",
                     "완료");
             }
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"엑셀 저장 실패: {ex.Message}",
                 "오류");
         }

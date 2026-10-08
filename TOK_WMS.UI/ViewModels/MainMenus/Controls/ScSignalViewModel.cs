@@ -381,7 +381,7 @@ public partial class ScSignalViewModel : DocumentViewModelBase
         catch (Exception ex)
         {
             StatusMessage = $"수정할 값 확인 실패: {ex.Message}";
-            _dialog.ShowMessage(StatusMessage, "오류");
+            _dialog.ShowWarning(StatusMessage, "오류");
             return;
         }
 
@@ -407,14 +407,14 @@ public partial class ScSignalViewModel : DocumentViewModelBase
             catch (Exception ex)
             {
                 StatusMessage = $"{requestedCrane.ScNo}호기 수정 완료 (재조회 실패: {ex.Message})";
-                _dialog.ShowMessage(StatusMessage, "오류");
+                _dialog.ShowWarning(StatusMessage, "오류");
             }
         }
         catch (Exception ex)
         {
             IsConnected = false;
             StatusMessage = $"수정 실패: {ex.Message}";
-            _dialog.ShowMessage(StatusMessage, "오류");
+            _dialog.ShowWarning(StatusMessage, "오류");
         }
         finally
         {

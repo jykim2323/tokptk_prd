@@ -73,7 +73,7 @@ public partial class TrackingInfoViewModel : ObservableObject
         catch (Exception ex)
         {
             StatusMessage = $"{requestedTrackNo} 구간 조회 실패";
-            _dialog.ShowMessage($"트렉킹 정보 조회 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"트렉킹 정보 조회 실패: {ex.Message}", "오류");
         }
         finally
         {
@@ -119,14 +119,14 @@ public partial class TrackingInfoViewModel : ObservableObject
         }
         catch (ArgumentOutOfRangeException ex)
         {
-            _dialog.ShowMessage(ex.Message, "이동 구간 확인");
+            _dialog.ShowWarning(ex.Message, "이동 구간 확인");
             MoveTargetTrackNo = null;
             return false;
         }
 
         if (string.Equals(sourceTrackNo, targetTrackNo, StringComparison.Ordinal))
         {
-            _dialog.ShowMessage("현재 구간과 다른 이동 대상 구간을 선택해 주세요.", "이동 구간 확인");
+            _dialog.ShowWarning("현재 구간과 다른 이동 대상 구간을 선택해 주세요.", "이동 구간 확인");
             MoveTargetTrackNo = null;
             return false;
         }
@@ -157,7 +157,7 @@ public partial class TrackingInfoViewModel : ObservableObject
         catch (Exception ex)
         {
             StatusMessage = $"{sourceTrackNo} → {targetTrackNo} 구간 이동 실패";
-            _dialog.ShowMessage($"트렉킹 정보 이동 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"트렉킹 정보 이동 실패: {ex.Message}", "오류");
             MoveTargetTrackNo = null;
             return false;
         }
@@ -204,7 +204,7 @@ public partial class TrackingInfoViewModel : ObservableObject
         catch (Exception ex)
         {
             StatusMessage = $"{trackNo} 구간 등록 실패";
-            _dialog.ShowMessage($"트렉킹 정보 등록 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"트렉킹 정보 등록 실패: {ex.Message}", "오류");
         }
         finally
         {
@@ -237,7 +237,7 @@ public partial class TrackingInfoViewModel : ObservableObject
         catch (Exception ex)
         {
             StatusMessage = $"{trackNo} 구간 삭제 실패";
-            _dialog.ShowMessage($"트렉킹 정보 삭제 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"트렉킹 정보 삭제 실패: {ex.Message}", "오류");
         }
         finally
         {
@@ -300,7 +300,7 @@ public partial class TrackingInfoViewModel : ObservableObject
         if (error is null)
             return true;
 
-        _dialog.ShowMessage(error, "입력 확인");
+        _dialog.ShowWarning(error, "입력 확인");
         return false;
     }
 

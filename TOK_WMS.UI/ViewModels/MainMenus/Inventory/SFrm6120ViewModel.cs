@@ -63,7 +63,7 @@ public partial class SFrm6120ViewModel : ObservableObject
         {
             if (string.IsNullOrEmpty(LstkPltno))
             {
-                _dialog.ShowMessage("PLT_NO를입력하세요..'\n' 확인한 후 다시 하십시요!!!", "알림");
+                _dialog.ShowWarning("PLT_NO를입력하세요..'\n' 확인한 후 다시 하십시요!!!", "알림");
                 return;
             }
 
@@ -76,13 +76,13 @@ public partial class SFrm6120ViewModel : ObservableObject
 
             if (result == "0")
             {
-                _dialog.ShowMessage($"{LstkPltno}는 신규 파레트 번호 입니다.. 등록후 수정 하십시요!!!", "알림");
+                _dialog.ShowWarning($"{LstkPltno}는 신규 파레트 번호 입니다.. 등록후 수정 하십시요!!!", "알림");
                 return;
             }
 
             if (result != "")
             {
-                _dialog.ShowMessage($"{LstkPltno}는  이미 랙 재고에 등록되어 있는 PLTNO 입니다..\n 확인 후 다시 하십시오!!!", "알림");
+                _dialog.ShowWarning($"{LstkPltno}는  이미 랙 재고에 등록되어 있는 PLTNO 입니다..\n 확인 후 다시 하십시오!!!", "알림");
                 return;
             }
 
@@ -90,7 +90,7 @@ public partial class SFrm6120ViewModel : ObservableObject
 
             if (!lstkcheck)
             {
-                _dialog.ShowMessage($"{LstkPltno}는  이미 랙 재고에 등록되어 있는 PLTNO 입니다..\n 확인 후 다시 하십시오!!!", "알림");
+                _dialog.ShowWarning($"{LstkPltno}는  이미 랙 재고에 등록되어 있는 PLTNO 입니다..\n 확인 후 다시 하십시오!!!", "알림");
                 return;
             }
 
@@ -99,7 +99,7 @@ public partial class SFrm6120ViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage($"조회 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"조회 실패: {ex.Message}", "오류");
         }
     }
 
@@ -116,7 +116,7 @@ public partial class SFrm6120ViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage($"조회 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"조회 실패: {ex.Message}", "오류");
         }
     }
 
@@ -133,7 +133,7 @@ public partial class SFrm6120ViewModel : ObservableObject
 
             if (string.IsNullOrEmpty(LstkPltno))
             {
-                _dialog.ShowMessage("PLTNO를 입력 하십시오.....", "오류");
+                _dialog.ShowWarning("PLTNO를 입력 하십시오.....", "오류");
                 return;
             };
 
@@ -151,23 +151,23 @@ public partial class SFrm6120ViewModel : ObservableObject
 
                     if (!await _sfrm6120Api.MilstkUpdateAsync(item))
                     {
-                        _dialog.ShowMessage($"{LstkLoca} 재고 마스터 위치 수정 실패", "오류");
+                        _dialog.ShowWarning($"{LstkLoca} 재고 마스터 위치 수정 실패", "오류");
                         return;
                     }
 
                     if (!await _sfrm6120Api.MisubkUpdateAsync(item))
                     {
-                        _dialog.ShowMessage($"{LstkLoca} 재고 상세 위치 수정 실패", "오류");
+                        _dialog.ShowWarning($"{LstkLoca} 재고 상세 위치 수정 실패", "오류");
                         return;
                     }
                 }
             }
 
-            _dialog.ShowMessage($"작업 성공", "확인");
+            _dialog.ShowInfo($"작업 성공", "확인");
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage($"수정 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"수정 실패: {ex.Message}", "오류");
         }
     }
 

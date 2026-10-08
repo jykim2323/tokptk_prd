@@ -9,6 +9,8 @@ using TOK.WMS.UI.Services.ETC;
 using TOK.WMS.UI.Services.Interfaces;
 using TOK.WMS.UI.ViewModels.Base;
 
+using System.Windows.Controls;
+
 namespace TOK.WMS.UI.ViewModels.MainMenus.Controls;
 
 public partial class ScReservationViewModel : DocumentViewModelBase
@@ -47,15 +49,15 @@ public partial class ScReservationViewModel : DocumentViewModelBase
     private Task Search() => SearchAsync();
 
     [RelayCommand]
-    private void ExportExcel()
+    private void ExportExcel(DataGrid? grid)
     {
         if (Items.Count == 0)
         {
-            _dialog.ShowMessage("엑셀로 저장할 예약 데이터가 없습니다.", "안내");
+            _dialog.ShowInfo("엑셀로 저장할 예약 데이터가 없습니다.", "안내");
             return;
         }
 
-        if (_excel.Export(Items, "스태커예약현황", "예약현황"))
+        if (_excel.Export(Items, "스태커예약현황", "예약현황", grid: grid))
             StatusMessage = $"예약 {Items.Count}건을 엑셀로 저장했습니다.";
     }
 
@@ -64,13 +66,13 @@ public partial class ScReservationViewModel : DocumentViewModelBase
     {
         if (!CanDelete)
         {
-            _dialog.ShowMessage("관리자만 예약을 삭제할 수 있습니다.", "권한 확인");
+            _dialog.ShowWarning("관리자만 예약을 삭제할 수 있습니다.", "권한 확인");
             return;
         }
 
         if (SelectedItem is null)
         {
-            _dialog.ShowMessage("삭제할 예약을 선택해 주세요.", "안내");
+            _dialog.ShowWarning("삭제할 예약을 선택해 주세요.", "안내");
             return;
         }
 
@@ -96,7 +98,7 @@ public partial class ScReservationViewModel : DocumentViewModelBase
         catch (Exception ex)
         {
             StatusMessage = $"예약 삭제 실패: {ex.Message}";
-            _dialog.ShowMessage(StatusMessage, "오류");
+            _dialog.ShowWarning(StatusMessage, "오류");
         }
         finally
         {

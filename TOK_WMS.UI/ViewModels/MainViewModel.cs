@@ -44,7 +44,7 @@ public partial class MainViewModel : ObservableObject
     //{
     //    if (Documents.Any()) 
     //    {
-    //        _dialog.ShowMessage("창을 모두 닫은 후 창을 선택해주세요.", "창이 열려있습니다.");
+    //        _dialog.ShowWarning("창을 모두 닫은 후 창을 선택해주세요.", "창이 열려있습니다.");
     //        return;
     //    }
     //    _warehouseContext.SelectedWarehouse = WarehouseType.Raw;
@@ -56,7 +56,7 @@ public partial class MainViewModel : ObservableObject
     //{
     //    if (Documents.Any())
     //    {
-    //        _dialog.ShowMessage("창을 모두 닫은 후 창을 선택해주세요.", "창이 열려있습니다.");
+    //        _dialog.ShowWarning("창을 모두 닫은 후 창을 선택해주세요.", "창이 열려있습니다.");
     //        return;
     //    }
     //    _warehouseContext.SelectedWarehouse = WarehouseType.Product;
@@ -88,10 +88,13 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void OpenDocument(string menuKey)
     {
+        if (string.IsNullOrWhiteSpace(menuKey)) return;
+
         var existing = Documents.FirstOrDefault(d => d.ContentId == menuKey);
         if (existing != null) { ActiveDocument = existing; return; }
 
         var doc = _factory.Create(menuKey);
+        doc.CloseRequested += Document_CloseRequested;
         Documents.Add(doc);
         ActiveDocument = doc;
     }
@@ -99,9 +102,24 @@ public partial class MainViewModel : ObservableObject
     /// <summary>탭이 닫힐 때 호출 — 컬렉션에서 제거 후 정리(구독/타이머 해제)</summary>
     public void CloseDocument(DocumentViewModelBase doc)
     {
-        if (doc == null) return;
+        var index = Documents.IndexOf(doc);
+        if (index < 0) return;
+
+        doc.CloseRequested -= Document_CloseRequested;
         Documents.Remove(doc);
+
+        if (ActiveDocument == doc || ActiveDocument == null || !Documents.Contains(ActiveDocument))
+            ActiveDocument = Documents.Count == 0
+                ? null
+                : Documents[Math.Min(index, Documents.Count - 1)];
+
         doc.Dispose();
+    }
+
+    private void Document_CloseRequested(object? sender, EventArgs e)
+    {
+        if (sender is DocumentViewModelBase doc && doc.CanClose)
+            CloseDocument(doc);
     }
 
     // ── 다크/라이트 테마 토글 ─────────────────────────────────────────

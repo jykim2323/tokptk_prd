@@ -9,6 +9,8 @@ using TOK.WMS.UI.Services.ETC;
 using TOK.WMS.UI.Services.Interfaces;
 using TOK.WMS.UI.ViewModels.Base;
 
+using System.Windows.Controls;
+
 namespace TOK.WMS.UI.ViewModels.MainMenus.Controls;
 
 public partial class TransferCompletionWaitViewModel : DocumentViewModelBase
@@ -46,15 +48,15 @@ public partial class TransferCompletionWaitViewModel : DocumentViewModelBase
     private Task Search() => SearchAsync();
 
     [RelayCommand]
-    private void ExportExcel()
+    private void ExportExcel(DataGrid? grid)
     {
         if (Items.Count == 0)
         {
-            _dialog.ShowMessage("엑셀로 저장할 완료 대기 데이터가 없습니다.", "안내");
+            _dialog.ShowInfo("엑셀로 저장할 완료 대기 데이터가 없습니다.", "안내");
             return;
         }
 
-        if (_excel.Export(Items, "입출고완료대기", "완료대기"))
+        if (_excel.Export(Items, "입출고완료대기", "완료대기", grid: grid))
             StatusMessage = $"완료 대기 {Items.Count}건을 엑셀로 저장했습니다.";
     }
 
@@ -63,13 +65,13 @@ public partial class TransferCompletionWaitViewModel : DocumentViewModelBase
     {
         if (!CanDelete)
         {
-            _dialog.ShowMessage("관리자만 완료 대기 데이터를 삭제할 수 있습니다.", "권한 확인");
+            _dialog.ShowWarning("관리자만 완료 대기 데이터를 삭제할 수 있습니다.", "권한 확인");
             return;
         }
 
         if (SelectedItem is null)
         {
-            _dialog.ShowMessage("삭제할 완료 대기 데이터를 선택해 주세요.", "안내");
+            _dialog.ShowWarning("삭제할 완료 대기 데이터를 선택해 주세요.", "안내");
             return;
         }
 
@@ -95,7 +97,7 @@ public partial class TransferCompletionWaitViewModel : DocumentViewModelBase
         catch (Exception ex)
         {
             StatusMessage = $"완료 대기 삭제 실패: {ex.Message}";
-            _dialog.ShowMessage(StatusMessage, "오류");
+            _dialog.ShowWarning(StatusMessage, "오류");
         }
         finally
         {

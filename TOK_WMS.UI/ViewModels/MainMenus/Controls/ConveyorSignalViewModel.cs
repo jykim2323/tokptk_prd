@@ -501,7 +501,7 @@ public partial class ConveyorSignalViewModel : DocumentViewModelBase
         {
             IsConnected = false;
             StatusMessage = $"수정 실패: {ex.Message}";
-            _dialog.ShowMessage(StatusMessage, "오류");
+            _dialog.ShowWarning(StatusMessage, "오류");
         }
         finally
         {

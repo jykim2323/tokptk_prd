@@ -20,6 +20,13 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
 
     private readonly DispatcherTimer _searchTimer;
     private readonly DispatcherTimer _resumeTimer;
+    private readonly SemaphoreSlim _scanGate = new(1, 1);
+    private int _scanSessionVersion;
+    private int _searchVersion;
+    private bool _isDisposed;
+
+    public event Action? PltFocusRequested;
+    public event Action? BarcodeFocusRequested;
 
 
     // =========================================================
@@ -91,7 +98,7 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
 
         _searchTimer.Tick += async (_, _) =>
         {
-            if (!IsStopped)
+            if (!IsStopped && !_isDisposed)
             {
                 await Search();
             }
@@ -111,6 +118,9 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
         _resumeTimer.Tick += async (_, _) =>
         {
             _resumeTimer.Stop();
+
+            if (_isDisposed)
+                return;
 
             IsStopped = false;
 
@@ -132,9 +142,16 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
     [RelayCommand]
     private async Task Search()
     {
+        var pltNo = PltnoEdit.Trim();
+        var sessionVersion = _scanSessionVersion;
+        var searchVersion = ++_searchVersion;
+
+        if (_isDisposed)
+            return;
+
         try
         {
-            if (string.IsNullOrWhiteSpace(PltnoEdit))
+            if (string.IsNullOrWhiteSpace(pltNo))
             {
                 Items.Clear();
                 return;
@@ -145,9 +162,11 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
                 await _frm3130Api.SearchAsync(
                     new Frm3130Dto.ReqDto
                     {
-                        SubkPltno = PltnoEdit.Trim()
+                        SubkPltno = pltNo
                     });
 
+            if (!IsCurrentScan(sessionVersion) || searchVersion != _searchVersion)
+                return;
 
             Items.Clear();
 
@@ -162,6 +181,9 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
+            if (!IsCurrentScan(sessionVersion) || searchVersion != _searchVersion)
+                return;
+
             StatusMessage =
                 $"조회 실패: {ex.Message}";
         }
@@ -173,17 +195,23 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
     // Delphi BcrData1MedKeyPress
     // =========================================================
 
-    [RelayCommand]
+    [RelayCommand(AllowConcurrentExecutions = true)]
     private async Task PltEnter()
     {
+        var pltNo = PltnoEdit.Trim();
+        PltnoEdit = pltNo;
+        ResetProductDetails();
+        var sessionVersion = _scanSessionVersion;
+
+        await _scanGate.WaitAsync();
         try
         {
-            var pltNo =
-                PltnoEdit?.Trim() ?? string.Empty;
-
+            if (!IsCurrentScan(sessionVersion))
+                return;
 
             if (string.IsNullOrWhiteSpace(pltNo))
             {
+                PltFocusRequested?.Invoke();
                 return;
             }
 
@@ -192,13 +220,16 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
                 await _frm3130Api.PltCheckAsync(
                     pltNo);
 
+            if (!IsCurrentScan(sessionVersion))
+                return;
 
             if (check == null)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "파렛트 상태를 확인할 수 없습니다.",
                     "오류");
 
+                PltFocusRequested?.Invoke();
                 return;
             }
 
@@ -206,7 +237,7 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
             // 이미 위치가 지정된 재고
             if (check.LocatedSubkCount > 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     $"{pltNo}\n" +
                     "해당 파레트 번호는 이미 창고에 있는 번호입니다.\n" +
                     "확인 후 다시 입력하세요!",
@@ -216,6 +247,7 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
                 PltnoEdit =
                     string.Empty;
 
+                PltFocusRequested?.Invoke();
 
                 return;
             }
@@ -224,14 +256,23 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
             StatusMessage =
                 $"PLT-NO [{pltNo}] 입력 완료";
 
+            BarcodeFocusRequested?.Invoke();
 
             await Search();
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            if (!IsCurrentScan(sessionVersion))
+                return;
+
+            _dialog.ShowWarning(
                 $"PLT-NO 확인 실패: {ex.Message}",
                 "오류");
+            PltFocusRequested?.Invoke();
+        }
+        finally
+        {
+            _scanGate.Release();
         }
     }
 
@@ -241,20 +282,23 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
     // Delphi BcrData2MedKeyPress
     // =========================================================
 
-    [RelayCommand]
+    [RelayCommand(AllowConcurrentExecutions = true)]
     private async Task BarcodeEnter()
     {
+        var barcode = ItemBcrEdit.Trim();
+        if (string.IsNullOrWhiteSpace(barcode))
+            return;
+
+        var sessionVersion = _scanSessionVersion;
+        var focusPallet = false;
+        // 다음 스캔을 즉시 받을 수 있도록 입력을 먼저 비우고 순서대로 처리한다.
+        ItemBcrEdit = string.Empty;
+
+        await _scanGate.WaitAsync();
         try
         {
-            var barcode =
-                ItemBcrEdit?.Trim()
-                ?? string.Empty;
-
-
-            if (string.IsNullOrWhiteSpace(barcode))
-            {
+            if (!IsCurrentScan(sessionVersion))
                 return;
-            }
 
 
             // =================================================
@@ -265,7 +309,7 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
                 "END",
                 StringComparison.OrdinalIgnoreCase))
             {
-                End();
+                ResetScanSession();
                 return;
             }
 
@@ -278,7 +322,7 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
                 "CANCEL",
                 StringComparison.OrdinalIgnoreCase))
             {
-                await DeleteAll();
+                await DeleteAllCore(sessionVersion);
                 return;
             }
 
@@ -290,7 +334,8 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
 
             if (string.IsNullOrWhiteSpace(pltNo))
             {
-                _dialog.ShowMessage(
+                focusPallet = true;
+                _dialog.ShowWarning(
                     "파레트 번호(PLT-NO)가 없습니다.",
                     "오류");
 
@@ -306,10 +351,13 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
                 await _frm3130Api.PltCheckAsync(
                     pltNo);
 
+            if (!IsCurrentScan(sessionVersion))
+                return;
 
             if (check == null)
             {
-                _dialog.ShowMessage(
+                focusPallet = true;
+                _dialog.ShowWarning(
                     "파렛트 상태를 확인할 수 없습니다.",
                     "오류");
 
@@ -319,13 +367,11 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
 
             if (check.TrackingCount > 0)
             {
-                _dialog.ShowMessage(
+                focusPallet = true;
+                _dialog.ShowWarning(
                     "현재 트래킹(이동) 구간에 위치한 파레트입니다.\n" +
                     "추가 작업을 진행할 수 없습니다.",
                     "오류");
-
-                ItemBcrEdit =
-                    string.Empty;
 
                 return;
             }
@@ -333,13 +379,11 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
 
             if (check.LstkCount > 0)
             {
-                _dialog.ShowMessage(
+                focusPallet = true;
+                _dialog.ShowWarning(
                     "이미 재고로 확정 등록된 파레트입니다.\n" +
                     "추가 작업을 진행할 수 없습니다.",
                     "오류");
-
-                ItemBcrEdit =
-                    string.Empty;
 
                 return;
             }
@@ -421,16 +465,12 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
             }
             else
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     $"{barcode}\n\n" +
                     "스캔 바코드 형식 오류입니다!\n\n" +
                     "[출하처] 코드|명|수량\n" +
                     "[표준] 코드|명|LOT|수량|BOX|비고",
                     "오류");
-
-
-                ItemBcrEdit =
-                    string.Empty;
 
 
                 return;
@@ -451,7 +491,7 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
                 qtyText,
                 out var qty))
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "중량 값이 올바르지 않습니다.",
                     "오류");
 
@@ -461,7 +501,7 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
 
             if (qty <= 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "중량은 0보다 커야 합니다.",
                     "오류");
 
@@ -500,11 +540,13 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
                             _currentUser?.User?.UserId ?? string.Empty
                     });
 
+            if (!IsCurrentScan(sessionVersion))
+                return;
 
             if (result == null ||
                 !result.Success)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     result?.Message
                     ?? "등록 실패",
                     "오류");
@@ -513,17 +555,27 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
             }
 
 
-            ItemBcrEdit =
-                string.Empty;
-
-
             await Search();
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            if (!IsCurrentScan(sessionVersion))
+                return;
+
+            _dialog.ShowWarning(
                 $"바코드 처리 실패: {ex.Message}",
                 "오류");
+        }
+        finally
+        {
+            _scanGate.Release();
+            if (IsCurrentScan(sessionVersion))
+            {
+                if (focusPallet || string.IsNullOrWhiteSpace(PltnoEdit))
+                    PltFocusRequested?.Invoke();
+                else
+                    BarcodeFocusRequested?.Invoke();
+            }
         }
     }
 
@@ -534,6 +586,7 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
 
     private async Task EmptyInsert()
     {
+        var sessionVersion = _scanSessionVersion;
         try
         {
             var pltNo =
@@ -543,7 +596,7 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
 
             if (string.IsNullOrWhiteSpace(pltNo))
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "PLT-NO가 없습니다.",
                     "오류");
 
@@ -558,11 +611,13 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
                     // 실제 로그인 사용자 ID 연결
                     string.Empty);
 
+            if (!IsCurrentScan(sessionVersion))
+                return;
 
             if (result == null ||
                 !result.Success)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     result?.Message
                     ?? "EMPTY 등록 실패",
                     "오류");
@@ -590,15 +645,14 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
             BigoEdit =
                 string.Empty;
 
-            ItemBcrEdit =
-                string.Empty;
-
-
             await Search();
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            if (!IsCurrentScan(sessionVersion))
+                return;
+
+            _dialog.ShowWarning(
                 $"EMPTY 등록 실패: {ex.Message}",
                 "오류");
         }
@@ -671,11 +725,27 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
     private async Task Delete(
         Frm3130Dto.ResDto item)
     {
+        var sessionVersion = _scanSessionVersion;
+        await _scanGate.WaitAsync();
+        try
+        {
+            if (IsCurrentScan(sessionVersion))
+                await DeleteCore(item, sessionVersion);
+        }
+        finally
+        {
+            _scanGate.Release();
+        }
+    }
+
+    private async Task DeleteCore(Frm3130Dto.ResDto item, int sessionVersion)
+    {
+        var pausedForDelete = false;
         try
         {
             if (item == null)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "삭제할 행을 먼저 선택해주세요.",
                     "오류");
 
@@ -685,6 +755,7 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
 
             // 삭제 처리 중 자동조회 멈춤
             IsStopped = true;
+            pausedForDelete = true;
 
             _searchTimer.Stop();
             _resumeTimer.Stop();
@@ -699,12 +770,14 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
                 await _frm3130Api.PltCheckAsync(
                     pltNo);
 
+            if (!IsCurrentScan(sessionVersion))
+                return;
 
             if (!CanDelete(
                 check,
                 out var message))
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     message,
                     "오류");
 
@@ -740,10 +813,12 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
                             item.SubkLotno
                     });
 
+            if (!IsCurrentScan(sessionVersion))
+                return;
 
             if (count <= 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "삭제된 데이터가 없습니다.",
                     "오류");
 
@@ -761,11 +836,19 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
+            if (!IsCurrentScan(sessionVersion))
+                return;
+
             ResumeAutoSearch();
 
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"삭제 실패: {ex.Message}",
                 "오류");
+        }
+        finally
+        {
+            if (pausedForDelete)
+                ResumeAutoSearch();
         }
     }
 
@@ -778,6 +861,22 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
     [RelayCommand]
     private async Task DeleteAll()
     {
+        var sessionVersion = _scanSessionVersion;
+        await _scanGate.WaitAsync();
+        try
+        {
+            if (IsCurrentScan(sessionVersion))
+                await DeleteAllCore(sessionVersion);
+        }
+        finally
+        {
+            _scanGate.Release();
+        }
+    }
+
+    private async Task DeleteAllCore(int sessionVersion)
+    {
+        var pausedForDelete = false;
         try
         {
             var pltNo =
@@ -787,7 +886,7 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
 
             if (string.IsNullOrWhiteSpace(pltNo))
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "삭제할 파레트 번호가 입력되지 않았습니다.",
                     "오류");
 
@@ -796,6 +895,7 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
 
 
             IsStopped = true;
+            pausedForDelete = true;
 
             _searchTimer.Stop();
             _resumeTimer.Stop();
@@ -805,12 +905,14 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
                 await _frm3130Api.PltCheckAsync(
                     pltNo);
 
+            if (!IsCurrentScan(sessionVersion))
+                return;
 
             if (!CanDelete(
                 check,
                 out var message))
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     message,
                     "오류");
 
@@ -835,10 +937,12 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
                 await _frm3130Api.DeleteAllAsync(
                     pltNo);
 
+            if (!IsCurrentScan(sessionVersion))
+                return;
 
             if (count <= 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "삭제된 데이터가 없습니다.",
                     "오류");
 
@@ -848,17 +952,25 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
             }
 
 
-            End();
+            ResetScanSession();
 
             ResumeAutoSearch();
         }
         catch (Exception ex)
         {
+            if (!IsCurrentScan(sessionVersion))
+                return;
+
             ResumeAutoSearch();
 
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"전체삭제 실패: {ex.Message}",
                 "오류");
+        }
+        finally
+        {
+            if (pausedForDelete)
+                ResumeAutoSearch();
         }
     }
 
@@ -946,6 +1058,13 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
     partial void OnIsStoppedChanged(
         bool value)
     {
+        if (_isDisposed)
+        {
+            _searchTimer.Stop();
+            _resumeTimer.Stop();
+            return;
+        }
+
         if (value)
         {
             _searchTimer.Stop();
@@ -964,6 +1083,9 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
 
     private void ResumeAutoSearch()
     {
+        if (_isDisposed)
+            return;
+
         _resumeTimer.Stop();
 
         IsStopped =
@@ -978,9 +1100,9 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
     // =========================================================
 
     [RelayCommand]
-    private void Complete()
+    private async Task Complete()
     {
-        End();
+        await End();
     }
 
 
@@ -989,8 +1111,23 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
     // Delphi EndBitBtnClick
     // =========================================================
 
-    [RelayCommand]
-    private void End()
+    [RelayCommand(AllowConcurrentExecutions = true)]
+    private async Task End()
+    {
+        var sessionVersion = _scanSessionVersion;
+        await _scanGate.WaitAsync();
+        try
+        {
+            if (IsCurrentScan(sessionVersion))
+                ResetScanSession();
+        }
+        finally
+        {
+            _scanGate.Release();
+        }
+    }
+
+    private void ResetScanSession()
     {
         ItemBcrEdit =
             string.Empty;
@@ -999,16 +1136,39 @@ public partial class Frm3130ViewModel : DocumentViewModelBase
             string.Empty;
 
 
-        SelectedItem =
-            null;
-
-        Items.Clear();
-
-        ClearDetail();
+        ResetProductDetails();
 
 
         StatusMessage =
             string.Empty;
+
+        PltFocusRequested?.Invoke();
+    }
+
+    partial void OnPltnoEditChanged(string value)
+    {
+        ResetProductDetails();
+    }
+
+    private void ResetProductDetails()
+    {
+        ++_scanSessionVersion;
+        ItemBcrEdit = string.Empty;
+        SelectedItem = null;
+        Items.Clear();
+        ClearDetail();
+    }
+
+    private bool IsCurrentScan(int sessionVersion) =>
+        !_isDisposed && sessionVersion == _scanSessionVersion;
+
+    public override void Dispose()
+    {
+        _isDisposed = true;
+        ++_scanSessionVersion;
+        _searchTimer.Stop();
+        _resumeTimer.Stop();
+        base.Dispose();
     }
 
 

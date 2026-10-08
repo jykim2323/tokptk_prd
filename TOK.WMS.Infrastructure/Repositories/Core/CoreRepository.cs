@@ -14,13 +14,11 @@ public class CoreRepository(DbConnectionFactory db) : ICoreRepository
     {
         using var conn = db.Create();
 
-        var trak_sql = @"SELECT COUNT(*)
-                    FROM T2TBTRAK WITH (NOLOCK)
-                    WHERE TRAK_PLTNO = @sPltno";
+        const string trak_sql = PalletTrackingSql.CountByPallet;
 
         var trak_cnt = await conn.QuerySingleAsync<int>(trak_sql, new
         {
-            sPltno = sPltno ?? string.Empty
+            PltNo = sPltno ?? string.Empty
         });
 
         if (trak_cnt > 0)

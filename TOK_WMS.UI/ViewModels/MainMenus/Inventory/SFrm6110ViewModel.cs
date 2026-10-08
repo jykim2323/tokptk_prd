@@ -51,7 +51,7 @@ public partial class SFrm6110ViewModel : ObservableObject
         {
             if(LstkIndate.Length != 8)
             {
-                _dialog.ShowMessage($"입고 일자는 8자리여야 합니다.", "오류");
+                _dialog.ShowWarning($"입고 일자는 8자리여야 합니다.", "오류");
                 return;
             }
 
@@ -73,15 +73,15 @@ public partial class SFrm6110ViewModel : ObservableObject
 
             if (!result)
             {
-                _dialog.ShowMessage($"{LstkLoca} 위치 수정 실패", "오류");
+                _dialog.ShowWarning($"{LstkLoca} 위치 수정 실패", "오류");
                 return;
             }
 
-            _dialog.ShowMessage($"작업 성공", "확인");
+            _dialog.ShowInfo($"작업 성공", "확인");
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage($"수정 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"수정 실패: {ex.Message}", "오류");
         }
     }
 

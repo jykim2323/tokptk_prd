@@ -71,13 +71,11 @@ public class Frm3130Repository(DbConnectionFactory db) : IFrm3130Repository
     {
         using var conn = db.Create();
 
-        const string sql = @"
+        const string sql = $@"
             SELECT
 
                 (
-                    SELECT COUNT(*)
-                    FROM T2TBTRAK WITH (NOLOCK)
-                    WHERE TRAK_PLTNO = @PltNo
+                    {PalletTrackingSql.CountByPallet}
                 ) AS TrackingCount,
 
                 (

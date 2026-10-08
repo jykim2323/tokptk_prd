@@ -253,7 +253,7 @@ public partial class SFrm1100ViewModel
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"구분 데이터 조회 실패: {ex.Message}",
                 "오류");
         }
@@ -365,7 +365,7 @@ public partial class SFrm1100ViewModel
             if (string.IsNullOrWhiteSpace(
                 MastCode))
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "품목코드를 입력 하십시오.",
                     "오류");
 
@@ -377,7 +377,7 @@ public partial class SFrm1100ViewModel
                 string.IsNullOrWhiteSpace(
                     MastName))
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "품목명을 입력 하십시오.",
                     "오류");
 
@@ -398,7 +398,7 @@ public partial class SFrm1100ViewModel
                 weightText,
                 out var weight))
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "단위중량을 숫자로 입력해주세요.",
                     "오류");
 
@@ -420,7 +420,7 @@ public partial class SFrm1100ViewModel
 
                 if (result <= 0)
                 {
-                    _dialog.ShowMessage(
+                    _dialog.ShowWarning(
                         $"품목 코드 {MastCode} 등록 실패",
                         "오류");
 
@@ -443,7 +443,7 @@ public partial class SFrm1100ViewModel
 
                 if (result <= 0)
                 {
-                    _dialog.ShowMessage(
+                    _dialog.ShowWarning(
                         $"품목 코드 {MastCode} 수정 실패",
                         "오류");
 
@@ -469,7 +469,7 @@ public partial class SFrm1100ViewModel
 
                 if (result <= 0)
                 {
-                    _dialog.ShowMessage(
+                    _dialog.ShowWarning(
                         $"품목 코드 {MastCode} 삭제 실패",
                         "오류");
 
@@ -483,7 +483,7 @@ public partial class SFrm1100ViewModel
 
             else
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "잘못된 작업 모드입니다.",
                     "오류");
 
@@ -491,7 +491,7 @@ public partial class SFrm1100ViewModel
             }
 
 
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 StatusMessage,
                 "완료");
 
@@ -500,7 +500,7 @@ public partial class SFrm1100ViewModel
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"{Title} 실패: {ex.Message}",
                 "오류");
         }

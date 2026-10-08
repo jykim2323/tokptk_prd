@@ -46,6 +46,7 @@ public class Frm6550Dto
 
         public decimal StokSqty { get; set; }
         public decimal StokWqty { get; set; }
+        public decimal StokMqty { get; set; }
         public decimal StokFqty { get; set; }
         public decimal StokTqty { get; set; }
 

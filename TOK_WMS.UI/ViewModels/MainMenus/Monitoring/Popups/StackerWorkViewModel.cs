@@ -74,7 +74,7 @@ public partial class StackerWorkViewModel : ObservableObject
             {
                 ClearCurrent(craneNo);
                 StatusMessage = $"{craneNo}호기 상태 정보가 없습니다.";
-                _dialog.ShowMessage(StatusMessage, "조회 결과");
+                _dialog.ShowInfo(StatusMessage, "조회 결과");
                 return;
             }
 
@@ -84,7 +84,7 @@ public partial class StackerWorkViewModel : ObservableObject
         catch (Exception ex)
         {
             StatusMessage = $"{craneNo}호기 조회 실패";
-            _dialog.ShowMessage($"스태커 크레인 상태 조회에 실패했습니다.\n{ex.Message}", "오류");
+            _dialog.ShowWarning($"스태커 크레인 상태 조회에 실패했습니다.\n{ex.Message}", "오류");
         }
         finally
         {
@@ -102,29 +102,16 @@ public partial class StackerWorkViewModel : ObservableObject
             "S/C Fork에 제품이 있습니까?\n\n" +
             "[예] 제품 있음    [아니요] 제품 없음    [취소] 작업 취소";
 
-        var result = owner is null
-            ? MessageBox.Show(
-                message,
-                "재지시 확인",
-                MessageBoxButton.YesNoCancel,
-                MessageBoxImage.Question,
-                MessageBoxResult.Cancel)
-            : MessageBox.Show(
-                owner,
-                message,
-                "재지시 확인",
-                MessageBoxButton.YesNoCancel,
-                MessageBoxImage.Question,
-                MessageBoxResult.Cancel);
+        var result = _dialog.ShowConfirmWithCancel(message, "재지시 확인");
 
-        if (result == MessageBoxResult.Cancel)
+        if (result is null)
             return;
 
         await RunActionAsync(
             "재지시",
             () => _api.ReissueStackerAsync(
                 SelectedCraneNo,
-                result == MessageBoxResult.Yes));
+                result.Value));
     }
 
     [RelayCommand]
@@ -199,7 +186,7 @@ public partial class StackerWorkViewModel : ObservableObject
         catch (Exception ex)
         {
             StatusMessage = $"{craneNo}호기 {actionName} 처리 실패";
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"{actionName} 처리에 실패했습니다.\n{ex.Message}",
                 "오류");
         }

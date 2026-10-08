@@ -1,188 +1,199 @@
-﻿<Window x:Class="TOK.WMS.UI.Views.MainMenus.Inventory.LocaAddView"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:behaviors="clr-namespace:TOK.WMS.UI.Behaviors"
-        mc:Ignorable="d"
-        Background="{DynamicResource AppBackgroundBrush}"
-        Foreground="{DynamicResource AppTextBrush}"
-        FontFamily="{StaticResource AppFont}"
-        FontWeight="Medium"
-        WindowStyle="None"
-        Height="730" Width="700">
-
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:behaviors="clr-namespace:TOK.WMS.UI.Behaviors" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="TOK.WMS.UI.Views.MainMenus.Inventory.LocaAddView" Background="{DynamicResource AppBackgroundBrush}" Foreground="{DynamicResource AppTextBrush}" FontFamily="{StaticResource AppFont}" FontWeight="Medium" WindowStyle="None" Height="730" Width="700" FontSize="14">
     <Window.Resources>
-        <Style x:Key="FilterLabel" TargetType="TextBlock">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Margin" Value="0,0,6,0"/>
-            <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}"/>
-        </Style>
-        <Style x:Key="FilterBox" TargetType="TextBox">
-            <Setter Property="Width" Value="120"/>
-            <Setter Property="Padding" Value="5,4"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Background" Value="{DynamicResource InputBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
-            <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}"/>
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="BorderThickness" Value="1"/>
-        </Style>
-        <Style x:Key="DetailLabelCell" TargetType="Border">
-            <Setter Property="Background" Value="#F2F6FA"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
-            <Setter Property="BorderThickness" Value="0,0,1,1"/>
-            <Setter Property="Padding" Value="12,0"/>
-        </Style>
-
-        <Style x:Key="Header" TargetType="Border">
-            <Setter Property="Background" Value="{DynamicResource HeaderBrush}"/>
-            <Setter Property="TextElement.Foreground" Value="{DynamicResource AppTextOnPrimBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}"/>
-            <Setter Property="BorderThickness" Value="2,2,2,2"/>
-        </Style>
-
-        <Style x:Key="DetailInputBox" TargetType="TextBox">
-            <Setter Property="Height" Value="34"/>
-            <Setter Property="Margin" Value="8,3,0,5"/>
-            <Setter Property="Padding" Value="10,4"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Background" Value="{DynamicResource InputBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontSize" Value="14"/>
-
-            <Style.Triggers>
-                <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                    <Setter Property="BorderBrush"
-             Value="{DynamicResource BtnPrimaryBrush}"/>
-                    <Setter Property="BorderThickness" Value="2"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/TOK.WMS.UI;component/Styles/ManagementScreenStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Style x:Key="FilterLabel" TargetType="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="Margin" Value="0,0,8,0" />
+                <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}" />
+            </Style>
+            <Style x:Key="DetailInputBox" TargetType="TextBox" BasedOn="{StaticResource ScreenFilterInputStyle}">
+                <Style.Triggers>
+                    <Trigger Property="IsReadOnly" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource AppSurface2Brush}" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="FilterBox" TargetType="TextBox" BasedOn="{StaticResource ScreenFilterInputStyle}">
+                <Style.Triggers>
+                    <Trigger Property="IsReadOnly" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource AppSurface2Brush}" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="Header" TargetType="Border" BasedOn="{StaticResource ScreenSectionTitleStyle}" />
+            <Style x:Key="DetailLabelCell" TargetType="Border">
+                <Setter Property="Background" Value="{DynamicResource AppSurface2Brush}" />
+                <Setter Property="Padding" Value="12,0" />
+                <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}" />
+                <Setter Property="BorderThickness" Value="0,0,0,1" />
+            </Style>
+        </ResourceDictionary>
     </Window.Resources>
-    <DockPanel Margin="12">
-        <!-- 헤더 -->
-        <Grid DockPanel.Dock="Top" Margin="0,0,10,0" >
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
-                <TextBlock Text="📦" FontSize="18" Margin="0,5,3,5" VerticalAlignment="Center"/>
-                <TextBlock Text="재고 추가 등록" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource AppTextBrush}" VerticalAlignment="Center"/>
-                <TextBlock Text="- LocaAdd" FontSize="12" FontWeight="Bold" Margin="10,0,0,0" Foreground="{DynamicResource AppTextBrush}" VerticalAlignment="Center"/>
-                <Button Content="❌  종료" Width="85" Margin="430,0,0,0"  FontWeight="Bold" Cursor="Hand" BorderThickness="0"
-                                Background="{DynamicResource BtnStadardBrush}" Foreground="{DynamicResource BtnPrimaryTextBrush}"
-                                Command="{Binding CloseCommand}"  CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid Margin="0,0,0,16" behaviors:ResponsiveHeader.Toolbar="{Binding ElementName=ToolbarPanel}" behaviors:ResponsiveHeader.StackBelowWidth="800">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Border Style="{StaticResource ScreenTitleIconSurfaceStyle}">
+                    <Path Data="{StaticResource ScreenPackageIconGeometry}" Style="{StaticResource ScreenToolbarIconStyle}" Stroke="{DynamicResource AppTextBrush}" />
+                </Border>
+                <TextBlock Text="재고 추가 등록" Style="{StaticResource ScreenTitleTextStyle}" />
+                <TextBlock Text="LocaAdd" Style="{StaticResource ScreenSubtitleTextStyle}" Margin="12,0,0,0" />
             </StackPanel>
-
-            <TextBlock Text="{Binding StatusMessage}" HorizontalAlignment="Right" VerticalAlignment="Center"
-             FontSize="18" FontWeight="Bold" Foreground="{DynamicResource AppTextSubBrush}"/>
+            <WrapPanel VerticalAlignment="Center" x:Name="ToolbarPanel" Grid.Column="1" HorizontalAlignment="Right" ItemHeight="50">
+                <Button Margin="8,0,0,0" Command="{Binding CloseCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource ScreenSecondaryButtonStyle}">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Path Data="{StaticResource ScreenPowerIconGeometry}" Style="{StaticResource ScreenToolbarIconStyle}" />
+                        <TextBlock Text="종료" Margin="8,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+            </WrapPanel>
         </Grid>
-
-        <Border DockPanel.Dock="Top" BorderThickness="1" BorderBrush="#58A6FF" CornerRadius="2" Padding="12,10" Margin="0,10,0,8">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-
-
-                <Grid Grid.Row="0">
-                    <StackPanel Orientation="Horizontal" Margin="10">
-                        <TextBlock Text="저장 위치:" FontSize="15" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>
-                        <TextBox Width="200" IsReadOnly="True" Background="LightYellow" behaviors:LocaMask.Value="{Binding SubkLoca, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}" />
-                    </StackPanel>
-                </Grid>
-                <Grid Grid.Row="1">
-                    <StackPanel Orientation="Horizontal" Margin="10">
-                        <TextBlock Text=" 상 태:" FontSize="15" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>
-                        <ComboBox Width="200"
-                                    Height="34"
-                                    Margin="33,0,0,0"
-                                    SelectedValue="{Binding SubkFlag, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                    SelectedValuePath="Tag"
-                                    FontSize="16"
-                                    VerticalContentAlignment="Center">
-                            <ComboBoxItem Content="0 - 비어 있음" Tag="0"/>
-                            <ComboBoxItem Content="1 - 제품 있음" Tag="1"/>
-                            <ComboBoxItem Content="X - 입고 예약" Tag="X"/>
-                            <ComboBoxItem Content="Y - 출고 예약" Tag="Y"/>
-                            <ComboBoxItem Content="W - 이중 입고" Tag="W"/>
-                            <ComboBoxItem Content="E - 공출고" Tag="E"/>
-                            <ComboBoxItem Content="N - 사용 금지" Tag="N"/>
+        <WrapPanel VerticalAlignment="Center" Grid.Row="2" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button Margin="8,0,0,0" Command="{Binding ConfirmedCommand}" Style="{StaticResource ScreenPrimaryButtonStyle}">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Path Data="{StaticResource ScreenConfirmIconGeometry}" Style="{StaticResource ScreenToolbarIconStyle}" />
+                    <TextBlock Text="확정" Margin="8,0,0,0" VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
+        </WrapPanel>
+        <Border Style="{StaticResource ScreenCardStyle}" Grid.Row="1">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="저장 위치:" Style="{StaticResource FilterLabel}" />
+                        <TextBox IsReadOnly="True" behaviors:LocaMask.Value="{Binding SubkLoca, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}" Margin="0" FontSize="14" Height="36" Grid.Column="1" />
+                    </Grid>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text=" 상 태:" Style="{StaticResource FilterLabel}" />
+                        <ComboBox Height="36" Margin="0" SelectedValue="{Binding SubkFlag, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Tag" FontSize="14" Style="{StaticResource ScreenFilterComboBoxStyle}" Grid.Column="1">
+                            <ComboBoxItem Content="0 - 비어 있음" Tag="0" />
+                            <ComboBoxItem Content="1 - 제품 있음" Tag="1" />
+                            <ComboBoxItem Content="X - 입고 예약" Tag="X" />
+                            <ComboBoxItem Content="Y - 출고 예약" Tag="Y" />
+                            <ComboBoxItem Content="W - 이중 입고" Tag="W" />
+                            <ComboBoxItem Content="E - 공출고" Tag="E" />
+                            <ComboBoxItem Content="N - 사용 금지" Tag="N" />
                         </ComboBox>
-                    </StackPanel>
-                </Grid>
-                <Grid Grid.Row="2">
-                    <StackPanel Orientation="Horizontal" Margin="10">
-                        <TextBlock Text="PLT-NO:" FontSize="15" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>
-                        <TextBox Width="200" Margin="14,0,0,0" IsReadOnly="True" CharacterCasing="Upper" Background="LightGray" Text="{Binding SubkPltno, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}"/>
-                    </StackPanel>
-                </Grid>
-                <Grid Grid.Row="3">
-                    <StackPanel Orientation="Horizontal" Margin="10">
-                        <TextBlock Text="품번코드:" FontSize="15" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>
-                        <TextBox Width="400" Margin="14,0,0,0" Text="{Binding SubkCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}"/>
-                    </StackPanel>
-                </Grid>
-                <Grid Grid.Row="4">
-                    <StackPanel Orientation="Horizontal" Margin="10">
-                        <TextBlock Text="품 번 명:" FontSize="15" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>
-                        <TextBox Width="400" Margin="20,0,0,0" Background="LightYellow" Text="{Binding MastName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}"/>
-                    </StackPanel>
-                </Grid>
-                <Grid Grid.Row="5">
-                    <StackPanel Orientation="Horizontal" Margin="10">
-                        <TextBlock Text="LOT-NO:" FontSize="15" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>
-                        <TextBox Width="400" Margin="13,0,0,0" Text="{Binding SubkLotno, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}"/>
-                    </StackPanel>
-                </Grid>
-                <Grid Grid.Row="6">
-                    <StackPanel Orientation="Horizontal" Margin="10">
-                        <TextBlock Text="재고수량:" FontSize="15" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>
-                        <TextBox Width="400" Margin="13,0,0,0" Text="{Binding SubkWgt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}"/>
-                    </StackPanel>
-                </Grid>
-                <Grid Grid.Row="7">
-                    <StackPanel Orientation="Horizontal" Margin="10">
-                        <TextBlock Text="예약수량:" FontSize="15" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>
-                        <TextBox Width="400" Margin="13,0,0,0" Background="LightYellow" IsReadOnly="True" Text="{Binding SubkRwgt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}"/>
-                    </StackPanel>
-                </Grid>
-                <Grid Grid.Row="8">
-                    <StackPanel Orientation="Horizontal" Margin="10">
-                        <TextBlock Text="BoxNo:" FontSize="15" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>
-                        <TextBox Width="400" Margin="20,0,0,0" Text="{Binding SubkBoxno, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}"/>
-                    </StackPanel>
-                </Grid>
-                <Grid Grid.Row="9">
-                    <StackPanel Orientation="Horizontal" Margin="10">
-                        <TextBlock Text="비 고:" FontSize="15" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>
-                        <TextBox Width="400" Margin="40,0,0,0" Text="{Binding SubkRemark, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}"/>
-                    </StackPanel>
-                </Grid>
-                <Grid Grid.Row="10">
-                    <StackPanel Orientation="Horizontal" Margin="10">
-                        <TextBlock Text="입고일자:" FontSize="15" Margin="0,0,13,0" Style="{StaticResource FilterLabel}"/>
-                        <DatePicker Width="200"
-                                    Margin="13,0,0,0"
-                                    FontSize="20"
-                                    SelectedDate="{Binding SelectedInDate, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
-                                    SelectedDateFormat="Short"/>
-                        <TextBox Width="160" Margin="13,0,0,0" Text="{Binding SubkIndate, Converter={StaticResource DateTimeFormatConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}"/>
-                        <Button Content="💾  확정" Width="85" Margin="80,0,0,0" Command="{Binding ConfirmedCommand}" FontWeight="Bold" Cursor="Hand" BorderThickness="0"
-                        Background="{DynamicResource BtnPrimaryBrush}" Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
-                    </StackPanel>
-                </Grid>
-            </Grid>
+                    </Grid>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="PLT-NO:" Style="{StaticResource FilterLabel}" />
+                        <TextBox Margin="0" IsReadOnly="True" CharacterCasing="Upper" Text="{Binding SubkPltno, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}" FontSize="14" Height="36" Grid.Column="1" />
+                    </Grid>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="품번코드:" Style="{StaticResource FilterLabel}" />
+                        <TextBox Margin="0" Text="{Binding SubkCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}" FontSize="14" Height="36" Grid.Column="1" />
+                    </Grid>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="품 번 명:" Style="{StaticResource FilterLabel}" />
+                        <TextBox Margin="0" Text="{Binding MastName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}" FontSize="14" Height="36" Grid.Column="1" />
+                    </Grid>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="LOT-NO:" Style="{StaticResource FilterLabel}" />
+                        <TextBox Margin="0" Text="{Binding SubkLotno, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}" FontSize="14" Height="36" Grid.Column="1" />
+                    </Grid>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="재고수량:" Style="{StaticResource FilterLabel}" />
+                        <TextBox Margin="0" Text="{Binding SubkWgt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}" FontSize="14" Height="36" Grid.Column="1" />
+                    </Grid>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="예약수량:" Style="{StaticResource FilterLabel}" />
+                        <TextBox Margin="0" IsReadOnly="True" Text="{Binding SubkRwgt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}" FontSize="14" Height="36" Grid.Column="1" />
+                    </Grid>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="BoxNo:" Style="{StaticResource FilterLabel}" />
+                        <TextBox Margin="0" Text="{Binding SubkBoxno, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}" FontSize="14" Height="36" Grid.Column="1" />
+                    </Grid>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="비 고:" Style="{StaticResource FilterLabel}" />
+                        <TextBox Margin="0" Text="{Binding SubkRemark, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}" FontSize="14" Height="36" Grid.Column="1" />
+                    </Grid>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="입고일자:" Style="{StaticResource FilterLabel}" />
+                        <DatePicker Margin="0" FontSize="14" SelectedDate="{Binding SelectedInDate, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" SelectedDateFormat="Short" Style="{StaticResource ScreenFilterDatePickerStyle}" Height="36" VerticalContentAlignment="Center" Grid.Column="1" />
+                    </Grid>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="입고일시:" Style="{StaticResource FilterLabel}" />
+                        <TextBox Margin="0" Text="{Binding SubkIndate, Converter={StaticResource DateTimeFormatConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DetailInputBox}" FontSize="14" Height="36" Grid.Column="1" />
+                    </Grid>
+                </StackPanel>
+            </ScrollViewer>
         </Border>
-    </DockPanel>
+    </Grid>
 </Window>

@@ -69,21 +69,21 @@ public partial class Frm6900ViewModel : DocumentViewModelBase
 
         if (!await _frm6900Api.TrackingAsync(SelectedItem?.SubkPltno ?? string.Empty))
         {
-            _dialog.ShowMessage($"{SelectedItem?.SubkPltno} 해당 PLT-NO는 현재 입/출고 작업이 진행 중입니다.", "오류");
+            _dialog.ShowWarning($"{SelectedItem?.SubkPltno} 해당 PLT-NO는 현재 입/출고 작업이 진행 중입니다.", "오류");
             SelectedItem?.IsClicked = false;
             return;
         }
 
         if (!await _frm6900Api.LstkCheckAsync(SelectedItem?.SubkPltno ?? string.Empty))
         {
-            _dialog.ShowMessage($"{SelectedItem?.SubkPltno}  이미 랙 재고로 등록된 파레트입니다.", "오류");
+            _dialog.ShowWarning($"{SelectedItem?.SubkPltno}  이미 랙 재고로 등록된 파레트입니다.", "오류");
             SelectedItem?.IsClicked = false;
             return;
         }
 
         if (await _frm6900Api.SubkLocaCheckAsync(SelectedItem?.SubkPltno ?? string.Empty))
         {
-            _dialog.ShowMessage($"{SelectedItem?.SubkPltno}  위치  {SelectedItem?.SubkLoca} 가 지정된 파레트는 선택할 수 없습니다.", "오류");
+            _dialog.ShowWarning($"{SelectedItem?.SubkPltno}  위치  {SelectedItem?.SubkLoca} 가 지정된 파레트는 선택할 수 없습니다.", "오류");
             SelectedItem?.IsClicked = false;
             return;
         }
@@ -113,7 +113,7 @@ public partial class Frm6900ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage($"조회 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"조회 실패: {ex.Message}", "오류");
         }
     }
 
@@ -137,7 +137,7 @@ public partial class Frm6900ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage($"조회 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"조회 실패: {ex.Message}", "오류");
         }
     }
 
@@ -167,7 +167,7 @@ public partial class Frm6900ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage($"조회 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"조회 실패: {ex.Message}", "오류");
         }
     }
 
@@ -182,7 +182,7 @@ public partial class Frm6900ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage($"화면 생성 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"화면 생성 실패: {ex.Message}", "오류");
         }
     }
 
@@ -197,7 +197,7 @@ public partial class Frm6900ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage($"화면 생성 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"화면 생성 실패: {ex.Message}", "오류");
         }
     }
 
@@ -217,7 +217,7 @@ public partial class Frm6900ViewModel : DocumentViewModelBase
             }
             else
             {
-                _dialog.ShowMessage($"파렛트를 2개 선택해주세요.", "오류");
+                _dialog.ShowWarning($"파렛트를 2개 선택해주세요.", "오류");
                 return;
             }
 
@@ -226,7 +226,7 @@ public partial class Frm6900ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage($"화면 생성 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"화면 생성 실패: {ex.Message}", "오류");
         }
     }
 
@@ -237,7 +237,7 @@ public partial class Frm6900ViewModel : DocumentViewModelBase
         {
             if(string.IsNullOrEmpty(SelectedItem?.SubkPltno))
             {
-                _dialog.ShowMessage($" 등록할 파렛트 번호(PLT-NO)를 입력해주세요 !", "오류");
+                _dialog.ShowWarning($" 등록할 파렛트 번호(PLT-NO)를 입력해주세요 !", "오류");
                 return;
             }
 
@@ -253,7 +253,7 @@ public partial class Frm6900ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage($"화면 생성 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"화면 생성 실패: {ex.Message}", "오류");
         }
     }
 
@@ -276,7 +276,7 @@ public partial class Frm6900ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage($"화면 생성 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"화면 생성 실패: {ex.Message}", "오류");
         }
     }
 
@@ -304,7 +304,7 @@ public partial class Frm6900ViewModel : DocumentViewModelBase
 
                 if (deleteCount <= 0)
                 {
-                    _dialog.ShowMessage($"재고위치(T2MISUBK) '{item?.SubkLoca}' 삭제 {deleteCount} 건 오류", "오류");
+                    _dialog.ShowWarning($"재고위치(T2MISUBK) '{item?.SubkLoca}' 삭제 {deleteCount} 건 오류", "오류");
                     return;
                 }
 
@@ -312,7 +312,7 @@ public partial class Frm6900ViewModel : DocumentViewModelBase
 
                 if (lstkclearCount <= 0)
                 {
-                    _dialog.ShowMessage($"재고위치(T2MILSTK) '{item?.SubkLoca}' 삭제 {deleteCount} 건 오류", "오류");
+                    _dialog.ShowWarning($"재고위치(T2MILSTK) '{item?.SubkLoca}' 삭제 {deleteCount} 건 오류", "오류");
                     return;
                 }
                 this.SearchCommand.Execute(null);
@@ -321,7 +321,7 @@ public partial class Frm6900ViewModel : DocumentViewModelBase
         catch (Exception ex)
         {
             //StatusMessage = ex.Message;
-            _dialog.ShowMessage($"삭제 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"삭제 실패: {ex.Message}", "오류");
         }
     }
 
@@ -341,7 +341,7 @@ public partial class Frm6900ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage($"화면 생성 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"화면 생성 실패: {ex.Message}", "오류");
         }
     }
 }

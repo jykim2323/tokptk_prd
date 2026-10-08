@@ -10,6 +10,8 @@ using TOK.WMS.UI.Services.ETC;
 using TOK.WMS.UI.Services.Interfaces;
 using TOK.WMS.UI.ViewModels.Base;
 
+using System.Windows.Controls;
+
 namespace TOK.WMS.UI.ViewModels.MainMenus.Outbounds;
 
 public partial class Frm4400ViewModel : DocumentViewModelBase
@@ -222,7 +224,7 @@ public partial class Frm4400ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"납품처 조회 실패: {ex.Message}",
                 "오류");
         }
@@ -241,7 +243,7 @@ public partial class Frm4400ViewModel : DocumentViewModelBase
             if (FromDate == null ||
                 ToDate == null)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "출고일자를 선택해주세요.",
                     "확인");
 
@@ -252,7 +254,7 @@ public partial class Frm4400ViewModel : DocumentViewModelBase
             if (FromDate >
                 ToDate)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "시작일자가 종료일자보다 클 수 없습니다.",
                     "확인");
 
@@ -324,7 +326,7 @@ public partial class Frm4400ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"조회 실패: {ex.Message}",
                 "오류");
         }
@@ -342,7 +344,7 @@ public partial class Frm4400ViewModel : DocumentViewModelBase
         {
             if (!IsAdmin)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "관리자만 삭제할 수 있습니다.",
                     "확인");
 
@@ -352,7 +354,7 @@ public partial class Frm4400ViewModel : DocumentViewModelBase
 
             if (SelectedItem == null)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "삭제할 데이터를 선택해주세요.",
                     "확인");
 
@@ -388,7 +390,7 @@ public partial class Frm4400ViewModel : DocumentViewModelBase
                         reqDto);
 
 
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 $"삭제 완료: {result:N0}건",
                 "완료");
 
@@ -397,7 +399,7 @@ public partial class Frm4400ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"삭제 실패: {ex.Message}",
                 "오류");
         }
@@ -409,11 +411,11 @@ public partial class Frm4400ViewModel : DocumentViewModelBase
     // =========================================================
 
     [RelayCommand]
-    private void Excel()
+    private void Excel(DataGrid? grid)
     {
         if (Items.Count == 0)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 "엑셀로 저장할 데이터가 없습니다.",
                 "확인");
 
@@ -433,12 +435,12 @@ public partial class Frm4400ViewModel : DocumentViewModelBase
             _excelService.Export(
                 Items,
                 "출고이력현황",
-                "출고이력현황");
+                "출고이력현황", grid: grid);
 
 
         if (result)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 "엑셀 저장이 완료되었습니다.",
                 "완료");
         }

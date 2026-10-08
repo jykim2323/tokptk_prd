@@ -43,8 +43,8 @@ public partial class MonitoringViewModel : DocumentViewModelBase, IRefreshable
 
     private static readonly Brush OperatorAutoBrush = CreateBrush(0x17, 0x17, 0xED);
     private static readonly Brush RackProhibitedBrush = CreateBrush(0x00, 0x00, 0x00);
-    private static readonly Brush RackDoubleStorageBrush = CreateBrush(0x80, 0x00, 0x80);
-    private static readonly Brush RackEmptyRetrievalBrush = CreateBrush(0xFF, 0x00, 0xFF);
+    private static readonly Brush RackDoubleStorageBrush = CreateBrush(0x76, 0x00, 0x6F);
+    private static readonly Brush RackEmptyRetrievalBrush = CreateBrush(0xF0, 0x00, 0xD0);
     private static readonly Brush RackInboundBrush = CreateBrush(0x00, 0xFF, 0xFF);
     private static readonly Brush RackOutboundBrush = CreateBrush(0x00, 0x00, 0xFF);
     private static readonly Brush RackNormalBrush = CreateBrush(0xFF, 0xFF, 0xFF);
@@ -634,7 +634,7 @@ public partial class MonitoringViewModel : DocumentViewModelBase, IRefreshable
             { HasError: true } => (ErrorBrush, "에러"),
             { IsOnline: false } => (StoppedBrush, "오프라인"),
             { IsReady: true } => (ReadyBrush, "READY"),
-            _ => (WorkingBrush, "작업 중/대기 아님")
+            _ => (WorkingBrush, "작업중")
         };
 
         var toolTip = string.Join(Environment.NewLine,
@@ -950,9 +950,9 @@ public partial class MonitoringViewModel : DocumentViewModelBase, IRefreshable
 
             var (background, status) = rackBay switch
             {
-                { ProhibitedCells: > 0 } => (RackProhibitedBrush, "금지 셀"),
                 { DoubleStorageCells: > 0 } => (RackDoubleStorageBrush, "이중격납"),
                 { EmptyRetrievalCells: > 0 } => (RackEmptyRetrievalBrush, "공출고"),
+                { ProhibitedCells: > 0 } => (RackProhibitedBrush, "금지 셀"),
                 { InboundCells: > 0 } => (RackInboundBrush, "입고 작업"),
                 { OutboundCells: > 0 } => (RackOutboundBrush, "출고 작업"),
                 _ => (RackNormalBrush, "정상")

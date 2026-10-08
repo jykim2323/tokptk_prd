@@ -10,6 +10,8 @@ using TOK.WMS.UI.Services.ETC;
 using TOK.WMS.UI.Services.Interfaces;
 using TOK.WMS.UI.ViewModels.Base;
 
+using System.Windows.Controls;
+
 namespace TOK.WMS.UI.ViewModels.MainMenus.Outbounds;
 
 public partial class Frm4102ViewModel
@@ -141,7 +143,7 @@ public partial class Frm4102ViewModel
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"조회 실패: {ex.Message}",
                 "오류");
         }
@@ -182,7 +184,7 @@ public partial class Frm4102ViewModel
 
             if (selected.Count == 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "출고확정할 데이터를 선택해주세요.",
                     "확인");
 
@@ -252,7 +254,7 @@ public partial class Frm4102ViewModel
 
             if (result == null)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "출고확정 결과를 확인할 수 없습니다.",
                     "오류");
 
@@ -262,7 +264,7 @@ public partial class Frm4102ViewModel
 
             if (!result.Success)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     result.Message
                     ?? "출고확정 실패",
                     "오류");
@@ -271,7 +273,7 @@ public partial class Frm4102ViewModel
             }
 
 
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 result.Message
                 ?? "출고 예약 작업을 완료했습니다.",
                 "완료");
@@ -285,7 +287,7 @@ public partial class Frm4102ViewModel
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"출고확정 실패: {ex.Message}",
                 "오류");
         }
@@ -311,7 +313,7 @@ public partial class Frm4102ViewModel
 
             if (selected.Count == 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "삭제할 데이터를 선택해주세요.",
                     "확인");
 
@@ -355,7 +357,7 @@ public partial class Frm4102ViewModel
             }
 
 
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 $"{deleted:N0}건 삭제했습니다.",
                 "완료");
 
@@ -368,7 +370,7 @@ public partial class Frm4102ViewModel
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"삭제 실패: {ex.Message}",
                 "오류");
         }
@@ -396,7 +398,7 @@ public partial class Frm4102ViewModel
                 await _frm4102Api.DeleteAllAsync();
 
 
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 $"{count:N0}건 삭제했습니다.",
                 "완료");
 
@@ -409,7 +411,7 @@ public partial class Frm4102ViewModel
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"전체삭제 실패: {ex.Message}",
                 "오류");
         }
@@ -421,11 +423,11 @@ public partial class Frm4102ViewModel
     // =========================================================
 
     [RelayCommand]
-    private void Excel()
+    private void Excel(DataGrid? grid)
     {
         if (Items.Count == 0)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 "엑셀로 저장할 데이터가 없습니다.",
                 "확인");
 
@@ -445,12 +447,12 @@ public partial class Frm4102ViewModel
             _excelService.Export(
                 Items,
                 "출고지시",
-                "출고 지시 데이터");
+                "출고 지시 데이터", grid: grid);
 
 
         if (result)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 "엑셀 저장이 완료되었습니다.",
                 "완료");
         }

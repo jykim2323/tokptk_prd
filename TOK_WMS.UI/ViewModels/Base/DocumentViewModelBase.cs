@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
+using CommunityToolkit.Mvvm.Input;
+
 namespace TOK.WMS.UI.ViewModels.Base;
 
 /// <summary>
@@ -16,7 +18,9 @@ public abstract partial class DocumentViewModelBase : ObservableObject, IDisposa
     [ObservableProperty] private string _iconKey = "";
 
     /// <summary>닫기 버튼 노출 여부 (AvalonDock CanClose 바인딩)</summary>
-    [ObservableProperty] private bool _canClose = true;
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(CloseCommand))]
+    private bool _canClose = true;
 
     /// <summary>현재 활성(포커스) 문서 (AvalonDock IsActive 양방향)</summary>
     [ObservableProperty] private bool _isActive;
@@ -26,10 +30,22 @@ public abstract partial class DocumentViewModelBase : ObservableObject, IDisposa
 
     /// <summary>
     /// 문서 유일키 — 같은 키면 중복 생성 대신 기존 탭 포커스.
-    /// (AvalonDock ContentId 바인딩) 파생 ctor에서 지정.
+    /// (AvalonDock ContentId 바인딩) 문서 팩토리에서 메뉴 키로 확정.
     /// </summary>
     public string ContentId { get; protected set; } = "";
 
+    public event EventHandler? CloseRequested;
+
+    internal void InitializeDocument(string contentId, string title)
+    {
+        ContentId = contentId;
+        if (string.IsNullOrWhiteSpace(Title))
+            Title = title;
+    }
+
+    /// <summary>현재 문서 탭의 닫기를 요청합니다.</summary>
+    [RelayCommand(CanExecute = nameof(CanClose))]
+    private void Close() => CloseRequested?.Invoke(this, EventArgs.Empty);
 
     public virtual void Dispose() { }
 }

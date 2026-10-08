@@ -186,7 +186,7 @@ public partial class Frm1300ViewModel
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"전체 조회 실패: {ex.Message}",
                 "오류");
         }
@@ -205,7 +205,7 @@ public partial class Frm1300ViewModel
             if (string.IsNullOrWhiteSpace(
                 SearchText))
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "사용자ID를 입력하세요.",
                     "확인");
 
@@ -229,14 +229,14 @@ public partial class Frm1300ViewModel
 
             if (Items.Count == 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowInfo(
                     "조회할 데이터가 없습니다.",
                     "확인");
             }
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"조회 실패: {ex.Message}",
                 "오류");
         }
@@ -320,7 +320,7 @@ public partial class Frm1300ViewModel
         {
             if (!IsAdmin)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "관리자만 사용자를 등록할 수 있습니다.",
                     "확인");
 
@@ -344,7 +344,7 @@ public partial class Frm1300ViewModel
 
             if (duplicate)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "이미 사용자ID를 사용하고 있습니다.",
                     "오류");
 
@@ -368,7 +368,7 @@ public partial class Frm1300ViewModel
 
             if (result <= 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "사용자 등록 실패",
                     "오류");
 
@@ -383,13 +383,13 @@ public partial class Frm1300ViewModel
             await Search();
 
 
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 "사용자 등록 완료",
                 "완료");
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"사용자 등록 실패: {ex.Message}",
                 "오류");
         }
@@ -407,7 +407,7 @@ public partial class Frm1300ViewModel
         {
             if (!IsAdmin)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "관리자만 사용자를 수정할 수 있습니다.",
                     "확인");
 
@@ -417,7 +417,7 @@ public partial class Frm1300ViewModel
 
             if (SelectedItem == null)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "수정할 사용자를 선택해주세요.",
                     "확인");
 
@@ -445,7 +445,7 @@ public partial class Frm1300ViewModel
 
             if (result <= 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "수정할 사용자를 찾을 수 없습니다.",
                     "오류");
 
@@ -460,13 +460,13 @@ public partial class Frm1300ViewModel
             await Search();
 
 
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 "사용자 수정 완료",
                 "완료");
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"사용자 수정 실패: {ex.Message}",
                 "오류");
         }
@@ -484,7 +484,7 @@ public partial class Frm1300ViewModel
         {
             if (!IsAdmin)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "관리자만 사용자를 삭제할 수 있습니다.",
                     "확인");
 
@@ -495,7 +495,7 @@ public partial class Frm1300ViewModel
             if (SelectedItem == null ||
                 string.IsNullOrWhiteSpace(UserId))
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "삭제할 사용자를 선택해주세요.",
                     "확인");
 
@@ -523,7 +523,7 @@ public partial class Frm1300ViewModel
 
             if (result <= 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "삭제할 사용자를 찾을 수 없습니다.",
                     "오류");
 
@@ -541,13 +541,13 @@ public partial class Frm1300ViewModel
             await AllSearch();
 
 
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 "사용자 삭제 완료",
                 "완료");
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"사용자 삭제 실패: {ex.Message}",
                 "오류");
         }
@@ -602,7 +602,7 @@ public partial class Frm1300ViewModel
         if (string.IsNullOrWhiteSpace(
             UserId))
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 "사용자 ID를 입력하세요.",
                 "확인");
 
@@ -613,7 +613,7 @@ public partial class Frm1300ViewModel
         if (string.IsNullOrWhiteSpace(
             UserPassword))
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 "비밀번호를 입력하세요.",
                 "확인");
 
@@ -624,7 +624,7 @@ public partial class Frm1300ViewModel
         if (string.IsNullOrWhiteSpace(
             UserName))
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 "사용자 성명을 입력하세요.",
                 "확인");
 

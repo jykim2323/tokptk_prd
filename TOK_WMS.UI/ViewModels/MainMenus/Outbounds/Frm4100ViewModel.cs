@@ -175,7 +175,7 @@ public partial class Frm4100ViewModel
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"재고조회 실패: {ex.Message}",
                 "오류");
         }
@@ -231,7 +231,7 @@ public partial class Frm4100ViewModel
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"팔레트 조회 실패: {ex.Message}",
                 "오류");
         }
@@ -354,7 +354,7 @@ public partial class Frm4100ViewModel
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"출고정보 설정 실패: {ex.Message}",
                 "오류");
         }
@@ -371,7 +371,7 @@ public partial class Frm4100ViewModel
         if (string.IsNullOrWhiteSpace(
             PltnoEdit))
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 "출고할 재고를 선택해주세요.",
                 "확인");
 
@@ -384,7 +384,7 @@ public partial class Frm4100ViewModel
             out var available) ||
             available <= 0)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 "출고 가능한 재고가 없습니다.",
                 "오류");
 
@@ -397,7 +397,7 @@ public partial class Frm4100ViewModel
             out var requestQty) ||
             requestQty <= 0)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 "지시 수량을 입력해주세요.",
                 "오류");
 
@@ -407,7 +407,7 @@ public partial class Frm4100ViewModel
 
         if (requestQty > available)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 "출고 수량이 재고 수량보다 큽니다.",
                 "오류");
 
@@ -418,7 +418,7 @@ public partial class Frm4100ViewModel
         if (string.IsNullOrWhiteSpace(
             SelectedWsno))
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 "출고할 컨베어 스테이션을 선택해주세요.",
                 "확인");
 
@@ -444,7 +444,7 @@ public partial class Frm4100ViewModel
 
         if (duplicate)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 "동일한 출고예약 데이터가 이미 존재합니다.",
                 "오류");
 
@@ -464,7 +464,7 @@ public partial class Frm4100ViewModel
             samePlt.Wsno !=
             SelectedWsno)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"PLT-NO [{PltnoEdit}]는 " +
                 $"이미 {samePlt.Wsno}번 출고대에 예약되어 있습니다.",
                 "오류");
@@ -552,7 +552,7 @@ public partial class Frm4100ViewModel
     {
         if (StationStatus == null)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 "출고대 상태를 확인할 수 없습니다.",
                 "오류");
 
@@ -562,7 +562,7 @@ public partial class Frm4100ViewModel
 
         if (!StationStatus.AutoMode)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 "해당 컨베어가 자동모드가 아닙니다.",
                 "오류");
 
@@ -575,7 +575,7 @@ public partial class Frm4100ViewModel
         {
             if (!StationStatus.Station1OutputMode)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     $"{SelectedWsno}번 컨베어가 출고모드가 아닙니다.",
                     "오류");
 
@@ -587,7 +587,7 @@ public partial class Frm4100ViewModel
         {
             if (!StationStatus.Station2OutputMode)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     $"{SelectedWsno}번 컨베어가 출고모드가 아닙니다.",
                     "오류");
 
@@ -596,7 +596,7 @@ public partial class Frm4100ViewModel
         }
         else
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 "현재 위치에서 사용할 수 없는 출고대입니다.",
                 "오류");
 
@@ -617,7 +617,7 @@ public partial class Frm4100ViewModel
     {
         if (SelectedWorkItem == null)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 "삭제할 출고예약 데이터를 선택해주세요.",
                 "확인");
 
@@ -676,7 +676,7 @@ public partial class Frm4100ViewModel
         {
             if (WorkItems.Count == 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "출고작업할 데이터가 없습니다.",
                     "확인");
 
@@ -710,7 +710,7 @@ public partial class Frm4100ViewModel
             if (result == null ||
                 !result.Success)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     result?.Message
                     ?? "출고예약 실패",
                     "오류");
@@ -719,7 +719,7 @@ public partial class Frm4100ViewModel
             }
 
 
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 $"{result.Message}\n" +
                 $"PLT {result.PltCount:N0}건 / " +
                 $"상세 {result.DetailCount:N0}건",
@@ -734,7 +734,7 @@ public partial class Frm4100ViewModel
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"출고예약 실패: {ex.Message}",
                 "오류");
         }
@@ -753,7 +753,7 @@ public partial class Frm4100ViewModel
             if (string.IsNullOrWhiteSpace(
                 PltnoEdit))
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "출고할 재고를 선택해주세요.",
                     "확인");
 
@@ -766,7 +766,7 @@ public partial class Frm4100ViewModel
                     x.SubkPltno ==
                     PltnoEdit))
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     $"해당 PLT [{PltnoEdit}]는 이미 출고예약 목록에 있습니다.\n" +
                     "예약목록에서 삭제하거나 출고예약 버튼을 사용해주세요.",
                     "오류");
@@ -780,7 +780,7 @@ public partial class Frm4100ViewModel
                 out var requestQty) ||
                 requestQty <= 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "지시 수량을 입력해주세요.",
                     "오류");
 
@@ -872,7 +872,7 @@ public partial class Frm4100ViewModel
             if (result == null ||
                 !result.Success)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     result?.Message
                     ?? "바로출고 실패",
                     "오류");
@@ -881,7 +881,7 @@ public partial class Frm4100ViewModel
             }
 
 
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 result.Message
                 ?? "바로출고 완료",
                 "완료");
@@ -893,7 +893,7 @@ public partial class Frm4100ViewModel
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"바로출고 실패: {ex.Message}",
                 "오류");
         }

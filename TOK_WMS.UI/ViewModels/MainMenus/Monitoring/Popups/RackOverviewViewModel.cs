@@ -161,7 +161,7 @@ public partial class RackOverviewViewModel : ObservableObject
             StatusMessage = DisplayedBank > 0
                 ? $"{bank}열 조회 실패 · {DisplayedBank}열 화면 유지"
                 : $"{bank}열 조회에 실패했습니다.";
-            _dialog.ShowMessage($"랙 셀 현황 조회 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"랙 셀 현황 조회 실패: {ex.Message}", "오류");
         }
         finally
         {

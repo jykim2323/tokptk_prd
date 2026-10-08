@@ -1,0 +1,178 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/TOK.WMS.UI;component/Styles/InboundScreenStyles.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+    <!-- 미입고 현황에서 정한 디자인을 모든 업무 화면이 함께 사용합니다. -->
+    <GeometryGroup x:Key="ScreenSearchIconGeometry"><StaticResource ResourceKey="InboundSearchIconGeometry"/></GeometryGroup>
+    <GeometryGroup x:Key="ScreenExcelIconGeometry"><StaticResource ResourceKey="InboundExcelIconGeometry"/></GeometryGroup>
+    <GeometryGroup x:Key="ScreenPrinterIconGeometry"><StaticResource ResourceKey="InboundPrinterIconGeometry"/></GeometryGroup>
+    <GeometryGroup x:Key="ScreenDeleteIconGeometry"><StaticResource ResourceKey="InboundDeleteIconGeometry"/></GeometryGroup>
+    <GeometryGroup x:Key="ScreenPowerIconGeometry"><StaticResource ResourceKey="InboundPowerIconGeometry"/></GeometryGroup>
+    <GeometryGroup x:Key="ScreenPackageIconGeometry"><StaticResource ResourceKey="InboundPackageIconGeometry"/></GeometryGroup>
+    <GeometryGroup x:Key="ScreenConfirmIconGeometry"><StaticResource ResourceKey="InboundConfirmIconGeometry"/></GeometryGroup>
+    <GeometryGroup x:Key="ScreenPlusIconGeometry"><StaticResource ResourceKey="InboundPlusIconGeometry"/></GeometryGroup>
+    <GeometryGroup x:Key="ScreenRefreshIconGeometry"><StaticResource ResourceKey="InboundRefreshIconGeometry"/></GeometryGroup>
+    <GeometryGroup x:Key="ScreenModifyIconGeometry"><StaticResource ResourceKey="InboundModifyIconGeometry"/></GeometryGroup>
+    <Geometry x:Key="ScreenUploadIconGeometry">M 12,16 L 12,3 M 6,9 L 12,3 L 18,9 M 3,16 L 3,21 L 21,21 L 21,16</Geometry>
+    <Geometry x:Key="ScreenDownloadIconGeometry">M 12,3 L 12,16 M 6,10 L 12,16 L 18,10 M 3,17 L 3,21 L 21,21 L 21,17</Geometry>
+    <Geometry x:Key="ScreenSettingsIconGeometry">M 4,6 L 20,6 M 4,12 L 20,12 M 4,18 L 20,18 M 8,3 L 8,9 M 16,9 L 16,15 M 10,15 L 10,21</Geometry>
+    <Geometry x:Key="ScreenUserIconGeometry">M 12,3 A 4,4 0 1 1 12,11 A 4,4 0 1 1 12,3 M 4,22 L 4,19 A 8,7 0 0 1 20,19 L 20,22</Geometry>
+    <Style x:Key="ScreenToolbarIconStyle" TargetType="Path" BasedOn="{StaticResource InboundToolbarIconStyle}"/>
+    <Style x:Key="ScreenPrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource InboundPrimaryButtonStyle}"/>
+    <Style x:Key="ScreenExcelButtonStyle" TargetType="Button" BasedOn="{StaticResource InboundExcelButtonStyle}"/>
+    <Style x:Key="ScreenSecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource InboundSecondaryButtonStyle}"/>
+    <Style x:Key="ScreenTitleTextStyle" TargetType="TextBlock" BasedOn="{StaticResource InboundTitleTextStyle}"/>
+    <Style x:Key="ScreenSubtitleTextStyle" TargetType="TextBlock" BasedOn="{StaticResource InboundSubtitleTextStyle}"/>
+    <Style x:Key="ScreenCardStyle" TargetType="Border" BasedOn="{StaticResource InboundCardStyle}"/>
+    <Style x:Key="ScreenSectionTitleStyle" TargetType="Border" BasedOn="{StaticResource InboundSectionTitleStyle}"/>
+    <Style x:Key="ScreenCellTextStyle" TargetType="TextBlock" BasedOn="{StaticResource InboundCellTextStyle}"/>
+    <Style x:Key="ScreenLeftCellTextStyle" TargetType="TextBlock" BasedOn="{StaticResource InboundLeftCellTextStyle}"/>
+    <Style x:Key="ScreenRightCellTextStyle" TargetType="TextBlock" BasedOn="{StaticResource InboundRightCellTextStyle}"/>
+    <Style x:Key="ScreenHeaderStyle" TargetType="DataGridColumnHeader" BasedOn="{StaticResource InboundHeaderStyle}"/>
+    <Style x:Key="ScreenCellStyle" TargetType="DataGridCell" BasedOn="{StaticResource InboundCellStyle}"/>
+    <Style x:Key="ScreenDangerButtonStyle" TargetType="Button" BasedOn="{StaticResource ScreenSecondaryButtonStyle}">
+        <Setter Property="BorderBrush" Value="{DynamicResource StatusErrorBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource StatusErrorBrush}"/>
+    </Style>
+    <Style x:Key="ScreenDataGridStyle" TargetType="DataGrid" BasedOn="{StaticResource InboundDataGridStyle}">
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="HeadersVisibility" Value="Column"/>
+        <Setter Property="RowHeaderWidth" Value="0"/>
+        <Setter Property="MinColumnWidth" Value="80"/>
+        <Setter Property="CellStyle" Value="{StaticResource ScreenCellStyle}"/>
+        <Setter Property="ColumnHeaderStyle" Value="{StaticResource ScreenHeaderStyle}"/>
+        <Setter Property="EnableRowVirtualization" Value="True"/>
+        <Setter Property="EnableColumnVirtualization" Value="True"/>
+    </Style>
+    <Style x:Key="ScreenFilterInputStyle" TargetType="Control">
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Height" Value="36"/>
+        <Setter Property="Padding" Value="8,2"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Background" Value="{DynamicResource InputBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+    <!-- OS 기본 선택 표면 대신 업무 화면의 테마와 함께 바뀌는 입력 표면을 사용합니다. -->
+    <Style x:Key="ScreenComboBoxItemStyle" TargetType="ComboBoxItem">
+        <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Padding" Value="8,6"/>
+        <Setter Property="MinHeight" Value="32"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBoxItem">
+                    <Border x:Name="ItemSurface" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}"
+                            BorderThickness="2,0,0,0" BorderBrush="Transparent">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="ItemSurface" Property="Background" Value="{DynamicResource AppSurface2Brush}"/>
+                            <Setter TargetName="ItemSurface" Property="BorderBrush" Value="{DynamicResource AppAccentBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="ItemSurface" Property="Background" Value="{DynamicResource AppSurface2Brush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.55"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="ScreenFilterComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource ScreenFilterInputStyle}">
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="ItemContainerStyle" Value="{StaticResource ScreenComboBoxItemStyle}"/>
+        <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
+        <Setter Property="MaxDropDownHeight" Value="280"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <Grid x:Name="InputRoot" SnapsToDevicePixels="True">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="30"/>
+                        </Grid.ColumnDefinitions>
+                        <Border x:Name="InputSurface" Grid.ColumnSpan="2" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4"/>
+                        <ToggleButton x:Name="DropDownToggle" Grid.ColumnSpan="2" Focusable="False" IsTabStop="False"
+                                      ClickMode="Press" Foreground="{TemplateBinding Foreground}"
+                                      IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                            <ToggleButton.Template>
+                                <ControlTemplate TargetType="ToggleButton">
+                                    <Grid Background="Transparent">
+                                        <Path Data="M 0,0 L 4,4 L 8,0" Stroke="{TemplateBinding Foreground}" StrokeThickness="1.6"
+                                              StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                                              HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                    </Grid>
+                                </ControlTemplate>
+                            </ToggleButton.Template>
+                        </ToggleButton>
+                        <ContentPresenter x:Name="SelectionDisplay" Grid.Column="0" Margin="{TemplateBinding Padding}"
+                                          IsHitTestVisible="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="Center" Content="{TemplateBinding SelectionBoxItem}"
+                                          ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                          ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                          TextElement.Foreground="{TemplateBinding Foreground}"/>
+                        <TextBox x:Name="PART_EditableTextBox" Grid.Column="0" Margin="1" Padding="{TemplateBinding Padding}"
+                                 Foreground="{TemplateBinding Foreground}" Background="Transparent" BorderThickness="0"
+                                 FontSize="{TemplateBinding FontSize}" VerticalContentAlignment="Center"
+                                 IsReadOnly="{TemplateBinding IsReadOnly}" Visibility="Hidden"/>
+                        <Popup x:Name="PART_Popup" Grid.ColumnSpan="2" Placement="Bottom" AllowsTransparency="True"
+                               Focusable="False" IsOpen="{TemplateBinding IsDropDownOpen}" PopupAnimation="None">
+                            <Border MinWidth="{TemplateBinding ActualWidth}" MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                    Background="{DynamicResource AppSurfaceBrush}" BorderBrush="{DynamicResource AppBorderBrush}"
+                                    BorderThickness="1" CornerRadius="4" Padding="2">
+                                <ScrollViewer CanContentScroll="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                                    <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEditable" Value="True">
+                            <Setter TargetName="SelectionDisplay" Property="Visibility" Value="Hidden"/>
+                            <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="DropDownToggle" Property="Grid.Column" Value="1"/>
+                            <Setter TargetName="DropDownToggle" Property="Grid.ColumnSpan" Value="1"/>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                            <Setter TargetName="InputSurface" Property="BorderBrush" Value="{DynamicResource AppAccentBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="InputRoot" Property="Opacity" Value="0.55"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!-- 달력의 기본 동작을 유지하고 입력 글자·배경만 테마에 맞춥니다. -->
+    <Style x:Key="ScreenFilterDatePickerStyle" TargetType="DatePicker" BasedOn="{StaticResource ScreenFilterInputStyle}">
+        <Style.Resources>
+            <Style TargetType="DatePickerTextBox">
+                <Setter Property="Background" Value="{DynamicResource InputBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Padding" Value="4,0"/>
+            </Style>
+        </Style.Resources>
+        <Setter Property="Padding" Value="2"/>
+    </Style>
+    <Style x:Key="ScreenTitleIconSurfaceStyle" TargetType="Border">
+        <Setter Property="Width" Value="40"/>
+        <Setter Property="Height" Value="40"/>
+        <Setter Property="Padding" Value="10"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="Margin" Value="0,0,12,0"/>
+        <Setter Property="Background" Value="{DynamicResource AppSurface2Brush}"/>
+    </Style>
+</ResourceDictionary>

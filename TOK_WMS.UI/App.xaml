@@ -11,6 +11,8 @@
                 <ResourceDictionary Source="Themes/LightTheme.xaml"/>
                 <!-- 분리된 View 스타일 -->
                 <ResourceDictionary Source="Styles/DataGridStyles.xaml"/>
+                <!-- 날짜 입력 컨트롤의 공통 정렬 -->
+                <ResourceDictionary Source="Styles/DatePickerStyles.xaml"/>
                 <!-- 모니터링 View 스타일 -->
                 <ResourceDictionary Source="Styles/MonitoringStyles.xaml"/>
                 <!-- 모니터링 카드형 팝업 스타일 -->

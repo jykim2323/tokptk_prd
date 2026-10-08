@@ -51,6 +51,7 @@ public partial class App : Application
     private Process? _apiProcess;
     private static Mutex? _instanceMutex;
     private bool _ownsMutex;
+    private bool _showingUnhandledError;
 
     private void Application_Startup(object sender, StartupEventArgs e)
     {
@@ -59,17 +60,32 @@ public partial class App : Application
         _instanceMutex = new Mutex(true, @"Global\TOK.WMS.UI.SingleInstance", out _ownsMutex);
         if (!_ownsMutex)
         {
-            MessageBox.Show("메인메뉴가 이미 실행 중입니다.", "메인메뉴",
-                MessageBoxButton.OK, MessageBoxImage.Information);
+            Alert.ShowInfo("메인메뉴가 이미 실행 중입니다.", "메인메뉴");
             Shutdown();
             return;
         }
 
         DispatcherUnhandledException += (s, ex) =>
         {
-            MessageBox.Show($"오류가 발생했습니다.\n{ex.Exception.Message}", "메인메뉴",
-                MessageBoxButton.OK, MessageBoxImage.Error);
             ex.Handled = true;
+            if (_showingUnhandledError)
+                return;
+
+            _showingUnhandledError = true;
+            try
+            {
+                Alert.ShowWarning($"오류가 발생했습니다.\n{ex.Exception.Message}", "메인메뉴");
+            }
+            catch
+            {
+                // 공통 알림 화면 자체를 만들 수 없는 예외에만 OS 창을 사용한다.
+                MessageBox.Show($"오류가 발생했습니다.\n{ex.Exception.Message}", "메인메뉴",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                _showingUnhandledError = false;
+            }
         };
 
         var config = new ConfigurationBuilder()
@@ -147,7 +163,7 @@ public partial class App : Application
 
 
         sc.AddSingleton<ThemeService>();
-        sc.AddSingleton<IDialogService, DialogService>();
+        sc.AddSingleton<IDialogService>(_ => Alert.Service);
         sc.AddSingleton<ICurrentUserService, CurrentUserService>();
         sc.AddSingleton<DocumentFactory>();
         sc.AddSingleton<IExcelService, ExcelService>();
@@ -312,8 +328,7 @@ public partial class App : Application
         var exe = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, settings.ApiExePath));
         if (!File.Exists(exe))
         {
-            MessageBox.Show($"API 실행파일을 찾을 수 없습니다.\n{exe}", "TOK WMS",
-                MessageBoxButton.OK, MessageBoxImage.Warning);
+            Alert.ShowWarning($"API 실행파일을 찾을 수 없습니다.\n{exe}", "TOK WMS");
             return;
         }
 

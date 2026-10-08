@@ -1,0 +1,34 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- 본문 구역 제목은 색 면적을 줄여 남색 표 컬럼 헤더와 역할을 구분한다. -->
+    <Style x:Key="SectionTitleStyle" TargetType="Border">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource SectionTitleAccentBrush}"/>
+        <Setter Property="BorderThickness" Value="3,0,0,0"/>
+        <Setter Property="CornerRadius" Value="0"/>
+        <Setter Property="Padding" Value="10,0"/>
+        <Setter Property="MinHeight" Value="36"/>
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource AppTextBrush}"/>
+        <Setter Property="TextElement.FontSize" Value="15"/>
+        <Setter Property="TextElement.FontWeight" Value="SemiBold"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="UseLayoutRounding" Value="True"/>
+    </Style>
+    <Style x:Key="SectionTitleTextStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}"/>
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="TextAlignment" Value="Left"/>
+    </Style>
+    <!-- 건수·합계는 제목과 별도 열에 배치하고 보조 정보로 표시한다. -->
+    <Style x:Key="SectionTitleMetadataTextStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource AppTextSubBrush}"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="TextAlignment" Value="Right"/>
+    </Style>
+</ResourceDictionary>

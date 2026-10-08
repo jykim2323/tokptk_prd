@@ -120,7 +120,7 @@ public partial class SFrm6910ViewModel : ObservableObject
             if (string.IsNullOrWhiteSpace(LeftPltNo) ||
                 string.IsNullOrWhiteSpace(RightPltNo))
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "파렛트 번호가 입력되지 않았습니다.", "오류");
 
                 return;
@@ -128,7 +128,7 @@ public partial class SFrm6910ViewModel : ObservableObject
 
             if (LeftPltNo == RightPltNo)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "상단과 하단 파렛트 번호가 동일합니다.", "오류");
 
                 return;
@@ -137,7 +137,7 @@ public partial class SFrm6910ViewModel : ObservableObject
             // 화면 상태 기준 중복검사
             if (HasDuplicate(LeftItems))
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     $"상단 파렛트 [{LeftPltNo}]에 동일한 품목/LOT가 존재합니다.", "오류");
 
                 return;
@@ -145,7 +145,7 @@ public partial class SFrm6910ViewModel : ObservableObject
 
             if (HasDuplicate(RightItems))
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     $"하단 파렛트 [{RightPltNo}]에 동일한 품목/LOT가 존재합니다.", "오류");
 
                 return;
@@ -182,12 +182,12 @@ public partial class SFrm6910ViewModel : ObservableObject
 
             if (!result)
             {
-                _dialog.ShowMessage("저장하지 못했습니다.", "오류");
+                _dialog.ShowWarning("저장하지 못했습니다.", "오류");
                 return;
             }
 
 
-            _dialog.ShowMessage("PLT-NO 저장 완료.", "완료");
+            _dialog.ShowInfo("PLT-NO 저장 완료.", "완료");
             // DB 기준으로 다시 조회
             await Initialize(
                 LeftPltNo,
@@ -195,7 +195,7 @@ public partial class SFrm6910ViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"파렛트 합짐 처리 실패 : {ex.Message}",
                 "오류");
         }

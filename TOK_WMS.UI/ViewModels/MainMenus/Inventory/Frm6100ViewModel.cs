@@ -68,7 +68,7 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage($"조회 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"조회 실패: {ex.Message}", "오류");
         }
     }
 
@@ -86,7 +86,7 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage($"조회 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"조회 실패: {ex.Message}", "오류");
         }
     }
 
@@ -117,7 +117,7 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage($"조회 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"조회 실패: {ex.Message}", "오류");
         }
     }
 
@@ -145,7 +145,7 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
 
                 if (deleteCount <= 0)
                 {
-                    _dialog.ShowMessage($"재고위치(T2MISUBK) '{item.LstkLoca}' 삭제 {deleteCount} 건 오류", "오류");
+                    _dialog.ShowWarning($"재고위치(T2MISUBK) '{item.LstkLoca}' 삭제 {deleteCount} 건 오류", "오류");
                     return;
                 }
 
@@ -153,7 +153,7 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
 
                 if (lstkclearCount <= 0)
                 {
-                    _dialog.ShowMessage($"재고위치(T2MILSTK) '{item.LstkLoca}' 삭제 {deleteCount} 건 오류", "오류");
+                    _dialog.ShowWarning($"재고위치(T2MILSTK) '{item.LstkLoca}' 삭제 {deleteCount} 건 오류", "오류");
                     return;
                 }
 
@@ -163,7 +163,7 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
         catch (Exception ex)
         {
             //StatusMessage = ex.Message;
-            _dialog.ShowMessage($"삭제 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"삭제 실패: {ex.Message}", "오류");
         }
     }
 
@@ -176,14 +176,14 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
 
             if (string.IsNullOrEmpty(item?.LstkLoca))
             {
-                _dialog.ShowMessage($"선택한 행이 없습니다.", "오류");
+                _dialog.ShowWarning($"선택한 행이 없습니다.", "오류");
                 return;
             }
 
 
             if (!string.IsNullOrEmpty(item?.LstkPltno) || (item?.LstkFlag == "1"))
             {
-                _dialog.ShowMessage($"이미 재고가 들어있는 위치입니다. 다른 위치를 선택해주세요.", "오류");
+                _dialog.ShowWarning($"이미 재고가 들어있는 위치입니다. 다른 위치를 선택해주세요.", "오류");
                 return;
             }
 
@@ -200,7 +200,7 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage($"조회 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"조회 실패: {ex.Message}", "오류");
         }
     }
 
@@ -211,7 +211,7 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
         {
             if (string.IsNullOrEmpty(item?.LstkLoca))
             {
-                _dialog.ShowMessage($"선택한 행이 없습니다.", "오류");
+                _dialog.ShowWarning($"선택한 행이 없습니다.", "오류");
                 return;
             }
 
@@ -219,7 +219,7 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
 
             if (string.IsNullOrEmpty(lstk_pltno))
             {
-                _dialog.ShowMessage($"해당 위치에 재고가 없습니다. 셀 재고 등록후 추가해 주세요", "오류");
+                _dialog.ShowWarning($"해당 위치에 재고가 없습니다. 셀 재고 등록후 추가해 주세요", "오류");
                 return;
             }
 
@@ -227,7 +227,7 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
 
             if (!await _frm6100Api.SubklocacheckAsync(lstk_pltno ?? string.Empty))
             {
-                _dialog.ShowMessage($"해당 PLTNO 정보가 없습니다. 확인후 다시 시도하십시오.", "오류");
+                _dialog.ShowWarning($"해당 PLTNO 정보가 없습니다. 확인후 다시 시도하십시오.", "오류");
                 return;
             }
 
@@ -245,7 +245,7 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage($"조회 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"조회 실패: {ex.Message}", "오류");
         }
     }
 
@@ -267,7 +267,7 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
 
             if (!result)
             {
-                _dialog.ShowMessage($"재고위치 {item?.LstkLoca} 셀 재고 취소 에러!!!!(SUBK 초기화 에러) ", "오류");
+                _dialog.ShowWarning($"재고위치 {item?.LstkLoca} 셀 재고 취소 에러!!!!(SUBK 초기화 에러) ", "오류");
                 return;
             }
 
@@ -275,7 +275,7 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
 
             if (!response)
             {
-                _dialog.ShowMessage($"재고위치 {item?.LstkLoca} 셀 재고 취소 에러!!!!(LSTK 초기화 에러) ", "오류");
+                _dialog.ShowWarning($"재고위치 {item?.LstkLoca} 셀 재고 취소 에러!!!!(LSTK 초기화 에러) ", "오류");
                 return;
             }
 
@@ -284,7 +284,7 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage($"조회 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"조회 실패: {ex.Message}", "오류");
         }
     }
 
@@ -300,7 +300,7 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
 
             if(SelectedSubkItem == null)
             {
-                _dialog.ShowMessage($"삭제할 PLT 정보를 클릭하세요....!", "오류");
+                _dialog.ShowWarning($"삭제할 PLT 정보를 클릭하세요....!", "오류");
                 return;
             }
 
@@ -315,7 +315,7 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
 
             if (!result)
             {
-                _dialog.ShowMessage($" 재고위치 { SelectedSubkItem?.SubkLoca } 삭제 에러!!!!  ", "오류"); 
+                _dialog.ShowWarning($" 재고위치 { SelectedSubkItem?.SubkLoca } 삭제 에러!!!!  ", "오류");
                 return;
             }
 
@@ -333,7 +333,7 @@ public partial class Frm6100ViewModel : DocumentViewModelBase
         catch (Exception ex)
         {
             //StatusMessage = ex.Message;
-            _dialog.ShowMessage($"삭제 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"삭제 실패: {ex.Message}", "오류");
         }
     }
 }

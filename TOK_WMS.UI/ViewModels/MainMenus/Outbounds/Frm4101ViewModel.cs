@@ -88,7 +88,7 @@ public partial class Frm4101ViewModel : DocumentViewModelBase
                     StartLine.Trim(),
                     out var startLine))
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "시작 Line을 숫자로 입력해주세요.",
                     "오류");
 
@@ -98,7 +98,7 @@ public partial class Frm4101ViewModel : DocumentViewModelBase
 
             if (startLine < 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "시작 Line은 0 이상이어야 합니다.",
                     "오류");
 
@@ -133,7 +133,7 @@ public partial class Frm4101ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"Excel 불러오기 실패: {ex.Message}",
                 "오류");
         }
@@ -151,7 +151,7 @@ public partial class Frm4101ViewModel : DocumentViewModelBase
         {
             if (Items.Count == 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "등록할 출고 데이터가 없습니다.",
                     "확인");
 
@@ -187,7 +187,7 @@ public partial class Frm4101ViewModel : DocumentViewModelBase
 
             if (result == null)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "출고지시 등록 결과가 없습니다.",
                     "오류");
 
@@ -195,7 +195,7 @@ public partial class Frm4101ViewModel : DocumentViewModelBase
             }
 
 
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 $"출고지시 등록 건수\n\n" +
                 $"차수 [{result.Chasu}]\n" +
                 $"등록 {result.Count:N0}건",
@@ -211,7 +211,7 @@ public partial class Frm4101ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"출고지시 등록 실패: {ex.Message}",
                 "오류");
         }
@@ -228,7 +228,7 @@ public partial class Frm4101ViewModel : DocumentViewModelBase
     {
         if (SelectedItem == null)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 "삭제할 데이터를 선택해주세요.",
                 "확인");
 

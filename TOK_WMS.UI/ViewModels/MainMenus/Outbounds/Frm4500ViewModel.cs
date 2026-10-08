@@ -9,6 +9,8 @@ using TOK.WMS.UI.Services.Api.Outbounds;
 using TOK.WMS.UI.Services.ETC;
 using TOK.WMS.UI.ViewModels.Base;
 
+using System.Windows.Controls;
+
 namespace TOK.WMS.UI.ViewModels.MainMenus.Outbounds;
 
 public partial class Frm4500ViewModel : DocumentViewModelBase
@@ -144,7 +146,7 @@ public partial class Frm4500ViewModel : DocumentViewModelBase
             if (FromDate == null ||
                 ToDate == null)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "출고일자를 선택해주세요.",
                     "확인");
 
@@ -155,7 +157,7 @@ public partial class Frm4500ViewModel : DocumentViewModelBase
             if (FromDate >
                 ToDate)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "시작일자가 종료일자보다 클 수 없습니다.",
                     "확인");
 
@@ -239,7 +241,7 @@ public partial class Frm4500ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"조회 실패: {ex.Message}",
                 "오류");
         }
@@ -338,7 +340,7 @@ public partial class Frm4500ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"LOT별 조회 실패: {ex.Message}",
                 "오류");
         }
@@ -352,11 +354,11 @@ public partial class Frm4500ViewModel : DocumentViewModelBase
     // =========================================================
 
     [RelayCommand]
-    private void Excel()
+    private void Excel(DataGrid? grid)
     {
         if (Items.Count == 0)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 "엑셀로 저장할 데이터가 없습니다.",
                 "확인");
 
@@ -376,12 +378,12 @@ public partial class Frm4500ViewModel : DocumentViewModelBase
             _excelService.Export(
                 Items,
                 "출고실적현황",
-                "출고실적현황");
+                "출고실적현황", grid: grid);
 
 
         if (result)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 "엑셀 저장이 완료되었습니다.",
                 "완료");
         }

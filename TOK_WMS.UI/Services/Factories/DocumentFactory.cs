@@ -10,6 +10,20 @@ public class DocumentFactory(IServiceProvider sp)
     public DocumentViewModelBase Create(MenuLeaf leaf) => Create(leaf.MenuKey, leaf.Title);
 
     public DocumentViewModelBase Create(string menuKey, string title = "")
-        => sp.GetKeyedService<DocumentViewModelBase>(menuKey)
-        ?? new PlaceholderViewModel(menuKey, title);
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(menuKey);
+
+        if (string.IsNullOrWhiteSpace(title))
+        {
+            title = menuKey == DocumentKeys.Mornitor
+                ? "모니터링"
+                : MenuCatalog.Groups.SelectMany(group => group.Items)
+                    .FirstOrDefault(menu => menu.MenuKey == menuKey)?.Title ?? menuKey;
+        }
+
+        var document = sp.GetKeyedService<DocumentViewModelBase>(menuKey)
+            ?? new PlaceholderViewModel(menuKey, title);
+        document.InitializeDocument(menuKey, title);
+        return document;
+    }
 }

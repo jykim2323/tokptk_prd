@@ -1,12 +1,4 @@
-<UserControl x:Class="TOK.WMS.UI.Views.Monitoring.MonitoringView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:behaviors="clr-namespace:TOK.WMS.UI.Behaviors"
-             mc:Ignorable="d"
-             d:DesignWidth="1600"
-             d:DesignHeight="900">
+<UserControl xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:behaviors="clr-namespace:TOK.WMS.UI.Behaviors" x:Class="TOK.WMS.UI.Views.Monitoring.MonitoringView" mc:Ignorable="d" d:DesignWidth="1600" d:DesignHeight="900">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -17,9 +9,7 @@
             </ResourceDictionary.MergedDictionaries>
 
             <!-- 랙 셀: 공통 입체감 + 위쪽 보라색 표시선 -->
-            <Style x:Key="RackCellStyle"
-                   TargetType="{x:Type Label}"
-                   BasedOn="{StaticResource RaisedCellBaseStyle}">
+            <Style x:Key="RackCellStyle" TargetType="{x:Type Label}" BasedOn="{StaticResource RaisedCellBaseStyle}">
                 <Setter Property="Background" Value="{DynamicResource MonitoringCellBrush}"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource MonitoringCellBorderBrush}"/>
                 <Setter Property="Foreground" Value="{DynamicResource MonitoringTextBrush}"/>
@@ -29,40 +19,20 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type Label}">
-                            <Grid Background="Transparent"
-                                  SnapsToDevicePixels="True">
+                            <Grid Background="Transparent" SnapsToDevicePixels="True">
 
-                                <Border Margin="1,1,0,0"
-                                        Background="{DynamicResource MonitoringCellShadowBrush}"
-                                        CornerRadius="2"/>
+                                <Border Margin="1,1,0,0" Background="{DynamicResource MonitoringCellShadowBrush}" CornerRadius="2"/>
 
-                                <Border Margin="0,0,1,1"
-                                        Background="{TemplateBinding Background}"
-                                        BorderBrush="{TemplateBinding BorderBrush}"
-                                        BorderThickness="{TemplateBinding BorderThickness}"
-                                        CornerRadius="2">
+                                <Border Margin="0,0,1,1" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2">
 
                                     <Grid>
-                                        <Rectangle Height="4"
-                                                   Margin="1,1,1,0"
-                                                   VerticalAlignment="Top"
-                                                   Fill="#980098"
-                                                   RadiusX="1"
-                                                   RadiusY="1"/>
+                                        <Rectangle Height="4" Margin="1,1,1,0" VerticalAlignment="Top" Fill="#980098" RadiusX="1" RadiusY="1"/>
 
-                                        <Border BorderBrush="{DynamicResource MonitoringCellHighlightBrush}"
-                                                BorderThickness="1,1,0,0"
-                                                CornerRadius="1"/>
+                                        <Border BorderBrush="{DynamicResource MonitoringCellHighlightBrush}" BorderThickness="1,1,0,0" CornerRadius="1"/>
 
-                                        <Border BorderBrush="{DynamicResource MonitoringCellLowlightBrush}"
-                                                BorderThickness="0,0,1,1"
-                                                CornerRadius="1"/>
+                                        <Border BorderBrush="{DynamicResource MonitoringCellLowlightBrush}" BorderThickness="0,0,1,1" CornerRadius="1"/>
 
-                                        <ContentPresenter
-                                            Content="{TemplateBinding Content}"
-                                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                            Margin="0,3,0,0"/>
+                                        <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="0,3,0,0"/>
                                     </Grid>
                                 </Border>
                             </Grid>
@@ -71,18 +41,24 @@
                 </Setter>
             </Style>
 
-            <!-- 메인 모니터링 랙 셀은 테마와 작업·이상 상태에 관계없이 흰 배경을 유지한다. -->
-            <Style x:Key="RackStateCellStyle"
-                   TargetType="{x:Type Label}"
-                   BasedOn="{StaticResource RackCellStyle}">
+            <!-- 랙 셀은 흰 배경을 유지하고 공출고·이중입고 예외만 상태 색상으로 표시한다. -->
+            <Style x:Key="RackStateCellStyle" TargetType="{x:Type Label}" BasedOn="{StaticResource RackCellStyle}">
                 <Setter Property="Background" Value="White"/>
                 <Setter Property="Foreground" Value="{StaticResource TrackingDarkForegroundBrush}"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Tag.Status, RelativeSource={RelativeSource Self}}" Value="공출고">
+                        <Setter Property="Background" Value="{Binding Tag.Background, RelativeSource={RelativeSource Self}}"/>
+                        <Setter Property="Foreground" Value="{StaticResource TrackingLightForegroundBrush}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Tag.Status, RelativeSource={RelativeSource Self}}" Value="이중격납">
+                        <Setter Property="Background" Value="{Binding Tag.Background, RelativeSource={RelativeSource Self}}"/>
+                        <Setter Property="Foreground" Value="{StaticResource TrackingLightForegroundBrush}"/>
+                    </DataTrigger>
+                </Style.Triggers>
             </Style>
 
             <!-- 3~13열의 1연 위치에 표시하는 트래킹 구간 -->
-            <Style x:Key="TrackingSlotStyle"
-                   TargetType="{x:Type Label}"
-                   BasedOn="{StaticResource RaisedCellBaseStyle}">
+            <Style x:Key="TrackingSlotStyle" TargetType="{x:Type Label}" BasedOn="{StaticResource RaisedCellBaseStyle}">
                 <Setter Property="Background" Value="{DynamicResource MonitoringTrackingSlotBrush}"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource MonitoringTrackingSlotBorderBrush}"/>
                 <Setter Property="Foreground" Value="{DynamicResource MonitoringTrackingSlotTextBrush}"/>
@@ -140,43 +116,23 @@
             <ColumnDefinition Width="163*"/>
         </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="0"
-                Margin="8,8,8,8"
-                Padding="8"
-                Background="{DynamicResource AppSurfaceBrush}"
-                BorderBrush="{DynamicResource MonitoringPanelBorderBrush}"
-                BorderThickness="1"
-                CornerRadius="5"
-                ClipToBounds="True" Grid.RowSpan="2">
+        <Border Grid.Column="0" Margin="8,8,8,8" Padding="8" Background="{DynamicResource AppSurfaceBrush}" BorderBrush="{DynamicResource MonitoringPanelBorderBrush}" BorderThickness="1" CornerRadius="5" ClipToBounds="True" Grid.RowSpan="2">
 
             <Grid>
                 <Grid.RowDefinitions>
                     <!-- 설비 배치 전용 영역 -->
                     <RowDefinition Height="*"/>
                     <!-- 상태 및 메시지 전용 영역 -->
-                    <RowDefinition Height="190"/>
+                    <RowDefinition Height="260"/>
                 </Grid.RowDefinitions>
 
                 <!-- 가로와 세로를 함께 계산하여 전체 도면을 화면 안에 표시 -->
-                <Viewbox Grid.Row="0"
-                     Stretch="Uniform"
-                     StretchDirection="Both"
-                     HorizontalAlignment="Center"
-                     VerticalAlignment="Top"
-                     Margin="12">
+                <Viewbox Grid.Row="0" Stretch="Uniform" StretchDirection="Both" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="12">
 
                     <!-- 도면 전체를 같은 비율로 확대하기 위한 표시 영역 -->
-                    <Grid x:Name="WarehouseViewport"
-                      Width="800"
-                      Height="930">
+                    <Grid x:Name="WarehouseViewport" Width="800" Height="930">
 
-                        <Canvas x:Name="WarehouseCanvas"
-                        Width="800"
-                        Height="1072"
-                        MouseLeftButtonDown="WarehouseCanvas_OnMouseDoubleClick"
-                        behaviors:CanvasMotion.PixelsPerSecond="120"
-                        behaviors:CanvasMotion.MinimumTravelTimeMs="220"
-                        Background="Transparent">
+                        <Canvas x:Name="WarehouseCanvas" Width="800" Height="1072" MouseLeftButtonDown="WarehouseCanvas_OnMouseDoubleClick" behaviors:CanvasMotion.PixelsPerSecond="120" behaviors:CanvasMotion.MinimumTravelTimeMs="220" Background="Transparent">
 
                             <Canvas.RenderTransform>
                                 <TransformGroup>
@@ -189,35 +145,16 @@
                             </Canvas.RenderTransform>
 
                             <!-- 설비와 같은 가로 배율을 따르되 위·아래 여백을 둔 배경 -->
-                            <Rectangle x:Name="EquipmentAreaBackground"
-                                       Canvas.Left="0"
-                                       Canvas.Top="165"
-                                       Width="800"
-                                       Height="880"
-                                       Fill="{DynamicResource MonitoringEquipmentBackgroundBrush}"
-                                       RadiusX="4"
-                                       RadiusY="4"
-                                       IsHitTestVisible="False"
-                                       Panel.ZIndex="-100"/>
+                            <Rectangle x:Name="EquipmentAreaBackground" Canvas.Left="0" Canvas.Top="165" Width="800" Height="880" Fill="{DynamicResource MonitoringEquipmentBackgroundBrush}" RadiusX="4" RadiusY="4" IsHitTestVisible="False" Panel.ZIndex="-100"/>
 
                             <!-- 구역 제목 -->
 
                             <!-- 상품창고와 제품창고 구분선 -->
-                            <Rectangle x:Name="WarehouseTypeDivider"
-                               Canvas.Left="132"
-                               Canvas.Top="226"
-                               Width="2"
-                               Height="650"
-                               Fill="{DynamicResource MonitoringDividerBrush}"
-                               Opacity="0.7"
-                               RadiusX="1"
-                               RadiusY="1"
-                               Panel.ZIndex="20"
-                               IsHitTestVisible="False"/>
+                            <Rectangle x:Name="WarehouseTypeDivider" Canvas.Left="132" Canvas.Top="226" Width="2" Height="650" Fill="{DynamicResource MonitoringDividerBrush}" Opacity="0.7" RadiusX="1" RadiusY="1" Panel.ZIndex="20" IsHitTestVisible="False"/>
 
                             <!-- 랙 열별 연회색 받침: 셀 사이와 모서리에만 은은하게 보이도록 1px 확장 -->
-                            <Rectangle x:Name="RackColumn01_Backplate" Canvas.Left="19"  Canvas.Top="321" Width="32" Height="482" Fill="{DynamicResource MonitoringRackBackplateBrush}" RadiusX="2" RadiusY="2" Panel.ZIndex="-20" IsHitTestVisible="False"/>
-                            <Rectangle x:Name="RackColumn02_Backplate" Canvas.Left="85"  Canvas.Top="321" Width="32" Height="482" Fill="{DynamicResource MonitoringRackBackplateBrush}" RadiusX="2" RadiusY="2" Panel.ZIndex="-20" IsHitTestVisible="False"/>
+                            <Rectangle x:Name="RackColumn01_Backplate" Canvas.Left="19" Canvas.Top="321" Width="32" Height="482" Fill="{DynamicResource MonitoringRackBackplateBrush}" RadiusX="2" RadiusY="2" Panel.ZIndex="-20" IsHitTestVisible="False"/>
+                            <Rectangle x:Name="RackColumn02_Backplate" Canvas.Left="85" Canvas.Top="321" Width="32" Height="482" Fill="{DynamicResource MonitoringRackBackplateBrush}" RadiusX="2" RadiusY="2" Panel.ZIndex="-20" IsHitTestVisible="False"/>
                             <Rectangle x:Name="RackColumn03_Backplate" Canvas.Left="149" Canvas.Top="321" Width="32" Height="482" Fill="{DynamicResource MonitoringRackBackplateBrush}" RadiusX="2" RadiusY="2" Panel.ZIndex="-20" IsHitTestVisible="False"/>
                             <Rectangle x:Name="RackColumn04_Backplate" Canvas.Left="215" Canvas.Top="321" Width="32" Height="482" Fill="{DynamicResource MonitoringRackBackplateBrush}" RadiusX="2" RadiusY="2" Panel.ZIndex="-20" IsHitTestVisible="False"/>
                             <Rectangle x:Name="RackColumn05_Backplate" Canvas.Left="249" Canvas.Top="321" Width="32" Height="482" Fill="{DynamicResource MonitoringRackBackplateBrush}" RadiusX="2" RadiusY="2" Panel.ZIndex="-20" IsHitTestVisible="False"/>
@@ -260,23 +197,12 @@
                             <Label x:Name="PLT81" Content="81" Canvas.Left="650" Canvas.Top="262" Width="30" Height="41" Style="{StaticResource InboundTrackingSectionStyle}" Tag="{Binding TrackStates[81]}" ToolTip="{Binding TrackStates[81].ToolTip}"/>
 
                             <!-- 상부 82번 RGV -->
-                            <Rectangle x:Name="TopRailUpper" Canvas.Left="134" Canvas.Top="186"
-                               Width="570" Height="2" Fill="{DynamicResource MonitoringCarrierRailBrush}"/>
-                            <Rectangle x:Name="TopRailLower" Canvas.Left="134" Canvas.Top="198"
-                               Width="570" Height="2" Fill="{DynamicResource MonitoringCarrierRailBrush}"/>
-                            <Rectangle x:Name="TopRailLeftStop" Canvas.Left="130" Canvas.Top="176"
-                               Width="5" Height="34" Fill="{DynamicResource MonitoringCarrierRailBrush}"/>
-                            <Rectangle x:Name="TopRailRightStop" Canvas.Left="700" Canvas.Top="176"
-                               Width="5" Height="34" Fill="{DynamicResource MonitoringCarrierRailBrush}"/>
+                            <Rectangle x:Name="TopRailUpper" Canvas.Left="134" Canvas.Top="186" Width="570" Height="2" Fill="{DynamicResource MonitoringCarrierRailBrush}"/>
+                            <Rectangle x:Name="TopRailLower" Canvas.Left="134" Canvas.Top="198" Width="570" Height="2" Fill="{DynamicResource MonitoringCarrierRailBrush}"/>
+                            <Rectangle x:Name="TopRailLeftStop" Canvas.Left="130" Canvas.Top="176" Width="5" Height="34" Fill="{DynamicResource MonitoringCarrierRailBrush}"/>
+                            <Rectangle x:Name="TopRailRightStop" Canvas.Left="700" Canvas.Top="176" Width="5" Height="34" Fill="{DynamicResource MonitoringCarrierRailBrush}"/>
 
-                            <ContentControl x:Name="TopCarrier82"
-                                    Content="{Binding RgvStates[02].DisplayNo, FallbackValue=82}"
-                                    Style="{StaticResource RgvCarrierStyle}"
-                                    behaviors:CanvasMotion.TargetLeft="{Binding RgvStates[02].CanvasLeft, FallbackValue=363}"
-                                    Canvas.Top="172"
-                                    Tag="{Binding RgvStates[02]}"
-                                    ToolTip="{Binding RgvStates[02].ToolTip}"
-                                    Panel.ZIndex="10"/>
+                            <ContentControl x:Name="TopCarrier82" Content="{Binding RgvStates[02].DisplayNo, FallbackValue=82}" Style="{StaticResource RgvCarrierStyle}" behaviors:CanvasMotion.TargetLeft="{Binding RgvStates[02].CanvasLeft, FallbackValue=363}" Canvas.Top="172" Tag="{Binding RgvStates[02]}" ToolTip="{Binding RgvStates[02].ToolTip}" Panel.ZIndex="10"/>
 
                             <!-- 열 번호 -->
                             <Label x:Name="Column01_Header" Content="1열" Canvas.Left="20" Canvas.Top="306" Width="30" Height="16" Style="{StaticResource ColumnHeaderStyle}" ToolTip="{Binding Bank1ModeStatus}" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="9"/>
@@ -299,93 +225,37 @@
                             <Rectangle x:Name="Crane01_Rail" Canvas.Left="67" Canvas.Top="322" Width="3" Height="480" Fill="{DynamicResource MonitoringCraneRailBrush}"/>
                             <Rectangle x:Name="Crane01_StopTop" Canvas.Left="60" Canvas.Top="322" Width="17" Height="3" Fill="{DynamicResource MonitoringCraneRailBrush}"/>
                             <Rectangle x:Name="Crane01_StopBottom" Canvas.Left="60" Canvas.Top="799" Width="17" Height="3" Fill="{DynamicResource MonitoringCraneRailBrush}"/>
-                            <Label x:Name="SC01"
-                           Content="1"
-                           Style="{StaticResource StackerCraneStyle}"
-                           Canvas.Left="42"
-                           behaviors:CanvasMotion.TargetTop="{Binding CraneStates[01].CanvasTop, FallbackValue=544}"
-                           Background="{Binding CraneStates[01].Background, FallbackValue=#32D43F}"
-                           Tag="{Binding CraneStates[01]}"
-                           ToolTip="{Binding CraneStates[01].ToolTip}"
-                           Panel.ZIndex="40" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Label x:Name="SC01" Content="1" Style="{StaticResource StackerCraneStyle}" Canvas.Left="42" behaviors:CanvasMotion.TargetTop="{Binding CraneStates[01].CanvasTop, FallbackValue=544}" Background="{Binding CraneStates[01].Background, FallbackValue=#32D43F}" Tag="{Binding CraneStates[01]}" ToolTip="{Binding CraneStates[01].ToolTip}" Panel.ZIndex="40" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                             <!-- 2호기 -->
                             <Rectangle x:Name="Crane02_Rail" Canvas.Left="197" Canvas.Top="322" Width="3" Height="480" Fill="{DynamicResource MonitoringCraneRailBrush}"/>
                             <Rectangle x:Name="Crane02_StopTop" Canvas.Left="190" Canvas.Top="322" Width="17" Height="3" Fill="{DynamicResource MonitoringCraneRailBrush}"/>
                             <Rectangle x:Name="Crane02_StopBottom" Canvas.Left="190" Canvas.Top="799" Width="17" Height="3" Fill="{DynamicResource MonitoringCraneRailBrush}"/>
-                            <Label x:Name="SC02"
-                           Content="2"
-                           Style="{StaticResource StackerCraneStyle}"
-                           Canvas.Left="171"
-                           behaviors:CanvasMotion.TargetTop="{Binding CraneStates[02].CanvasTop, FallbackValue=544}"
-                           Background="{Binding CraneStates[02].Background, FallbackValue=#32D43F}"
-                           Tag="{Binding CraneStates[02]}"
-                           ToolTip="{Binding CraneStates[02].ToolTip}"
-                           Panel.ZIndex="40" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Label x:Name="SC02" Content="2" Style="{StaticResource StackerCraneStyle}" Canvas.Left="171" behaviors:CanvasMotion.TargetTop="{Binding CraneStates[02].CanvasTop, FallbackValue=544}" Background="{Binding CraneStates[02].Background, FallbackValue=#32D43F}" Tag="{Binding CraneStates[02]}" ToolTip="{Binding CraneStates[02].ToolTip}" Panel.ZIndex="40" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                             <!-- 3호기 -->
                             <Rectangle x:Name="Crane03_Rail" Canvas.Left="298" Canvas.Top="322" Width="3" Height="480" Fill="{DynamicResource MonitoringCraneRailBrush}"/>
                             <Rectangle x:Name="Crane03_StopTop" Canvas.Left="291" Canvas.Top="322" Width="17" Height="3" Fill="{DynamicResource MonitoringCraneRailBrush}"/>
                             <Rectangle x:Name="Crane03_StopBottom" Canvas.Left="291" Canvas.Top="799" Width="17" Height="3" Fill="{DynamicResource MonitoringCraneRailBrush}"/>
-                            <Label x:Name="SC03"
-                           Content="3"
-                           Style="{StaticResource StackerCraneStyle}"
-                           Canvas.Left="272"
-                           behaviors:CanvasMotion.TargetTop="{Binding CraneStates[03].CanvasTop, FallbackValue=544}"
-                           Background="{Binding CraneStates[03].Background, FallbackValue=#32D43F}"
-                           Tag="{Binding CraneStates[03]}"
-                           ToolTip="{Binding CraneStates[03].ToolTip}"
-                           Panel.ZIndex="40" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Label x:Name="SC03" Content="3" Style="{StaticResource StackerCraneStyle}" Canvas.Left="272" behaviors:CanvasMotion.TargetTop="{Binding CraneStates[03].CanvasTop, FallbackValue=544}" Background="{Binding CraneStates[03].Background, FallbackValue=#32D43F}" Tag="{Binding CraneStates[03]}" ToolTip="{Binding CraneStates[03].ToolTip}" Panel.ZIndex="40" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                             <!-- 4호기 -->
                             <Rectangle x:Name="Crane04_Rail" Canvas.Left="397" Canvas.Top="322" Width="3" Height="480" Fill="{DynamicResource MonitoringCraneRailBrush}"/>
                             <Rectangle x:Name="Crane04_StopTop" Canvas.Left="390" Canvas.Top="322" Width="17" Height="3" Fill="{DynamicResource MonitoringCraneRailBrush}"/>
                             <Rectangle x:Name="Crane04_StopBottom" Canvas.Left="390" Canvas.Top="799" Width="17" Height="3" Fill="{DynamicResource MonitoringCraneRailBrush}"/>
-                            <Label x:Name="SC04"
-                           Content="4"
-                           Style="{StaticResource StackerCraneStyle}"
-                           Canvas.Left="371"
-                           behaviors:CanvasMotion.TargetTop="{Binding CraneStates[04].CanvasTop, FallbackValue=544}"
-                           Background="{Binding CraneStates[04].Background, FallbackValue=#32D43F}"
-                           Tag="{Binding CraneStates[04]}"
-                           ToolTip="{Binding CraneStates[04].ToolTip}"
-                           Panel.ZIndex="40" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Label x:Name="SC04" Content="4" Style="{StaticResource StackerCraneStyle}" Canvas.Left="371" behaviors:CanvasMotion.TargetTop="{Binding CraneStates[04].CanvasTop, FallbackValue=544}" Background="{Binding CraneStates[04].Background, FallbackValue=#32D43F}" Tag="{Binding CraneStates[04]}" ToolTip="{Binding CraneStates[04].ToolTip}" Panel.ZIndex="40" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                             <!-- 5호기 -->
                             <Rectangle x:Name="Crane05_Rail" Canvas.Left="497" Canvas.Top="322" Width="3" Height="480" Fill="{DynamicResource MonitoringCraneRailBrush}"/>
                             <Rectangle x:Name="Crane05_StopTop" Canvas.Left="490" Canvas.Top="322" Width="17" Height="3" Fill="{DynamicResource MonitoringCraneRailBrush}"/>
                             <Rectangle x:Name="Crane05_StopBottom" Canvas.Left="490" Canvas.Top="799" Width="17" Height="3" Fill="{DynamicResource MonitoringCraneRailBrush}"/>
-                            <Label x:Name="SC05"
-                           Content="5"
-                           Style="{StaticResource StackerCraneStyle}"
-                           Canvas.Left="471"
-                           behaviors:CanvasMotion.TargetTop="{Binding CraneStates[05].CanvasTop, FallbackValue=544}"
-                           Background="{Binding CraneStates[05].Background, FallbackValue=#32D43F}"
-                           Tag="{Binding CraneStates[05]}"
-                           ToolTip="{Binding CraneStates[05].ToolTip}"
-                           Panel.ZIndex="40" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Label x:Name="SC05" Content="5" Style="{StaticResource StackerCraneStyle}" Canvas.Left="471" behaviors:CanvasMotion.TargetTop="{Binding CraneStates[05].CanvasTop, FallbackValue=544}" Background="{Binding CraneStates[05].Background, FallbackValue=#32D43F}" Tag="{Binding CraneStates[05]}" ToolTip="{Binding CraneStates[05].ToolTip}" Panel.ZIndex="40" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                             <!-- 6호기 -->
                             <Rectangle x:Name="Crane06_Rail" Canvas.Left="597" Canvas.Top="322" Width="3" Height="480" Fill="{DynamicResource MonitoringCraneRailBrush}"/>
                             <Rectangle x:Name="Crane06_StopTop" Canvas.Left="590" Canvas.Top="322" Width="17" Height="3" Fill="{DynamicResource MonitoringCraneRailBrush}"/>
                             <Rectangle x:Name="Crane06_StopBottom" Canvas.Left="590" Canvas.Top="799" Width="17" Height="3" Fill="{DynamicResource MonitoringCraneRailBrush}"/>
-                            <Label x:Name="SC06"
-                           Content="6"
-                           Style="{StaticResource StackerCraneStyle}"
-                           Canvas.Left="571"
-                           behaviors:CanvasMotion.TargetTop="{Binding CraneStates[06].CanvasTop, FallbackValue=544}"
-                           Background="{Binding CraneStates[06].Background, FallbackValue=#32D43F}"
-                           Tag="{Binding CraneStates[06]}"
-                           ToolTip="{Binding CraneStates[06].ToolTip}"
-                           Panel.ZIndex="40" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Label x:Name="SC06" Content="6" Style="{StaticResource StackerCraneStyle}" Canvas.Left="571" behaviors:CanvasMotion.TargetTop="{Binding CraneStates[06].CanvasTop, FallbackValue=544}" Background="{Binding CraneStates[06].Background, FallbackValue=#32D43F}" Tag="{Binding CraneStates[06]}" ToolTip="{Binding CraneStates[06].ToolTip}" Panel.ZIndex="40" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                             <!-- 7호기 -->
                             <Rectangle x:Name="Crane07_Rail" Canvas.Left="697" Canvas.Top="322" Width="3" Height="480" Fill="{DynamicResource MonitoringCraneRailBrush}"/>
                             <Rectangle x:Name="Crane07_StopTop" Canvas.Left="690" Canvas.Top="322" Width="17" Height="3" Fill="{DynamicResource MonitoringCraneRailBrush}"/>
                             <Rectangle x:Name="Crane07_StopBottom" Canvas.Left="690" Canvas.Top="799" Width="17" Height="3" Fill="{DynamicResource MonitoringCraneRailBrush}"/>
-                            <Label x:Name="SC07"
-                           Content="7"
-                           Style="{StaticResource StackerCraneStyle}"
-                           Canvas.Left="671"
-                           behaviors:CanvasMotion.TargetTop="{Binding CraneStates[07].CanvasTop, FallbackValue=544}"
-                           Background="{Binding CraneStates[07].Background, FallbackValue=#32D43F}"
-                           Tag="{Binding CraneStates[07]}"
-                           ToolTip="{Binding CraneStates[07].ToolTip}"
-                           Panel.ZIndex="40" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Label x:Name="SC07" Content="7" Style="{StaticResource StackerCraneStyle}" Canvas.Left="671" behaviors:CanvasMotion.TargetTop="{Binding CraneStates[07].CanvasTop, FallbackValue=544}" Background="{Binding CraneStates[07].Background, FallbackValue=#32D43F}" Tag="{Binding CraneStates[07]}" ToolTip="{Binding CraneStates[07].ToolTip}" Panel.ZIndex="40" HorizontalAlignment="Left" VerticalAlignment="Center"/>
 
                             <!-- 랙과 1연 컨베이어 -->
                             <Label x:Name="Rack0109" Content="9" Canvas.Left="20" Canvas.Top="322" Width="30" Height="50" Style="{StaticResource RackStateCellStyle}" Tag="{Binding RackBayStates[0109]}" ToolTip="{Binding RackBayStates[0109].ToolTip}"/>
@@ -655,171 +525,41 @@
                             <Label x:Name="PLT23" Content="23" Canvas.Left="399" Canvas.Top="940" Width="30" Height="41" Style="{StaticResource OutboundTrackingSectionStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Tag="{Binding TrackStates[23]}" ToolTip="{Binding TrackStates[23].ToolTip}"/>
 
                             <!-- RGV: 3열부터 14열까지만 배치 -->
-                            <Rectangle x:Name="RgvRailUpper" Canvas.Left="130" Canvas.Top="905"
-                               Width="580" Height="2" Fill="{DynamicResource MonitoringCarrierRailBrush}"/>
-                            <Rectangle x:Name="RgvRailLower" Canvas.Left="130" Canvas.Top="918"
-                               Width="580" Height="2" Fill="{DynamicResource MonitoringCarrierRailBrush}"/>
-                            <Rectangle x:Name="RgvRailLeftStop" Canvas.Left="130" Canvas.Top="895"
-                               Width="5" Height="34" Fill="{DynamicResource MonitoringCarrierRailBrush}"/>
-                            <Rectangle x:Name="RgvRailRightStop" Canvas.Left="710" Canvas.Top="895"
-                               Width="5" Height="34" Fill="{DynamicResource MonitoringCarrierRailBrush}"/>
+                            <Rectangle x:Name="RgvRailUpper" Canvas.Left="130" Canvas.Top="905" Width="580" Height="2" Fill="{DynamicResource MonitoringCarrierRailBrush}"/>
+                            <Rectangle x:Name="RgvRailLower" Canvas.Left="130" Canvas.Top="918" Width="580" Height="2" Fill="{DynamicResource MonitoringCarrierRailBrush}"/>
+                            <Rectangle x:Name="RgvRailLeftStop" Canvas.Left="130" Canvas.Top="895" Width="5" Height="34" Fill="{DynamicResource MonitoringCarrierRailBrush}"/>
+                            <Rectangle x:Name="RgvRailRightStop" Canvas.Left="710" Canvas.Top="895" Width="5" Height="34" Fill="{DynamicResource MonitoringCarrierRailBrush}"/>
 
-                            <ContentControl x:Name="BottomCarrier25"
-                                    Content="{Binding RgvStates[01].DisplayNo, FallbackValue=25}"
-                                    Style="{StaticResource RgvCarrierStyle}"
-                                    behaviors:CanvasMotion.TargetLeft="{Binding RgvStates[01].CanvasLeft, FallbackValue=363}"
-                                    Canvas.Top="894"
-                                    Tag="{Binding RgvStates[01]}"
-                                    ToolTip="{Binding RgvStates[01].ToolTip}"
-                                    Panel.ZIndex="10"/>
-                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_"
-                        Canvas.Left="20" Canvas.Top="802"
-                        Width="30" Height="179"
-                        Fill="{DynamicResource MonitoringBcrConnectorBrush}"
-                        IsHitTestVisible="False"
-                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_복사__C_"
-                        Canvas.Left="86" Canvas.Top="802"
-                        Width="30" Height="179"
-                        Fill="{DynamicResource MonitoringBcrConnectorBrush}"
-                        IsHitTestVisible="False"
-                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_복사__C_1"
-                        Canvas.Left="20" Canvas.Top="802"
-                        Width="30" Height="179"
-                        Fill="{DynamicResource MonitoringBcrConnectorBrush}"
-                        IsHitTestVisible="False"
-                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_1"
-                        Canvas.Left="397" Canvas.Top="940"
-                        Width="33" Height="90"
-                        Fill="{DynamicResource MonitoringBcrConnectorBrush}"
-                        IsHitTestVisible="False"
-                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_1복사__C_"
-                        Canvas.Left="335" Canvas.Top="940"
-                        Width="33" Height="90"
-                        Fill="{DynamicResource MonitoringBcrConnectorBrush}"
-                        IsHitTestVisible="False"
-                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_1복사__C_1"
-                        Canvas.Left="273" Canvas.Top="940"
-                        Width="33" Height="90"
-                        Fill="{DynamicResource MonitoringBcrConnectorBrush}"
-                        IsHitTestVisible="False"
-                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_1복사__C_2"
-                        Canvas.Left="210" Canvas.Top="940"
-                        Width="33" Height="90"
-                        Fill="{DynamicResource MonitoringBcrConnectorBrush}"
-                        IsHitTestVisible="False"
-                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                            <Rectangle x:Name="PLT02_03_Gap복사__C_"
-                        Canvas.Left="149" Canvas.Top="940"
-                        Width="33" Height="90"
-                        Fill="{DynamicResource MonitoringBcrConnectorBrush}"
-                        IsHitTestVisible="False" 
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Top"
-                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34"/>
-                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_1복사__C_1복사__C_"
-                        Canvas.Left="161" Canvas.Top="988"
-                        Width="270" Height="42"
-                        Fill="{DynamicResource MonitoringBcrConnectorBrush}"
-                        IsHitTestVisible="False"
-                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2"
-                        Canvas.Left="150" Canvas.Top="769"
-                        Width="29" Height="120"
-                        Fill="{DynamicResource MonitoringBcrConnectorBrush}"
-                        IsHitTestVisible="False"
-                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C_"
-                        Canvas.Left="215" Canvas.Top="769"
-                        Width="65" Height="120"
-                        Fill="{DynamicResource MonitoringBcrConnectorBrush}"
-                        IsHitTestVisible="False"
-                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C2_"
-                        Canvas.Left="315" Canvas.Top="769"
-                        Width="65" Height="120"
-                        Fill="{DynamicResource MonitoringBcrConnectorBrush}"
-                        IsHitTestVisible="False"
-                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C3_"
-                        Canvas.Left="415" Canvas.Top="769"
-                        Width="65" Height="120"
-                        Fill="{DynamicResource MonitoringBcrConnectorBrush}"
-                        IsHitTestVisible="False"
-                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C4_"
-                        Canvas.Left="515" Canvas.Top="769"
-                        Width="65" Height="120"
-                        Fill="{DynamicResource MonitoringBcrConnectorBrush}"
-                        IsHitTestVisible="False"
-                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C5_"
-                        Canvas.Left="615" Canvas.Top="769"
-                        Width="65" Height="120"
-                        Fill="{DynamicResource MonitoringBcrConnectorBrush}"
-                        IsHitTestVisible="False"
-                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_3"
-                        Canvas.Left="150" Canvas.Top="216"
-                        Width="30" Height="88"
-                        Fill="{DynamicResource MonitoringBcrConnectorBrush}"
-                        IsHitTestVisible="False"
-                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C6_"
-                        Canvas.Left="215" Canvas.Top="216"
-                        Width="65" Height="88"
-                        Fill="{DynamicResource MonitoringBcrConnectorBrush}"
-                        IsHitTestVisible="False"
-                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C7_"
-                        Canvas.Left="316" Canvas.Top="216"
-                        Width="65" Height="88"
-                        Fill="{DynamicResource MonitoringBcrConnectorBrush}"
-                        IsHitTestVisible="False"
-                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C8_"
-                        Canvas.Left="416" Canvas.Top="216"
-                        Width="65" Height="88"
-                        Fill="{DynamicResource MonitoringBcrConnectorBrush}"
-                        IsHitTestVisible="False"
-                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C9_"
-                        Canvas.Left="516" Canvas.Top="216"
-                        Width="65" Height="88"
-                        Fill="{DynamicResource MonitoringBcrConnectorBrush}"
-                        IsHitTestVisible="False"
-                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__10_"
-                        Canvas.Left="615" Canvas.Top="216"
-                        Width="65" Height="88"
-                        Fill="{DynamicResource MonitoringBcrConnectorBrush}"
-                        IsHitTestVisible="False"
-                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__10_복사__C_"
-                        Canvas.Left="347" Canvas.Top="116"
-                        Width="102" Height="50"
-                        Fill="{DynamicResource MonitoringBcrConnectorBrush}"
-                        IsHitTestVisible="False"
-                        Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                            <Control x:Name="OP01" Style="{StaticResource StatusLampStyle}" Canvas.Left="470" Canvas.Top="950" Panel.ZIndex="30"
-                                     Background="{Binding OperatorStates[02].Background}" Opacity="{Binding OperatorStates[02].Opacity}" ToolTip="{Binding OperatorStates[02].ToolTip}"/>
-                            <Control x:Name="OP02" Style="{StaticResource StatusLampStyle}" Canvas.Left="500" Canvas.Top="950" Panel.ZIndex="30"
-                                     Background="{Binding OperatorStates[03].Background}" Opacity="{Binding OperatorStates[03].Opacity}" ToolTip="{Binding OperatorStates[03].ToolTip}"/>
-                            <Control x:Name="OP03" Style="{StaticResource StatusLampStyle}" Canvas.Left="490" Canvas.Top="125" Panel.ZIndex="30"
-                                     Background="{Binding OperatorStates[04].Background}" Opacity="{Binding OperatorStates[04].Opacity}" ToolTip="{Binding OperatorStates[04].ToolTip}"/>
-                            <Control x:Name="bcr01" Style="{StaticResource BcrSignalStyle}" Canvas.Left="68" Canvas.Top="900" Panel.ZIndex="30"
-                                     Background="{Binding BcrStates[01].Background}" Opacity="{Binding BcrStates[01].Opacity}" ToolTip="{Binding BcrStates[01].ToolTip}"/>
-                            <Control x:Name="bcr02" Style="{StaticResource BcrSignalStyle}" Canvas.Left="331" Canvas.Top="130" Panel.ZIndex="30"
-                                     Background="{Binding BcrStates[04].Background}" Opacity="{Binding BcrStates[04].Opacity}" ToolTip="{Binding BcrStates[04].ToolTip}"/>
-                            <Control x:Name="bcr03" Style="{StaticResource BcrSignalStyle}" Canvas.Left="135" Canvas.Top="1000" Panel.ZIndex="30"
-                                     Background="{Binding BcrStates[02].Background}" Opacity="{Binding BcrStates[02].Opacity}" ToolTip="{Binding BcrStates[02].ToolTip}"/>
-                            <Control x:Name="bcr04" Style="{StaticResource BcrSignalStyle}" Canvas.Left="434" Canvas.Top="1000" Panel.ZIndex="30"
-                                     Background="{Binding BcrStates[03].Background}" Opacity="{Binding BcrStates[03].Opacity}" ToolTip="{Binding BcrStates[03].ToolTip}"/>
+                            <ContentControl x:Name="BottomCarrier25" Content="{Binding RgvStates[01].DisplayNo, FallbackValue=25}" Style="{StaticResource RgvCarrierStyle}" behaviors:CanvasMotion.TargetLeft="{Binding RgvStates[01].CanvasLeft, FallbackValue=363}" Canvas.Top="894" Tag="{Binding RgvStates[01]}" ToolTip="{Binding RgvStates[01].ToolTip}" Panel.ZIndex="10"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_" Canvas.Left="20" Canvas.Top="802" Width="30" Height="179" Fill="{DynamicResource MonitoringBcrConnectorBrush}" IsHitTestVisible="False" Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_복사__C_" Canvas.Left="86" Canvas.Top="802" Width="30" Height="179" Fill="{DynamicResource MonitoringBcrConnectorBrush}" IsHitTestVisible="False" Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_복사__C_1" Canvas.Left="20" Canvas.Top="802" Width="30" Height="179" Fill="{DynamicResource MonitoringBcrConnectorBrush}" IsHitTestVisible="False" Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_1" Canvas.Left="397" Canvas.Top="940" Width="33" Height="90" Fill="{DynamicResource MonitoringBcrConnectorBrush}" IsHitTestVisible="False" Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_1복사__C_" Canvas.Left="335" Canvas.Top="940" Width="33" Height="90" Fill="{DynamicResource MonitoringBcrConnectorBrush}" IsHitTestVisible="False" Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_1복사__C_1" Canvas.Left="273" Canvas.Top="940" Width="33" Height="90" Fill="{DynamicResource MonitoringBcrConnectorBrush}" IsHitTestVisible="False" Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_1복사__C_2" Canvas.Left="210" Canvas.Top="940" Width="33" Height="90" Fill="{DynamicResource MonitoringBcrConnectorBrush}" IsHitTestVisible="False" Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_" Canvas.Left="149" Canvas.Top="940" Width="33" Height="90" Fill="{DynamicResource MonitoringBcrConnectorBrush}" IsHitTestVisible="False" HorizontalAlignment="Center" VerticalAlignment="Top" Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_1복사__C_1복사__C_" Canvas.Left="161" Canvas.Top="988" Width="270" Height="42" Fill="{DynamicResource MonitoringBcrConnectorBrush}" IsHitTestVisible="False" Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2" Canvas.Left="150" Canvas.Top="769" Width="29" Height="120" Fill="{DynamicResource MonitoringBcrConnectorBrush}" IsHitTestVisible="False" Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C_" Canvas.Left="215" Canvas.Top="769" Width="65" Height="120" Fill="{DynamicResource MonitoringBcrConnectorBrush}" IsHitTestVisible="False" Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C2_" Canvas.Left="315" Canvas.Top="769" Width="65" Height="120" Fill="{DynamicResource MonitoringBcrConnectorBrush}" IsHitTestVisible="False" Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C3_" Canvas.Left="415" Canvas.Top="769" Width="65" Height="120" Fill="{DynamicResource MonitoringBcrConnectorBrush}" IsHitTestVisible="False" Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C4_" Canvas.Left="515" Canvas.Top="769" Width="65" Height="120" Fill="{DynamicResource MonitoringBcrConnectorBrush}" IsHitTestVisible="False" Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C5_" Canvas.Left="615" Canvas.Top="769" Width="65" Height="120" Fill="{DynamicResource MonitoringBcrConnectorBrush}" IsHitTestVisible="False" Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_3" Canvas.Left="150" Canvas.Top="216" Width="30" Height="88" Fill="{DynamicResource MonitoringBcrConnectorBrush}" IsHitTestVisible="False" Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C6_" Canvas.Left="215" Canvas.Top="216" Width="65" Height="88" Fill="{DynamicResource MonitoringBcrConnectorBrush}" IsHitTestVisible="False" Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C7_" Canvas.Left="316" Canvas.Top="216" Width="65" Height="88" Fill="{DynamicResource MonitoringBcrConnectorBrush}" IsHitTestVisible="False" Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C8_" Canvas.Left="416" Canvas.Top="216" Width="65" Height="88" Fill="{DynamicResource MonitoringBcrConnectorBrush}" IsHitTestVisible="False" Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__C9_" Canvas.Left="516" Canvas.Top="216" Width="65" Height="88" Fill="{DynamicResource MonitoringBcrConnectorBrush}" IsHitTestVisible="False" Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__10_" Canvas.Left="615" Canvas.Top="216" Width="65" Height="88" Fill="{DynamicResource MonitoringBcrConnectorBrush}" IsHitTestVisible="False" Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="PLT02_03_Gap복사__C_복사__C_2복사__10_복사__C_" Canvas.Left="347" Canvas.Top="116" Width="102" Height="50" Fill="{DynamicResource MonitoringBcrConnectorBrush}" IsHitTestVisible="False" Panel.ZIndex="-10" RadiusX="1.729" RadiusY="1.34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Control x:Name="OP01" Style="{StaticResource StatusLampStyle}" Canvas.Left="470" Canvas.Top="950" Panel.ZIndex="30" Background="{Binding OperatorStates[02].Background}" Opacity="{Binding OperatorStates[02].Opacity}" ToolTip="{Binding OperatorStates[02].ToolTip}"/>
+                            <Control x:Name="OP02" Style="{StaticResource StatusLampStyle}" Canvas.Left="500" Canvas.Top="950" Panel.ZIndex="30" Background="{Binding OperatorStates[03].Background}" Opacity="{Binding OperatorStates[03].Opacity}" ToolTip="{Binding OperatorStates[03].ToolTip}"/>
+                            <Control x:Name="OP03" Style="{StaticResource StatusLampStyle}" Canvas.Left="490" Canvas.Top="125" Panel.ZIndex="30" Background="{Binding OperatorStates[04].Background}" Opacity="{Binding OperatorStates[04].Opacity}" ToolTip="{Binding OperatorStates[04].ToolTip}"/>
+                            <Control x:Name="bcr01" Style="{StaticResource BcrSignalStyle}" Canvas.Left="68" Canvas.Top="900" Panel.ZIndex="30" Background="{Binding BcrStates[01].Background}" Opacity="{Binding BcrStates[01].Opacity}" ToolTip="{Binding BcrStates[01].ToolTip}"/>
+                            <Control x:Name="bcr02" Style="{StaticResource BcrSignalStyle}" Canvas.Left="331" Canvas.Top="130" Panel.ZIndex="30" Background="{Binding BcrStates[04].Background}" Opacity="{Binding BcrStates[04].Opacity}" ToolTip="{Binding BcrStates[04].ToolTip}"/>
+                            <Control x:Name="bcr03" Style="{StaticResource BcrSignalStyle}" Canvas.Left="135" Canvas.Top="1000" Panel.ZIndex="30" Background="{Binding BcrStates[02].Background}" Opacity="{Binding BcrStates[02].Opacity}" ToolTip="{Binding BcrStates[02].ToolTip}"/>
+                            <Control x:Name="bcr04" Style="{StaticResource BcrSignalStyle}" Canvas.Left="434" Canvas.Top="1000" Panel.ZIndex="30" Background="{Binding BcrStates[03].Background}" Opacity="{Binding BcrStates[03].Opacity}" ToolTip="{Binding BcrStates[03].ToolTip}"/>
                             <!--<TextBox x:Name="tbBcr02" Text="BCR 리딩 정상" Style="{StaticResource BcrTextBoxStyle}" Canvas.Left="66" Canvas.Top="1016"/>
                     <TextBox x:Name="tbBcr03" Text="BCR 리딩 정상" Style="{StaticResource BcrTextBoxStyle}" Canvas.Left="434" Canvas.Top="1016"/>
                     <TextBox x:Name="tbBcr04" Text="BCR 리딩 정상" Style="{StaticResource BcrTextBoxStyle}" Canvas.Left="262" Canvas.Top="146"/>-->
@@ -827,45 +567,14 @@
                             <TextBox x:Name="tbPck02" Text="완전출고" Style="{StaticResource PckTextBoxStyle}" Canvas.Left="340" Canvas.Top="1040"/>
 
                             <!-- 하향/상향 화살표 -->
-                            <Control x:Name="DownArrow01" Style="{StaticResource DownArrowStyle}" Canvas.Left="70" Canvas.Top="958" Panel.ZIndex="30"
-                                     Visibility="{Binding Bank2OutboundArrowVisibility}" ToolTip="{Binding Sc1ModeToolTip}"/>
-                            <Control x:Name="UpArrow01" Style="{StaticResource UpArrowStyle}" Canvas.Left="70" Canvas.Top="958" Panel.ZIndex="30"
-                                     Visibility="{Binding Bank2InboundArrowVisibility}" ToolTip="{Binding Sc1ModeToolTip}"/>
-                            <Control x:Name="DownArrow02" Style="{StaticResource DownArrowStyle}" Canvas.Left="6" Canvas.Top="958" Panel.ZIndex="30"
-                                     Visibility="{Binding Bank1OutboundArrowVisibility}" ToolTip="{Binding Sc1ModeToolTip}"/>
-                            <Button x:Name="Bank2AvailabilityButton"
-                                    Canvas.Left="45"
-                                    Canvas.Top="977"
-                                    Width="64"
-                                    Height="18"
-                                    Panel.ZIndex="80"
-                                    Content="{Binding Bank2AvailabilityText}"
-                                    d:Content="입고 가능"
-                                    Visibility="{Binding Bank2AvailabilityVisibility}"
-                                    d:Visibility="Visible"
-                                    ToolTip="{Binding Sc1ModeToolTip}"
-                                    Command="{Binding ToggleBank2ModeCommand}"
-                                    Foreground="{DynamicResource MonitoringModeTextBrush}"
-                                    Background="{DynamicResource MonitoringTableBackgroundBrush}"
-                                    BorderBrush="{DynamicResource MonitoringPanelHeaderBorderBrush}"
-                                    BorderThickness="1"
-                                    Padding="0"
-                                    Cursor="Hand"
-                                    FontSize="9"
-                                    FontWeight="Bold"
-                                    HorizontalContentAlignment="Center"
-                                    VerticalContentAlignment="Center">
+                            <Control x:Name="DownArrow01" Style="{StaticResource DownArrowStyle}" Canvas.Left="70" Canvas.Top="958" Panel.ZIndex="30" Visibility="{Binding Bank2OutboundArrowVisibility}" ToolTip="{Binding Sc1ModeToolTip}"/>
+                            <Control x:Name="UpArrow01" Style="{StaticResource UpArrowStyle}" Canvas.Left="70" Canvas.Top="958" Panel.ZIndex="30" Visibility="{Binding Bank2InboundArrowVisibility}" ToolTip="{Binding Sc1ModeToolTip}"/>
+                            <Control x:Name="DownArrow02" Style="{StaticResource DownArrowStyle}" Canvas.Left="6" Canvas.Top="958" Panel.ZIndex="30" Visibility="{Binding Bank1OutboundArrowVisibility}" ToolTip="{Binding Sc1ModeToolTip}"/>
+                            <Button x:Name="Bank2AvailabilityButton" Canvas.Left="45" Canvas.Top="977" Width="64" Height="18" Panel.ZIndex="80" Content="{Binding Bank2AvailabilityText}" d:Content="입고 가능" Visibility="{Binding Bank2AvailabilityVisibility}" d:Visibility="Visible" ToolTip="{Binding Sc1ModeToolTip}" Command="{Binding ToggleBank2ModeCommand}" Foreground="{DynamicResource MonitoringModeTextBrush}" Background="{DynamicResource MonitoringTableBackgroundBrush}" BorderBrush="{DynamicResource MonitoringPanelHeaderBorderBrush}" BorderThickness="1" Padding="0" Cursor="Hand" FontSize="9" FontWeight="Bold" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
                                 <Button.Template>
                                     <ControlTemplate TargetType="{x:Type Button}">
-                                        <Border x:Name="ModeButtonBorder"
-                                                Background="{TemplateBinding Background}"
-                                                BorderBrush="{TemplateBinding BorderBrush}"
-                                                BorderThickness="{TemplateBinding BorderThickness}"
-                                                CornerRadius="2">
-                                            <ContentPresenter Content="{TemplateBinding Content}"
-                                                              TextElement.Foreground="{TemplateBinding Foreground}"
-                                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                        <Border x:Name="ModeButtonBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2">
+                                            <ContentPresenter Content="{TemplateBinding Content}" TextElement.Foreground="{TemplateBinding Foreground}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                                         </Border>
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
@@ -880,30 +589,18 @@
                             </Button>
 
                             <!-- 파란색 상태 램프 -->
-                            <Control x:Name="StatusLamp01"
-                             Style="{StaticResource StatusLampStyle}"
-                             Canvas.Left="20"
-                             Canvas.Top="1000"
-                             Background="{Binding OperatorStates[01].Background}"
-                             Opacity="{Binding OperatorStates[01].Opacity}"
-                             ToolTip="{Binding OperatorStates[01].ToolTip}"
-                             Panel.ZIndex="30"/>
+                            <Control x:Name="StatusLamp01" Style="{StaticResource StatusLampStyle}" Canvas.Left="20" Canvas.Top="1000" Background="{Binding OperatorStates[01].Background}" Opacity="{Binding OperatorStates[01].Opacity}" ToolTip="{Binding OperatorStates[01].ToolTip}" Panel.ZIndex="30"/>
                             <Label Content="2층 라인" Foreground="{DynamicResource MonitoringTextBrush}" Canvas.Left="20" Canvas.Top="230" FontSize="24" FontFamily="Noto Sans KR" FontWeight="Bold"/>
                             <Label Content="1층 라인" Foreground="{DynamicResource MonitoringTextBrush}" Canvas.Left="620" Canvas.Top="970" FontSize="24" FontFamily="Noto Sans KR" FontWeight="Bold"/>
                             <Label Content="OP #1" Foreground="{DynamicResource MonitoringTextBrush}" Canvas.Left="6" Canvas.Top="1010" FontSize="9" FontFamily="Noto Sans KR" FontWeight="Bold"/>
                             <Label Content="OP #2" Foreground="{DynamicResource MonitoringTextBrush}" Canvas.Left="454" Canvas.Top="960" FontSize="9" FontFamily="Noto Sans KR" FontWeight="Bold"/>
                             <Label Content="OP #3" Foreground="{DynamicResource MonitoringTextBrush}" Canvas.Left="495" Canvas.Top="960" FontSize="9" FontFamily="Noto Sans KR" FontWeight="Bold"/>
                             <Label Content="OP #4" Foreground="{DynamicResource MonitoringTextBrush}" Canvas.Left="484" Canvas.Top="136" FontSize="9" FontFamily="Noto Sans KR" FontWeight="Bold"/>
-                            <Button x:Name="BcrCanvasButton01" Content="BCR #1" Canvas.Left="49" Canvas.Top="907" Style="{StaticResource BcrCanvasLabelStyle}"
-                                    Tag="{Binding BcrStates[01]}" ToolTip="{Binding BcrStates[01].ToolTip}" Command="{Binding ToggleBcrCommand}" CommandParameter="1"/>
-                            <Button x:Name="BcrCanvasButton02" Content="BCR #2" Canvas.Left="99" Canvas.Top="996" Style="{StaticResource BcrCanvasLabelStyle}"
-                                    Tag="{Binding BcrStates[02]}" ToolTip="{Binding BcrStates[02].ToolTip}" Command="{Binding ToggleBcrCommand}" CommandParameter="2"/>
-                            <Button x:Name="BcrCanvasButton03" Content="BCR #3" Canvas.Left="441" Canvas.Top="996" Style="{StaticResource BcrCanvasLabelStyle}"
-                                    Tag="{Binding BcrStates[03]}" ToolTip="{Binding BcrStates[03].ToolTip}" Command="{Binding ToggleBcrCommand}" CommandParameter="3"/>
-                            <Button x:Name="BcrCanvasButton04" Content="BCR #4" Canvas.Left="294" Canvas.Top="126" Style="{StaticResource BcrCanvasLabelStyle}"
-                                    Tag="{Binding BcrStates[04]}" ToolTip="{Binding BcrStates[04].ToolTip}" Command="{Binding ToggleBcrCommand}" CommandParameter="4"/>
-                            <Control x:Name="UpArrow01복사__C_" Style="{StaticResource UpArrowStyle}" Canvas.Left="136" Canvas.Top="855" Panel.ZIndex="30"
-                                Visibility="{Binding Bank2InboundArrowVisibility}" ToolTip="{Binding Sc1ModeToolTip}" HorizontalAlignment="Center" VerticalAlignment="Top" Height="43" Width="14"/>
+                            <Button x:Name="BcrCanvasButton01" Content="BCR #1" Canvas.Left="49" Canvas.Top="907" Style="{StaticResource BcrCanvasLabelStyle}" Tag="{Binding BcrStates[01]}" ToolTip="{Binding BcrStates[01].ToolTip}" Command="{Binding ToggleBcrCommand}" CommandParameter="1"/>
+                            <Button x:Name="BcrCanvasButton02" Content="BCR #2" Canvas.Left="99" Canvas.Top="996" Style="{StaticResource BcrCanvasLabelStyle}" Tag="{Binding BcrStates[02]}" ToolTip="{Binding BcrStates[02].ToolTip}" Command="{Binding ToggleBcrCommand}" CommandParameter="2"/>
+                            <Button x:Name="BcrCanvasButton03" Content="BCR #3" Canvas.Left="441" Canvas.Top="996" Style="{StaticResource BcrCanvasLabelStyle}" Tag="{Binding BcrStates[03]}" ToolTip="{Binding BcrStates[03].ToolTip}" Command="{Binding ToggleBcrCommand}" CommandParameter="3"/>
+                            <Button x:Name="BcrCanvasButton04" Content="BCR #4" Canvas.Left="294" Canvas.Top="126" Style="{StaticResource BcrCanvasLabelStyle}" Tag="{Binding BcrStates[04]}" ToolTip="{Binding BcrStates[04].ToolTip}" Command="{Binding ToggleBcrCommand}" CommandParameter="4"/>
+                            <Control x:Name="UpArrow01복사__C_" Style="{StaticResource UpArrowStyle}" Canvas.Left="136" Canvas.Top="855" Panel.ZIndex="30" Visibility="{Binding Bank2InboundArrowVisibility}" ToolTip="{Binding Sc1ModeToolTip}" HorizontalAlignment="Center" VerticalAlignment="Top" Height="43" Width="14"/>
 
                             <!-- 전체 화면 맞춤: 도면 콘텐츠는 Canvas.Top 0~1072 안에 배치 -->
 
@@ -912,58 +609,33 @@
                 </Viewbox>
 
                 <!-- 트래킹 도면과 하단 정보 패널 사이 구분선 -->
-                <Grid x:Name="MonitorSectionDivider"
-                      Grid.Row="1"
-                      Height="16"
-                      Margin="16,-24,16,0"
-                      VerticalAlignment="Top"
-                      Panel.ZIndex="40"
-                      IsHitTestVisible="False">
+                <Grid x:Name="MonitorSectionDivider" Grid.Row="1" Height="16" Margin="16,-24,16,0" VerticalAlignment="Top" Panel.ZIndex="40" IsHitTestVisible="False">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Rectangle Grid.Column="0"
-                               Height="1"
-                               VerticalAlignment="Center"
-                               Fill="{DynamicResource MonitoringSectionDividerBrush}"/>
+                    <Rectangle Grid.Column="0" Height="1" VerticalAlignment="Center" Fill="{DynamicResource MonitoringSectionDividerBrush}"/>
 
 
-                    <Rectangle Grid.Column="2"
-                               Height="1"
-                               VerticalAlignment="Center"
-                               Fill="{DynamicResource MonitoringSectionDividerBrush}"/>
+                    <Rectangle Grid.Column="2" Height="1" VerticalAlignment="Center" Fill="{DynamicResource MonitoringSectionDividerBrush}"/>
                 </Grid>
 
                 <!-- 화면 하단 정보 영역: BCR / 설비 상태 / 적재 현황 -->
-                <Viewbox x:Name="MonitorInfoViewbox"
-                          Grid.Row="1"
-                          Margin="0"
-                          Stretch="Uniform"
-                          StretchDirection="Both"
-                          HorizontalAlignment="Left"
-                          VerticalAlignment="Top">
+                <Viewbox x:Name="MonitorInfoViewbox" Grid.Row="1" Margin="16,0,16,0" Stretch="Uniform" StretchDirection="Both" HorizontalAlignment="Right" VerticalAlignment="Top">
 
-                    <Grid x:Name="MonitorInfoGrid"
-                      Width="750"
-                      Height="150">
+                    <Grid x:Name="MonitorInfoGrid" Width="800" Height="190">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="185*"/>
-                            <ColumnDefinition Width="3"/>
-                            <ColumnDefinition Width="307*"/>
                             <ColumnDefinition Width="8"/>
-                            <ColumnDefinition Width="247*"/>
+                            <ColumnDefinition Width="307*"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="287*"/>
                         </Grid.ColumnDefinitions>
 
                         <!-- 1. BCR 상태 -->
-                        <Border x:Name="BcrMonitorPanel"
-                            Grid.Column="0"
-                            Height="112"
-                            VerticalAlignment="Top"
-                            Background="Transparent"
-                            BorderThickness="0">
+                        <Border x:Name="BcrMonitorPanel" Grid.Column="0" Height="112" VerticalAlignment="Top" Background="Transparent" BorderThickness="0">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="*"/>
@@ -1017,15 +689,9 @@
                         </Border>
 
                         <!-- 2. 설비 상태 색상표 -->
-                        <Border x:Name="EquipmentLegendPanel"
-                                Grid.Column="2"
-                                Background="{DynamicResource MonitoringStatusPanelBrush}"
-                                BorderBrush="{DynamicResource MonitoringPanelHeaderBorderBrush}"
-                                BorderThickness="1"
-                                CornerRadius="4">
+                        <Border x:Name="EquipmentLegendPanel" Grid.Column="2" Height="150" VerticalAlignment="Top" Background="{DynamicResource MonitoringStatusPanelBrush}" BorderBrush="{DynamicResource MonitoringPanelHeaderBorderBrush}" BorderThickness="1" CornerRadius="4">
                             <Grid>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="*"/>
                                     <RowDefinition Height="*"/>
                                     <RowDefinition Height="*"/>
                                     <RowDefinition Height="*"/>
@@ -1039,9 +705,9 @@
                                     </Grid.ColumnDefinitions>
                                     <Label Content="RACK" Style="{StaticResource MonitorLegendNameStyle}"/>
                                     <UniformGrid Grid.Column="1" Rows="1" Columns="3">
-                                        <ContentControl Content="정상" BorderBrush="{DynamicResource MonitoringCellBrush}" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                        <ContentControl Content="정상" BorderBrush="White" Style="{StaticResource MonitorLegendItemStyle}"/>
                                         <ContentControl Content="공 출고" BorderBrush="#F000D0" Style="{StaticResource MonitorLegendItemStyle}"/>
-                                        <ContentControl Content="이중 입고" BorderBrush="#76006F" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                        <ContentControl Content="이중 입고" BorderBrush="#76006F" BorderThickness="0,0,0,1" Style="{StaticResource MonitorLegendItemStyle}"/>
                                     </UniformGrid>
                                 </Grid>
 
@@ -1050,12 +716,12 @@
                                         <ColumnDefinition Width="76"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <Label Content="C/V DATA" Style="{StaticResource MonitorLegendNameStyle}"/>
+                                    <Label Content="C/V" Style="{StaticResource MonitorLegendNameStyle}"/>
                                     <UniformGrid Grid.Column="1" Rows="1" Columns="4">
                                         <ContentControl Content="PLT+DATA" BorderBrush="{StaticResource TrackingPalletAndDataBrush}" Style="{StaticResource MonitorLegendItemStyle}"/>
                                         <ContentControl Content="파렛트 유" BorderBrush="{StaticResource TrackingPalletOnlyBrush}" Style="{StaticResource MonitorLegendItemStyle}"/>
                                         <ContentControl Content="데이터 유" BorderBrush="{StaticResource TrackingDataOnlyBrush}" Style="{StaticResource MonitorLegendItemStyle}"/>
-                                        <ContentControl Content="비어 있음" BorderBrush="{StaticResource OutboundTrackingEmptyBrush}" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                        <ContentControl Content="비어 있음" BorderBrush="{StaticResource OutboundTrackingEmptyBrush}" BorderThickness="0,0,0,1" Style="{StaticResource MonitorLegendItemStyle}"/>
                                     </UniformGrid>
                                 </Grid>
 
@@ -1064,12 +730,12 @@
                                         <ColumnDefinition Width="76"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <Label Content="C/V" Style="{StaticResource MonitorLegendNameStyle}"/>
+                                    <Label Content="Stacker Crane" Style="{StaticResource MonitorLegendNameStyle}"/>
                                     <UniformGrid Grid.Column="1" Rows="1" Columns="4">
-                                        <ContentControl Content="수동 상태" BorderBrush="#C7C7C7" Style="{StaticResource MonitorLegendItemStyle}"/>
-                                        <ContentControl Content="공파렛트 매거진" FontSize="7" BorderBrush="#15989A" Style="{StaticResource MonitorLegendItemStyle}"/>
-                                        <ContentControl Content="SIZE / WM" BorderBrush="#10258F" Style="{StaticResource MonitorLegendItemStyle}"/>
-                                        <ContentControl Content="에러" BorderBrush="#F20D0D" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                        <ContentControl Content="준비 완료" BorderBrush="#00FF00" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                        <ContentControl Content="오프라인" BorderBrush="#F0F0F0" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                        <ContentControl Content="작업중" BorderBrush="#FFFF00" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                        <ContentControl Content="에러" BorderBrush="#FF0000" BorderThickness="0,0,0,1" Style="{StaticResource MonitorLegendItemStyle}"/>
                                     </UniformGrid>
                                 </Grid>
 
@@ -1078,42 +744,21 @@
                                         <ColumnDefinition Width="76"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <Label Content="Stacker Crane" Style="{StaticResource MonitorLegendNameStyle}"/>
+                                    <Label Content="RGV" BorderThickness="0,0,1,0" Style="{StaticResource MonitorLegendNameStyle}"/>
                                     <UniformGrid Grid.Column="1" Rows="1" Columns="4">
-                                        <ContentControl Content="준비 완료" BorderBrush="#00FF00" Style="{StaticResource MonitorLegendItemStyle}"/>
-                                        <ContentControl Content="오프라인" BorderBrush="#F0F0F0" Style="{StaticResource MonitorLegendItemStyle}"/>
-                                        <ContentControl Content="대기 아님" BorderBrush="#FFFF00" Style="{StaticResource MonitorLegendItemStyle}"/>
-                                        <ContentControl Content="에러" BorderBrush="#FF0000" Style="{StaticResource MonitorLegendItemStyle}"/>
-                                    </UniformGrid>
-                                </Grid>
-
-                                <Grid Grid.Row="4">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="76"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <Label Content="RGV" Style="{StaticResource MonitorLegendNameStyle}"/>
-                                    <UniformGrid Grid.Column="1" Rows="1" Columns="4">
-                                        <ContentControl Content="준비 완료" BorderBrush="{StaticResource RgvReadyBrush}" Style="{StaticResource MonitorLegendItemStyle}"/>
-                                        <ContentControl Content="수동 상태" BorderBrush="{DynamicResource RgvManualBrush}" Style="{StaticResource MonitorLegendItemStyle}"/>
-                                        <ContentControl Content="작업중" BorderBrush="{StaticResource RgvWorkingBrush}" Style="{StaticResource MonitorLegendItemStyle}"/>
-                                        <ContentControl Content="에러" BorderBrush="{StaticResource RgvErrorBrush}" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                        <ContentControl Content="준비 완료" BorderBrush="{StaticResource RgvReadyBrush}" BorderThickness="0,0,1,0" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                        <ContentControl Content="수동 상태" BorderBrush="{DynamicResource RgvManualBrush}" BorderThickness="0,0,1,0" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                        <ContentControl Content="작업중" BorderBrush="{StaticResource RgvWorkingBrush}" BorderThickness="0,0,1,0" Style="{StaticResource MonitorLegendItemStyle}"/>
+                                        <ContentControl Content="에러" BorderBrush="{StaticResource RgvErrorBrush}" BorderThickness="0" Style="{StaticResource MonitorLegendItemStyle}"/>
                                     </UniformGrid>
                                 </Grid>
                             </Grid>
                         </Border>
 
                         <!-- 3. 적재 현황 -->
-                        <Border x:Name="InventorySummaryPanel"
-                            Grid.Column="4"
-                            Background="{DynamicResource MonitoringTableBackgroundBrush}"
-                            BorderBrush="{DynamicResource MonitoringPanelHeaderBorderBrush}"
-                            BorderThickness="1"
-                            CornerRadius="4">
-                            <Grid>
+                        <Border x:Name="InventorySummaryPanel" Grid.Column="4" Padding="4" Background="{DynamicResource MonitoringTableBackgroundBrush}" BorderBrush="{DynamicResource MonitoringPanelHeaderBorderBrush}" BorderThickness="1" CornerRadius="4">
+                            <Grid UseLayoutRounding="True">
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="*"/>
                                     <RowDefinition Height="*"/>
                                     <RowDefinition Height="*"/>
                                     <RowDefinition Height="*"/>
@@ -1125,11 +770,11 @@
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1.05*"/>
                                     <ColumnDefinition Width="1*"/>
                                     <ColumnDefinition Width="1*"/>
                                     <ColumnDefinition Width="1*"/>
-                                    <ColumnDefinition Width="1*"/>
-                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1.15*"/>
                                 </Grid.ColumnDefinitions>
 
                                 <Label Grid.Row="0" Grid.Column="0" Content="적재현황" Style="{StaticResource MonitorTableHeaderStyle}"/>
@@ -1138,65 +783,53 @@
                                 <Label Grid.Row="0" Grid.Column="3" Content="빈 셀" Style="{StaticResource MonitorTableHeaderStyle}"/>
                                 <Label Grid.Row="0" Grid.Column="4" Content="적재율(%)" Style="{StaticResource MonitorTableHeaderStyle}"/>
 
-                                <Label Grid.Row="1" Grid.Column="0" Content="1호기" Style="{StaticResource MonitorTableHeaderStyle}"/>
+                                <Label Grid.Row="1" Grid.Column="0" Content="1호기" Style="{StaticResource MonitorTableRowHeaderStyle}"/>
                                 <Label x:Name="InventorySc01Total" Grid.Row="1" Grid.Column="1" Content="{Binding InventoryStates[01].TotalCells}" Style="{StaticResource MonitorTableCellStyle}"/>
                                 <Label x:Name="InventorySc01Used" Grid.Row="1" Grid.Column="2" Content="{Binding InventoryStates[01].UsedCells}" Style="{StaticResource MonitorTableCellStyle}"/>
                                 <Label x:Name="InventorySc01Empty" Grid.Row="1" Grid.Column="3" Content="{Binding InventoryStates[01].EmptyCells}" Style="{StaticResource MonitorTableCellStyle}"/>
                                 <Label x:Name="InventorySc01Rate" Grid.Row="1" Grid.Column="4" Content="{Binding InventoryStates[01].OccupancyRate, StringFormat={}{0:0.0}}" Style="{StaticResource MonitorTableCellStyle}"/>
 
-                                <Label Grid.Row="2" Grid.Column="0" Content="2호기" Style="{StaticResource MonitorTableHeaderStyle}"/>
+                                <Label Grid.Row="2" Grid.Column="0" Content="2호기" Style="{StaticResource MonitorTableRowHeaderStyle}"/>
                                 <Label x:Name="InventorySc02Total" Grid.Row="2" Grid.Column="1" Content="{Binding InventoryStates[02].TotalCells}" Style="{StaticResource MonitorTableCellStyle}"/>
                                 <Label x:Name="InventorySc02Used" Grid.Row="2" Grid.Column="2" Content="{Binding InventoryStates[02].UsedCells}" Style="{StaticResource MonitorTableCellStyle}"/>
                                 <Label x:Name="InventorySc02Empty" Grid.Row="2" Grid.Column="3" Content="{Binding InventoryStates[02].EmptyCells}" Style="{StaticResource MonitorTableCellStyle}"/>
                                 <Label x:Name="InventorySc02Rate" Grid.Row="2" Grid.Column="4" Content="{Binding InventoryStates[02].OccupancyRate, StringFormat={}{0:0.0}}" Style="{StaticResource MonitorTableCellStyle}"/>
 
-                                <Label Grid.Row="3" Grid.Column="0" Content="3호기" Style="{StaticResource MonitorTableHeaderStyle}"/>
+                                <Label Grid.Row="3" Grid.Column="0" Content="3호기" Style="{StaticResource MonitorTableRowHeaderStyle}"/>
                                 <Label x:Name="InventorySc03Total" Grid.Row="3" Grid.Column="1" Content="{Binding InventoryStates[03].TotalCells}" Style="{StaticResource MonitorTableCellStyle}"/>
                                 <Label x:Name="InventorySc03Used" Grid.Row="3" Grid.Column="2" Content="{Binding InventoryStates[03].UsedCells}" Style="{StaticResource MonitorTableCellStyle}"/>
                                 <Label x:Name="InventorySc03Empty" Grid.Row="3" Grid.Column="3" Content="{Binding InventoryStates[03].EmptyCells}" Style="{StaticResource MonitorTableCellStyle}"/>
                                 <Label x:Name="InventorySc03Rate" Grid.Row="3" Grid.Column="4" Content="{Binding InventoryStates[03].OccupancyRate, StringFormat={}{0:0.0}}" Style="{StaticResource MonitorTableCellStyle}"/>
 
-                                <Label Grid.Row="4" Grid.Column="0" Content="4호기" Style="{StaticResource MonitorTableHeaderStyle}"/>
+                                <Label Grid.Row="4" Grid.Column="0" Content="4호기" Style="{StaticResource MonitorTableRowHeaderStyle}"/>
                                 <Label x:Name="InventorySc04Total" Grid.Row="4" Grid.Column="1" Content="{Binding InventoryStates[04].TotalCells}" Style="{StaticResource MonitorTableCellStyle}"/>
                                 <Label x:Name="InventorySc04Used" Grid.Row="4" Grid.Column="2" Content="{Binding InventoryStates[04].UsedCells}" Style="{StaticResource MonitorTableCellStyle}"/>
                                 <Label x:Name="InventorySc04Empty" Grid.Row="4" Grid.Column="3" Content="{Binding InventoryStates[04].EmptyCells}" Style="{StaticResource MonitorTableCellStyle}"/>
                                 <Label x:Name="InventorySc04Rate" Grid.Row="4" Grid.Column="4" Content="{Binding InventoryStates[04].OccupancyRate, StringFormat={}{0:0.0}}" Style="{StaticResource MonitorTableCellStyle}"/>
 
-                                <Label Grid.Row="5" Grid.Column="0" Content="5호기" Style="{StaticResource MonitorTableHeaderStyle}"/>
+                                <Label Grid.Row="5" Grid.Column="0" Content="5호기" Style="{StaticResource MonitorTableRowHeaderStyle}"/>
                                 <Label x:Name="InventorySc05Total" Grid.Row="5" Grid.Column="1" Content="{Binding InventoryStates[05].TotalCells}" Style="{StaticResource MonitorTableCellStyle}"/>
                                 <Label x:Name="InventorySc05Used" Grid.Row="5" Grid.Column="2" Content="{Binding InventoryStates[05].UsedCells}" Style="{StaticResource MonitorTableCellStyle}"/>
                                 <Label x:Name="InventorySc05Empty" Grid.Row="5" Grid.Column="3" Content="{Binding InventoryStates[05].EmptyCells}" Style="{StaticResource MonitorTableCellStyle}"/>
                                 <Label x:Name="InventorySc05Rate" Grid.Row="5" Grid.Column="4" Content="{Binding InventoryStates[05].OccupancyRate, StringFormat={}{0:0.0}}" Style="{StaticResource MonitorTableCellStyle}"/>
 
-                                <Label Grid.Row="6" Grid.Column="0" Content="6호기" Style="{StaticResource MonitorTableHeaderStyle}"/>
+                                <Label Grid.Row="6" Grid.Column="0" Content="6호기" Style="{StaticResource MonitorTableRowHeaderStyle}"/>
                                 <Label x:Name="InventorySc06Total" Grid.Row="6" Grid.Column="1" Content="{Binding InventoryStates[06].TotalCells}" Style="{StaticResource MonitorTableCellStyle}"/>
                                 <Label x:Name="InventorySc06Used" Grid.Row="6" Grid.Column="2" Content="{Binding InventoryStates[06].UsedCells}" Style="{StaticResource MonitorTableCellStyle}"/>
                                 <Label x:Name="InventorySc06Empty" Grid.Row="6" Grid.Column="3" Content="{Binding InventoryStates[06].EmptyCells}" Style="{StaticResource MonitorTableCellStyle}"/>
                                 <Label x:Name="InventorySc06Rate" Grid.Row="6" Grid.Column="4" Content="{Binding InventoryStates[06].OccupancyRate, StringFormat={}{0:0.0}}" Style="{StaticResource MonitorTableCellStyle}"/>
 
-                                <Label Grid.Row="7" Grid.Column="0" Content="7호기" Style="{StaticResource MonitorTableHeaderStyle}"/>
+                                <Label Grid.Row="7" Grid.Column="0" Content="7호기" Style="{StaticResource MonitorTableRowHeaderStyle}"/>
                                 <Label x:Name="InventorySc07Total" Grid.Row="7" Grid.Column="1" Content="{Binding InventoryStates[07].TotalCells}" Style="{StaticResource MonitorTableCellStyle}"/>
                                 <Label x:Name="InventorySc07Used" Grid.Row="7" Grid.Column="2" Content="{Binding InventoryStates[07].UsedCells}" Style="{StaticResource MonitorTableCellStyle}"/>
                                 <Label x:Name="InventorySc07Empty" Grid.Row="7" Grid.Column="3" Content="{Binding InventoryStates[07].EmptyCells}" Style="{StaticResource MonitorTableCellStyle}"/>
                                 <Label x:Name="InventorySc07Rate" Grid.Row="7" Grid.Column="4" Content="{Binding InventoryStates[07].OccupancyRate, StringFormat={}{0:0.0}}" Style="{StaticResource MonitorTableCellStyle}"/>
 
-                                <Label Grid.Row="8" Grid.Column="0" Content="상품" Style="{StaticResource MonitorTableHeaderStyle}"/>
-                                <Label x:Name="InventoryGoodsTotal" Grid.Row="8" Grid.Column="1" Content="{Binding InventoryGoods.TotalCells}" Background="{DynamicResource MonitoringSubtotalBrush}" Style="{StaticResource MonitorTableCellStyle}"/>
-                                <Label x:Name="InventoryGoodsUsed" Grid.Row="8" Grid.Column="2" Content="{Binding InventoryGoods.UsedCells}" Background="{DynamicResource MonitoringSubtotalBrush}" Style="{StaticResource MonitorTableCellStyle}"/>
-                                <Label x:Name="InventoryGoodsEmpty" Grid.Row="8" Grid.Column="3" Content="{Binding InventoryGoods.EmptyCells}" Background="{DynamicResource MonitoringSubtotalBrush}" Style="{StaticResource MonitorTableCellStyle}"/>
-                                <Label x:Name="InventoryGoodsRate" Grid.Row="8" Grid.Column="4" Content="{Binding InventoryGoods.OccupancyRate, StringFormat={}{0:0.0}}" Background="{DynamicResource MonitoringSubtotalBrush}" Style="{StaticResource MonitorTableCellStyle}"/>
-
-                                <Label Grid.Row="9" Grid.Column="0" Content="제품" Style="{StaticResource MonitorTableHeaderStyle}"/>
-                                <Label x:Name="InventoryProductsTotal" Grid.Row="9" Grid.Column="1" Content="{Binding InventoryProducts.TotalCells}" Background="{DynamicResource MonitoringSubtotalBrush}" Style="{StaticResource MonitorTableCellStyle}"/>
-                                <Label x:Name="InventoryProductsUsed" Grid.Row="9" Grid.Column="2" Content="{Binding InventoryProducts.UsedCells}" Background="{DynamicResource MonitoringSubtotalBrush}" Style="{StaticResource MonitorTableCellStyle}"/>
-                                <Label x:Name="InventoryProductsEmpty" Grid.Row="9" Grid.Column="3" Content="{Binding InventoryProducts.EmptyCells}" Background="{DynamicResource MonitoringSubtotalBrush}" Style="{StaticResource MonitorTableCellStyle}"/>
-                                <Label x:Name="InventoryProductsRate" Grid.Row="9" Grid.Column="4" Content="{Binding InventoryProducts.OccupancyRate, StringFormat={}{0:0.0}}" Background="{DynamicResource MonitoringSubtotalBrush}" Style="{StaticResource MonitorTableCellStyle}"/>
-
-                                <Label Grid.Row="10" Grid.Column="0" Content="TOTAL" Style="{StaticResource MonitorTableHeaderStyle}"/>
-                                <Label x:Name="InventoryTotalCells" Grid.Row="10" Grid.Column="1" Content="{Binding InventoryTotal.TotalCells}" Background="{DynamicResource MonitoringTotalBrush}" Style="{StaticResource MonitorTableCellStyle}"/>
-                                <Label x:Name="InventoryUsedCells" Grid.Row="10" Grid.Column="2" Content="{Binding InventoryTotal.UsedCells}" Background="{DynamicResource MonitoringTotalBrush}" Style="{StaticResource MonitorTableCellStyle}"/>
-                                <Label x:Name="InventoryEmptyCells" Grid.Row="10" Grid.Column="3" Content="{Binding InventoryTotal.EmptyCells}" Background="{DynamicResource MonitoringTotalBrush}" Style="{StaticResource MonitorTableCellStyle}"/>
-                                <Label x:Name="InventoryRate" Grid.Row="10" Grid.Column="4" Content="{Binding InventoryTotal.OccupancyRate, StringFormat={}{0:0.0}}" Background="{DynamicResource MonitoringTotalBrush}" Style="{StaticResource MonitorTableCellStyle}"/>
+                                <Label Grid.Row="8" Grid.Column="0" Content="TOTAL" HorizontalContentAlignment="Center" Style="{StaticResource MonitorTableTotalCellStyle}"/>
+                                <Label x:Name="InventoryTotalCells" Grid.Row="8" Grid.Column="1" Content="{Binding InventoryTotal.TotalCells}" Style="{StaticResource MonitorTableTotalCellStyle}"/>
+                                <Label x:Name="InventoryUsedCells" Grid.Row="8" Grid.Column="2" Content="{Binding InventoryTotal.UsedCells}" Style="{StaticResource MonitorTableTotalCellStyle}"/>
+                                <Label x:Name="InventoryEmptyCells" Grid.Row="8" Grid.Column="3" Content="{Binding InventoryTotal.EmptyCells}" Style="{StaticResource MonitorTableTotalCellStyle}"/>
+                                <Label x:Name="InventoryRate" Grid.Row="8" Grid.Column="4" Content="{Binding InventoryTotal.OccupancyRate, StringFormat={}{0:0.0}}" Style="{StaticResource MonitorTableTotalCellStyle}"/>
                             </Grid>
                         </Border>
                     </Grid>
@@ -1205,38 +838,23 @@
         </Border>
 
         <!-- 우측 상세 영역 -->
-        <Border Grid.Column="1"
-                Margin="0,8,8,8"
-                Padding="12"
-                Background="{DynamicResource AppSurfaceBrush}"
-                BorderBrush="{DynamicResource MonitoringPanelBorderBrush}"
-                BorderThickness="1"
-                CornerRadius="5" Grid.RowSpan="2">
+        <Border Grid.Column="1" Margin="0,8,8,8" Padding="12" Background="{DynamicResource AppSurfaceBrush}" BorderBrush="{DynamicResource MonitoringPanelBorderBrush}" BorderThickness="1" CornerRadius="5" Grid.RowSpan="2">
 
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="36"/>
                     <RowDefinition Height="2*"/>
                     <RowDefinition Height="12"/>
-                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="36"/>
                     <RowDefinition Height="2*"/>
                 </Grid.RowDefinitions>
 
                 <!-- 스택커 크레인 출고 예약 현황 -->
-                <Border Grid.Row="0"
-                        Style="{StaticResource MonitorRightSectionTitleStyle}">
-                    <TextBlock Text="스택커 크레인 출고 예약 현황"
-                               VerticalAlignment="Center"
-                               Foreground="{DynamicResource AppTextOnPrimBrush}"
-                               FontSize="13"
-                               FontWeight="Bold"/>
+                <Border Grid.Row="0" Style="{StaticResource MonitorRightSectionTitleStyle}">
+                    <TextBlock Text="스택커 크레인 출고 예약 현황" Style="{StaticResource SectionTitleTextStyle}"/>
                 </Border>
 
-                <DataGrid x:Name="StackerOutboundReservationGrid"
-                          Grid.Row="1"
-                          Margin="0,4,0,0"
-                          ItemsSource="{Binding Sc1OutboundReservations}"
-                          Style="{StaticResource MonitorDataGridStyle}">
+                <DataGrid x:Name="StackerOutboundReservationGrid" Grid.Row="1" Margin="0,4,0,0" ItemsSource="{Binding Sc1OutboundReservations}" Style="{StaticResource MonitorDataGridStyle}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="출고 순번" Width="0.9*" MinWidth="85" Binding="{Binding OutboundSequence}"/>
                         <DataGridTextColumn Header="호기" Width="0.55*" MinWidth="55" Binding="{Binding CraneNo}"/>
@@ -1249,20 +867,11 @@
                 </DataGrid>
 
                 <!-- 컨베어 트랙킹 정보 -->
-                <Border Grid.Row="3"
-                        Style="{StaticResource MonitorRightSectionTitleStyle}">
-                    <TextBlock Text="컨베어 트랙킹 정보"
-                               VerticalAlignment="Center"
-                               Foreground="{DynamicResource AppTextOnPrimBrush}"
-                               FontSize="13"
-                               FontWeight="Bold"/>
+                <Border Grid.Row="3" Style="{StaticResource MonitorRightSectionTitleStyle}">
+                    <TextBlock Text="컨베어 트랙킹 정보" Style="{StaticResource SectionTitleTextStyle}"/>
                 </Border>
 
-                <DataGrid x:Name="ConveyorTrackingGrid"
-                          Grid.Row="4"
-                          Margin="0,4,0,0"
-                          ItemsSource="{Binding Sc1TrackingItems}"
-                          Style="{StaticResource MonitorDataGridStyle}">
+                <DataGrid x:Name="ConveyorTrackingGrid" Grid.Row="4" Margin="0,4,0,0" ItemsSource="{Binding Sc1TrackingItems}" Style="{StaticResource MonitorDataGridStyle}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="순번" Width="0.65*" MinWidth="70" Binding="{Binding Sequence}"/>
                         <DataGridTextColumn Header="저장위치" Width="1.3*" MinWidth="150" Binding="{Binding StorageLocation}"/>
@@ -1277,5 +886,3 @@
 
     </Grid>
 </UserControl>
-
-

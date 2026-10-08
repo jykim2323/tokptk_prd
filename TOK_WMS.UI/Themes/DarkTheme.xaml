@@ -10,6 +10,7 @@
 
     <!-- Header -->
     <SolidColorBrush x:Key="HeaderBrush" Color="#163272"/>
+    <SolidColorBrush x:Key="SectionTitleAccentBrush" Color="#6AA7DF"/>
 
     <!-- Surfaces -->
     <SolidColorBrush x:Key="AppBackgroundBrush" Color="#111820"/>

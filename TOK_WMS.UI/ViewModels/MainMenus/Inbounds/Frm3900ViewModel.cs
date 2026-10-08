@@ -164,7 +164,7 @@ public partial class Frm3900ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"조회 실패: {ex.Message}",
                 "오류");
         }
@@ -301,7 +301,7 @@ public partial class Frm3900ViewModel : DocumentViewModelBase
             if (result == null ||
                 !result.Any())
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "등록된 재고 정보를 찾을 수 없습니다.",
                     "오류");
 
@@ -327,7 +327,7 @@ public partial class Frm3900ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"바닥재고 조회 실패: {ex.Message}",
                 "오류");
         }
@@ -361,7 +361,7 @@ public partial class Frm3900ViewModel : DocumentViewModelBase
 
             if (string.IsNullOrWhiteSpace(pltNo))
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "PLT-NO가 입력되지 않았습니다.",
                     "오류");
 
@@ -371,7 +371,7 @@ public partial class Frm3900ViewModel : DocumentViewModelBase
 
             if (string.IsNullOrWhiteSpace(code))
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "품목코드가 없습니다.",
                     "오류");
 
@@ -389,7 +389,7 @@ public partial class Frm3900ViewModel : DocumentViewModelBase
 
             if (mast == null)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "품목 마스터에 존재하지 않는 코드입니다.",
                     "오류");
 
@@ -419,7 +419,7 @@ public partial class Frm3900ViewModel : DocumentViewModelBase
                     out var qty) ||
                 qty <= 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "입고할 중량은 0보다 커야 합니다.",
                     "오류");
 
@@ -440,7 +440,7 @@ public partial class Frm3900ViewModel : DocumentViewModelBase
             if (!string.IsNullOrWhiteSpace(firstPltNo) &&
                 firstPltNo != pltNo)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     $"작업 목록에는 동일한 PLT-NO만 등록할 수 있습니다.\n\n" +
                     $"기존 목록 : [{firstPltNo}]\n" +
                     $"현재 입력 : [{pltNo}]",
@@ -469,7 +469,7 @@ public partial class Frm3900ViewModel : DocumentViewModelBase
                 if (!string.IsNullOrWhiteSpace(
                     pltCheck.SubkLoca))
                 {
-                    _dialog.ShowMessage(
+                    _dialog.ShowWarning(
                         $"[{pltNo}] 는 이미 적재 완료된 파렛트입니다.\n" +
                         $"위치 : {pltCheck.SubkLoca}",
                         "오류");
@@ -490,7 +490,7 @@ public partial class Frm3900ViewModel : DocumentViewModelBase
                 if (!gridHasPlt &&
                     pltNo != _checkPltNo)
                 {
-                    _dialog.ShowMessage(
+                    _dialog.ShowWarning(
                         $"[{pltNo}] 는 이미 등록된 바닥 재고입니다.\n" +
                         $"먼저 출고이력에서 해당 PLT-NO를 선택하여 " +
                         $"기존 재고를 작업목록으로 불러와주세요.",
@@ -510,7 +510,7 @@ public partial class Frm3900ViewModel : DocumentViewModelBase
                 x.SubkCode == code &&
                 x.SubkLotno == lotNo))
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "이미 작업 목록에 추가된 항목입니다.",
                     "오류");
 
@@ -563,7 +563,7 @@ public partial class Frm3900ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"작업목록 추가 실패: {ex.Message}",
                 "오류");
         }
@@ -584,7 +584,7 @@ public partial class Frm3900ViewModel : DocumentViewModelBase
         {
             if (item == null)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "수정할 데이터를 선택해주세요.",
                     "오류");
 
@@ -680,7 +680,7 @@ public partial class Frm3900ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"수정 실패: {ex.Message}",
                 "오류");
         }
@@ -701,7 +701,7 @@ public partial class Frm3900ViewModel : DocumentViewModelBase
             if (WorkItems.Count == 0 &&
                 _deleteItems.Count == 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "저장할 데이터가 없습니다.",
                     "오류");
 
@@ -750,7 +750,7 @@ public partial class Frm3900ViewModel : DocumentViewModelBase
             ClearInput(true);
 
 
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 $"저장이 완료되었습니다. ({result}건)",
                 "확인");
 
@@ -759,7 +759,7 @@ public partial class Frm3900ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"저장 실패: {ex.Message}",
                 "오류");
         }

@@ -144,7 +144,7 @@ public partial class RackCellDetailViewModel : ObservableObject
         catch (Exception ex)
         {
             StatusMessage = $"재고 {actionName} 화면을 열지 못했습니다.";
-            _dialog.ShowMessage($"재고 {actionName} 화면 오류: {ex.Message}", "오류");
+            _dialog.ShowWarning($"재고 {actionName} 화면 오류: {ex.Message}", "오류");
         }
         finally
         {
@@ -179,7 +179,7 @@ public partial class RackCellDetailViewModel : ObservableObject
         catch (Exception ex)
         {
             StatusMessage = "재고 삭제에 실패했습니다. 조회 후 다시 확인하세요.";
-            _dialog.ShowMessage($"재고 삭제 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"재고 삭제 실패: {ex.Message}", "오류");
         }
         finally
         {
@@ -205,7 +205,7 @@ public partial class RackCellDetailViewModel : ObservableObject
         {
             ClearDetail();
             StatusMessage = $"재고 {actionName} 완료 · 재조회에 실패했습니다.";
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"재고 {actionName}은 완료했지만 재조회에 실패했습니다. 조회 버튼으로 확인하세요.\n{ex.Message}",
                 "재조회 오류");
         }
@@ -264,7 +264,7 @@ public partial class RackCellDetailViewModel : ObservableObject
             StatusMessage = saved
                 ? $"{displayLocation} 셀 {actionName} 처리 완료 · 재조회에 실패했습니다."
                 : $"{displayLocation} 셀 {actionName} 처리에 실패했습니다.";
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 saved
                     ? $"셀 {actionName} 저장은 완료했지만 재조회에 실패했습니다. 조회 버튼으로 확인하세요.\n{ex.Message}"
                     : $"셀 {actionName} 처리 실패: {ex.Message}",
@@ -309,7 +309,7 @@ public partial class RackCellDetailViewModel : ObservableObject
         {
             ClearDetail();
             StatusMessage = $"{DisplayLocation} 조회에 실패했습니다.";
-            _dialog.ShowMessage($"셀 정보 조회 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"셀 정보 조회 실패: {ex.Message}", "오류");
         }
         finally
         {

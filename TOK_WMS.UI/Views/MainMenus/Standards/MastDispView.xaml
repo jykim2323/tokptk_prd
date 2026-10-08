@@ -1,370 +1,136 @@
-﻿<Window x:Class="TOK.WMS.UI.Views.MainMenus.Standards.MastDispView"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-        Background="{DynamicResource AppBackgroundBrush}"
-        Foreground="{DynamicResource AppTextBrush}"
-        FontFamily="{StaticResource AppFont}"
-        FontWeight="Medium"
-        WindowStyle="None"
-        ResizeMode="CanResize"
-        Width="1200"
-        Height="720"
-        MinWidth="850"
-        MinHeight="550">
-
-    <Window.Resources>
-
-        <!-- ===================================================== -->
-        <!-- 검색 Input -->
-        <!-- ===================================================== -->
-
-        <Style x:Key="FilterBox"
-               TargetType="TextBox">
-
-            <Setter Property="Height"
-                    Value="34"/>
-
-            <Setter Property="Padding"
-                    Value="8,3"/>
-
-            <Setter Property="VerticalContentAlignment"
-                    Value="Center"/>
-
-            <Setter Property="Background"
-                    Value="{DynamicResource InputBrush}"/>
-
-            <Setter Property="Foreground"
-                    Value="{DynamicResource AppTextBrush}"/>
-
-            <Setter Property="BorderBrush"
-                    Value="{DynamicResource InputBorderBrush}"/>
-
-            <Setter Property="BorderThickness"
-                    Value="1"/>
-
-            <Setter Property="FontSize"
-                    Value="14"/>
-
-
-            <Style.Triggers>
-
-                <Trigger Property="IsKeyboardFocusWithin"
-                         Value="True">
-
-                    <Setter Property="BorderBrush"
-                            Value="{DynamicResource BtnPrimaryBrush}"/>
-
-                    <Setter Property="BorderThickness"
-                            Value="2"/>
-
-                </Trigger>
-
-            </Style.Triggers>
-
-        </Style>
-
-    </Window.Resources>
-
-
-    <!-- ========================================================= -->
-    <!-- Loaded -->
-    <!-- ========================================================= -->
-
-    <i:Interaction.Triggers>
-
-        <i:EventTrigger EventName="Loaded">
-
-            <i:InvokeCommandAction
-                Command="{Binding LoadedCommand}"/>
-
-        </i:EventTrigger>
-
-    </i:Interaction.Triggers>
-
-
-    <DockPanel Margin="12">
-
-
-        <!-- ===================================================== -->
-        <!-- HEADER -->
-        <!-- ===================================================== -->
-
-        <Grid DockPanel.Dock="Top"
-              Height="55"
-              Margin="0,0,0,8">
-
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:i="http://schemas.microsoft.com/xaml/behaviors" xmlns:behaviors="clr-namespace:TOK.WMS.UI.Behaviors" x:Class="TOK.WMS.UI.Views.MainMenus.Standards.MastDispView" Background="{DynamicResource AppBackgroundBrush}" Foreground="{DynamicResource AppTextBrush}" FontFamily="{StaticResource AppFont}" FontWeight="Medium" WindowStyle="None" ResizeMode="CanResize" Width="1200" Height="720" MinWidth="850" MinHeight="550" UseLayoutRounding="True">
+  <Window.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/TOK.WMS.UI;component/Styles/ManagementScreenStyles.xaml"/>
+      </ResourceDictionary.MergedDictionaries>
+      <!-- ===================================================== -->
+      <!-- 검색 Input -->
+      <!-- ===================================================== -->
+      <Style x:Key="FilterBox" TargetType="TextBox">
+        <Setter Property="Height" Value="36"/>
+        <Setter Property="Padding" Value="8,3"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Background" Value="{DynamicResource InputBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Style.Triggers>
+          <Trigger Property="IsKeyboardFocusWithin" Value="True">
+            <Setter Property="BorderBrush" Value="{DynamicResource BtnPrimaryBrush}"/>
+            <Setter Property="BorderThickness" Value="2"/>
+          </Trigger>
+        </Style.Triggers>
+      </Style>
+    </ResourceDictionary>
+  </Window.Resources>
+  <!-- ========================================================= -->
+  <!-- Loaded -->
+  <!-- ========================================================= -->
+  <i:Interaction.Triggers>
+    <i:EventTrigger EventName="Loaded">
+      <i:InvokeCommandAction Command="{Binding LoadedCommand}"/>
+    </i:EventTrigger>
+  </i:Interaction.Triggers>
+  <DockPanel Margin="16">
+    <!-- ===================================================== -->
+    <!-- HEADER -->
+    <!-- ===================================================== -->
+    <Grid DockPanel.Dock="Top" Margin="0,0,0,16" behaviors:ResponsiveHeader.Toolbar="{Binding ElementName=ScreenToolbar}" behaviors:ResponsiveHeader.StackBelowWidth="900">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+      <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+        <Border Style="{StaticResource ScreenTitleIconSurfaceStyle}">
+          <Path Data="{StaticResource ScreenPackageIconGeometry}" Style="{StaticResource ScreenToolbarIconStyle}" Stroke="{DynamicResource AppTextBrush}" Focusable="False" IsHitTestVisible="False"/>
+        </Border>
+        <TextBlock Text="품목 코드 관리" VerticalAlignment="Center" Style="{StaticResource ScreenTitleTextStyle}"/>
+        <TextBlock Text="MastDisp" VerticalAlignment="Center" Style="{StaticResource ScreenSubtitleTextStyle}" Margin="12,0,0,0"/>
+      </StackPanel>
+      <WrapPanel Grid.Column="1" Orientation="Horizontal" ItemHeight="50" HorizontalAlignment="Right" VerticalAlignment="Center" x:Name="ScreenToolbar">
+        <Button Command="{Binding CloseCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource ScreenSecondaryButtonStyle}" Margin="0,0,8,8" AutomationProperties.Name="종료">
+          <StackPanel Orientation="Horizontal">
+            <Path Data="{StaticResource ScreenPowerIconGeometry}" Style="{StaticResource ScreenToolbarIconStyle}" Margin="0,0,8,0" Focusable="False" IsHitTestVisible="False"/>
+            <TextBlock Text="종료" VerticalAlignment="Center"/>
+          </StackPanel>
+        </Button>
+      </WrapPanel>
+    </Grid>
+    <!-- ===================================================== -->
+    <!-- 검색 -->
+    <!-- ===================================================== -->
+    <Border DockPanel.Dock="Top" Margin="0,0,0,8" Style="{StaticResource ScreenCardStyle}">
+      <WrapPanel Margin="0" VerticalAlignment="Center">
+        <TextBlock Text="품목코드" Margin="0,0,8,8" VerticalAlignment="Center" FontSize="15" FontWeight="Bold"/>
+        <TextBox Text="{Binding SearchText,                                         Mode=TwoWay,                                         UpdateSourceTrigger=PropertyChanged}" CharacterCasing="Upper" Style="{StaticResource FilterBox}" Margin="0,0,8,8" Width="240">
+          <TextBox.InputBindings>
+            <KeyBinding Key="Enter" Command="{Binding SearchCommand}"/>
+          </TextBox.InputBindings>
+        </TextBox>
+        <Button Command="{Binding SearchCommand}" Style="{StaticResource ScreenPrimaryButtonStyle}" Margin="0,0,8,8" AutomationProperties.Name="검색">
+          <StackPanel Orientation="Horizontal">
+            <Path Data="{StaticResource ScreenSearchIconGeometry}" Style="{StaticResource ScreenToolbarIconStyle}" Margin="0,0,8,0" Focusable="False" IsHitTestVisible="False"/>
+            <TextBlock Text="검색" VerticalAlignment="Center"/>
+          </StackPanel>
+        </Button>
+        <Button Command="{Binding AllSearchCommand}" Style="{StaticResource ScreenSecondaryButtonStyle}" Margin="0,0,8,8" AutomationProperties.Name="전체보기">
+          <StackPanel Orientation="Horizontal">
+            <Path Data="{StaticResource ScreenRefreshIconGeometry}" Style="{StaticResource ScreenToolbarIconStyle}" Margin="0,0,8,0" Focusable="False" IsHitTestVisible="False"/>
+            <TextBlock Text="전체보기" VerticalAlignment="Center"/>
+          </StackPanel>
+        </Button>
+        <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" HorizontalAlignment="Right" FontWeight="Bold" Foreground="{DynamicResource AppTextSubBrush}" Margin="0,0,8,8"/>
+      </WrapPanel>
+    </Border>
+    <!-- ===================================================== -->
+    <!-- GRID -->
+    <!-- ===================================================== -->
+    <Border Style="{StaticResource ScreenCardStyle}">
+      <DockPanel>
+        <Border Style="{StaticResource ScreenSectionTitleStyle}" Margin="0,0,0,7" DockPanel.Dock="Top">
+          <Grid MinHeight="36">
             <Grid.ColumnDefinitions>
-
-                <ColumnDefinition Width="*"/>
-
-                <ColumnDefinition Width="Auto"/>
-
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-
-
-            <StackPanel Grid.Column="0"
-                        Orientation="Horizontal"
-                        VerticalAlignment="Center">
-
-                <TextBlock Text="📊"
-                           FontSize="20"
-                           Margin="0,0,8,0"/>
-
-
-                <TextBlock Text="품목 코드 관리"
-                           FontSize="20"
-                           FontWeight="Bold"
-                           VerticalAlignment="Center"/>
-                <TextBlock Text="- MastDisp" FontSize="12" FontWeight="Bold" Margin="10,0,0,0" Foreground="{DynamicResource AppTextBrush}" VerticalAlignment="Center"/>
-
-            </StackPanel>
-
-
-            <Button Grid.Column="1"
-                    Content="❌ 종료"
-                    Width="95"
-                    Height="38"
-                    Command="{Binding CloseCommand}"
-                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
-                    FontWeight="Bold"
-                    Cursor="Hand"
-                    BorderThickness="0"
-                    Background="{DynamicResource BtnStadardBrush}"
-                    Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
-
-        </Grid>
-
-
-        <!-- ===================================================== -->
-        <!-- 검색 -->
-        <!-- ===================================================== -->
-
-        <Border DockPanel.Dock="Top"
-                Background="{DynamicResource AppSurfaceBrush}"
-                BorderBrush="{DynamicResource AppBorderBrush}"
-                BorderThickness="1"
-                CornerRadius="5"
-                Padding="12"
-                Margin="0,0,0,8">
-
-            <Grid>
-
-                <Grid.ColumnDefinitions>
-
-                    <ColumnDefinition Width="Auto"/>
-
-                    <ColumnDefinition Width="270"/>
-
-                    <ColumnDefinition Width="12"/>
-
-                    <ColumnDefinition Width="95"/>
-
-                    <ColumnDefinition Width="12"/>
-
-                    <ColumnDefinition Width="105"/>
-
-                    <ColumnDefinition Width="*"/>
-
-                    <ColumnDefinition Width="Auto"/>
-
-                </Grid.ColumnDefinitions>
-
-
-                <!-- 품목코드 -->
-
-                <TextBlock Grid.Column="0"
-                           Text="품목코드"
-                           Margin="0,0,10,0"
-                           VerticalAlignment="Center"
-                           FontSize="15"
-                           FontWeight="Bold"/>
-
-
-                <TextBox Grid.Column="1"
-                         Text="{Binding SearchText,
-                                        Mode=TwoWay,
-                                        UpdateSourceTrigger=PropertyChanged}"
-                         CharacterCasing="Upper"
-                         Style="{StaticResource FilterBox}">
-
-                    <TextBox.InputBindings>
-
-                        <KeyBinding Key="Enter"
-                                    Command="{Binding SearchCommand}"/>
-
-                    </TextBox.InputBindings>
-
-                </TextBox>
-
-
-                <!-- 검색 -->
-
-                <Button Grid.Column="3"
-                        Content="🔍 검색"
-                        Height="34"
-                        Command="{Binding SearchCommand}"
-                        FontWeight="Bold"
-                        Cursor="Hand"
-                        BorderThickness="0"
-                        Background="{DynamicResource BtnPrimaryBrush}"
-                        Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
-
-
-                <!-- 전체보기 -->
-
-                <Button Grid.Column="5"
-                        Content="🔄 전체보기"
-                        Height="34"
-                        Command="{Binding AllSearchCommand}"
-                        FontWeight="Bold"
-                        Cursor="Hand"
-                        BorderThickness="0"
-                        Background="{DynamicResource BtnStadardBrush}"
-                        Foreground="{DynamicResource BtnPrimaryTextBrush}"/>
-
-
-                <TextBlock Grid.Column="7"
-                           Text="{Binding StatusMessage}"
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Right"
-                           FontWeight="Bold"
-                           Foreground="{DynamicResource AppTextSubBrush}"/>
-
-            </Grid>
-
+            <TextBlock Text="품목 목록" Style="{StaticResource SectionTitleTextStyle}" TextWrapping="Wrap" Margin="0,0,12,0"/>
+            <TextBlock Grid.Column="1" Text="{Binding RecordCount, StringFormat=조회건수 : {0:N0}건}" Style="{StaticResource SectionTitleMetadataTextStyle}"/>
+          </Grid>
         </Border>
-
-
-        <!-- ===================================================== -->
-        <!-- GRID -->
-        <!-- ===================================================== -->
-
-        <Border Background="{DynamicResource AppSurfaceBrush}"
-                BorderBrush="{DynamicResource AppBorderBrush}"
-                BorderThickness="1"
-                CornerRadius="5"
-                Padding="8">
-
-            <DockPanel>
-
-
-                <Grid DockPanel.Dock="Top"
-                      Background="{DynamicResource HeaderBrush}"
-                      Height="40"
-                      Margin="0,0,0,7">
-
-                    <TextBlock Text="📋 품목 목록"
-                               Foreground="{DynamicResource AppTextOnPrimBrush}"
-                               VerticalAlignment="Center"
-                               FontSize="15"
-                               FontWeight="Bold"/>
-
-
-                    <TextBlock Text="{Binding RecordCount,
-                                              StringFormat=조회건수 : {0:N0}건}"
-                               HorizontalAlignment="Right"
-                               VerticalAlignment="Center"
-                               FontWeight="Bold"
-                               Foreground="{DynamicResource AppTextOnPrimBrush}"/>
-
-                </Grid>
-
-
-                <DataGrid x:Name="DB_Table1"
-                          ItemsSource="{Binding Items}"
-                          SelectedItem="{Binding SelectedItem,
-                                                 Mode=TwoWay}"
-                          Style="{StaticResource ListDataGridStyle}"
-                          AutoGenerateColumns="False"
-                          IsReadOnly="True"
-                          CanUserAddRows="False"
-                          CanUserSortColumns="True"
-                          SelectionMode="Single"
-                          SelectionUnit="FullRow"
-                          ScrollViewer.VerticalScrollBarVisibility="Visible"
-                          ScrollViewer.HorizontalScrollBarVisibility="Auto">
-
-
-                    <!-- ========================================= -->
-                    <!-- Delphi DBGrid1CellClick -->
-                    <!-- 행 클릭 → 선택 후 Window Close -->
-                    <!-- ========================================= -->
-
-                    <i:Interaction.Triggers>
-
-                        <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
-
-                            <i:InvokeCommandAction
-                                Command="{Binding SelectItemCommand}"
-                                CommandParameter="{Binding SelectedItem}"/>
-
-                        </i:EventTrigger>
-
-                    </i:Interaction.Triggers>
-
-
-                    <DataGrid.Columns>
-
-
-                        <!-- 품목코드 -->
-
-                        <DataGridTextColumn Header="품목코드"
-                                            Binding="{Binding MastCode}"
-                                            Width="180"/>
-
-
-                        <!-- 품목명 -->
-
-                        <DataGridTextColumn Header="품 목 명"
-                                            Binding="{Binding MastName}"
-                                            Width="240"
-                                            MinWidth="180"/>
-
-
-                        <!-- 단위 -->
-
-                        <DataGridTextColumn Header="단위"
-                                            Binding="{Binding MastUnit}"
-                                            Width="90"/>
-
-
-                        <!-- 위험성 -->
-
-                        <DataGridTextColumn Header="위험성"
-                                            Binding="{Binding Gubn1Name}"
-                                            Width="150"/>
-
-
-                        <!-- 석유류 -->
-
-                        <DataGridTextColumn Header="석유류"
-                                            Binding="{Binding Gubn2Name}"
-                                            Width="165"/>
-
-
-                        <!-- 수용성 -->
-
-                        <DataGridTextColumn Header="수용성"
-                                            Binding="{Binding Gubn3Name}"
-                                            Width="145"/>
-
-
-                        <!-- 단위중량 -->
-
-                        <DataGridTextColumn Header="단위중량"
-                                            Binding="{Binding MastWeight,
-                                            StringFormat={}{0:N2}}"
-                                            Width="120"/>
-
-                    </DataGrid.Columns>
-
-                </DataGrid>
-
-            </DockPanel>
-
-        </Border>
-
-    </DockPanel>
-
+        <DataGrid x:Name="DB_Table1" ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem,                                                  Mode=TwoWay}" Style="{StaticResource ScreenDataGridStyle}" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False" CanUserSortColumns="True" SelectionMode="Single" SelectionUnit="FullRow" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+          <!-- ========================================= -->
+          <!-- Delphi DBGrid1CellClick -->
+          <!-- 행 클릭 → 선택 후 Window Close -->
+          <!-- ========================================= -->
+          <i:Interaction.Triggers>
+            <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+              <i:InvokeCommandAction Command="{Binding SelectItemCommand}" CommandParameter="{Binding SelectedItem}"/>
+            </i:EventTrigger>
+          </i:Interaction.Triggers>
+          <DataGrid.Columns>
+            <!-- 품목코드 -->
+            <DataGridTextColumn Header="품목코드" Binding="{Binding MastCode}" Width="180" ElementStyle="{StaticResource ScreenCellTextStyle}" MinWidth="92"/>
+            <!-- 품목명 -->
+            <DataGridTextColumn Header="품 목 명" Binding="{Binding MastName}" Width="240" MinWidth="90" ElementStyle="{StaticResource ScreenLeftCellTextStyle}"/>
+            <!-- 단위 -->
+            <DataGridTextColumn Header="단위" Binding="{Binding MastUnit}" Width="90" ElementStyle="{StaticResource ScreenCellTextStyle}" MinWidth="90"/>
+            <!-- 위험성 -->
+            <DataGridTextColumn Header="위험성" Binding="{Binding Gubn1Name}" Width="150" ElementStyle="{StaticResource ScreenLeftCellTextStyle}" MinWidth="90"/>
+            <!-- 석유류 -->
+            <DataGridTextColumn Header="석유류" Binding="{Binding Gubn2Name}" Width="165" ElementStyle="{StaticResource ScreenLeftCellTextStyle}" MinWidth="90"/>
+            <!-- 수용성 -->
+            <DataGridTextColumn Header="수용성" Binding="{Binding Gubn3Name}" Width="145" ElementStyle="{StaticResource ScreenLeftCellTextStyle}" MinWidth="90"/>
+            <!-- 단위중량 -->
+            <DataGridTextColumn Header="단위중량" Binding="{Binding MastWeight,                                             StringFormat={}{0:N2}}" Width="120" ElementStyle="{StaticResource ScreenRightCellTextStyle}" MinWidth="92"/>
+          </DataGrid.Columns>
+        </DataGrid>
+      </DockPanel>
+    </Border>
+  </DockPanel>
 </Window>

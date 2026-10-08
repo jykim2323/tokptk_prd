@@ -287,7 +287,7 @@ public partial class RackInventoryEditViewModel : ObservableObject
     private void ReportError(string message)
     {
         StatusMessage = message;
-        _dialog.ShowMessage(message, "확인");
+        _dialog.ShowWarning(message, "확인");
     }
 
     private static bool ValidText(string? value, int maximumLength, bool required = false)

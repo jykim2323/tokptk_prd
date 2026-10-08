@@ -163,7 +163,7 @@ public partial class Frm1500ViewModel
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"조회 실패: {ex.Message}",
                 "오류");
         }
@@ -297,7 +297,7 @@ public partial class Frm1500ViewModel
 
             if (result <= 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "구분#1 등록 실패",
                     "오류");
 
@@ -308,13 +308,13 @@ public partial class Frm1500ViewModel
             await RefreshGubn1();
 
 
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 "구분#1 등록 완료",
                 "완료");
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"구분#1 등록 실패: {ex.Message}",
                 "오류");
         }
@@ -357,7 +357,7 @@ public partial class Frm1500ViewModel
 
             if (result <= 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "구분#1 수정 대상이 없습니다.",
                     "오류");
 
@@ -368,13 +368,13 @@ public partial class Frm1500ViewModel
             await RefreshGubn1();
 
 
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 "구분#1 수정 완료",
                 "완료");
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"구분#1 수정 실패: {ex.Message}",
                 "오류");
         }
@@ -393,7 +393,7 @@ public partial class Frm1500ViewModel
             if (string.IsNullOrWhiteSpace(
                 Gubn1Code))
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "구분#1 코드를 선택해주세요.",
                     "확인");
 
@@ -418,7 +418,7 @@ public partial class Frm1500ViewModel
 
             if (result <= 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "구분#1 삭제 대상이 없습니다.",
                     "오류");
 
@@ -429,13 +429,13 @@ public partial class Frm1500ViewModel
             await RefreshGubn1();
 
 
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 "구분#1 삭제 완료",
                 "완료");
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"구분#1 삭제 실패: {ex.Message}",
                 "오류");
         }
@@ -478,7 +478,7 @@ public partial class Frm1500ViewModel
 
             if (result <= 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "구분#2 등록 실패",
                     "오류");
 
@@ -489,13 +489,13 @@ public partial class Frm1500ViewModel
             await RefreshGubn2();
 
 
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 "구분#2 등록 완료",
                 "완료");
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"구분#2 등록 실패: {ex.Message}",
                 "오류");
         }
@@ -538,7 +538,7 @@ public partial class Frm1500ViewModel
 
             if (result <= 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "구분#2 수정 대상이 없습니다.",
                     "오류");
 
@@ -549,13 +549,13 @@ public partial class Frm1500ViewModel
             await RefreshGubn2();
 
 
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 "구분#2 수정 완료",
                 "완료");
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"구분#2 수정 실패: {ex.Message}",
                 "오류");
         }
@@ -574,7 +574,7 @@ public partial class Frm1500ViewModel
             if (string.IsNullOrWhiteSpace(
                 Gubn2Code))
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "구분#2 코드를 선택해주세요.",
                     "확인");
 
@@ -599,7 +599,7 @@ public partial class Frm1500ViewModel
 
             if (result <= 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "구분#2 삭제 대상이 없습니다.",
                     "오류");
 
@@ -610,13 +610,13 @@ public partial class Frm1500ViewModel
             await RefreshGubn2();
 
 
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 "구분#2 삭제 완료",
                 "완료");
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"구분#2 삭제 실패: {ex.Message}",
                 "오류");
         }
@@ -659,7 +659,7 @@ public partial class Frm1500ViewModel
 
             if (result <= 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "구분#3 등록 실패",
                     "오류");
 
@@ -670,13 +670,13 @@ public partial class Frm1500ViewModel
             await RefreshGubn3();
 
 
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 "구분#3 등록 완료",
                 "완료");
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"구분#3 등록 실패: {ex.Message}",
                 "오류");
         }
@@ -719,7 +719,7 @@ public partial class Frm1500ViewModel
 
             if (result <= 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "구분#3 수정 대상이 없습니다.",
                     "오류");
 
@@ -730,13 +730,13 @@ public partial class Frm1500ViewModel
             await RefreshGubn3();
 
 
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 "구분#3 수정 완료",
                 "완료");
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"구분#3 수정 실패: {ex.Message}",
                 "오류");
         }
@@ -755,7 +755,7 @@ public partial class Frm1500ViewModel
             if (string.IsNullOrWhiteSpace(
                 Gubn3Code))
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "구분#3 코드를 선택해주세요.",
                     "확인");
 
@@ -780,7 +780,7 @@ public partial class Frm1500ViewModel
 
             if (result <= 0)
             {
-                _dialog.ShowMessage(
+                _dialog.ShowWarning(
                     "구분#3 삭제 대상이 없습니다.",
                     "오류");
 
@@ -791,13 +791,13 @@ public partial class Frm1500ViewModel
             await RefreshGubn3();
 
 
-            _dialog.ShowMessage(
+            _dialog.ShowInfo(
                 "구분#3 삭제 완료",
                 "완료");
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"구분#3 삭제 실패: {ex.Message}",
                 "오류");
         }
@@ -943,7 +943,7 @@ public partial class Frm1500ViewModel
         if (string.IsNullOrWhiteSpace(
             code))
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"{title} 코드를 입력해주세요.",
                 "확인");
 
@@ -954,7 +954,7 @@ public partial class Frm1500ViewModel
         if (string.IsNullOrWhiteSpace(
             name))
         {
-            _dialog.ShowMessage(
+            _dialog.ShowWarning(
                 $"{title} 구분명을 입력해주세요.",
                 "확인");
 

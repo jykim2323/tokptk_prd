@@ -145,7 +145,7 @@ public partial class Frm6300ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage($"조회 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"조회 실패: {ex.Message}", "오류");
         }
     }
 
@@ -176,22 +176,22 @@ public partial class Frm6300ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage($"조회 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"조회 실패: {ex.Message}", "오류");
         }
     }
 
     [RelayCommand]
-    private async Task ExportExcel()
+    private async Task ExportExcel(DataGrid? grid)
     {
         try
         {
-            if (Items.Count == 0) { _dialog.ShowMessage("저장할 데이터가 없습니다.", "안내"); return; }
-            if (_excel.Export(Items, "재고집계자료조회"))
-                _dialog.ShowMessage("엑셀로 저장되었습니다.", "완료");
+            if (Items.Count == 0) { _dialog.ShowInfo("저장할 데이터가 없습니다.", "안내"); return; }
+            if (_excel.Export(Items, "재고집계자료조회", grid: grid))
+                _dialog.ShowInfo("엑셀로 저장되었습니다.", "완료");
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage($"조회 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"조회 실패: {ex.Message}", "오류");
         }
     }
 
@@ -203,10 +203,8 @@ public partial class Frm6300ViewModel : DocumentViewModelBase
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage($"조회 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"조회 실패: {ex.Message}", "오류");
         }
     }
 
-    [RelayCommand]
-    private void Close(Window? window) => window?.Close();
 }

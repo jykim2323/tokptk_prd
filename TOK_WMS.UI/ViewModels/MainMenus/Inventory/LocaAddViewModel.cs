@@ -69,19 +69,19 @@ public partial class LocaAddViewModel : ObservableObject
 
             if (string.IsNullOrEmpty(SubkCode))
             {
-                _dialog.ShowMessage($" 품번코드를 입력 하세요.", "오류");
+                _dialog.ShowWarning($" 품번코드를 입력 하세요.", "오류");
                 return;
             }
 
             if (string.IsNullOrEmpty(SubkLotno))
             {
-                _dialog.ShowMessage($" LOT-NO 입력 하세요.", "오류");
+                _dialog.ShowWarning($" LOT-NO 입력 하세요.", "오류");
                 return;
             }
 
             if (string.IsNullOrEmpty(SubkWgt))
             {
-                _dialog.ShowMessage($" 재고 수량을 입력 하세요.", "오류");
+                _dialog.ShowWarning($" 재고 수량을 입력 하세요.", "오류");
                 return;
             }
 
@@ -92,7 +92,7 @@ public partial class LocaAddViewModel : ObservableObject
 
             if(int.Parse(SubkWgt) < int.Parse(SubkRwgt))
             {
-                _dialog.ShowMessage($" 예약 중량이 재고 중량보다 클 수 없습니다....", "오류");
+                _dialog.ShowWarning($" 예약 중량이 재고 중량보다 클 수 없습니다....", "오류");
                 return;
             }
 
@@ -108,7 +108,7 @@ public partial class LocaAddViewModel : ObservableObject
 
             if (!result)
             {
-                _dialog.ShowMessage($" 해당 PLT-NO 에 동일 품목/LOT가 이미 등록되어 있습니다. \n PLT-NO : {SubkPltno} 품번: {SubkCode} LOT-NO : {SubkLotno}", "오류");
+                _dialog.ShowWarning($" 해당 PLT-NO 에 동일 품목/LOT가 이미 등록되어 있습니다. \n PLT-NO : {SubkPltno} 품번: {SubkCode} LOT-NO : {SubkLotno}", "오류");
                 return;
             }
 
@@ -131,15 +131,15 @@ public partial class LocaAddViewModel : ObservableObject
             
             if (!await _locaAddApi.ConfirmedAsync(req))
             {
-                _dialog.ShowMessage($"저장 실패", "오류");
+                _dialog.ShowWarning($"저장 실패", "오류");
                 return;
             }
 
-            _dialog.ShowMessage($"저장위치: {SubkLoca} 를 등록 하였습니다..! ", "확인");
+            _dialog.ShowInfo($"저장위치: {SubkLoca} 를 등록 하였습니다..! ", "확인");
         }
         catch (Exception ex)
         {
-            _dialog.ShowMessage($"수정 실패: {ex.Message}", "오류");
+            _dialog.ShowWarning($"수정 실패: {ex.Message}", "오류");
         }
     }
 

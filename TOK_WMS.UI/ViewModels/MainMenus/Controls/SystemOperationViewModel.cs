@@ -165,7 +165,7 @@ public partial class SystemOperationViewModel : DocumentViewModelBase
         if (!int.TryParse(InboundCrane.Trim(), out var inboundCrane)
             || inboundCrane is < 1 or > 7)
         {
-            _dialog.ShowMessage("입고호기는 1에서 7 사이로 입력해 주세요.", "입력 확인");
+            _dialog.ShowWarning("입고호기는 1에서 7 사이로 입력해 주세요.", "입력 확인");
             return;
         }
 
@@ -228,7 +228,7 @@ public partial class SystemOperationViewModel : DocumentViewModelBase
         {
             IsConnected = false;
             StatusMessage = $"수정 실패: {ex.Message}";
-            _dialog.ShowMessage(StatusMessage, "오류");
+            _dialog.ShowWarning(StatusMessage, "오류");
         }
         finally
         {
@@ -262,7 +262,7 @@ public partial class SystemOperationViewModel : DocumentViewModelBase
             || !long.TryParse(normalized, out value)
             || value < 0)
         {
-            _dialog.ShowMessage($"{label}은 0 이상 18자리 이하의 숫자로 입력해 주세요.", "입력 확인");
+            _dialog.ShowWarning($"{label}은 0 이상 18자리 이하의 숫자로 입력해 주세요.", "입력 확인");
             return false;
         }
 
